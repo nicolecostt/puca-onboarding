@@ -13,7 +13,8 @@
     "bench:turn": "tsx server/bench/turn-latency.ts",
     "precompute": "tsx server/scripts/precompute.ts",
     "dev:server": "tsx watch server/src/server.ts",
-    "start": "tsx server/src/server.ts"
+    "start": "tsx server/src/server.ts",
+    "check": "npm run typecheck && npm test && vite build"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

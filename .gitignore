@@ -4,8 +4,12 @@
 # testes locais (agente azul etc.): não comitar
 sandbox/
 
-# instruções locais do Claude
-.claude/
+# Claude: o que é da equipe vai pro git (skills, agentes, permissões comuns); o resto é pessoal
+.claude/*
+!.claude/skills/
+!.claude/agents/
+!.claude/settings.json
+CLAUDE.local.md
 
 # dependências e build
 node_modules/
