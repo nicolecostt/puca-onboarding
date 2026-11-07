@@ -1,0 +1,117 @@
+/* Quadro da aula: nós, arestas, destaques, pulso de fluxo e cartão do nó.
+   Usa os mesmos tons das outras telas (fundo claro, traço fino, Inter). */
+.board{
+  --b-fg:#171717;
+  --b-muted:#737373;
+  --b-faint:#a3a3a3;
+  --b-line:#e5e5e5;
+  --b-surface:#fff;
+  --b-edge:#c9c9c9;
+  --b-focus:#3f8cec;
+  --b-warn:#e0821e;
+  --b-ok:#26911c;
+  position:relative;width:100%;height:100%;
+  background:
+    radial-gradient(circle at 1px 1px, #e3e3e3 1px, transparent 0) 0 0 / 24px 24px,
+    #fafafa;
+  border:1px solid var(--b-line);border-radius:20px;overflow:hidden;
+}
+.board__svg{display:block;width:100%;height:100%;font-family:Inter, ui-sans-serif, system-ui, sans-serif}
+.board__title{
+  position:absolute;left:20px;top:16px;margin:0;z-index:1;
+  font-size:12px;font-weight:500;letter-spacing:.02em;color:var(--b-muted);
+}
+
+/* ---------- Nós ---------- */
+.bnode{transition:opacity .45s ease}
+.bnode__inner{transform-box:fill-box;transform-origin:center;transition:transform .45s cubic-bezier(.2,.8,.2,1), opacity .45s ease}
+.bnode[data-state="hidden"]{opacity:0;pointer-events:none}
+.bnode[data-state="hidden"] .bnode__inner{transform:scale(.86)}
+.bnode[data-state="shown"]{transition-delay:var(--delay,0ms)}
+.bnode[data-state="shown"] .bnode__inner{transition-delay:var(--delay,0ms)}
+.bnode__box{fill:var(--b-surface);stroke:var(--b-line);stroke-width:1.2;filter:drop-shadow(0 6px 14px rgba(0,0,0,.05));transition:stroke .25s ease, stroke-width .25s ease, fill .25s ease}
+.bnode__accent{fill:var(--accent,#171717)}
+.bnode__label{font-size:15px;font-weight:600;fill:var(--b-fg);letter-spacing:-.15px}
+.bnode__sub{font-size:11.5px;fill:var(--b-muted)}
+
+.bnode[data-kind="frontend"]{--accent:#3f8cec}
+.bnode[data-kind="service"]{--accent:#171717}
+.bnode[data-kind="db"]{--accent:#7c5cd6}
+.bnode[data-kind="external"]{--accent:#a3a3a3}
+.bnode[data-kind="queue"]{--accent:#e0821e}
+.bnode[data-kind="person"]{--accent:#26911c}
+.bnode[data-kind="team"]{--accent:#171717}
+.bnode[data-kind="value"]{--accent:#d6336c}
+.bnode[data-kind="doc"]{--accent:#737373}
+.bnode[data-kind="task"]{--accent:#f1692e}
+.bnode[data-kind="external"] .bnode__box{stroke-dasharray:5 4}
+
+/* destaque: quem tem tom fica forte, o resto esmaece */
+.board.has-highlight .bnode[data-state="shown"]:not([data-tone]),
+.board.has-highlight .bedge[data-state="shown"]:not([data-tone]){opacity:.32}
+.bnode[data-tone] .bnode__box{stroke-width:2.4}
+.bnode[data-tone="focus"] .bnode__box{stroke:var(--b-focus);fill:#f3f8fe}
+.bnode[data-tone="warn"] .bnode__box{stroke:var(--b-warn);fill:#fdf6ee}
+.bnode[data-tone="ok"] .bnode__box{stroke:var(--b-ok);fill:#f2f9f1}
+
+/* modo de escolha (passo "select") */
+.board.is-selecting .bnode[data-state="shown"]{cursor:pointer}
+.board.is-selecting .bnode[data-state="shown"]:hover .bnode__box,
+.board.is-selecting .bnode[data-state="shown"]:focus-visible .bnode__box{stroke:var(--b-fg);stroke-width:2}
+.bnode:focus{outline:none}
+.board.is-selecting .bnode[data-state="shown"]:focus-visible .bnode__box{stroke-dasharray:4 3}
+
+/* ---------- Arestas ---------- */
+.bedge{transition:opacity .4s ease}
+.bedge[data-state="hidden"]{opacity:0}
+.bedge__path{fill:none;stroke:var(--b-edge);stroke-width:1.6;transition:stroke-dashoffset .8s ease var(--delay,0ms), stroke .25s ease}
+.bedge__label{font-size:11px;fill:var(--b-muted);paint-order:stroke;stroke:#fafafa;stroke-width:5px;stroke-linejoin:round}
+.bedge[data-tone] .bedge__path{stroke-width:2.4}
+.bedge[data-tone="focus"] .bedge__path{stroke:var(--b-focus)}
+.bedge[data-tone="warn"] .bedge__path{stroke:var(--b-warn)}
+.bedge[data-tone="ok"] .bedge__path{stroke:var(--b-ok)}
+.board__arrow--base{fill:var(--b-edge)}
+.board__arrow--focus{fill:var(--b-focus)}
+.board__arrow--warn{fill:var(--b-warn)}
+.board__arrow--ok{fill:var(--b-ok)}
+
+/* pulso que percorre o caminho (ação "flow") */
+.board__pulse{fill:var(--b-focus);opacity:0;transition:opacity .2s ease;filter:drop-shadow(0 0 6px rgba(63,140,236,.6))}
+.board__pulse.is-on{opacity:1}
+
+/* ---------- Cartão do nó ---------- */
+.board__card{
+  position:absolute;left:0;top:0;z-index:2;width:300px;max-width:calc(100% - 16px);
+  padding:14px 16px 16px;border-radius:14px;
+  background:var(--b-surface);border:1px solid var(--b-line);
+  box-shadow:0 24px 48px rgba(0,0,0,.08),0 8px 16px rgba(0,0,0,.05);
+  font-size:13px;line-height:1.5;color:var(--b-fg);
+  opacity:0;transition:opacity .25s ease; /* posição vem do JS a cada quadro: sem transição no transform */
+}
+.board__card.is-in{opacity:1}
+.bcard__head{display:grid;grid-template-columns:1fr auto;align-items:start;gap:2px 8px;margin-bottom:6px}
+.bcard__kind{grid-column:1;font-size:11px;font-weight:500;color:var(--b-muted);text-transform:uppercase;letter-spacing:.05em}
+.bcard__title{grid-column:1;margin:0;font-size:16px;font-weight:600;letter-spacing:-.16px}
+.bcard__close{
+  grid-column:2;grid-row:1 / span 2;width:28px;height:28px;border:0;border-radius:8px;
+  background:transparent;color:var(--b-muted);font:18px/1 Inter, sans-serif;cursor:pointer;
+}
+.bcard__close:hover{background:#f2f2f2;color:var(--b-fg)}
+.bcard__close:focus-visible{outline:2px solid var(--b-fg);outline-offset:1px}
+.bcard__role{margin:0 0 10px;color:#404040}
+.bcard__facts{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:0 0 10px}
+.bcard__facts dt{color:var(--b-muted)}
+.bcard__facts dd{margin:0;font-weight:500}
+.bcard__unconfirmed{margin:0 0 10px;padding:8px 10px;border-radius:10px;background:#fdf6ee;color:#8a4b0f}
+.bcard__adr{display:flex;flex-direction:column;gap:2px;margin:0 0 10px;padding:10px;border-radius:10px;background:#f6f6f6}
+.bcard__adr p{margin:2px 0 4px;color:#404040}
+.bcard__adr-id{font-size:11px;font-weight:600;color:var(--b-focus)}
+.bcard__list{margin:0 0 10px;padding-left:18px}
+.bcard__list li{margin:2px 0}
+.bcard__docs{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.bcard__doc{padding:2px 8px;border-radius:999px;background:#f2f2f2;font-size:12px}
+.bcard__muted{font-size:12px;color:var(--b-muted)}
+
+@media (prefers-reduced-motion:reduce){
+  .bnode,.bnode__inner,.bedge,.bedge__path,.board__card{transition:none}
+}
