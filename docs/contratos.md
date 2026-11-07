@@ -12,7 +12,7 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/ask`, `/api/voice/token` | `src/voice/agent-voice.ts`, `screens/lesson` | `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
-| Visual da Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `sandbox/puca-teste.ts` (local) | `tsc` |
+| Visual da Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `src/lib/puca-sphere.ts` | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
 
 ## Contratos que vão surgir

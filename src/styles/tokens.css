@@ -44,6 +44,12 @@
   --color-puca: #d83995; /* cursor da Puca mexendo na tela */
   --color-puca-text: #ffffff;
 
+  /* esfera da Puca (src/lib/puca-sphere.ts): só #rrggbb, o canvas lê estes valores */
+  --puca-sphere-dot: #807c7a;
+  --puca-sphere-accent: #b04a30;
+  --puca-sphere-warm: #d63a2c;
+  --puca-sphere-core: #1e1e1e;
+
   --color-highlight: rgba(250, 204, 21, 0.35); /* trecho sendo falado / foco no quadro */
 
   /* ---- Formas ---- */
