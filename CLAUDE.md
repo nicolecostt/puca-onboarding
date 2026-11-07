@@ -28,7 +28,7 @@ Antes de dizer que terminou: `npm run check` (ou, no mínimo, `npm run typecheck
 
 ## Prioridade no hackathon
 
-O critério de tudo é a demo: call inicial → trilha → aula no quadro → verificação de compreensão → task → progresso,
+O critério de tudo é a demo: call inicial → jornada → aula no quadro → verificação de compreensão → primeira tarefa → progresso,
 mais uma pergunta que muda o rumo e uma dúvida que vira encaminhamento ([`docs/demo.md`](docs/demo.md)).
 Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o fluxo. Label `se-der-tempo` fica por último.
 

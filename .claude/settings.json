@@ -28,12 +28,15 @@
     "deny": [
       "Bash(git push --force *)",
       "Bash(git push -f *)",
+      "Bash(git push *--force*)",
+      "Bash(git push * -f*)",
       "Bash(git reset --hard *)",
       "Bash(git clean *)",
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./server/.env)",
-      "Read(./server/.env.*)"
+      "Read(./server/.env.local)",
+      "Read(./server/.env.*.local)"
     ]
   },
   "hooks": {

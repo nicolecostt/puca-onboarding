@@ -16,8 +16,8 @@ ultimo=$(cat "$MARCA" 2>/dev/null || echo 0)
 if [ "$1" != "--agora" ] && [ $((agora - ultimo)) -lt "$INTERVALO" ]; then exit 0; fi
 echo "$agora" > "$MARCA"
 
-# só caracteres seguros de caminho/login: letras, números, . _ - / @ + espaço e acentos comuns
-limpa() { LC_ALL=C tr -cd '[:alnum:]._/@+ \n-' ; }
+# tira caracteres de controle (escapes de terminal etc.) e mantém o resto, inclusive letras acentuadas
+limpa() { LC_ALL=C tr -d '\000-\011\013-\037\177' ; }
 linha() { printf '%s\n' "$*"; }
 
 git fetch --quiet origin 2>/dev/null || { linha "[sync] não consegui fazer git fetch (sem rede?). Não sei se a main andou."; exit 0; }
@@ -48,6 +48,7 @@ fi
 # PRs abertos de outras pessoas mexendo nos mesmos arquivos (sem título: é texto livre de terceiros)
 if command -v gh >/dev/null 2>&1 && [ -n "$meus" ]; then
   while IFS= read -r -d '' bloco; do
+    bloco=${bloco#$'\n'}   # o gh põe uma quebra de linha depois de cada PR; sem isso, só o 1º PR era lido
     num=$(cut -f1 <<<"$bloco" | head -1 | tr -cd '0-9')
     autor=$(cut -f2 <<<"$bloco" | head -1 | LC_ALL=C tr -cd '[:alnum:]-' | cut -c1-39)
     cabeca=$(cut -f3 <<<"$bloco" | head -1)
