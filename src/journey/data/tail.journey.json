@@ -768,7 +768,8 @@
             }
           ]
         }
-      ]
+      ],
+      "knowledge": "A Tail tem três áreas: Produto, Engenharia e Pessoas. Os valores ficam no Notion, na página Nossos valores."
     },
     {
       "id": "seu-time",
@@ -886,7 +887,8 @@
             }
           ]
         }
-      ]
+      ],
+      "knowledge": "A daily é todo dia às 9h30 e dura 15 minutos. A planning é na segunda às 10h e a retro é a cada duas semanas. A Paula tem 30 minutos com você toda sexta. O canal do time no Slack é o #time-terminais."
     },
     {
       "id": "pagamentos",
@@ -896,7 +898,7 @@
         "mode": "board",
         "board": "pagamentos"
       },
-      "knowledge": "O MDR é 1,19% no débito e 2,49% no crédito à vista. Se o settlement-worker cair, as vendas ficam esperando na fila transactions.authorized e nada se perde.",
+      "knowledge": "O MDR é 1,19% no débito e 2,49% no crédito à vista; o cálculo do MDR fica no authorizer, no módulo fees/mdr, com uma tabela por plano do lojista, e quem conhece os detalhes é a Júlia Paiva. Se o settlement-worker cair, nada se perde: as vendas ficam esperando na fila transactions.authorized e ele continua de onde parou quando volta. O dono do pos-gateway e do authorizer é o time de Autorização, com o Diego e a Júlia; o dono do settlement-worker é a Liquidação, com o Rafa, e a Carla é a referência.",
       "steps": [
         {
           "id": "pg-pos",
@@ -1208,7 +1210,8 @@
             }
           ]
         }
-      ]
+      ],
+      "knowledge": "A settlement.dlq guarda as mensagens que falharam três vezes, e alguém da Liquidação olha uma por uma. Antes de mandar para a DLQ, o settlement-worker tenta de novo três vezes."
     },
     {
       "id": "quem-cuida",
@@ -1391,7 +1394,8 @@
             }
           ]
         }
-      ]
+      ],
+      "knowledge": "A tarefa mexe só no terminal-config-api: a validação da versão mínima de firmware e os testes. O README do terminal-config-api explica o fluxo de configuração das maquininhas. O Lucas Melo revisa a mudança."
     },
     {
       "id": "encerramento",

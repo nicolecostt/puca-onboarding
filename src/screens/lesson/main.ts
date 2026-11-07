@@ -6,13 +6,14 @@ import "../../styles/base.css";
 import "./style.css";
 import demo from "../../journey/data/tail.journey.json";
 import { loadJourney } from "../../journey/validate";
-import { createRunner, type RunnerIO } from "../../journey/runner";
+import { createRunner, type Runner, type RunnerIO } from "../../journey/runner";
+import { answerFromKnowledge, findJump } from "../../journey/intent";
 import { createClock, Cancelled } from "../../journey/clock";
 import { mountWhiteboard, type Whiteboard } from "../../components/whiteboard/whiteboard";
 import { whiteboardFromJourney } from "../../components/whiteboard/from-journey";
-import { normalize } from "../../journey/conditions";
+import { matchReply, normalize } from "../../journey/conditions";
 import { interpolateDeep, resolveProfile } from "../../journey/profile";
-import type { Profile, Step, Vinculo } from "../../journey/types";
+import type { Moment, Profile, Step, Vinculo } from "../../journey/types";
 import { mountAppHeader } from "../../components/app-header/app-header";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
@@ -91,7 +92,10 @@ async function main(): Promise<void> {
   let currentStep: Step | null = null;
 
   // Resposta pendente: resposta sugerida, chat ou clique no quadro resolvem.
-  let pending: { kind: "reply" | "select"; resolve: (v: string) => void; reject: (e: Error) => void } | null = null;
+  let pending: { kind: "reply" | "select"; resolve: (v: string) => void; reject: (e: Error) => void; replies?: string[] } | null = null;
+  let runner: Runner | null = null;
+  let running = false;
+  let currentMoment: Moment | null = null;
 
   // ---- Estado visível ----
   function setAgent(s: AgentState): void {
@@ -166,20 +170,49 @@ async function main(): Promise<void> {
     pickNode(id, label);
   }
 
+  /** Interrompe o que a Puca está fazendo (fala, espera de resposta ou de clique) para pular de momento. */
+  function interrupt(): void {
+    clock.interrupt();
+    const p = pending;
+    pending = null;
+    el.replies.replaceChildren();
+    board?.setSelectable(false);
+    p?.reject(new Cancelled());
+  }
+
+  // Mensagem da pessoa no chat. Ordem: pedido para mudar de assunto → resposta sugerida → nome de um
+  // item do quadro → pergunta que o conhecimento responde → resposta livre → dúvida anotada para a buddy.
   document.addEventListener("chatpanel:send", (e) => {
     const text = e.detail.text.trim();
     if (!text) return;
-    if (pending?.kind === "reply") return answer(text, "chat");
+    const isReply = pending?.kind === "reply" && matchReply(text, pending.replies ?? []) !== null;
+
+    const jump = running && !isReply ? findJump(text, journey, currentMoment?.id) : null;
+    if (jump && runner?.jumpTo(jump.id)) {
+      chat.addMessage({ from: "agent", text: `Claro, vamos para ${jump.title.toLowerCase()}.` });
+      interrupt();
+      return;
+    }
+    if (isReply) return answer(text, "chat");
     if (pending?.kind === "select") {
       // escreveu o nome de um item do quadro em vez de tocar nele
       const said = normalize(text);
       const hit = journey.boards[currentBoard ?? ""]?.nodes.find((n) => said.includes(normalize(n.label)) || said.includes(normalize(n.id)));
       if (hit) return pickNode(hit.id, text);
     }
-    // O roteiro é fixo nesta versão: a pergunta fica anotada (§4.5, encaminhamento para uma pessoa).
+    // pergunta: o conhecimento do momento atual primeiro, depois o da aula toda (sem chutar)
+    const known =
+      answerFromKnowledge(text, currentStep, currentMoment) ??
+      journey.moments.map((m) => answerFromKnowledge(text, null, m)).find((a): a is string => !!a);
+    if (known) {
+      chat.addMessage({ from: "agent", text: known });
+      return;
+    }
+    if (pending?.kind === "reply") return answer(text, "chat");
+    // sem fonte confiável: a dúvida fica anotada (§4.5, encaminhamento para uma pessoa)
     chat.addMessage({
       from: "agent",
-      text: "Anotei a sua pergunta. Nesta versão eu sigo o roteiro da aula, mas ela fica registrada para a sua buddy responder.",
+      text: "Não achei isso confirmado na documentação, então não quero chutar. Anotei a sua pergunta para a sua buddy responder.",
     });
   });
 
@@ -257,7 +290,7 @@ async function main(): Promise<void> {
     listen(replies) {
       setAgent("listening");
       return new Promise<string>((resolve, reject) => {
-        pending = { kind: "reply", resolve, reject };
+        pending = { kind: "reply", resolve, reject, replies };
         showReplies(replies);
         if (auto && replies.length) void clock.wait(2200).then(() => answer(replies[0], "auto"), () => {});
       }).then(async (text) => {
@@ -275,6 +308,7 @@ async function main(): Promise<void> {
       });
     },
     onMoment(m) {
+      currentMoment = m;
       el.moment.textContent = m.title;
       emit("journey:moment", { id: m.id, title: m.title });
     },
@@ -297,7 +331,10 @@ async function main(): Promise<void> {
     try {
       setAgent("thinking");
       await clock.wait(600);
-      await createRunner(journey, profile, io).run();
+      runner = createRunner(journey, profile, io);
+      running = true;
+      await runner.run();
+      running = false;
       setAgent("done");
       el.moment.textContent = "aula completa";
       showReplies(["Recomeçar a aula"]);
