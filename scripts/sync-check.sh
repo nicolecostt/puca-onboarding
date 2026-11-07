@@ -16,8 +16,9 @@ ultimo=$(cat "$MARCA" 2>/dev/null || echo 0)
 if [ "$1" != "--agora" ] && [ $((agora - ultimo)) -lt "$INTERVALO" ]; then exit 0; fi
 echo "$agora" > "$MARCA"
 
-# tira caracteres de controle (escapes de terminal etc.) e mantém o resto, inclusive letras acentuadas
-limpa() { LC_ALL=C tr -d '\000-\011\013-\037\177' ; }
+# lista de permitidos, linha a linha: letras (com acento), números, . _ / @ + - e espaço.
+# Linha com qualquer outro caractere (controle, bidi, largura zero) é descartada inteira.
+limpa() { perl -CSD -ne 'print if /\A[\p{L}\p{N}._\/\@+ -]+\n?\z/' ; }
 linha() { printf '%s\n' "$*"; }
 
 git fetch --quiet origin 2>/dev/null || { linha "[sync] não consegui fazer git fetch (sem rede?). Não sei se a main andou."; exit 0; }
