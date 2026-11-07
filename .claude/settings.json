@@ -36,7 +36,11 @@
       "Read(./.env.*)",
       "Read(./server/.env)",
       "Read(./server/.env.local)",
-      "Read(./server/.env.*.local)"
+      "Read(./server/.env.*.local)",
+      "Read(./server/.env.production)",
+      "Read(./server/.env.development)",
+      "Read(./server/.env.test)",
+      "Read(./server/.env.staging)"
     ]
   },
   "hooks": {
