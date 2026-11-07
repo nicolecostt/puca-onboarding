@@ -301,6 +301,67 @@
   color: var(--color-muted);
 }
 
+.wb-pop__warn {
+  margin-top: 8px !important;
+  padding: 6px 8px;
+  border: 1px dashed var(--color-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+.wb-pop__list {
+  margin: 8px 0 0;
+  padding-left: 16px;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+/* ---- Destaque (a Puca chamando atenção): quem tem tom fica forte, o resto apaga ---- */
+.wb--highlight .wb-node.is-shown:not([class*="tone-"]),
+.wb--highlight .wb-edge.is-shown:not([class*="tone-"]),
+.wb--highlight .wb-label.is-shown:not([class*="tone-"]),
+.wb--highlight .wb-badge.is-shown:not([class*="tone-"]) {
+  opacity: 0.3;
+}
+.wb-node.tone-focus {
+  border-color: var(--color-info);
+  background: var(--color-info-bg);
+}
+.wb-node.tone-warn {
+  border-color: var(--color-warning);
+  background: var(--color-warning-bg);
+}
+.wb-node.tone-ok {
+  border-color: var(--color-success-strong);
+  background: var(--color-success-bg);
+}
+.wb-edge.tone-focus path {
+  stroke: var(--color-info);
+}
+.wb-edge.tone-warn path {
+  stroke: var(--color-warning);
+}
+.wb-edge.tone-ok path {
+  stroke: var(--color-success-strong);
+}
+
+/* ---- Pulso que percorre o caminho ---- */
+.wb-pulse {
+  fill: var(--color-info);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  filter: drop-shadow(0 0 6px rgba(25, 113, 194, 0.5));
+}
+.wb-pulse.is-on {
+  opacity: 1;
+}
+
+/* ---- Modo de escolha (checagem): nós visíveis viram alvos ---- */
+.wb--selecting .wb-node.is-shown:hover {
+  box-shadow: 0 0 0 6px var(--color-highlight), var(--shadow-sketch);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .wb-node,
   .wb-label,
