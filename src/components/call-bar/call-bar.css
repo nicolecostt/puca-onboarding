@@ -1,0 +1,106 @@
+/* Barra de call flutuante (Figma: "Session control bar", nó 24:54).
+   Fica fixa na base da tela, por cima de qualquer conteúdo. */
+.call-dock{
+  position:fixed;left:50%;bottom:18px;z-index:1000;
+  transform:translateX(-50%);
+  display:grid;justify-items:center;align-items:end;
+  font-family:"Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+/* Arrastável: depois de mover, a posição vira left/top em px (definidos pelo JS) */
+.call-dock{user-select:none;-webkit-user-select:none;touch-action:none}
+.call-dock.is-placed{bottom:auto;transform:none}
+.call-bar,.call-redial{cursor:grab}
+.call-dock.is-dragging,.call-dock.is-dragging *{cursor:grabbing !important}
+.call-dock.is-dragging .call-bar,.call-dock.is-dragging .call-redial{
+  filter:drop-shadow(0 16px 20px rgba(0,0,0,.10)) drop-shadow(0 6px 8px rgba(0,0,0,.06));
+}
+
+/* barra e botão de ligar ocupam o mesmo lugar; um some quando o outro aparece */
+.call-live,.call-redial{grid-area:1/1;transition:opacity .22s ease, transform .22s ease}
+.call-live{display:flex;flex-direction:column;align-items:center}
+.call-dock.is-ended .call-live{opacity:0;transform:translateY(12px) scale(.96);pointer-events:none}
+.call-dock:not(.is-ended) .call-redial{opacity:0;transform:translateY(12px) scale(.96);pointer-events:none}
+
+/* Botão que fica na tela depois de encerrar, para ligar de novo */
+.call-redial{
+  all:unset;box-sizing:border-box;cursor:pointer;margin-bottom:9px;
+  display:flex;align-items:center;gap:10px;padding:8px 18px 8px 8px;
+  background:#fff;border:1px solid #e5e5e5;border-radius:999px;
+  filter:drop-shadow(0 8px 8px rgba(0,0,0,.05)) drop-shadow(0 4px 4px rgba(0,0,0,.05)) drop-shadow(0 2px 2px rgba(0,0,0,.05));
+  font-size:13px;line-height:19.5px;font-weight:500;letter-spacing:-.13px;color:#171717;white-space:nowrap;
+}
+.call-redial:hover .call-redial__icon{background:#1f7a17}
+.call-redial:active{transform:scale(.97)}
+.call-redial:focus-visible{outline:2px solid #171717;outline-offset:3px}
+.call-redial__icon{
+  display:flex;align-items:center;justify-content:center;
+  width:40px;height:36px;border-radius:999px;background:#26911c;transition:background-color .15s ease;
+}
+
+/* Linha de status acima da barra ("Clicking “Compare plans”…") */
+.call-status{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 0 10px;
+  font-size:12px;line-height:18px;font-style:italic;color:#737373;white-space:nowrap;
+}
+.call-status:empty{display:none}
+.call-status::before{
+  content:"";width:6px;height:6px;border-radius:3px;background:#26911c;opacity:.44;flex:none;
+}
+
+.call-bar{
+  display:flex;align-items:center;gap:10px;padding:8px 21px;
+  background:#fff;border:1px solid #e5e5e5;border-radius:999px;
+  filter:drop-shadow(0 8px 8px rgba(0,0,0,.05)) drop-shadow(0 4px 4px rgba(0,0,0,.05)) drop-shadow(0 2px 2px rgba(0,0,0,.05));
+}
+
+.call-btn{
+  all:unset;box-sizing:border-box;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex:none;
+  height:36px;width:44px;border-radius:999px;
+  transition:background-color .15s ease, transform .1s ease;
+}
+.call-btn:hover{background:#f5f5f5}
+.call-btn:active{transform:scale(.94)}
+.call-btn:focus-visible{outline:2px solid #171717;outline-offset:2px}
+.call-btn[aria-pressed="true"]{background:#ededed}
+.call-btn img{display:block}
+
+/* Chat: o asset já traz o estado (fechado = ponto de não lido, aberto = fundo cinza) */
+.call-btn--chat[aria-pressed="true"],.call-btn--chat[aria-pressed="true"]:hover{background:none}
+
+/* Encerrar */
+.call-btn--end{width:40px;background:#d12d26}
+.call-btn--end:hover{background:#b8231d}
+
+/* Mic (principal) */
+.call-mic{position:relative;width:56px;height:56px;flex:none}
+.call-mic__ring{
+  position:absolute;left:-12px;top:-12px;width:80px;height:80px;pointer-events:none;
+  transform-origin:center;opacity:0;
+}
+/* Anel só aparece ao clicar no mic: pulso de liga/desliga */
+.call-mic__ring.is-pulsing{animation:call-ring-pulse .5s ease-out}
+@keyframes call-ring-pulse{
+  0%  {opacity:0;transform:scale(.8)}
+  35% {opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1.12)}
+}
+.call-mic__btn{
+  all:unset;box-sizing:border-box;cursor:pointer;
+  position:absolute;left:0;top:0;width:56px;height:56px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  background:#171717;transition:background-color .15s ease, transform .1s ease;
+}
+.call-mic__btn:active{transform:scale(.95)}
+.call-mic__btn:focus-visible{outline:2px solid #171717;outline-offset:3px}
+.call-mic__btn[aria-pressed="true"]{background:#737373}  /* mutado */
+.call-mic__btn[aria-pressed="true"] + .call-mic__slash{opacity:1}
+.call-mic__slash{
+  position:absolute;left:17px;top:27px;width:22px;height:2px;border-radius:2px;
+  background:#fafafa;transform:rotate(-45deg);opacity:0;pointer-events:none;transition:opacity .15s ease;
+}
+@media (prefers-reduced-motion:reduce){
+  .call-live,.call-redial{transition:none}
+  .call-mic__ring.is-pulsing{animation-duration:.01s}
+}
