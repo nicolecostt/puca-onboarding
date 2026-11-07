@@ -21,10 +21,21 @@ index.html               lista das telas (página inicial do npm run dev)
 docs/
   context.md             visão do produto
 src/
+  styles/
+    tokens.css           cores, fontes, raios e sombras (tirados do Figma); mude aqui
+    base.css             tokens + reset; importado por toda tela
+  data/                  dados de exemplo da demo (depois podem vir de uma API)
+    types.ts             formatos: perfil, empresa, jornada, aula, quadro
+    company.ts           Maré Pagamentos, pessoas e etapas da jornada
+    profiles.ts          os dois perfis: ?perfil=bruno (transição) | ?perfil=ana (recém-contratada)
+    lessons/             aulas do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css
     onboarding-call/     call inicial: o agente entrevista a pessoa
+    lesson/              aula no quadro: o quadro se monta junto com a fala
     live-session/        tela de auxílio: barra de call, chat e câmera por cima de uma tela
   components/            peças reutilizáveis (cada uma com .ts, .css e icons/)
+    app-header/          topo do app: logo, empresa, etapas da jornada, pessoa
+    whiteboard/          quadro da aula, desenhado a partir dos dados
     call-bar/            barra de call flutuante (Figma: "Session control bar")
     chat-panel/          chat flutuante (Figma: "Chat (floating window)")
     agent-cam/           "câmera" do agente no canto da tela
@@ -35,6 +46,18 @@ src/
     dom.ts               utilitários de DOM
 sandbox/                 testes locais, fora do git (ex.: visual da Iris)
 ```
+
+## Mudar o visual
+
+- **Cores, fontes, raios, sombras:** `src/styles/tokens.css`. Tudo usa essas variáveis.
+- **Um componente ou tela:** o `.css` ao lado do `.ts`. Pode reescrever à vontade.
+- **Conteúdo** (falas, perguntas, pessoas, perfis): `src/data/`.
+
+## Nova aula no quadro
+
+Crie um arquivo em `src/data/lessons/` no formato de `transaction-path.ts`:
+nós (posição no quadro de 1440×844), setas, e os trechos com o que o agente fala
+(`say`), o que aparece (`reveal`) e o que fica em foco (`focus`).
 
 ## Nova tela
 
