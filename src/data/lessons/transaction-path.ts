@@ -208,15 +208,4 @@ export const transactionPath: Lesson = {
         "O pos-gateway e o authorizer são do time de Autorização, com o Diego e a Júlia. O settlement-worker é da Liquidação, com o Rafa, e a Carla é a referência. O que está embaixo é do seu time novo, com o Lucas.",
     },
   ],
-
-  deeper: [
-    "A maquininha fala com o pos-gateway por uma conexão TLS mútua. Cada terminal tem um certificado próprio, e é pelo serial dele que o gateway sabe de qual lojista é a venda.",
-    "A chave de idempotência evita cobrar duas vezes: se a maquininha reenviar a mesma transação, o gateway reconhece o serial + NSU e devolve a resposta que já tinha dado.",
-    "O settlement-worker processa em lotes por lojista e grava o resultado na tabela de liquidação. A DLQ tem um alerta no canal #liquidacao-alertas.",
-  ],
-  simpler: [
-    "Pensa assim: a maquininha é a porta de entrada. Tudo que acontece depois começa ali.",
-    "O gateway pergunta para o authorizer: posso aprovar essa compra? E quanto o lojista paga de taxa?",
-    "Depois de aprovada, a venda entra numa fila. Alguém pega dessa fila e garante que o lojista receba no dia seguinte.",
-  ],
 };

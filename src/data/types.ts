@@ -127,7 +127,4 @@ export interface Lesson {
   upcoming: string[];
   sections: LessonSection[];
   questions: LessonQuestion[];
-  /** Respostas dos botões "mais fundo" / "mais simples" por trecho. */
-  deeper: string[];
-  simpler: string[];
 }

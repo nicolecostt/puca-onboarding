@@ -1,6 +1,6 @@
 // Aula no quadro: a Puca explica "o caminho de uma transação" e o quadro vai se montando
 // junto com a fala. A pessoa pode perguntar a qualquer momento pelo chat,
-// pedir "mais fundo" / "mais simples" e pausar pela barra de call.
+// e pausar pela barra de call.
 // Por enquanto a fala é simulada (texto dos dados da aula, palavra por palavra).
 import "../../styles/base.css";
 import "./style.css";
@@ -11,7 +11,7 @@ import { mountCallBar } from "../../components/call-bar/call-bar";
 import { mountAgentCam } from "../../components/agent-cam/agent-cam";
 import { loadAgentVisual } from "../../lib/agent-visual";
 import { activeProfile, company, transactionPath, type LessonBeat } from "../../data";
-import { esc, qs, targetEl } from "../../lib/dom";
+import { esc, qs } from "../../lib/dom";
 
 const lesson = transactionPath;
 const profile = activeProfile();
@@ -31,23 +31,13 @@ const el = {
   liveDot: qs(document, "#live-dot"),
   sectionCount: qs(document, "#section-count"),
   voice: qs(document, "#voice"),
-  voiceLabel: qs(document, "#voice-label"),
-  textToggle: qs<HTMLButtonElement>(document, '[data-tweak="text"]'),
 };
 
 qs(document, "#lesson-name").textContent = lesson.title;
-qs(document, "#calib-count").textContent = `${profile.calibration.length} respostas`;
-qs(document, "#calib-list").innerHTML = profile.calibration
-  .map(
-    (c) => `<div class="calib__row"><dt>${esc(c.label)}</dt>
-      <dd><span class="chip${c.tone === "neutral" ? "" : ` chip--${c.tone}`}">${esc(c.value)}</span></dd></div>`,
-  )
-  .join("");
 
 // ---- Estado da aula ----
 const state = { paused: false, ended: false, seconds: 0, done: false, section: 0 };
-type Interrupt = { kind: "question"; question: string } | { kind: "deeper" | "simpler" };
-const interrupts: Interrupt[] = [];
+const questions: string[] = []; // perguntas do chat, respondidas entre um trecho e outro
 
 function renderSection(): void {
   el.sectionCount.textContent = state.done
@@ -59,8 +49,7 @@ type Voice = "talk" | "listen" | "paused";
 function setVoice(v: Voice): void {
   const shown: Voice = state.paused || state.ended ? "paused" : v;
   el.voice.dataset.state = shown;
-  el.voiceLabel.textContent =
-    state.ended ? "Aula pausada" : state.paused ? "Puca pausada" : shown === "talk" ? "Puca falando" : "Puca ouvindo";
+  el.voice.setAttribute("aria-label", state.ended ? "Aula pausada" : state.paused ? "Puca pausada" : shown === "talk" ? "Puca falando" : "Puca ouvindo");
   el.liveDot.classList.toggle("is-off", state.paused || state.ended);
   // câmera acompanha: fala, quieta ouvindo, apagada pausada
   cam.setPaused(state.paused || state.ended);
@@ -117,59 +106,39 @@ async function say(beat: LessonBeat, toChat = true): Promise<void> {
   setVoice("listen");
 }
 
-// ---- Perguntas e ajustes (interrompem a aula entre um trecho e outro) ----
-async function handleInterrupt(it: Interrupt): Promise<void> {
+// ---- Perguntas pelo chat (interrompem a aula entre um trecho e outro) ----
+async function answer(question: string): Promise<void> {
   board.showOwners(false);
-  if (it.kind === "question") {
-    const known = lesson.questions.find((q) => normalize(q.question) === normalize(it.question));
-    el.caption.innerHTML = `<span class="caption__you">Você: ${esc(it.question)}</span>`;
-    cam.setState("think"); // pensa (esquenta) antes de responder
-    await wait(1200);
-    if (known) {
-      if (/dono/.test(known.question)) board.showOwners(true);
-      await say({ say: known.answer, focus: known.focus ?? null });
-    } else {
-      // sem fonte confiável: deixa claro e encaminha para uma pessoa (contexto 4.5)
-      await say({
-        say: `Boa pergunta. Não achei isso confirmado na documentação, então não quero chutar. Vou anotar e perguntar para ${buddy?.name ?? "sua buddy"}, que é sua buddy, e te aviso.`,
-        highlight: "Não achei isso confirmado na documentação",
-        focus: null,
-      });
-    }
+  const known = lesson.questions.find((q) => normalize(q.question) === normalize(question));
+  el.caption.innerHTML = `<span class="caption__you">Você: ${esc(question)}</span>`;
+  cam.setState("think"); // pensa (esquenta) antes de responder
+  await wait(1200);
+  if (known) {
+    if (/dono/.test(known.question)) board.showOwners(true);
+    await say({ say: known.answer, focus: known.focus ?? null });
   } else {
-    const list = it.kind === "deeper" ? lesson.deeper : lesson.simpler;
-    await say({ say: list[Math.min(state.section, list.length - 1)] });
+    // sem fonte confiável: deixa claro e encaminha para uma pessoa (contexto 4.5)
+    await say({
+      say: `Boa pergunta. Não achei isso confirmado na documentação, então não quero chutar. Vou anotar e perguntar para ${buddy?.name ?? "sua buddy"}, que é sua buddy, e te aviso.`,
+      highlight: "Não achei isso confirmado na documentação",
+      focus: null,
+    });
   }
   await wait(1500);
   board.showOwners(false);
 }
 
-async function drainInterrupts(): Promise<void> {
-  while (interrupts.length) {
-    const it = interrupts.shift();
-    if (it) await handleInterrupt(it);
+async function answerPending(): Promise<void> {
+  while (questions.length) {
+    const q = questions.shift();
+    if (q) await answer(q);
   }
 }
 
 document.addEventListener("chatpanel:send", (e) => {
-  interrupts.push({ kind: "question", question: e.detail.text });
-  if (state.done) void drainInterrupts();
+  questions.push(e.detail.text);
+  if (state.done) void answerPending();
 });
-
-document.querySelector(".tweaks")?.addEventListener("click", (e) => {
-  const btn = targetEl(e)?.closest<HTMLButtonElement>("[data-tweak]");
-  if (!btn) return;
-  const tweak = btn.dataset.tweak;
-  if (tweak === "text") {
-    chat.toggle(); // "texto": abre a transcrição para ler e escrever
-    return;
-  }
-  if (tweak === "deeper" || tweak === "simpler") {
-    interrupts.push({ kind: tweak });
-    if (state.done) void drainInterrupts();
-  }
-});
-document.addEventListener("chatpanel:change", (e) => el.textToggle.setAttribute("aria-pressed", String(e.detail.open)));
 
 // ---- Barra de call ----
 document.addEventListener("callbar:pause", (e) => {
@@ -196,12 +165,12 @@ async function run(): Promise<void> {
     state.section = s;
     renderSection();
     for (const beat of lesson.sections[s].beats) {
-      await drainInterrupts();
+      await answerPending();
       await say(beat);
       await wait(1300);
     }
   }
-  await drainInterrupts();
+  await answerPending();
   state.done = true;
   renderSection();
 }
