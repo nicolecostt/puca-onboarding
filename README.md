@@ -54,13 +54,7 @@ sandbox/                 testes locais, fora do git (ex.: visual da Puca)
 
 - **Cores, fontes, raios, sombras:** `src/styles/tokens.css`. Tudo usa essas variáveis.
 - **Um componente ou tela:** o `.css` ao lado do `.ts`. Pode reescrever à vontade.
-- **Conteúdo** (falas, perguntas, pessoas, perfis): `src/data/`.
-
-## Nova aula no quadro
-
-Crie um arquivo em `src/data/lessons/` no formato de `transaction-path.ts`:
-nós (posição no quadro de 1440×844), setas, e os trechos com o que o agente fala
-(`say`), o que aparece (`reveal`) e o que fica em foco (`focus`).
+- **Conteúdo:** pessoas e perfis em `src/data/`; falas e quadros da aula em `src/journey/data/`.
 
 ## Nova tela
 
@@ -80,10 +74,10 @@ document.addEventListener("callbar:pause", (e) => console.log(e.detail.on));
 
 ## Visual da Puca
 
-O visual da Puca (o agente) ainda está em definição. As telas usam um círculo neutro.
+O visual da Puca (a agente) ainda está em definição. As telas usam um círculo neutro.
 Se existir `sandbox/puca-teste.ts` (local, fora do git), ele é carregado no lugar.
 
-## Jornada no quadro
+## Aula no quadro
 
 A tela `src/screens/lesson/` roda uma jornada em JSON (`src/journey/data/`): a Puca fala,
 o quadro vai sendo montado e a pessoa responde pelos botões, pelo chat ou tocando no quadro.
@@ -94,4 +88,6 @@ A conversa ainda é simulada (sem LLM nem voz), e o motor (`src/journey/runner.t
   O recém-contratado passa pela parte institucional; quem está mudando de time pula direto para o time.
 - `?auto=1` responde sozinho, para apresentar sem mexer no mouse.
 
+Para uma aula nova, crie outro `*.journey.json` em `src/journey/data/`: os quadros (nós num espaço de
+1200×700, setas) e os momentos com o que a Puca fala (`line`) e o que acontece no quadro (`actions`).
 Formato completo em [`docs/journey-format.md`](docs/journey-format.md).

@@ -70,7 +70,7 @@ function nodeSize(n: BoardNode): { w: number; h: number } {
   return { w: Math.max(120, Math.round(longest + 36)), h: n.sublabel ? 58 : 44 };
 }
 
-function edgeGeometry(a: NodeView, b: NodeView): { d: string; mid: { x: number; y: number } } {
+function edgeGeometry(a: NodeView, b: NodeView): { d: string; mid: { x: number; y: number }; steep: boolean } {
   const ax = a.data.x, ay = a.data.y, bx = b.data.x, by = b.data.y;
   const dx = bx - ax, dy = by - ay;
   let x1, y1, x2, y2, c1x, c1y, c2x, c2y;
@@ -90,7 +90,9 @@ function edgeGeometry(a: NodeView, b: NodeView): { d: string; mid: { x: number; 
   }
   // ponto do meio da curva cúbica (t = 0,5)
   const mid = { x: (x1 + 3 * c1x + 3 * c2x + x2) / 8, y: (y1 + 3 * c1y + 3 * c2y + y2) / 8 };
-  return { d: `M${x1},${y1} C${c1x},${c1y} ${c2x},${c2y} ${x2},${y2}`, mid };
+  // direção da curva no meio: mais vertical que horizontal → o rótulo vai ao lado, não em cima da linha
+  const steep = Math.abs(x2 + c2x - c1x - x1) < Math.abs(y2 + c2y - c1y - y1);
+  return { d: `M${x1},${y1} C${c1x},${c1y} ${c2x},${c2y} ${x2},${y2}`, mid, steep };
 }
 
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -198,13 +200,15 @@ export function mountBoard(parent: HTMLElement): Board {
     for (const e of spec.edges) {
       const a = nodes.get(e.from), b = nodes.get(e.to);
       if (!a || !b) continue;
-      const { d, mid } = edgeGeometry(a, b);
+      const { d, mid, steep } = edgeGeometry(a, b);
       const g = svg("g", { class: "bedge", "data-id": e.id, "data-state": "hidden" });
       if (e.style) g.dataset.style = e.style;
       const path = svg("path", { class: "bedge__path", d, "marker-end": "url(#arrow-base)" });
       g.appendChild(path);
       if (e.label) {
-        const t = svg("text", { class: "bedge__label", x: mid.x, y: mid.y - 9, "text-anchor": "middle" });
+        const t = steep
+          ? svg("text", { class: "bedge__label", x: mid.x + 12, y: mid.y + 5, "text-anchor": "start" })
+          : svg("text", { class: "bedge__label", x: mid.x, y: mid.y - 9, "text-anchor": "middle" });
         t.textContent = e.label;
         g.appendChild(t);
       }
