@@ -1,29 +1,30 @@
 // Perfil da pessoa: vem da call de entrevista (sessionStorage), da URL (?perfil=)
-// ou de um dos dois perfis de demonstração (§7 do context.md).
+// ou de um dos dois perfis da demo (src/data/profiles.ts, §7 do context.md).
 import { normalize } from "./conditions";
+import { company } from "../data/company";
+import { profiles } from "../data/profiles";
+import type { Profile as DemoProfile } from "../data/types";
 import type { Profile, Vinculo } from "./types";
 
 const STORAGE_KEY = "puca:profile";
 
+/** Os perfis da demo (src/data/profiles.ts) no formato da jornada. */
+export function fromDemoProfile(p: DemoProfile): Profile {
+  return {
+    nome: p.nickname,
+    cargo: p.role,
+    time: p.toTeam,
+    gestor: company.people[p.managerId]?.name,
+    ferramentas: p.tools,
+    aprender: p.learningStyle,
+    vinculo: p.kind === "transfer" ? "transicao" : "novo",
+  };
+}
+
+/** novo = Ana (recém-contratada) · transicao = Bruno (mudando de time). */
 export const DEMO_PROFILES: Record<Vinculo, Profile> = {
-  novo: {
-    nome: "Bruno",
-    cargo: "Engenheiro de backend",
-    time: "TMS — fraud-score",
-    gestor: "Marcos Vidal",
-    ferramentas: "GitHub, Slack e Jira",
-    aprender: "Fazendo junto com alguém",
-    vinculo: "novo",
-  },
-  transicao: {
-    nome: "Camila",
-    cargo: "Engenheira de backend",
-    time: "TMS — fraud-score",
-    gestor: "Marcos Vidal",
-    ferramentas: "GitHub, Slack, Jira e Datadog",
-    aprender: "Vendo alguém fazer",
-    vinculo: "transicao",
-  },
+  novo: fromDemoProfile(profiles.ana),
+  transicao: fromDemoProfile(profiles.bruno),
 };
 
 /** Traduz a resposta livre "é sua primeira vez ou está mudando de time?" para o vínculo. */
@@ -66,13 +67,16 @@ export function loadSavedProfile(): Profile | null {
   }
 }
 
-/** Ordem: ?perfil= na URL → perfil salvo pela entrevista → demo "novo". */
+/** ?perfil= aceita o vínculo (novo | transicao) ou o perfil da demo (ana | bruno). */
+const URL_PROFILES: Record<string, Vinculo> = { novo: "novo", transicao: "transicao", ana: "novo", bruno: "transicao" };
+
+/** Ordem: ?perfil= na URL → perfil salvo pela entrevista → demo do Bruno (mesmo padrão das outras telas). */
 export function resolveProfile(search: string): { profile: Profile; source: "url" | "entrevista" | "demo" } {
-  const fromUrl = new URLSearchParams(search).get("perfil");
-  if (fromUrl === "novo" || fromUrl === "transicao") return { profile: DEMO_PROFILES[fromUrl], source: "url" };
+  const fromUrl = URL_PROFILES[new URLSearchParams(search).get("perfil") ?? ""];
+  if (fromUrl) return { profile: DEMO_PROFILES[fromUrl], source: "url" };
   const saved = loadSavedProfile();
   if (saved) return { profile: saved, source: "entrevista" };
-  return { profile: DEMO_PROFILES.novo, source: "demo" };
+  return { profile: DEMO_PROFILES.transicao, source: "demo" };
 }
 
 /** Aplica `interpolate` em todas as strings de um objeto (ex.: rótulos e cartões de um quadro). */

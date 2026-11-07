@@ -30,20 +30,17 @@ src/
     types.ts             formatos: perfil, empresa, jornada, aula, quadro
     company.ts           Maré Pagamentos, pessoas e etapas da jornada
     profiles.ts          os dois perfis: ?perfil=bruno (transição) | ?perfil=ana (recém-contratada)
-    lessons/             aulas do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css
     onboarding-call/     call inicial: o agente entrevista a pessoa
     lesson/              aula no quadro: o quadro se monta junto com a fala
     live-session/        tela de auxílio: barra de call, chat e câmera por cima de uma tela
-    aula-quadro/         aula visual: o agente conduz a jornada e monta o quadro
   components/            peças reutilizáveis (cada uma com .ts, .css e icons/)
     app-header/          topo do app: logo, empresa, etapas da jornada, pessoa
-    whiteboard/          quadro da aula, desenhado a partir dos dados
     call-bar/            barra de call flutuante (Figma: "Session control bar")
     chat-panel/          chat flutuante (Figma: "Chat (floating window)")
     agent-cam/           "câmera" do agente no canto da tela
   journey/               jornada da aula: tipos, validador, motor, perfil e quadro (SVG)
-    data/                jornadas em JSON (orla-pagamentos.journey.json é a demo)
+    data/                jornadas em JSON (mare-pagamentos.journey.json é a demo)
     board/               renderizador do quadro
   lib/                   código compartilhado
     events.ts            eventos tipados (callbar:*, chatpanel:*, onboarding:*)
@@ -88,12 +85,12 @@ Se existir `sandbox/puca-teste.ts` (local, fora do git), ele é carregado no lug
 
 ## Jornada no quadro
 
-A tela `src/screens/aula-quadro/` roda uma jornada em JSON (`src/journey/data/`): a Puca fala,
+A tela `src/screens/lesson/` roda uma jornada em JSON (`src/journey/data/`): a Puca fala,
 o quadro vai sendo montado e a pessoa responde pelos botões, pelo chat ou tocando no quadro.
 A conversa ainda é simulada (sem LLM nem voz), e o motor (`src/journey/runner.ts`) não depende da tela.
 
 - O perfil vem da call de entrevista: o link "Começar a aula →" no fim dela abre a aula.
-- `?perfil=novo` ou `?perfil=transicao` força um dos perfis de demo; o seletor no topo troca entre eles.
+- `?perfil=ana` (ou `novo`) e `?perfil=bruno` (ou `transicao`) força um dos perfis de demo.
   O recém-contratado passa pela parte institucional; quem está mudando de time pula direto para o time.
 - `?auto=1` responde sozinho, para apresentar sem mexer no mouse.
 

@@ -1,8 +1,10 @@
 // Quadro da aula: renderiza um BoardSpec em SVG e aplica as ações da jornada
 // (revelar, destacar, focar, pulso de fluxo, cartão do nó). Sem biblioteca.
+// Visual do Figma ("03 · Aula no quadro"): fundo pontilhado, traço desenhado e letra à mão.
 //   const board = mountBoard(container);
 //   board.load(spec);  board.apply({ type: "reveal", targets: ["checkout-web"] });
 //   board.setSelectable(true);  board.onSelect((id) => …);
+import "../../styles/tokens.css";
 import "./board.css";
 import { esc } from "../../lib/dom";
 import type { BoardAction, BoardEdge, BoardNode, BoardSpec, HighlightTone } from "../types";
@@ -64,8 +66,8 @@ const KIND_LABEL: Record<string, string> = {
 
 /** Largura aproximada do nó pelo tamanho do texto (sem medir o DOM). */
 function nodeSize(n: BoardNode): { w: number; h: number } {
-  const longest = Math.max(n.label.length * 8.6, (n.sublabel?.length ?? 0) * 6.6);
-  return { w: Math.max(132, Math.round(longest + 40)), h: n.sublabel ? 60 : 46 };
+  const longest = Math.max(n.label.length * 8.4, (n.sublabel?.length ?? 0) * 6.2);
+  return { w: Math.max(120, Math.round(longest + 36)), h: n.sublabel ? 58 : 44 };
 }
 
 function edgeGeometry(a: NodeView, b: NodeView): { d: string; mid: { x: number; y: number } } {
@@ -105,7 +107,7 @@ export function mountBoard(parent: HTMLElement): Board {
   const defs = svg("defs");
   for (const tone of ["base", "focus", "warn", "ok"]) {
     const m = svg("marker", { id: `arrow-${tone}`, viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" });
-    m.appendChild(svg("path", { d: "M0,0 L10,5 L0,10 z", class: `board__arrow board__arrow--${tone}` }));
+    m.appendChild(svg("path", { d: "M1.5,1.5 L8.5,5 L1.5,8.5", class: `board__arrow board__arrow--${tone}` }));
     defs.appendChild(m);
   }
   const edgesG = svg("g", { class: "board__edges" });
@@ -173,15 +175,18 @@ export function mountBoard(parent: HTMLElement): Board {
     for (const n of spec.nodes) {
       const { w, h } = nodeSize(n);
       const g = svg("g", { class: "bnode", "data-id": n.id, "data-kind": n.kind, "data-state": "hidden", transform: `translate(${n.x},${n.y})` });
+      // dono não confirmado: nó tracejado, como "caixa preta" no quadro
+      if (n.info?.owner_confirmed === false) g.dataset.unconfirmed = "";
       g.setAttribute("aria-label", `${n.label}${n.sublabel ? ", " + n.sublabel : ""} (${KIND_LABEL[n.kind] ?? n.kind})`);
       const inner = svg("g", { class: "bnode__inner" });
-      inner.appendChild(svg("rect", { class: "bnode__box", x: -w / 2, y: -h / 2, width: w, height: h, rx: 12 }));
-      inner.appendChild(svg("rect", { class: "bnode__accent", x: -w / 2 + 10, y: -h / 2 + 12, width: 4, height: h - 24, rx: 2 }));
-      const label = svg("text", { class: "bnode__label", x: 2, y: n.sublabel ? -4 : 5, "text-anchor": "middle" });
+      // anel amarelo de foco, atrás da caixa
+      inner.appendChild(svg("rect", { class: "bnode__halo", x: -w / 2 - 6, y: -h / 2 - 6, width: w + 12, height: h + 12, rx: n.kind === "queue" ? h / 2 + 6 : 17 }));
+      inner.appendChild(svg("rect", { class: "bnode__box", x: -w / 2, y: -h / 2, width: w, height: h, rx: n.kind === "queue" ? h / 2 : 12 }));
+      const label = svg("text", { class: "bnode__label", x: 0, y: n.sublabel ? -3 : 6, "text-anchor": "middle" });
       label.textContent = n.label;
       inner.appendChild(label);
       if (n.sublabel) {
-        const sub = svg("text", { class: "bnode__sub", x: 2, y: 15, "text-anchor": "middle" });
+        const sub = svg("text", { class: "bnode__sub", x: 0, y: 16, "text-anchor": "middle" });
         sub.textContent = n.sublabel;
         inner.appendChild(sub);
       }
@@ -195,10 +200,11 @@ export function mountBoard(parent: HTMLElement): Board {
       if (!a || !b) continue;
       const { d, mid } = edgeGeometry(a, b);
       const g = svg("g", { class: "bedge", "data-id": e.id, "data-state": "hidden" });
+      if (e.style) g.dataset.style = e.style;
       const path = svg("path", { class: "bedge__path", d, "marker-end": "url(#arrow-base)" });
       g.appendChild(path);
       if (e.label) {
-        const t = svg("text", { class: "bedge__label", x: mid.x, y: mid.y - 7, "text-anchor": "middle" });
+        const t = svg("text", { class: "bedge__label", x: mid.x, y: mid.y - 9, "text-anchor": "middle" });
         t.textContent = e.label;
         g.appendChild(t);
       }
@@ -275,7 +281,10 @@ export function mountBoard(parent: HTMLElement): Board {
   }
 
   function reset(): void {
-    for (const v of [...nodes.values(), ...edges.values()]) v.g.dataset.state = "hidden";
+    for (const v of [...nodes.values(), ...edges.values()]) {
+      v.g.dataset.state = "hidden";
+      v.g.removeAttribute("data-focus");
+    }
     clearHighlight();
     closeCard();
     animateView({ ...FULL });
@@ -414,7 +423,9 @@ export function mountBoard(parent: HTMLElement): Board {
         case "reveal": return reveal(a.targets);
         case "highlight": return highlight(a.targets, a.tone ?? "focus");
         case "clear_highlight": return clearHighlight();
-        case "focus": return animateView(focusBox(a.target));
+        case "focus":
+          for (const n of nodes.values()) n.g.toggleAttribute("data-focus", n.data.id === a.target);
+          return animateView(focusBox(a.target));
         case "flow": return flow(a.path);
         case "card": return openCard(a.target);
         case "close_card": return closeCard();

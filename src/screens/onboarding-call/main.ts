@@ -250,7 +250,7 @@ async function main(): Promise<void> {
   saveProfile(profileFromAnswers(answers));
   const next = document.createElement("a");
   next.className = "caption__next";
-  next.href = "../aula-quadro/";
+  next.href = "../lesson/";
   next.textContent = "Começar a aula →";
   el.captionHint.after(next);
 }

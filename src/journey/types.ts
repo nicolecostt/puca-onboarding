@@ -1,4 +1,4 @@
-// Formato da jornada do Puca.
+// Formato da jornada da Puca.
 // Vocabulário de jornadas de agentes de demonstração por voz (momentos → passos, com objetivo,
 // fala-guia, vista, conhecimento, decisão e transições), mais uma vista nova: o quadro.
 // Detalhes e exemplos em docs/journey-format.md.
@@ -64,6 +64,8 @@ export interface BoardEdge {
   from: string;
   to: string;
   label?: string;
+  /** inferred = ligação deduzida, sem confirmação (tracejada) · retry = caminho de erro/retentativa. */
+  style?: "inferred" | "retry";
 }
 
 export interface BoardSpec {
