@@ -67,7 +67,7 @@ export interface BoardNode {
   x: number;
   y: number;
   w: number;
-  /** id da pessoa dona (mostra @handle) ou texto livre (ex.: "cdn.mare.dev"). */
+  /** id da pessoa dona (mostra @handle) ou texto livre (ex.: "cdn.tail.dev"). */
   ownerId?: string;
   caption?: string;
   /** Texto do selo embaixo do nó (ex.: "caixa preta · aguardando Carla"). */

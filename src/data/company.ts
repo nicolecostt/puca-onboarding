@@ -2,7 +2,7 @@
 import type { Company, JourneyStep } from "./types";
 
 export const company: Company = {
-  name: "Maré Pagamentos",
+  name: "Tail",
   teams: ["Antifraude", "Terminais", "Autorização", "Liquidação", "Plataforma"],
   people: {
     diego: { id: "diego", name: "Diego Ramos", handle: "diegoramos", role: "Tech lead", team: "Autorização" },

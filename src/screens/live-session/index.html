@@ -18,10 +18,28 @@
 </script>
 </head>
 <body>
-  <main class="screen">
-    <h1>Tela de teste</h1>
-    <p>A barra de call fica flutuando por cima de qualquer tela.</p>
-    <div class="log" id="log"></div>
+  <!-- Imitação do Slack da Tail: a "tela qualquer" onde a Puca ajuda.
+       Barra de call, chat e câmera da Puca flutuam por cima (main.ts). -->
+  <main class="mock" aria-label="Slack da Tail (simulação)">
+    <aside class="mock-side">
+      <header class="mock-side__ws">
+        <span class="mock-side__logo" aria-hidden="true">T</span>
+        <strong>Tail</strong>
+      </header>
+      <nav class="mock-side__nav" id="side"></nav>
+    </aside>
+
+    <section class="mock-chan">
+      <header class="mock-chan__head">
+        <div>
+          <h1 class="mock-chan__name"># time-terminais</h1>
+          <p class="mock-chan__topic">Maquininhas TailPOS: configuração, firmware e CDN · daily 9h30</p>
+        </div>
+        <span class="mock-chan__members" aria-label="7 pessoas no canal">7 pessoas</span>
+      </header>
+      <ol class="mock-msgs" id="msgs"></ol>
+      <div class="mock-composer" aria-hidden="true">Mensagem para #time-terminais</div>
+    </section>
   </main>
 
 <script type="module" src="./main.ts"></script>

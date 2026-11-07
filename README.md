@@ -28,7 +28,7 @@ src/
     base.css             tokens + reset; importado por toda tela
   data/                  dados de exemplo da demo (depois podem vir de uma API)
     types.ts             formatos: perfil, empresa, jornada, aula, quadro
-    company.ts           Maré Pagamentos, pessoas e etapas da jornada
+    company.ts           Tail, pessoas e etapas da jornada
     profiles.ts          os dois perfis: ?perfil=bruno (transição) | ?perfil=ana (recém-contratada)
     lessons/             aulas do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css
@@ -42,7 +42,7 @@ src/
     chat-panel/          chat flutuante (Figma: "Chat (floating window)")
     agent-cam/           "câmera" do agente no canto da tela
   journey/               motor de jornada em JSON: tipos, validador, motor, perfil e quadro (SVG)
-    data/                jornadas em JSON (mare-pagamentos.journey.json é a demo)
+    data/                jornadas em JSON (tail.journey.json é a demo)
     board/               renderizador do quadro
   lib/                   código compartilhado
     events.ts            eventos tipados (callbar:*, chatpanel:*, onboarding:*)

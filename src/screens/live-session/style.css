@@ -1,9 +1,236 @@
-/* Tela de auxílio: sessão ao vivo. O fundo é só um exemplo de "tela qualquer";
+/* Tela de auxílio: sessão ao vivo. O fundo imita o Slack da Tail (simulação);
    a barra de call, o chat e a câmera da Puca flutuam por cima. */
-body{min-height:100vh;background:var(--color-surface-muted)}
-/* Tela de fundo só para testar a barra por cima */
-.screen{max-width:1240px;margin:20px auto;min-height:calc(100vh - 140px);background:var(--color-surface);border:1px solid var(--color-border);border-radius:16px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center}
-.screen h1{margin:0;font-size:clamp(28px,5vw,56px);letter-spacing:-.02em}
-.screen p{margin:0;color:var(--color-muted)}
-.log{font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--color-muted);min-height:1.4em}
+:root {
+  /* cores só desta imitação (barra lateral escura, estilo Slack) */
+  --mock-side-bg: #3f0e40;
+  --mock-side-text: rgba(255, 255, 255, 0.72);
+  --mock-side-strong: #ffffff;
+  --mock-side-hover: rgba(255, 255, 255, 0.08);
+  --mock-side-current: #1164a3;
+  --mock-badge: #cd2553;
+  --mock-avatar-bg: #e8e1f0;
+  --mock-avatar-text: #4a154b;
+  --mock-pin-bg: #fff8e1;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--color-surface-muted);
+}
+
+/* janela do app, com espaço embaixo para a barra de call */
+.mock {
+  max-width: 1240px;
+  height: calc(100vh - 116px);
+  min-height: 460px;
+  margin: 20px auto 0;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-sans);
+}
+
+/* ---- Barra lateral ---- */
+.mock-side {
+  background: var(--mock-side-bg);
+  color: var(--mock-side-text);
+  overflow: auto;
+}
+.mock-side__ws {
+  height: 52px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--mock-side-hover);
+  color: var(--mock-side-strong);
+  font-size: var(--text-lg);
+}
+.mock-side__logo {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  background: var(--mock-side-strong);
+  color: var(--mock-side-bg);
+  font-weight: 700;
+  font-size: var(--text-md);
+}
+.mock-side__nav {
+  padding: 12px 8px;
+}
+.mock-side__title {
+  margin: 14px 8px 4px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.mock-side__title:first-child {
+  margin-top: 0;
+}
+.mock-side__item {
+  height: 28px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  cursor: default;
+}
+.mock-side__item:hover {
+  background: var(--mock-side-hover);
+}
+.mock-side__item.is-unread {
+  color: var(--mock-side-strong);
+  font-weight: 700;
+}
+.mock-side__item.is-current {
+  background: var(--mock-side-current);
+  color: var(--mock-side-strong);
+}
+.mock-side__badge {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--mock-badge);
+  color: var(--mock-side-strong);
+  font-size: var(--text-xs);
+}
+
+/* ---- Canal ---- */
+.mock-chan {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.mock-chan__head {
+  min-height: 52px;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+.mock-chan__name {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+.mock-chan__topic {
+  margin: 2px 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+.mock-chan__members {
+  flex: none;
+  height: 26px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.mock-msgs {
+  flex: 1;
+  margin: 0;
+  padding: 16px 0;
+  list-style: none;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.mock-msg {
+  padding: 8px 20px;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 10px;
+}
+.mock-msg:hover {
+  background: var(--color-surface-muted);
+}
+.mock-msg p {
+  margin: 0;
+}
+.mock-msg__meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: var(--text-base);
+}
+.mock-msg__meta span {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+}
+.mock-msg__text {
+  font-size: var(--text-base);
+  line-height: 1.5;
+}
+.mock-msg__pin {
+  padding: 0 6px;
+  border-radius: var(--radius-sm);
+  background: var(--mock-pin-bg);
+}
+
+/* a mensagem que a Puca está mostrando: anel amarelo, como o foco no quadro */
+.mock-msg.is-target {
+  margin: 4px 12px;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 4px var(--color-highlight);
+}
+
+.mock-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  background: var(--mock-avatar-bg);
+  color: var(--mock-avatar-text);
+  font-size: var(--text-md);
+  font-weight: 700;
+}
+.mock-avatar--sm {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  font-size: 9px;
+}
+
+.mock-composer {
+  margin: 0 20px 16px;
+  height: 44px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-subtle);
+  font-size: var(--text-base);
+}
+
+@media (max-width: 720px) {
+  .mock {
+    grid-template-columns: 1fr;
+    margin: 0;
+    border-radius: 0;
+  }
+  .mock-side {
+    display: none;
+  }
+}

@@ -8,7 +8,7 @@ export const transactionPath: Lesson = {
 
   nodes: [
     {
-      id: "pos", label: "Maquininha\nMaréPOS", kind: "external", x: 40, y: 300, w: 140,
+      id: "pos", label: "Maquininha\nTailPOS", kind: "external", x: 40, y: 300, w: 140,
       details: { what: "A maquininha do lojista. Lê o cartão e manda a transação para o pos-gateway." },
     },
     {
@@ -28,7 +28,7 @@ export const transactionPath: Lesson = {
       },
     },
     {
-      id: "common", label: "mare-common", kind: "service", x: 700, y: 150, w: 130,
+      id: "common", label: "tail-common", kind: "service", x: 700, y: 150, w: 130,
       details: {
         what: "Biblioteca compartilhada. A ligação com o authorizer foi inferida do código, ainda sem confirmação do dono.",
         help: "Confirmar com a Júlia Paiva",
@@ -58,7 +58,7 @@ export const transactionPath: Lesson = {
     { id: "configApi", label: "terminal-config-api", kind: "service", x: 230, y: 600, w: 180, ownerId: "lucas" },
     { id: "configTopic", label: "terminal.config.updated", kind: "topic", x: 470, y: 600, w: 230 },
     { id: "cdnPublisher", label: "firmware-cdn-publisher", kind: "service", x: 780, y: 600, w: 200, ownerId: "lucas" },
-    { id: "cdn", label: "CDN", kind: "service", x: 1040, y: 600, w: 160, caption: "cdn.mare.dev" },
+    { id: "cdn", label: "CDN", kind: "service", x: 1040, y: 600, w: 160, caption: "cdn.tail.dev" },
   ],
 
   edges: [
@@ -123,7 +123,7 @@ export const transactionPath: Lesson = {
       title: "Do cartão ao gateway",
       beats: [
         {
-          say: "Vamos seguir uma transação do começo ao fim. Tudo começa na maquininha, a MaréPOS.",
+          say: "Vamos seguir uma transação do começo ao fim. Tudo começa na maquininha, a TailPOS.",
           highlight: "Tudo começa na maquininha",
           reveal: ["pos"],
           focus: "pos",
@@ -146,7 +146,7 @@ export const transactionPath: Lesson = {
           focus: "authorizer",
         },
         {
-          say: "O authorizer calcula o MDR, 1,19% no débito e 2,49% no crédito à vista, e responde. Ele usa a mare-common, mas isso eu deduzi do código: o dono ainda não confirmou.",
+          say: "O authorizer calcula o MDR, 1,19% no débito e 2,49% no crédito à vista, e responde. Ele usa a tail-common, mas isso eu deduzi do código: o dono ainda não confirmou.",
           highlight: "o dono ainda não confirmou",
           reveal: ["common", "authorizer-common"],
           focus: "common",

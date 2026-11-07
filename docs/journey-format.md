@@ -6,16 +6,16 @@ O modelo segue a ideia de jornadas usada em agentes de demonstração por voz:
 uma vista nova, o **quadro**, que o agente monta enquanto explica (§4.1 do [`context.md`](context.md)).
 
 Tipos: [`src/journey/types.ts`](../src/journey/types.ts). Validação: [`src/journey/validate.ts`](../src/journey/validate.ts).
-Jornada de exemplo: [`mare-pagamentos.journey.json`](../src/journey/data/mare-pagamentos.journey.json).
+Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json).
 
 ## Estrutura
 
 ```jsonc
 {
   "version": 1,
-  "id": "mare-pagamentos-terminais",
+  "id": "tail-terminais",
   "title": "Primeira semana — time fraud-score",
-  "company": "Maré Pagamentos",
+  "company": "Tail",
   "agent": { "name": "Puca", "guidelines": { "core_identity": "…", "personality_and_tone": "…", "safety_and_escalation": "…" } },
   "boards": { "<nome>": { "title": "…", "nodes": [ … ], "edges": [ … ] } },
   "moments": [ … ]
