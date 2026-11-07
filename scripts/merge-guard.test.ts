@@ -52,4 +52,15 @@ describe("merge-guard", () => {
     expect(r.codigo).toBe(2);
     expect(r.motivo).toMatch(/Não entendi/);
   });
+  it("cada trecho é verificado: um push entendido não libera um merge escondido no trecho seguinte", () => {
+    expect(guarda('git push origin feat/1-algo && eval "gh pr merge 58"', naBranch).codigo).toBe(2);
+  });
+  it("prefixos com flags não escondem push na main", () => {
+    expect(guarda("sudo -E git push origin main", naBranch).codigo).toBe(2);
+    expect(guarda("sudo -u bob git push origin main", naBranch).codigo).toBe(2);
+    expect(guarda("env -i git push origin feat/1-algo", naBranch).codigo).toBe(0);
+  });
+  it("não barra commit cuja mensagem fala de push", () => {
+    expect(guarda('git commit -m "fix push do áudio"', naBranch).codigo).toBe(0);
+  });
 });

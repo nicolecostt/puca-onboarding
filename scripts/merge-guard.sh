@@ -19,12 +19,18 @@ acoes=$(node -e '
   const args = (s) => [...s.matchAll(/"((?:\\.|[^"\\])*)"|'\''([^'\'']*)'\''|(\S+)/g)].map((m) => m[1] ?? m[2] ?? m[3]);
   const comValor = new Set(["-b", "--body", "-F", "--body-file", "-t", "--subject", "-A", "--author-email", "--match-head-commit"]);
   const limpo = c.replace(/\$\(|[()`{}]/g, " ");
-  let achou = false;
-  for (const trecho of limpo.split(/&&|\|\||[;&|\n]/)) {
+  const pareceMerge = (s) => /\bgh\b[^\n]*\bpr\s+(merge|review\b[^\n]*(--approve|\s-a\b))/.test(s);
+  // devolve true quando entendeu o trecho como gh pr merge/review (e já imprimiu a ação, se houver)
+  const analisa = (trecho) => {
     const t = args(trecho.trim());
     let i = 0;
     // VAR=valor e prefixos que só executam o comando seguinte
-    while (i < t.length && (/^[A-Z_][A-Z0-9_]*=/.test(t[i]) || ["env", "command", "exec", "sudo", "time", "nohup"].includes(t[i]))) i++;
+    const prefixos = ["env", "command", "exec", "sudo", "time", "nohup", "nice"];
+    while (i < t.length && (/^[A-Z_][A-Z0-9_]*=/.test(t[i]) || prefixos.includes(t[i]))) {
+      const eraPrefixo = prefixos.includes(t[i]);
+      i++;
+      while (eraPrefixo && i < t.length && t[i].startsWith("-")) i++; // flags do prefixo (sudo -E, env -i)
+    }
     const prog = (t[i] || "").split("/").pop();
     if (prog === "gh") {
       i++;
@@ -34,11 +40,10 @@ acoes=$(node -e '
         else if (t[i].startsWith("--repo=")) { repo = t[i].slice(7); i++; }
         else if (t[i] === "--hostname") i += 2; else i++;
       }
-      if (t[i] !== "pr" || !["merge", "review"].includes(t[i + 1])) continue;
-      achou = true; // entendido (inclusive review sem aprovação, que passa)
+      if (t[i] !== "pr" || !["merge", "review"].includes(t[i + 1])) return false;
       const sub = t[i + 1];
       const resto = t.slice(i + 2);
-      if (sub === "review" && !resto.some((a) => a === "--approve" || a === "-a")) continue;
+      if (sub === "review" && !resto.some((a) => a === "--approve" || a === "-a")) return true; // comentário: passa
       let sel = "atual";
       for (let k = 0; k < resto.length; k++) {
         const a = resto[k];
@@ -49,19 +54,25 @@ acoes=$(node -e '
         sel = a; break;
       }
       console.log(["pr", sel, repo].join("\t"));
+      return true;
     } else if (prog === "git") {
       const p = t.indexOf("push", i);
-      if (p < 0) continue;
-      achou = true;
+      if (p < 0) return false;
       const opts = t.slice(p + 1).filter((a) => a.startsWith("-"));
       const refs = t.slice(p + 1).filter((a) => !a.startsWith("-")).slice(1); // o primeiro é o remoto
       if (opts.some((o) => o === "--all" || o === "--mirror")) console.log("push-todas");
       else if (refs.some((r) => /^(\+)?(refs\/heads\/)?(main|master)$/.test(r) || /:(refs\/heads\/)?(main|master)$/.test(r))) console.log("push-main");
       else if (refs.length === 0 || refs.some((r) => /^(\+)?(HEAD|@)$/.test(r))) console.log("push-atual");
+      return true;
     }
+    return false;
+  };
+  // git e push como palavras soltas (não dentro de uma mensagem entre aspas)
+  const parecePush = (s) => { const tk = args(s); return tk.some((x) => x.split("/").pop() === "git") && tk.includes("push"); };
+  // trecho a trecho: tem cara de merge/aprovação mas não foi entendido → barra (falha fechada)
+  for (const trecho of limpo.split(/&&|\|\||[;&|\n]/)) {
+    if (!analisa(trecho) && (pareceMerge(trecho) || parecePush(trecho))) console.log("nao-entendi");
   }
-  // tem cara de merge/aprovação mas o parser não entendeu: barra (falha fechada)
-  if (!achou && /\bgh\b[^\n]*\bpr\s+(merge|review\b[^\n]*(--approve|\s-a\b))/.test(c)) console.log("nao-entendi");
 ' "$entrada" 2>/dev/null)
 
 [ -z "$acoes" ] && exit 0
@@ -70,7 +81,7 @@ while IFS=$'\t' read -r tipo sel repo; do
   case $tipo in
     push-main) barra "Push direto na main não: pelas regras do time tudo entra por PR (skill handoff).";;
     push-todas) barra "git push --all/--mirror pode levar a main junto: faça push só da sua branch.";;
-    nao-entendi) barra "Não entendi esse comando de merge/aprovação para verificar antes. Use a forma simples: gh pr merge <n>.";;
+    nao-entendi) barra "Não entendi esse comando de merge/aprovação/push para verificar antes. Use a forma simples: gh pr merge <n> ou git push origin <sua-branch>.";;
     push-atual)
       [ "$(git branch --show-current)" = main ] && barra "Você está na main: push direto na main não. Crie uma branch e abra um PR (skill handoff).";;
     pr)
