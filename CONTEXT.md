@@ -29,16 +29,6 @@ _Avoid_: chefe, manager
 Quem cuida de um sistema ou decisão, segundo uma fonte confirmada.
 _Avoid_: dono (quando não confirmado)
 
-## Negócio
-
-**Integração**:
-O que a empresa compra: uma pessoa entrando num contexto de destino, como novo ou em transição. É a unidade de cobrança.
-_Avoid_: jornada (é o roteiro da aula), licença, assento
-
-**Piloto**:
-Primeira contratação paga, curta e com poucas integrações, que termina numa decisão de continuar, ajustar ou encerrar.
-_Avoid_: teste grátis, prova de conceito
-
 ## Perfis
 
 **Perfil**:
@@ -159,3 +149,13 @@ _Avoid_: manual, tutorial
 **Jurado**:
 Quem avalia a Lousa no hackathon. Vive a pessoa: escolhe o perfil e passa pela jornada.
 _Avoid_: avaliador, juiz
+
+## Negócio
+
+**Integração**:
+O que a empresa compra: uma pessoa entrando num contexto de destino, como novo ou em transição. É a unidade de cobrança. (Não confundir com a conexão com sistemas, como Slack, Jira ou GitHub.)
+_Avoid_: jornada (é o roteiro da aula), licença, assento
+
+**Piloto**:
+Primeira contratação paga, curta e com poucas integrações, que termina numa decisão de continuar, ajustar ou encerrar.
+_Avoid_: teste grátis, prova de conceito

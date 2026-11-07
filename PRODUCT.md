@@ -50,7 +50,7 @@ Isso gera alguns problemas:
 - Dependência de colegas mais experientes para responder dúvidas recorrentes.
 - Documentação que nem sempre esclarece como os processos funcionam na prática.
 - Dificuldade em identificar as pessoas responsáveis por cada sistema ou atividade.
-- Jornadas de integração pouco adaptadas à experiência prévia do profissional.
+- Integrações pouco adaptadas à experiência prévia do profissional.
 - Falta de visibilidade para gestores, buddies e RH sobre etapas concluídas e dificuldades que exigem intervenção.
 
 Além disso, **quem muda de equipe enfrenta parte desses desafios novamente**, mesmo já conhecendo a empresa.
@@ -178,7 +178,7 @@ Depois de explicar os sistemas e processos da equipe, o agente identifica uma ta
 
 Durante a atividade, o profissional pode voltar ao quadro e fazer perguntas relacionadas ao que está desenvolvendo. Puca vira uma **ponte entre a teoria e a prática**, e o profissional ganha autonomia mais rápido, sem depender de explicações repetitivas a cada nova atividade.
 
-> **No hackathon:** pode ser demonstrada como uma primeira tarefa simulada e documentada no Notion. Não é preciso integração completa com Jira ou GitHub para validar a experiência.
+> **No hackathon:** pode ser demonstrada como uma primeira tarefa simulada e documentada no Notion. Não é preciso conexão completa com Jira ou GitHub para validar a experiência.
 
 ### 4.5. Conhecimento contínuo e encaminhamento humano
 
@@ -208,7 +208,7 @@ Além da experiência do funcionário, queremos dar visibilidade às pessoas res
 |---|---|
 | **Buddy** | Etapas de orientação concluídas, assuntos que ainda exigem suporte e pedidos de ajuda encaminhados a ele. |
 | **Gestor** | Marcos da integração, acessos pendentes, objetivos iniciais e possíveis bloqueios que dependam de decisões da equipe. |
-| **RH** | Etapas obrigatórias, pendências administrativas e indicadores agregados das jornadas de onboarding e transição. |
+| **RH** | Etapas obrigatórias, pendências administrativas e indicadores agregados das integrações, de novos e de transição. |
 
 **Exemplos de métricas:**
 
@@ -265,7 +265,7 @@ Para mostrar a personalização, usamos **uma única empresa fictícia com dois 
 
 Esses cenários mostram que o agente **não executa uma trilha fixa**: ele usa o contexto e o histórico disponíveis para decidir quais informações são relevantes.
 
-A apresentação pode ser complementada com um **painel simples** mostrando o acompanhamento de cada jornada por buddy, gestor ou RH.
+A apresentação pode ser complementada com um **painel simples** mostrando o acompanhamento de cada integração por buddy, gestor ou RH.
 
 ---
 
@@ -391,7 +391,7 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 
 ### 12.2. O que precisa aparecer na demo
 
-- **Agir num sistema, não só falar.** O encaminhamento do passo 4 precisa acontecer de fato no Slack simulado da tela `live-session`. O guia aceita integrações simuladas *"desde que o agente realmente opere sobre elas na demo"*.
+- **Agir num sistema, não só falar.** O encaminhamento do passo 4 precisa acontecer de fato no Slack simulado da tela `live-session`. O guia aceita conexões simuladas *"desde que o agente realmente opere sobre elas na demo"*.
 - **Rastro.** Cada decisão da Puca (o que respondeu, de qual fonte, quando encaminhou e por quê) fica registrada e pode ser auditada depois.
 - **Custo.** Mostrar quanto custa uma sessão em tempo e tokens, comparado com as horas que o buddy gastaria explicando a mesma coisa.
 
@@ -451,19 +451,19 @@ são **referência**. O mundo fictício pode redesenhar a Tail, as pessoas e a j
 
 ## 14. Modelo de negócio: quem compra e como cobramos
 
-> Pesquisa e alinhamento de Joaquim em 2026-11-07. Mercado, métricas, evidências externas e fontes: [`docs/negocio/contexto-de-negocio.md`](docs/negocio/contexto-de-negocio.md).
+> Alinhamento com Joaquim em 2026-11-07.
 
-A Puca é vendida para empresas (B2B): **a empresa compra e o RH aprova**. A entrada é um **piloto** pago e pequeno, que vira contrato anual medido em **integrações**.
+A Puca é vendida para empresas (B2B): **a empresa compra e o RH aprova**. A entrada é um **piloto** pago e pequeno, que vira contrato anual medido em **integrações**. Mercado, métricas, evidências externas e fontes estão em [`docs/negocio/contexto-de-negocio.md`](docs/negocio/contexto-de-negocio.md).
 
 ### 14.1. Quem compra e quem participa
 
 | Papel | No modelo |
 |---|---|
 | **Empresa** | Contrata e paga. |
-| **RH** | Aprova a compra e acompanha o valor para a integração. Ninguém substitui o RH como aprovador por inferência. |
+| **RH** | Aprova a compra e acompanha se as integrações trazem resultado. Ninguém substitui o RH como aprovador por inferência. |
 | **Gestor e engenharia** | Ajudam a definir tarefas, contexto e qualidade esperada. |
 | **Buddy** | Orienta quando precisa e mostra onde há repetição ou bloqueio. |
-| **TI e segurança** | Participam das integrações de sistemas e da avaliação de acessos, quando for o caso. |
+| **TI e segurança** | Participam da conexão com os sistemas da empresa e da avaliação de acessos, quando for o caso. |
 | **Pessoa** | Usa a Lousa para aprender e fazer as primeiras tarefas. |
 
 Foco inicial: empresas com times de tecnologia, contratações ou mudanças de time recorrentes e conhecimento espalhado em várias fontes. Não há corte de tamanho definido. Grandes empresas são um bom começo, não um limite.
@@ -475,7 +475,7 @@ Os dois vínculos, novo e transição ([§3](#3-cenários-principais-de-uso)), f
 - **Unidade:** a integração, ou seja, uma pessoa entrando num contexto de destino. Novo e transição consomem o **mesmo saldo**, com o mesmo preço, até os dados mostrarem diferença de custo ou de valor.
 - **Piloto pago:** preço e número de integrações menores que no contrato anual. Padrão de partida: **60 dias de uso**, contados depois que fontes e acessos estão disponíveis, em uma equipe. Revisão no meio e revisão comercial no fim.
 - **Contrato anual:** volume de integrações com **quantidade mínima**.
-- **Implantação:** a equipe já está trabalhando nela. Uma taxa separada só será proposta se o esforço observado justificar.
+- **Implantação:** conectar a Lousa às fontes e aos acessos de um cliente. A equipe já está construindo essa parte do produto, mas ainda não há implantação em nenhum cliente. Uma taxa separada só será proposta se o esforço observado justificar.
 
 O piloto vira contrato anual quando três coisas acontecem juntas:
 
@@ -490,6 +490,8 @@ Sem informação suficiente, a decisão é explícita: encerrar, corrigir o esco
 - **Resultado principal:** menos tempo bloqueado por falta de contexto e menos explicação repetida para buddies e gestores ([§8](#8-proposta-de-valor)).
 - **Efeito a acompanhar, não promessa:** retenção e experiência nos primeiros 90 dias.
 - **Métricas do piloto:** tempo até autonomia, tempo bloqueado por contexto, esforço do buddy, qualidade das tarefas, clareza de papel e uso efetivo. Escolher 1 ou 2 por piloto.
+
+> ⚠️ **Métricas agregadas, sobre o processo:** valem as regras de privacidade da [§5](#5-visibilidade-para-buddy-gestor-e-rh). Tempo até autonomia e qualidade das tarefas descrevem o processo de integração do grupo, e não medem a competência de uma pessoa.
 
 > ⚠️ **Sem medição própria, não afirmamos:** redução percentual de tempo ou de turnover, ausência de concorrência, preço validado, margem conhecida ou clientes na lista de empresas pesquisadas. A lista completa está no doc de negócio.
 

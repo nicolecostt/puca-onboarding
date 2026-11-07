@@ -18,7 +18,7 @@ Não transforme hipótese em decisão, interesse verbal em venda, funcionalidade
 
 ## 2. A dor, por quem sente
 
-O problema geral está no [`PRODUCT.md` §2](../../PRODUCT.md#2-problema-que-queremos-resolver). Do ponto de vista de quem paga:
+O problema geral está no [`PRODUCT.md` §2](../../PRODUCT.md#2-problema-que-queremos-resolver). Aqui, separado por quem sente. Quem paga é a empresa, com aprovação do RH, e o argumento de venda junta as três dores:
 
 - **Pessoa:** acha a informação, entende sistemas, responsáveis e decisões antigas, separa o que vale para o trabalho dela e avança sem esperar alguém ficar livre.
 - **Buddy e gestor:** reexplicam o que já foi explicado, param o que estão fazendo para responder dúvidas recorrentes e não sabem onde a pessoa travou.
@@ -32,12 +32,12 @@ Combinar no início com o RH e com o responsável operacional:
 
 - participantes e vínculo (novo ou transição);
 - tarefas representativas e critério de qualidade;
-- fontes e integrações de sistemas incluídas;
+- fontes e conexões com sistemas incluídas;
 - limites de uso e de suporte;
 - como medir a situação anterior ou um grupo comparável;
 - quem participa da revisão final e quando.
 
-Os prazos (60 dias, revisão no meio, revisão no fim) são recomendação de operação, não dado de pesquisa. Não adotar uma meta universal de redução de tempo sem linha de base: a meta é combinada antes, com método, amostra e limites registrados. A aprovação do RH conta, mas não é experimento causal.
+Os prazos (60 dias, revisão no meio, revisão no fim) são recomendação de operação, não dado de pesquisa. Não adotar um alvo universal de redução de tempo sem linha de base: o alvo é combinado antes, com método, amostra e limites registrados. A aprovação do RH conta, mas não é experimento causal.
 
 Antes de vender o contrato anual, definir o que uma integração cobre: duração, reabertura, troca de contexto (pode virar uma integração nova), excedentes e validade do saldo. Nada disso está decidido: não inventar multa, renovação automática ou franquia.
 
@@ -52,7 +52,9 @@ Antes de vender o contrato anual, definir o que uma integração cobre: duraçã
 | Clareza de papel | Perguntas fixas sobre responsabilidades, expectativas e próximos passos | Percepção complementa, não substitui o resultado da tarefa |
 | Uso efetivo | Pessoas que fazem atividades úteis com a Puca | Número de mensagens não prova valor |
 
-Escolher 1 ou 2 por piloto. Retenção em 90 dias e produtividade anual interessam, mas amostra pequena e fatores externos dificultam atribuir a mudança à Puca: um piloto de 60 dias pode ser seguido de observação aos 90, sem prometer a resposta no fim do piloto. Não usar commits ou linhas de código como medida única de produtividade.
+Escolher 1 ou 2 por piloto. As métricas são agregadas e descrevem o processo de integração, nunca a competência de uma pessoa: valem as regras de privacidade do [`PRODUCT.md` §5](../../PRODUCT.md#5-visibilidade-para-buddy-gestor-e-rh).
+
+Retenção em 90 dias e produtividade anual interessam, mas amostra pequena e fatores externos dificultam atribuir a mudança à Puca: um piloto de 60 dias pode ser seguido de observação aos 90, sem prometer a resposta no fim do piloto. Não usar commits ou linhas de código como medida única de produtividade.
 
 ### 4.1. Conta econômica (quando houver dados)
 
@@ -86,7 +88,7 @@ Fórmula: `profissionais na base × parcela elegível × integrações por profi
 
 `36,5 mi × 40% × 0,25 × R$ 900 ≈ R$ 3,29 bi/ano`
 
-> **Corrigido em 2026-11-07:** a pesquisa usava 38,4 milhões de desenvolvedores, número sem fonte localizada (o mais próximo, 38,3 mi, são contas do GitHub nos EUA, outra medida). A base agora é a SlashData: 36,5 mi de desenvolvedores profissionais no início de 2025 (47,2 mi contando não profissionais). Com a base total, o TAM seria ≈ R$ 4,25 bi.
+> **Corrigido em 2026-11-07:** a pesquisa usava 38,4 milhões de desenvolvedores, número sem fonte localizada. A base agora é a [SlashData](https://www.slashdata.co/post/global-developer-population-trends-2025-how-many-developers-are-there): 36,5 mi de desenvolvedores profissionais no início de 2025, de um total de 47,2 mi. Com a base total, o TAM seria ≈ R$ 4,25 bi.
 
 Preço único em reais para o mundo simplifica o exercício e ignora país, moeda e poder de compra.
 
@@ -94,7 +96,7 @@ Preço único em reais para o mundo simplifica o exercício e ignora país, moed
 
 `1,40 mi × 20% × 0,25 × R$ 900 ≈ R$ 63 mi/ano`
 
-> **Corrigido em 2026-11-07:** a pesquisa usava 1,44 mi de "profissionais CLT", sem fonte localizada. A base agora é a Brasscom (Monitor de Empregos, a partir de RAIS/CAGED): 1.403.318 profissionais de software, serviços de TI e TI interna em fev/2024. Essa conta inclui todos os vínculos, não só CLT. Como a base não é subconjunto da global (ocupações e anos diferentes), o SAM não é um recorte rigoroso do TAM.
+> **Corrigido em 2026-11-07:** a pesquisa usava 1,44 mi de "profissionais CLT", sem fonte localizada. A base agora é a Brasscom ([Monitor de Empregos e Salários](https://brasscom.org.br/wp-content/uploads/2024/04/BRI2-2024-001-Monitor-de-Empregos-e-Salarios-2024-04-v10-versao-SITE.pdf), a partir de RAIS/CAGED): 1.403.318 profissionais de software, serviços de TI e TI interna em fev/2024. Essa conta inclui todos os vínculos, não só CLT. Como a base não é subconjunto da global (ocupações e anos diferentes), o SAM não é um recorte rigoroso do TAM.
 
 ### 6.3. SOM (24 meses)
 
@@ -107,7 +109,7 @@ TAM e SAM variam na mesma proporção que preço, elegibilidade e frequência; o
 ### 6.4. Tamanho das categorias vizinhas (só contexto, fora da conta)
 
 - Treinamento corporativo no mundo: US$ 394,5 bi em 2025 (Training Industry, [Size of the Training Industry](https://trainingindustry.com/wiki/learning-services-and-outsourcing/size-of-training-industry/)).
-- LMS: US$ 28,6 bi em 2025 (Grand View Research, relatório de 2026–2033; visto num revendedor, não na página do editor). Não misturar com a projeção antiga da mesma casa (US$ 70,8 bi em 2030).
+- LMS: US$ 28,6 bi em 2025 (Grand View Research, [relatório de 2026–2033](https://www.grandviewresearch.com/press-release/global-learning-management-systems-lms-market)). Não misturar com a projeção antiga da mesma casa (US$ 70,8 bi em 2030).
 
 ## 7. Entrada no mercado
 
@@ -126,7 +128,7 @@ As empresas abaixo são alvos para investigar, não clientes, parceiros nem empr
 | Hotmart | Contratações ou mudanças de equipe com tarefas concretas |
 | PicPay | Integração técnica acompanhada por RH e gestor |
 | Vercel | Referência internacional; fora do SAM brasileiro, acesso comercial não demonstrado |
-| Tako | Conversa de descoberta a partir do contato de RH. A Tako também organiza o desafio do hackathon ([`PRODUCT.md` §12](../../PRODUCT.md#12-encaixe-no-desafio-tako-a-puca-como-digital-worker-de-onboarding)) |
+| Tako | Conversa de descoberta a partir do contato de RH. A Tako também organiza o desafio do hackathon ([`PRODUCT.md` §12](../../PRODUCT.md#12-encaixe-no-desafio-tako-a-puca-como-digital-worker-de-onboarding)): no pitch, não apresentar como cliente-alvo nem como endosso |
 
 **Exemplo de piloto (hipotético, Stone):** uma equipe e um responsável de RH; só fontes autorizadas (documentação de domínio, arquitetura, procedimentos, tarefas do piloto); atividades que mostrem autonomia e qualidade; comparação com integrações anteriores parecidas, quando houver. A Puca orienta, faz o encaminhamento do que não resolve e, no fim, o time revisa tempo bloqueado, esforço de apoio e resultado das tarefas. A continuidade depende do RH.
 
@@ -144,11 +146,11 @@ São perguntas, não afirmações de que o concorrente não tem a funcionalidade
 
 **Sana Learn (conferido em 2026-11-07):** a [página de preços](https://sanalabs.com/products/sana-learn/pricing) não mostra valores. A cobrança é por usuário por mês, o plano "Built to scale" começa em 300 usuários e o Enterprise tem preço sob consulta. A página cita "an AI Tutor for every learner". A Sana tem oferta específica de [onboarding de funcionários](https://sanalabs.com/products/sana-learn/solutions/employee-onboarding): "Every new hire gets an AI tutor on day one." Isso confirma que a categoria já oferece tutor com IA para quem chega: o diferencial da Puca precisa estar na forma (voz com quadro, calibragem, encaminhamento, transição entre times), não em "ter IA". O "onboarding" do FAQ de preços é a implantação da própria Sana, não a integração de funcionários.
 
-Integrações, RAG, agentes, voz e computer use são meios. Viram argumento comercial quando produzem um resultado útil, demonstrável e relevante para o RH e para a pessoa. Não alegar ausência de concorrência, melhor precisão, redução percentual de tempo, vantagem de dados ou barreira à cópia sem evidência. A comparação completa é a #43; o que a Lousa faz de verdade é a #74.
+Conexões com sistemas, RAG, agentes, voz e computer use são meios. Viram argumento comercial quando produzem um resultado útil, demonstrável e relevante para o RH e para a pessoa. Não alegar ausência de concorrência, melhor precisão, redução percentual de tempo, vantagem de dados ou barreira à cópia sem evidência. A comparação completa é a #43; o que a Lousa faz de verdade é a #74.
 
 ## 9. Validação que já temos
 
-Conversas com pessoas sobre a dor, incluindo uma profissional de RH da Tako que reconheceu o problema e demonstrou interesse. É sinal qualitativo de dor e interesse. Não há contrato, piloto pago, preço aceito, receita, carta de intenção nem resultado medido. Não atribuir frases literais a ninguém sem a transcrição, e não usar nome, logo ou depoimento como endosso sem autorização.
+Conversas com pessoas sobre a dor, incluindo uma profissional de RH da Tako que reconheceu o problema e demonstrou interesse. É sinal qualitativo de dor e interesse. Como a Tako organiza o desafio, no pitch esse sinal não pode soar como endosso de quem avalia: falar de "conversas com RH de empresas de tecnologia", sem nome. Não há contrato, piloto pago, preço aceito, receita, carta de intenção nem resultado medido. Não atribuir frases literais a ninguém sem a transcrição, e não usar nome, logo ou depoimento como endosso sem autorização.
 
 ## 10. Evidências externas
 
@@ -175,8 +177,8 @@ Sustentam o problema, não o resultado da Puca. Pesquisas de fornecedor têm int
 | F15 | [Sharma e Stol, J. Systems and Software 2020](https://cora.ucc.ie/handle/10468/8743) (vol. 159, DOI 10.1016/j.jss.2019.110442) | 102 profissionais de software, PLS-SEM: apoio a quem chega pesa muito no sucesso do onboarding (treinamento pesa menos); satisfação medeia a relação com intenção de sair | Intenção não é desligamento; associação não é causa |
 | F16 | [Santos et al., revisão sistemática, arXiv 2024](https://arxiv.org/abs/2408.15989) | 32 estudos de soluções de software para onboarding em projetos de software; barreiras ainda não cobertas | Não comprova falta de concorrentes comerciais |
 | F17 | [Brynjolfsson, Li e Raymond, QJE 2025](https://academic.oup.com/qje/article/140/2/889/7990658) (140(2):889–942) | Assistente de IA para 5.172 agentes de atendimento: +15% de problemas resolvidos por hora, com ganho maior para quem tem menos experiência | Atendimento não é engenharia; não usar os 14% e 5.179 da versão NBER de 2023 junto |
-| M1 | SlashData, Developer Population (2025) | 47,2 mi de desenvolvedores no início de 2025, 36,5 mi profissionais (48,4 mi no 3º tri) | Base do TAM; conferir a página antes do pitch |
-| M2 | Brasscom, Monitor de Empregos (RAIS/CAGED) | 1.403.318 profissionais de software, serviços de TI e TI interna em fev/2024 | Base do SAM; todos os vínculos, não só CLT |
+| M1 | SlashData, [tendências de 2025](https://www.slashdata.co/post/global-developer-population-trends-2025-how-many-developers-are-there) e [Developer Population](https://www.slashdata.co/developer-population) | Início de 2025: 47,2 mi de desenvolvedores no total, dos quais 36,5 mi profissionais. 3º tri de 2025: 48,4 mi no total (sem recorte de profissionais) | Base do TAM; estimativa por modelo, não censo. Outras casas usam outras definições (IDC, Evans Data): não misturar |
+| M2 | Brasscom, [Monitor de Empregos e Salários, abr/2024](https://brasscom.org.br/wp-content/uploads/2024/04/BRI2-2024-001-Monitor-de-Empregos-e-Salarios-2024-04-v10-versao-SITE.pdf) (RAIS/CAGED) | 1.403.318 profissionais de software, serviços de TI e TI interna em fev/2024 | Base do SAM; todos os vínculos, não só CLT |
 
 ### 10.1. Frases proibidas
 
@@ -206,4 +208,4 @@ A frase descreve a proposta. Antes de usá-la como capacidade pronta, conferir o
 | Durante o piloto | Uso, tarefas, bloqueios e apoio | Evidência de utilidade |
 | Fim do piloto | Revisão com o RH | Conversão, ajuste ou encerramento explícito |
 
-Não reabrir sem motivo novo: o RH aprova; os dois vínculos fazem parte da proposta; há piloto pago e contrato anual com mínimo; custos são apurados depois da implementação; a implantação já está em andamento.
+Não reabrir sem motivo novo: o RH aprova; os dois vínculos fazem parte da proposta; há piloto pago e contrato anual com mínimo; custos são apurados depois da implementação; a equipe já está construindo a implantação (conectar a Lousa às fontes e aos acessos de um cliente), ainda sem cliente.
