@@ -1,6 +1,6 @@
 ---
 name: contexto-base
-description: Use SEMPRE que for adicionar ou mudar algo em PRODUCT.md (visão de produto, cenários, funcionalidades, prioridades do hackathon, alinhamentos, insights) ou CONTEXT.md (glossário do domínio) — inclusive quando a pessoa disser "anota isso no contexto", "isso vai pro PRODUCT", "novo insight", "novo termo", "alinhamento com fulano". Garante o padrão dos dois arquivos e leva a mudança para issues e docs. Não use para decisão técnica (vai em docs/decisoes/) nem para como o código funciona (README, docs/).
+description: Chame automaticamente sempre que algo for entrar ou mudar no PRODUCT.md ou no CONTEXT.md — ex.: "anota no PRODUCT", "coloca isso no contexto", "novo insight", "alinhamos com fulano que…", "decidimos que o produto…", "termo novo", "renomeia X no glossário". Segue o padrão dos dois arquivos, valida e leva a mudança para issues e docs. Não use para decisão técnica (docs/decisoes/) nem para como o código funciona (README, docs/).
 argument-hint: "[o que entra ou muda na base]"
 ---
 

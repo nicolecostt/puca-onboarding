@@ -1,7 +1,6 @@
 ---
 name: handoff
-description: Entrega a tarefa atual para revisão e integração — roda as verificações, registra decisões e prepara (ou abre) o PR com o resumo para o time.
-disable-model-invocation: true
+description: Chame automaticamente quando a pessoa der a tarefa por terminada ou quiser entregar — ex.: "terminei", "pronto", "pode subir", "sobe isso", "abre o PR", "manda pra revisão". Sincroniza, roda o check, registra decisões e monta o PR. Commit e push só com o ok da pessoa.
 argument-hint: "[--abrir para já abrir o PR]"
 ---
 
@@ -23,11 +22,12 @@ Opções: $ARGUMENTS
    (modelo em `docs/decisoes/README.md`). Se não houver, não crie nada.
 5. **Docs.** README, `journey-format.md` ou `demo.md` precisam refletir a mudança?
 6. **Commit.** Mostre a mensagem no padrão `tipo(escopo): o que mudou` e só commite com o ok da pessoa.
+   Se o pedido já foi "pode subir", "sobe isso" ou "abre o PR", isso é o ok para commit, push e PR (desde que o check esteja verde).
 7. **Base do sistema.** A mudança altera algo descrito no `PRODUCT.md` ou cria/renomeia um termo? Atualize pela skill
    `contexto-base` (padrão + propagar para issues). Código novo, textos e o PR usam os termos do glossário.
 8. **Demo.** Se a mudança mexe num passo de `docs/demo.md`, atualize o estado dele na tabela.
 9. **PR.** Escreva a descrição seguindo `.github/pull_request_template.md`, com `Closes #<n>` da issue (o número
-   costuma estar no nome da branch). Com `--abrir` (e ok da pessoa), faça
+   costuma estar no nome da branch). Com `--abrir` ou um pedido de subir/abrir PR, faça
    `git push -u origin HEAD` e `gh pr create --base main --title "…" --body-file <arquivo>`. Sem `--abrir`, só mostre o texto.
 
 ## Saída

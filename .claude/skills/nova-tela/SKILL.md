@@ -1,6 +1,6 @@
 ---
 name: nova-tela
-description: Use para criar uma tela nova (página) em src/screens/ ou um componente novo em src/components/. Cobre os arquivos, o registro no build e o reuso dos componentes existentes. Não use para ajustes dentro de uma tela que já existe.
+description: Chame automaticamente para criar uma tela nova em src/screens/ ou um componente novo em src/components/ — ex.: "cria a tela do painel do gestor", "faz um componente de cartão". Cobre os arquivos, o registro no build e o reuso dos componentes. Não use para ajustes dentro de uma tela que já existe.
 argument-hint: "[nome e objetivo da tela ou componente]"
 ---
 

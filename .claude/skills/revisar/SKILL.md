@@ -1,6 +1,6 @@
 ---
 name: revisar
-description: Use para revisar uma mudança antes de integrar — a branch atual, um PR do time (número) ou um diff. Procura bugs, quebra de contrato e problemas de integração com uma leitura independente. Não use para escrever código.
+description: Chame automaticamente para revisar uma mudança antes de integrar — ex.: "revisa o PR 30", "dá uma olhada no que eu fiz", "tá bom pra subir?", ou a branch atual antes do handoff. Leitura independente pelo subagente revisor: bugs, quebra de contrato, regras do produto. Não use para escrever código.
 argument-hint: "[número do PR | branch | vazio = branch atual]"
 ---
 
