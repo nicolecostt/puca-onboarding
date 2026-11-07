@@ -19,7 +19,7 @@
 /* A borda usa a cor da "emoção" do agente (--cam-accent, definida no JS):
    forte quando fala/pensa, fraquinha quando está quieto. */
 
-.agent-cam__view{position:absolute;inset:-24%;transition:opacity .3s ease, filter .3s ease}
+.agent-cam__view{position:absolute;inset:4% 4% 14%;transition:opacity .3s ease, filter .3s ease}
 .agent-cam[data-paused] .agent-cam__view{opacity:.45;filter:saturate(.4)}
 
 /* sem o visual da Puca: círculo neutro no lugar */

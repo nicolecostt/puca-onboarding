@@ -34,7 +34,7 @@ src/
     profiles.ts          os dois perfis: ?perfil=bruno (transição) | ?perfil=ana (recém-contratada)
     lessons/             aulas do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css
-    onboarding-call/     call inicial: o agente entrevista a pessoa
+    onboarding-call/     call inicial: o agente entrevista a pessoa e grava a calibragem
     lesson/              aula no quadro: o quadro se monta junto com a fala
     live-session/        tela de auxílio: barra de call, chat e câmera por cima de uma tela
   components/            peças reutilizáveis (cada uma com .ts, .css e icons/)
@@ -44,7 +44,7 @@ src/
     chat-panel/          chat flutuante (Figma: "Chat (floating window)")
     agent-cam/           "câmera" do agente no canto da tela
     agent-cursor/        cursor da Puca (seta + "Puca") mexendo na tela, por enquanto simulado
-  journey/               jornada da aula em JSON: tipos, validador, motor, perfil e intenções (pulo, perguntas)
+  journey/               jornada da aula em JSON: tipos, validador, motor, perfil, calibragem e intenções (pulo, perguntas)
     data/                jornadas em JSON (tail.journey.json é a demo)
   lib/                   código compartilhado
     events.ts            eventos tipados (callbar:*, chatpanel:*, onboarding:*)
@@ -99,8 +99,10 @@ document.addEventListener("callbar:pause", (e) => console.log(e.detail.on));
 
 ## Visual da Puca
 
-O visual da Puca (a agente) ainda está em definição. As telas usam um círculo neutro.
-Se existir `sandbox/puca-teste.ts` (local, fora do git), ele é carregado no lugar.
+A Puca aparece como uma esfera de pontos com uma faixa em onda, sem rosto (`src/lib/puca-sphere.ts`),
+carregada por `loadAgentVisual()` em todas as telas: call inicial, aula e sessão ao vivo. Ela inclina na direção
+do mouse, os pontos perto do cursor crescem e um clique solta uma ondulação. Os estados `idle`/`think`/`talk`
+mudam a velocidade e a forma da onda. As cores ficam em `tokens.css` (`--puca-sphere-*`). Se o visual não carregar, fica um círculo neutro.
 
 ## Aula no quadro
 
