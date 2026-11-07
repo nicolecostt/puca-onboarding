@@ -61,6 +61,11 @@ Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o
    `main` e veja se alguém mudou (na `main` ou num PR aberto) os arquivos que você está mexendo. Um hook roda
    `scripts/sync-check.sh` a cada mensagem e avisa com `[sync]`: quando aparecer, pare e sincronize antes de seguir.
 4. **Escopo pequeno, merge cedo.** Não reformate nem "melhore" o que a issue não pede.
+   - **Faltou algo ou ficou dúvida? Vira issue nova.** Resolvendo uma issue, achou algo faltando (dado, tela, contrato,
+     doc, teste), algo que você não tem certeza de como deve ser, ou algo que sobra (código morto, duplicado)? Não
+     resolva por fora do escopo nem deixe só na conversa: crie uma issue curta (template `tarefa`, label da área), cite a
+     atual (`Relacionada a #<n>`) e diga no PR quais issues abriu. Antes, veja se já não existe uma (`gh issue list --search`).
+     Se a dúvida trava a issue atual, pergunte à pessoa em vez de supor.
 5. **Contratos** ([`docs/contratos.md`](docs/contratos.md)): formato novo ou alterado entra no doc antes de implementar
    os dois lados; quebra de compatibilidade vai marcada no PR.
 6. **Decisão que afeta os outros** vira um arquivo em `docs/decisoes/`. Conversa do dia a dia não vira documento.
