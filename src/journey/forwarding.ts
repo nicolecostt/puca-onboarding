@@ -24,6 +24,8 @@ export interface Forwarding {
   reason: string;
   moment: string | null;
   status: ForwardingStatus;
+  /** Aba do Slack que ficou com o envio (duas abas abertas não mandam duas vezes). */
+  claimed_by?: string;
 }
 
 export const FORWARDING_KEY = "puca:encaminhamentos";
@@ -55,6 +57,13 @@ export function createOutbox(store: KeyValueStore, opts: { now?: () => Date } = 
     },
     setStatus(id: string, status: ForwardingStatus): void {
       write(read().map((f) => (f.id === id ? { ...f, status } : f)));
+    },
+    /** A aba pega o envio: tira dos pendentes e marca a dona. Vale a última que escreveu. */
+    claim(id: string, tab: string): void {
+      write(read().map((f) => (f.id === id ? { ...f, status: "enviando" as const, claimed_by: tab } : f)));
+    },
+    ownerOf(id: string): string | undefined {
+      return read().find((f) => f.id === id)?.claimed_by;
     },
   };
 }

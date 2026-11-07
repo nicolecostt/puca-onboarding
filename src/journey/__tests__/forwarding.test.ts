@@ -82,3 +82,14 @@ describe("forwardingMessage", () => {
     expect(forwardingMessage({ ...f, consulted: [] })).toContain("Não achei nenhuma fonte sobre isso.");
   });
 });
+
+describe("createOutbox: posse do envio entre abas", () => {
+  it("duas abas pegam o mesmo encaminhamento: só a última fica com ele", () => {
+    const store = memoryStore();
+    const f = createOutbox(store).add(draft("x"));
+    createOutbox(store).claim(f.id, "aba-1");
+    createOutbox(store).claim(f.id, "aba-2");
+    expect(createOutbox(store).ownerOf(f.id)).toBe("aba-2");
+    expect(createOutbox(store).pending()).toEqual([]);
+  });
+});

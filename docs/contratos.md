@@ -31,7 +31,7 @@ Exemplo válido de `TrailEntry` (uma fala da pessoa e o que a Puca fez com ela):
 
 `forwarding_id` aparece quando a fala virou encaminhamento; `ms` é o tempo da resposta do agente (`route: "ask"`).
 
-Exemplo válido de `Forwarding` (status: `pendente` → `enviando` → `enviado` → `confirmado`):
+Exemplo válido de `Forwarding` (status: `pendente` → `enviando` → `enviado` → `confirmado`; `claimed_by` é a aba do Slack que pegou o envio, para duas abas não mandarem duas vezes):
 
 ```json
 {
