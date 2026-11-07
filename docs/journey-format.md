@@ -38,11 +38,14 @@ Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json)
             "bullets": ["…"] } }
 ```
 
-- `x`, `y` são o centro do nó num espaço de **1200 × 700**.
-- `kind` muda a cor da faixa do nó: `frontend`, `service`, `db`, `external`, `queue`, `person`, `team`, `value`, `doc`, `task`.
+- `x`, `y` são o centro do nó no quadro, que tem **1440 × 844** (o tamanho do Figma).
+- `kind` diz o que o nó é: `frontend`, `service`, `db`, `external`, `queue`, `person`, `team`, `value`, `doc`, `task`. No quadro, `queue` vira pílula azul; o resto, caixa desenhada.
+- Opcionais de desenho: `w` (largura; sem ela, sai do tamanho do rótulo), `look` (`"blackbox"` = caixa preta tracejada, `"dlq"` = fila de erro vermelha), `note` (selo embaixo do nó). O rótulo aceita `\n` para quebrar linha.
 - `info` alimenta o **cartão do nó** (§4.3): função, time, responsável, fontes e ADR.
 - `owner_confirmed: false` faz o cartão dizer que não há responsável confirmado e indicar a buddy. É a regra de não inventar quem cuida de um sistema.
 - Arestas: `{ "id", "from", "to", "label"? }`. Ids de nós e arestas não podem se repetir no mesmo quadro.
+  Opcionais: `style` (`"inferred"` tracejada cinza, `"retry"` tracejada vermelha), `path`/`head` (desenho exato da linha e da ponta em SVG; sem eles, a seta é calculada), `label_at` e `label_font` (`"hand"` ou `"mono"`), `evidence` (`{ "kind": "proven" | "inferred", "x", "y" }`: selo "✓ provado" ou "inferido").
+- No quadro: `upcoming` (ids que já aparecem apagados desde o começo, como "ainda não explicado") e `labels` (textos soltos `{ "id", "text", "x", "y" }`).
 - Textos aceitam `{nome}`, `{time}`, `{gestor}`, `{cargo}`…, preenchidos com o perfil da pessoa.
 
 ## Momento
@@ -52,7 +55,7 @@ Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json)
 | `id`, `title` | `title` aparece no topo da tela ("Aula · Fluxo de pagamento"). |
 | `goal` | O que o momento quer alcançar. O agente não fala isso. **Não pode repetir** entre momentos. |
 | `view` | `{ "mode": "logo" }` ou `{ "mode": "board", "board": "<nome>" }`. Um momento **com** `view` recomeça o quadro do zero; **sem** `view`, herda o quadro do momento anterior no estado em que ficou. |
-| `knowledge` | Contexto extra que o agente só usa se perguntarem. |
+| `knowledge` | Contexto extra que o agente só usa se perguntarem (ver "Perguntas e pulos"). |
 | `steps` | Ao menos um passo. |
 
 ## Passo
@@ -60,7 +63,9 @@ Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json)
 | Campo | Para quê |
 |---|---|
 | `goal` | O que o passo quer alcançar (não é falado; não pode repetir dentro do momento). |
-| `line` | O que o agente fala. |
+| `line` | O que o agente fala. É uma orientação, não um texto decorado: com um LLM, a Puca adapta as palavras à conversa. |
+| `highlight` | Trecho da fala que fica destacado em amarelo na legenda. |
+| `knowledge` | Contexto extra do passo, como o do momento. |
 | `actions` | Ações no quadro, aplicadas antes da fala (tabela abaixo). |
 | `decision` | `auto` (padrão: segue sozinho), `wait` (espera resposta) ou `select` (espera um toque num nó). |
 | `suggested_replies` | Botões de resposta para passos `wait`. O texto livre do chat é comparado com eles por palavras-chave. |
@@ -76,7 +81,7 @@ Um passo `wait` precisa terminar em pergunta ou ter `suggested_replies`, senão 
 | `{ "type": "reveal", "targets": [ids] }` | Nós aparecem; arestas se desenham. |
 | `{ "type": "highlight", "targets": [ids], "tone": "focus" \| "warn" \| "ok" }` | Destaca e esmaece o resto. |
 | `{ "type": "clear_highlight" }` | Volta tudo ao normal. |
-| `{ "type": "focus", "target": id \| null }` | A câmera aproxima do nó; `null` volta ao quadro inteiro. |
+| `{ "type": "focus", "target": id \| null }` | Anel amarelo no nó que a Puca está explicando; `null` tira. |
 | `{ "type": "flow", "path": [ids de arestas] }` | Um pulso percorre o caminho. |
 | `{ "type": "card", "target": id }` / `{ "type": "close_card" }` | Abre ou fecha o cartão do nó. |
 | `{ "type": "reset" }` | Esconde tudo. |
@@ -97,6 +102,20 @@ Um passo `wait` precisa terminar em pergunta ou ter `suggested_replies`, senão 
 - `if` é o que o motor local avalia: `{ "reply": "<uma das suggested_replies>" }` ou `{ "profile": "<campo>", "eq": "<valor>" }`.
 - `when` é a mesma condição em linguagem natural. Hoje é documentação; quando um LLM conduzir a aula, é o que ele vai ler.
 
+## Perguntas e pulos
+
+Além das respostas sugeridas, a pessoa pode escrever qualquer coisa no chat a qualquer momento:
+
+- **Pedir para mudar de assunto** ("volta pro caminho da transação", "quero ver a primeira tarefa"): a Puca vai para o
+  **início** do momento pedido. Não é preciso escrever transições para isso; os títulos e objetivos dos momentos são o
+  que ela usa para se localizar, por isso precisam ser únicos.
+- **Perguntar algo** ("onde está o cálculo do MDR?"): a Puca responde com o `knowledge` do passo e do momento atuais
+  (ou de outro momento da aula) e continua de onde estava.
+- **Sem fonte confiável**: ela diz que não achou confirmado e anota a dúvida para a buddy, sem chutar.
+
+Hoje isso é simulado por palavras-chave (`src/journey/intent.ts`). Com um LLM, vale o mesmo contrato: `goal` para se
+localizar, `knowledge` para responder, pulo sempre pelo primeiro passo de um momento.
+
 ## Perfil
 
 `{ nome, cargo?, time?, gestor?, ferramentas?, aprender?, vinculo: "novo" | "transicao" }`.
@@ -104,9 +123,7 @@ Um passo `wait` precisa terminar em pergunta ou ter `suggested_replies`, senão 
 A aula escolhe o perfil nesta ordem:
 1. `?perfil=ana` (ou `novo`) e `?perfil=bruno` (ou `transicao`) na URL;
 2. o perfil salvo pela call de entrevista (sessionStorage `puca:profile`);
-3. o perfil de demonstração "novo".
-
-O seletor no topo da tela troca entre os dois perfis de demonstração e reinicia a aula.
+3. o perfil de demonstração do Bruno (mudando de time).
 
 ## Regras que o validador aplica
 

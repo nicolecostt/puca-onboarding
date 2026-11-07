@@ -37,14 +37,13 @@ src/
     live-session/        tela de auxílio: barra de call, chat e câmera por cima de uma tela
   components/            peças reutilizáveis (cada uma com .ts, .css e icons/)
     app-header/          topo do app: logo, empresa, etapas da jornada, pessoa
-    whiteboard/          quadro da aula, desenhado a partir dos dados
+    whiteboard/          quadro da aula (visual do Figma), desenhado a partir da jornada
     call-bar/            barra de call flutuante (Figma: "Session control bar")
     chat-panel/          chat flutuante (Figma: "Chat (floating window)")
     agent-cam/           "câmera" do agente no canto da tela
     agent-cursor/        cursor da Puca (seta + "Puca") mexendo na tela, por enquanto simulado
-  journey/               motor de jornada em JSON: tipos, validador, motor, perfil e quadro (SVG)
+  journey/               jornada da aula em JSON: tipos, validador, motor, perfil e intenções (pulo, perguntas)
     data/                jornadas em JSON (tail.journey.json é a demo)
-    board/               renderizador do quadro
   lib/                   código compartilhado
     events.ts            eventos tipados (callbar:*, chatpanel:*, onboarding:*)
     draggable.ts         arrastar elementos fixos pela tela
@@ -80,15 +79,15 @@ document.addEventListener("callbar:pause", (e) => console.log(e.detail.on));
 O visual da Puca (a agente) ainda está em definição. As telas usam um círculo neutro.
 Se existir `sandbox/puca-teste.ts` (local, fora do git), ele é carregado no lugar.
 
-## Nova aula no quadro
+## Aula no quadro
 
-A tela `src/screens/lesson/` desenha a aula com o quadro de `src/components/whiteboard/`.
-Crie um arquivo em `src/data/lessons/` no formato de `transaction-path.ts`:
-nós (posição no quadro de 1440×844), setas, e os trechos com o que a Puca fala
-(`say`), o que aparece (`reveal`) e o que fica em foco (`focus`).
+A tela `src/screens/lesson/` roda a jornada em JSON (`src/journey/data/tail.journey.json`): a Puca fala, o quadro
+(`src/components/whiteboard/`) vai se montando e a pessoa responde pelas respostas sugeridas, pelo chat ou tocando no quadro.
+Pelo chat ela também pode pedir para mudar de assunto ou fazer perguntas, que a Puca responde com o conhecimento da aula.
+A conversa ainda é simulada (sem LLM nem voz); o motor (`src/journey/runner.ts`) não depende da tela.
 
-## Motor de jornada
+- O perfil vem da call de entrevista: o link "Começar a aula →" no fim dela abre a aula.
+- `?perfil=ana` (recém-contratada: passa pela parte institucional) ou `?perfil=bruno` (mudando de time: vai direto ao time).
+- `?auto=1` responde sozinho, para apresentar sem mexer no mouse.
 
-`src/journey/` tem um motor de roteiro em JSON (momentos, passos, respostas sugeridas, checagem
-tocando no quadro), com testes (`npm test`). A call de entrevista já salva o perfil nesse formato.
-Por enquanto a tela da aula não usa o motor. Formato em [`docs/journey-format.md`](docs/journey-format.md).
+Para uma aula nova, crie outro `*.journey.json` em `src/journey/data/`. Formato em [`docs/journey-format.md`](docs/journey-format.md).
