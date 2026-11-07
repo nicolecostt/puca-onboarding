@@ -133,9 +133,13 @@ fi
 # 4. outros PRs abertos: conflito de verdade (não só "mexe no mesmo arquivo") e seção do PRODUCT.md com mesmo número
 secoes() { git diff "$main...$1" -- PRODUCT.md 2>/dev/null | grep -E '^\+## [0-9]+\. ' | sed -E 's/^\+## ([0-9]+)\..*/\1/' | sort -u; }
 minhas=$(secoes "$pr")
+# arquivos que este PR muda em relação à main: o que veio da main (merge da main na branch) não é dele
+proprios=$(git diff --name-only "$main...$pr" 2>/dev/null)
 for m in $abertos; do
   [ "$m" = "$n" ] && continue
-  c=$(conflitos "$pr" "refs/puca-pr/$m")
+  deles=$(git diff --name-only "$main...refs/puca-pr/$m" 2>/dev/null)
+  # conflito entre PRs só em arquivo que os dois mudam por conta própria (o resto já aparece como conflito com a main)
+  c=$(conflitos "$pr" "refs/puca-pr/$m" | while IFS= read -r l; do f=${l%%|*}; grep -qxF "$f" <<<"$proprios" && grep -qxF "$f" <<<"$deles" && echo "$l"; done)
   iguais=$(comm -12 <(echo "$minhas") <(secoes "refs/puca-pr/$m") | sed '/^$/d' | tr '\n' ' ')
   [ -z "$c" ] && [ -z "$iguais" ] && continue
   atencao+=("conflito com o PR #$m")
