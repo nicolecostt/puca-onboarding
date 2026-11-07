@@ -1,4 +1,4 @@
-// Os dois perfis da demo (docs/context.md, seção 7).
+// Os dois perfis da demo: novo e transição (CONTEXT.md).
 // Troque pela URL: ?perfil=bruno (transição, padrão) ou ?perfil=ana (recém-contratada).
 import type { Profile } from "./types";
 

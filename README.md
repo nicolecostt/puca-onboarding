@@ -1,7 +1,7 @@
 # puca-onboarding
 
 Front da **Lousa**, produto de onboarding e transição entre equipes. A agente que conversa com a pessoa é a **Puca**.
-Contexto do produto em [`docs/context.md`](docs/context.md).
+Visão do produto em [`PRODUCT.md`](PRODUCT.md); glossário em [`CONTEXT.md`](CONTEXT.md).
 
 Vite + TypeScript, sem framework.
 
@@ -20,7 +20,6 @@ npm run build      # build de produção em dist/
 ```
 index.html               lista das telas (página inicial do npm run dev)
 docs/
-  context.md             visão do produto
   journey-format.md      formato da jornada (momentos, passos, quadro, transições)
 src/
   styles/

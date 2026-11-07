@@ -3,7 +3,7 @@
 A aula no quadro é conduzida por uma **jornada** em JSON (`src/journey/data/*.journey.json`).
 O modelo segue a ideia de jornadas usada em agentes de demonstração por voz:
 **momentos** (capítulos) feitos de **passos** (cada fala ou ação do agente). A diferença do Puca é
-uma vista nova, o **quadro**, que o agente monta enquanto explica (§4.1 do [`context.md`](context.md)).
+uma vista nova, o **quadro**, que o agente monta enquanto explica.
 
 Tipos: [`src/journey/types.ts`](../src/journey/types.ts). Validação: [`src/journey/validate.ts`](../src/journey/validate.ts).
 Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json).
