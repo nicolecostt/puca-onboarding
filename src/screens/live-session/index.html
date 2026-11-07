@@ -18,10 +18,192 @@
 </script>
 </head>
 <body>
-  <main class="screen">
-    <h1>Tela de teste</h1>
-    <p>A barra de call fica flutuando por cima de qualquer tela.</p>
-    <div class="log" id="log"></div>
+  <!-- Imitação do Slack (tema claro) com os dados da Tail: a tela onde a Puca ajuda.
+       Barra de call, chat e câmera da Puca flutuam por cima (main.ts). -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-back" viewBox="0 0 20 20"><path d="M16 10H4m5-5-5 5 5 5"/></symbol>
+      <symbol id="i-fwd" viewBox="0 0 20 20"><path d="M4 10h12m-5-5 5 5-5 5"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5"/><path d="M10 5.5V10l3 2"/></symbol>
+      <symbol id="i-search" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4.5 4.5"/></symbol>
+      <symbol id="i-help" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/><path d="M7.8 7.8a2.3 2.3 0 1 1 3.2 2.1c-.6.3-1 .8-1 1.4v.7M10 14.5v.1"/></symbol>
+      <symbol id="i-home" viewBox="0 0 20 20"><path d="M3.5 9 10 3.5 16.5 9v7.5h-13z" fill="currentColor" stroke="none"/><circle cx="10" cy="11" r="1.6" fill="#7a4d7d" stroke="none"/></symbol>
+      <symbol id="i-dms" viewBox="0 0 20 20"><path d="M11 4.5a5 5 0 0 1 5 5c0 1-.3 1.9-.8 2.7l.8 2.3-2.4-.7A5 5 0 1 1 11 4.5z"/><path d="M6.5 8.2A4.5 4.5 0 0 0 4 15.5l-.6 1.8 2-.6"/></symbol>
+      <symbol id="i-bell" viewBox="0 0 20 20"><path d="M5 14V9a5 5 0 0 1 10 0v5l1.5 1.5h-13zM8.5 17.5h3"/></symbol>
+      <symbol id="i-files" viewBox="0 0 20 20"><rect x="5.5" y="5.5" width="11" height="11" rx="3"/><path d="M3.5 13V6a3 3 0 0 1 3-3h7"/></symbol>
+      <symbol id="i-agents" viewBox="0 0 20 20"><circle cx="5.5" cy="5.5" r="2.5"/><circle cx="5.5" cy="14.5" r="2.5"/><circle cx="14.5" cy="14.5" r="2.5"/><path d="M14.5 3v5M12 5.5h5"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 20 20"><path d="M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8z"/></symbol>
+      <symbol id="i-chev" viewBox="0 0 20 20"><path d="m6 8 4 4 4-4"/></symbol>
+      <symbol id="i-gear" viewBox="0 0 20 20"><circle cx="10" cy="10" r="2.5"/><path d="M10 2.5v2m0 11v2M2.5 10h2m11 0h2M4.7 4.7l1.4 1.4m7.8 7.8 1.4 1.4M4.7 15.3l1.4-1.4m7.8-7.8 1.4-1.4"/></symbol>
+      <symbol id="i-compose" viewBox="0 0 20 20"><path d="M16 11v5H4V4h5"/><path d="m14 3 3 3-7 7H7v-3z"/></symbol>
+      <symbol id="i-compass" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5"/><path d="m12.8 7.2-1.6 4-4 1.6 1.6-4z"/></symbol>
+      <symbol id="i-find" viewBox="0 0 20 20"><path d="M3 5h7M3 9h5M3 13h4"/><circle cx="13" cy="11" r="3"/><path d="m15.2 13.2 2.3 2.3"/></symbol>
+      <symbol id="i-threads" viewBox="0 0 20 20"><path d="M10 3.5a6.5 6.5 0 0 1 0 13H4l1.5-2A6.5 6.5 0 0 1 10 3.5z"/><path d="M7 9h6M7 12h4"/></symbol>
+      <symbol id="i-huddle" viewBox="0 0 20 20"><path d="M3.5 13v-3a6.5 6.5 0 0 1 13 0v3"/><rect x="3" y="11.5" width="3.5" height="5" rx="1.2"/><rect x="13.5" y="11.5" width="3.5" height="5" rx="1.2"/></symbol>
+      <symbol id="i-send" viewBox="0 0 20 20"><path d="M3.5 3.5 17 10 3.5 16.5 5.5 10z"/><path d="M5.5 10H11"/></symbol>
+      <symbol id="i-dir" viewBox="0 0 20 20"><rect x="4" y="3" width="12" height="14" rx="2"/><circle cx="10" cy="8.5" r="2"/><path d="M7 13.5a3 3 0 0 1 6 0M2.5 6.5h2M2.5 10h2M2.5 13.5h2"/></symbol>
+      <symbol id="i-star" viewBox="0 0 20 20"><path d="m10 3 2.1 4.4 4.8.6-3.5 3.3.9 4.7L10 13.7 5.7 16l.9-4.7L3.1 8l4.8-.6z"/></symbol>
+      <symbol id="i-hashbox" viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="3"/><path d="M8.3 6.5 7.5 13.5M12.5 6.5l-.8 7M6.3 8.5h7.7M6 11.5h7.7"/></symbol>
+      <symbol id="i-person" viewBox="0 0 20 20"><circle cx="10" cy="7" r="3.5"/><path d="M3.5 17a6.5 6.5 0 0 1 13 0z"/></symbol>
+      <symbol id="i-person-add" viewBox="0 0 20 20"><circle cx="8" cy="7" r="3"/><path d="M2.5 16.5a5.5 5.5 0 0 1 9-4.2M15 11v5M12.5 13.5h5"/></symbol>
+      <symbol id="i-template" viewBox="0 0 20 20"><rect x="6" y="3" width="10" height="12" rx="2"/><path d="M4 6v9a2 2 0 0 0 2 2h7"/></symbol>
+      <symbol id="i-canvas" viewBox="0 0 20 20"><path d="M4 4h12v8l-4 4H4z"/><path d="M12 16v-4h4"/></symbol>
+      <symbol id="i-bell-off" viewBox="0 0 20 20"><path d="M5 14V9a5 5 0 0 1 10 0v5l1.5 1.5h-13zM8.5 17.5h3M3 3l14 14"/></symbol>
+      <symbol id="i-dots" viewBox="0 0 20 20"><circle cx="10" cy="4.5" r="1.2" fill="currentColor"/><circle cx="10" cy="10" r="1.2" fill="currentColor"/><circle cx="10" cy="15.5" r="1.2" fill="currentColor"/></symbol>
+      <symbol id="i-link" viewBox="0 0 20 20"><path d="M8.5 11.5a3 3 0 0 0 4.2 0l3-3a3 3 0 0 0-4.2-4.2l-1 1M11.5 8.5a3 3 0 0 0-4.2 0l-3 3a3 3 0 0 0 4.2 4.2l1-1"/></symbol>
+      <symbol id="i-ol" viewBox="0 0 20 20"><path d="M8 5h9M8 10h9M8 15h9M3 4l1-.5V7M3 12.5a1 1 0 1 1 1.5.8L3 15h2"/></symbol>
+      <symbol id="i-ul" viewBox="0 0 20 20"><path d="M8 5h9M8 10h9M8 15h9"/><circle cx="4" cy="5" r=".9" fill="currentColor"/><circle cx="4" cy="10" r=".9" fill="currentColor"/><circle cx="4" cy="15" r=".9" fill="currentColor"/></symbol>
+      <symbol id="i-quote" viewBox="0 0 20 20"><path d="M4 3.5v13M8 5h9M8 10h9M8 15h6"/></symbol>
+      <symbol id="i-code" viewBox="0 0 20 20"><path d="m7 6-4 4 4 4M13 6l4 4-4 4M11 4.5l-2 11"/></symbol>
+      <symbol id="i-codeblock" viewBox="0 0 20 20"><path d="M6 4H4.5v12H6M14 4h1.5v12H14"/><path d="m9 7-1.5 3L9 13M11 7l1.5 3L11 13"/></symbol>
+      <symbol id="i-strikeblock" viewBox="0 0 20 20"><path d="M4 4h12M4 16h12M3 10h14"/></symbol>
+      <symbol id="i-emoji" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5"/><path d="M7 12a3.5 3.5 0 0 0 6 0"/><circle cx="7.5" cy="8" r=".8" fill="currentColor"/><circle cx="12.5" cy="8" r=".8" fill="currentColor"/></symbol>
+      <symbol id="i-at" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3"/><path d="M13 10v1.2a2.3 2.3 0 0 0 4.5 0V10a7.5 7.5 0 1 0-3 6"/></symbol>
+      <symbol id="i-video" viewBox="0 0 20 20"><rect x="2.5" y="5.5" width="10.5" height="9" rx="2"/><path d="m13 9 4.5-2.5v7L13 11"/></symbol>
+      <symbol id="i-mic" viewBox="0 0 20 20"><rect x="7.5" y="2.5" width="5" height="9" rx="2.5"/><path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v2.5"/></symbol>
+      <symbol id="i-slash" viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="m12.5 6-5 8"/></symbol>
+      <symbol id="i-para" viewBox="0 0 20 20"><path d="M10 4v12M13.5 4v12M15.5 4H8.5a3.5 3.5 0 0 0 0 7H10"/></symbol>
+      <symbol id="i-join" viewBox="0 0 20 20"><circle cx="8" cy="7" r="3"/><path d="M2.5 16.5a5.5 5.5 0 0 1 11 0M15 7.5l2.5 2.5-2.5 2.5M12.5 10h5"/></symbol>
+    </defs>
+  </svg>
+
+  <main class="sk" aria-label="Slack da Tail (simulação)">
+    <!-- ---- Topo ---- -->
+    <header class="sk-top">
+      <div class="sk-top__nav">
+        <svg class="ic"><use href="#i-back"/></svg>
+        <svg class="ic sk-dim"><use href="#i-fwd"/></svg>
+        <svg class="ic"><use href="#i-clock"/></svg>
+      </div>
+      <div class="sk-top__search"><svg class="ic"><use href="#i-search"/></svg>Descreva o que você está buscando</div>
+      <span class="sk-top__ai" aria-hidden="true">P</span>
+      <svg class="ic sk-top__help"><use href="#i-help"/></svg>
+    </header>
+
+    <!-- ---- Coluna de ícones ---- -->
+    <nav class="sk-rail" aria-hidden="true">
+      <span class="sk-rail__ws">TL</span>
+      <span class="sk-rail__item is-current"><span class="sk-rail__btn"><svg class="ic"><use href="#i-home"/></svg><i class="sk-rail__dot"></i></span>Início</span>
+      <span class="sk-rail__item"><span class="sk-rail__btn"><svg class="ic"><use href="#i-dms"/></svg></span>MDs</span>
+      <span class="sk-rail__item"><span class="sk-rail__btn"><svg class="ic"><use href="#i-bell"/></svg><b class="sk-rail__badge">1</b></span>Atividade</span>
+      <span class="sk-rail__item"><span class="sk-rail__btn"><svg class="ic"><use href="#i-files"/></svg></span>Arquivos</span>
+      <span class="sk-rail__item"><span class="sk-rail__btn"><svg class="ic"><use href="#i-agents"/></svg></span>Agentes e ferra-<br>mentas</span>
+      <span class="sk-rail__round sk-rail__push"><svg class="ic"><use href="#i-plus"/></svg></span>
+      <span class="sk-rail__round"><svg class="ic"><use href="#i-moon"/></svg></span>
+      <span class="sk-rail__me">BT<i></i></span>
+    </nav>
+
+    <!-- ---- Lateral ---- -->
+    <aside class="sk-side">
+      <header class="sk-side__head">
+        <strong>Tail</strong><svg class="ic ic--sm"><use href="#i-chev"/></svg>
+        <span class="sk-side__tools"><svg class="ic"><use href="#i-gear"/></svg><svg class="ic"><use href="#i-compose"/></svg></span>
+      </header>
+      <div class="sk-side__scroll">
+        <div class="sk-offer"><svg class="ic"><use href="#i-compass"/></svg><strong>Uma oferta aguarda por você</strong><i></i></div>
+        <div class="sk-find"><svg class="ic"><use href="#i-find"/></svg>Encontrar uma conversa...</div>
+        <ul class="sk-list">
+          <li><svg class="ic"><use href="#i-threads"/></svg>Conversas</li>
+          <li><svg class="ic"><use href="#i-huddle"/></svg>Círculos</li>
+          <li><svg class="ic"><use href="#i-send"/></svg>Rascunhos e enviados</li>
+          <li><svg class="ic"><use href="#i-dir"/></svg>Diretórios</li>
+        </ul>
+        <hr class="sk-sep">
+        <ul class="sk-list">
+          <li><svg class="ic"><use href="#i-star"/></svg>Favoritos</li>
+          <li class="sk-list__hint">Arraste e solte coisas importantes aqui</li>
+        </ul>
+        <ul class="sk-list sk-list--chans">
+          <li class="sk-list__section"><svg class="ic"><use href="#i-hashbox"/></svg>Canais</li>
+          <li class="sk-ch"><b>#</b>deploys</li>
+          <li class="sk-ch"><b>#</b>engenharia</li>
+          <li class="sk-ch"><b>#</b>decisões-técnicas</li>
+          <li class="sk-ch is-hover"><b>#</b>incidentes</li>
+          <li class="sk-ch"><b>#</b>plantão</li>
+          <li class="sk-ch is-current"><b>#</b>time-terminais</li>
+          <li class="sk-ch is-unread"><b>#</b>social</li>
+          <li class="sk-ch"><b>#</b>toda-a-empresa-tail</li>
+          <li class="sk-ch sk-ch--add"><b>+</b>Adicionar canais</li>
+          <li class="sk-list__section"><svg class="ic"><use href="#i-dms"/></svg>Mensagens diretas</li>
+          <li class="sk-dm"><span class="sk-av sk-av--xs sk-av--blue">P<i></i></span>Paula Nunes <em>convidou você</em></li>
+          <li class="sk-dm"><span class="sk-av sk-av--xs sk-av--ghost"><svg class="ic"><use href="#i-person"/></svg><i class="is-off"></i></span>lucas.melo</li>
+          <li class="sk-dm"><span class="sk-av sk-av--xs sk-av--pink"><svg class="ic"><use href="#i-person"/></svg><i></i></span>marcos.vidal</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- ---- Canal ---- -->
+    <section class="sk-chan">
+      <header class="sk-chan__head">
+        <svg class="ic sk-chan__star"><use href="#i-star"/></svg>
+        <h1 class="sk-chan__name"># time-terminais</h1>
+        <span class="sk-chan__tools">
+          <span><svg class="ic"><use href="#i-person"/></svg>7</span>
+          <span><svg class="ic"><use href="#i-huddle"/></svg>Círculo<svg class="ic ic--sm"><use href="#i-chev"/></svg></span>
+          <svg class="ic"><use href="#i-bell-off"/></svg>
+          <svg class="ic"><use href="#i-search"/></svg>
+          <svg class="ic"><use href="#i-dots"/></svg>
+        </span>
+      </header>
+      <nav class="sk-tabs">
+        <span class="is-current"><i class="sk-tabs__bubble"></i>Mensagens</span>
+        <span><svg class="ic"><use href="#i-canvas"/></svg>Adicionar canvas</span>
+        <span><svg class="ic"><use href="#i-plus"/></svg></span>
+      </nav>
+
+      <div class="sk-feed">
+        <div class="sk-intro">
+          <h2># time-terminais</h2>
+          <p><span class="sk-mention">@Marcos Vidal</span> criou este canal hoje. Este é o início do canal <strong># time-terminais</strong>. O canal é para tudo relacionado a #time-terminais. Organize reuniões, compartilhe documentos e tome decisões em conjunto com a equipe. (<a>Editar descrição</a>)</p>
+          <div class="sk-intro__btns">
+            <span><svg class="ic"><use href="#i-person-add"/></svg>Adicionar pessoas ao canal</span>
+            <span><svg class="ic"><use href="#i-template"/></svg>Escolher modelo</span>
+          </div>
+        </div>
+
+        <div class="sk-day"><span>Hoje<svg class="ic ic--sm"><use href="#i-chev"/></svg></span></div>
+
+        <p class="sk-join"><svg class="ic"><use href="#i-join"/></svg>Lucas Melo e 3 outras pessoas entraram em #time-terminais. <span>9h20</span></p>
+
+        <article class="sk-msg">
+          <span class="sk-av sk-av--blue sk-av--lg">L</span>
+          <div class="sk-msg__body">
+            <p class="sk-msg__meta"><strong>Lucas Melo</strong><span>9h32</span></p>
+            <p><a class="sk-link"><svg class="ic ic--sm"><use href="#i-link"/></svg>github.com/tail/terminal-config-api#readme</a></p>
+            <div class="sk-unfurl">
+              <div>
+                <strong>terminal-config-api — README</strong>
+                <p>Configuração das maquininhas TailPOS: como uma mudança chega até a CDN</p>
+                <p class="sk-unfurl__src"><span class="sk-unfurl__logo" aria-hidden="true"></span>GitHub</p>
+              </div>
+              <div class="sk-unfurl__thumb" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="sk-composer" aria-hidden="true">
+        <div class="sk-composer__fmt">
+          <b>B</b><b class="it">I</b><b class="un">U</b><b class="st">S</b>
+          <svg class="ic"><use href="#i-para"/></svg><svg class="ic ic--sm"><use href="#i-chev"/></svg>
+          <i class="sk-vsep"></i>
+          <svg class="ic"><use href="#i-link"/></svg><svg class="ic"><use href="#i-ol"/></svg><svg class="ic"><use href="#i-ul"/></svg>
+          <i class="sk-vsep"></i>
+          <svg class="ic"><use href="#i-quote"/></svg><svg class="ic"><use href="#i-code"/></svg><svg class="ic"><use href="#i-codeblock"/></svg><svg class="ic"><use href="#i-strikeblock"/></svg>
+        </div>
+        <p class="sk-composer__input">Enviar mensagem para #time-terminais</p>
+        <div class="sk-composer__actions">
+          <span class="sk-composer__plus"><svg class="ic"><use href="#i-plus"/></svg></span>
+          <b class="aa">Aa</b><svg class="ic"><use href="#i-emoji"/></svg><svg class="ic"><use href="#i-at"/></svg>
+          <i class="sk-vsep"></i>
+          <svg class="ic"><use href="#i-video"/></svg><svg class="ic"><use href="#i-mic"/></svg>
+          <i class="sk-vsep"></i>
+          <svg class="ic"><use href="#i-slash"/></svg>
+          <span class="sk-composer__send"><svg class="ic"><use href="#i-send"/></svg><svg class="ic ic--sm"><use href="#i-chev"/></svg></span>
+        </div>
+      </div>
+    </section>
   </main>
 
 <script type="module" src="./main.ts"></script>

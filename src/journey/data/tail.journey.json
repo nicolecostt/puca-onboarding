@@ -1,19 +1,19 @@
 {
   "version": 1,
-  "id": "mare-pagamentos-terminais",
+  "id": "tail-terminais",
   "title": "Sua primeira aula",
-  "company": "Maré Pagamentos",
+  "company": "Tail",
   "agent": {
     "name": "Puca",
     "guidelines": {
-      "core_identity": "Você é a Puca, mentora de integração da Maré Pagamentos, uma empresa fictícia de maquininhas e pagamentos. Você acompanha quem acabou de entrar ou está mudando de time e explica a empresa, o time e os sistemas montando um quadro visual.",
+      "core_identity": "Você é a Puca, mentora de integração da Tail, uma empresa fictícia de maquininhas e pagamentos. Você acompanha quem acabou de entrar ou está mudando de time e explica a empresa, o time e os sistemas montando um quadro visual.",
       "personality_and_tone": "Acolhedora, direta e calma. Frases curtas. Explica termos técnicos na primeira vez que aparecem. Nunca avalia nem dá nota para a pessoa.",
       "safety_and_escalation": "Quando não houver fonte confiável, diga que não conseguiu confirmar e indique a buddy. Dúvidas sobre salário, contrato ou políticas de RH vão para o RH, com um resumo da dúvida."
     }
   },
   "boards": {
     "empresa": {
-      "title": "A Maré",
+      "title": "A Tail",
       "nodes": [
         { "id": "missao", "label": "Missão", "sublabel": "vender e receber sem atrito", "kind": "value", "x": 600, "y": 110,
           "info": { "role": "Fazer vender e receber ser simples para o lojista, da maquininha até o dinheiro na conta.", "docs": [{ "title": "Notion · Quem somos" }] } },
@@ -40,7 +40,7 @@
       "title": "Seu time",
       "nodes": [
         { "id": "time", "label": "{time}", "sublabel": "seu time", "kind": "team", "x": 600, "y": 340,
-          "info": { "role": "Cuida das maquininhas MaréPOS: configuração, firmware e tudo o que chega nelas.", "owner": "{gestor}", "owner_confirmed": true, "docs": [{ "title": "Notion · Página do time" }] } },
+          "info": { "role": "Cuida das maquininhas TailPOS: configuração, firmware e tudo o que chega nelas.", "owner": "{gestor}", "owner_confirmed": true, "docs": [{ "title": "Notion · Página do time" }] } },
         { "id": "gestor", "label": "{gestor}", "sublabel": "gestão", "kind": "person", "x": 600, "y": 110,
           "info": { "role": "Prioridades, metas, acessos e acompanhamento da sua integração.", "team": "{time}" } },
         { "id": "buddy", "label": "Paula Nunes", "sublabel": "sua buddy", "kind": "person", "x": 250, "y": 210,
@@ -62,7 +62,7 @@
     "pagamentos": {
       "title": "O caminho de uma transação",
       "nodes": [
-        { "id": "pos", "label": "MaréPOS", "sublabel": "maquininha", "kind": "external", "x": 110, "y": 330,
+        { "id": "pos", "label": "TailPOS", "sublabel": "maquininha", "kind": "external", "x": 110, "y": 330,
           "info": { "role": "A maquininha do lojista. Lê o cartão e manda a transação para o pos-gateway." } },
         { "id": "gateway", "label": "pos-gateway", "sublabel": "@diegoramos", "kind": "service", "x": 330, "y": 330,
           "info": { "role": "Recebe as transações das maquininhas, gera a chave de idempotência e chama o authorizer.", "team": "Autorização", "owner": "Diego Ramos", "owner_confirmed": true,
@@ -71,7 +71,7 @@
         { "id": "authorizer", "label": "authorizer", "sublabel": "@juliapaiva", "kind": "service", "x": 560, "y": 150,
           "info": { "role": "Decide se a transação é aprovada e calcula o MDR, a taxa cobrada do lojista.", "team": "Autorização", "owner": "Júlia Paiva", "owner_confirmed": true,
                     "docs": [{ "title": "ADR-019 · Cálculo de MDR por plano" }, { "title": "fees/mdr.go" }] } },
-        { "id": "common", "label": "mare-common", "sublabel": "biblioteca", "kind": "service", "x": 810, "y": 150,
+        { "id": "common", "label": "tail-common", "sublabel": "biblioteca", "kind": "service", "x": 810, "y": 150,
           "info": { "role": "Biblioteca compartilhada. A ligação com o authorizer foi deduzida do código, ainda sem confirmação de quem cuida.", "owner_confirmed": false } },
         { "id": "topic", "label": "transactions.authorized", "kind": "queue", "x": 590, "y": 330,
           "info": { "role": "Fila onde o gateway publica toda venda aprovada. É assim que o resto da empresa fica sabendo.", "team": "Autorização" } },
@@ -88,7 +88,7 @@
           "info": { "role": "Fila que avisa que a configuração de uma maquininha mudou.", "team": "{time}" } },
         { "id": "cdn-publisher", "label": "firmware-cdn-publisher", "sublabel": "@lucasmelo", "kind": "service", "x": 790, "y": 620,
           "info": { "role": "Pega a configuração nova e publica o firmware certo na CDN.", "team": "{time}", "owner": "Lucas Melo", "owner_confirmed": true } },
-        { "id": "cdn", "label": "CDN", "sublabel": "cdn.mare.dev", "kind": "external", "x": 1060, "y": 620,
+        { "id": "cdn", "label": "CDN", "sublabel": "cdn.tail.dev", "kind": "external", "x": 1060, "y": 620,
           "info": { "role": "De onde as maquininhas baixam firmware e configuração." } },
         { "id": "task", "label": "Primeira tarefa", "sublabel": "versão mínima de firmware", "kind": "task", "x": 220, "y": 480,
           "info": { "role": "Validar a versão mínima de firmware antes de publicar uma configuração.",
@@ -127,27 +127,27 @@
         {
           "id": "bv-novo",
           "goal": "Explicar o roteiro de quem acabou de chegar",
-          "line": "Como é o seu começo aqui, vou primeiro te mostrar quem é a Maré, depois o seu time e, por fim, o caminho de uma transação.",
+          "line": "Como é o seu começo aqui, vou primeiro te mostrar quem é a Tail, depois o seu time e, por fim, o caminho de uma transação.",
           "transitions": [{ "to": { "moment": "empresa-e-cultura" } }]
         },
         {
           "id": "bv-transicao",
           "goal": "Explicar o roteiro de quem está mudando de time",
-          "line": "Como você já conhece a Maré, vou pular a apresentação institucional e ir direto ao que muda: o novo time e os sistemas dele.",
+          "line": "Como você já conhece a Tail, vou pular a apresentação institucional e ir direto ao que muda: o novo time e os sistemas dele.",
           "transitions": [{ "to": { "moment": "seu-time" } }]
         }
       ]
     },
     {
       "id": "empresa-e-cultura",
-      "title": "A Maré",
+      "title": "A Tail",
       "goal": "Apresentar missão, valores e áreas da empresa",
       "view": { "mode": "board", "board": "empresa" },
       "steps": [
         {
           "id": "ec-missao",
           "goal": "Mostrar a missão",
-          "line": "A Maré existe para fazer vender e receber ser simples para o lojista, da maquininha até o dinheiro na conta. Essa é a nossa missão.",
+          "line": "A Tail existe para fazer vender e receber ser simples para o lojista, da maquininha até o dinheiro na conta. Essa é a nossa missão.",
           "actions": [{ "type": "reveal", "targets": ["missao"] }]
         },
         {
@@ -194,7 +194,7 @@
         {
           "id": "st-time",
           "goal": "Apresentar o time",
-          "line": "Este é o seu time, {time}. Ele cuida das maquininhas MaréPOS: a configuração, o firmware e tudo o que chega nelas.",
+          "line": "Este é o seu time, {time}. Ele cuida das maquininhas TailPOS: a configuração, o firmware e tudo o que chega nelas.",
           "actions": [{ "type": "reveal", "targets": ["time"] }]
         },
         {
@@ -250,7 +250,7 @@
         {
           "id": "pg-pos",
           "goal": "Mostrar a entrada do fluxo",
-          "line": "Agora a parte técnica. Vamos seguir uma transação do começo ao fim. Tudo começa na maquininha, a MaréPOS.",
+          "line": "Agora a parte técnica. Vamos seguir uma transação do começo ao fim. Tudo começa na maquininha, a TailPOS.",
           "actions": [
             { "type": "reveal", "targets": ["pos"] },
             { "type": "focus", "target": "pos" }
@@ -277,7 +277,7 @@
         {
           "id": "pg-common",
           "goal": "Mostrar uma ligação ainda não confirmada",
-          "line": "O authorizer calcula o MDR, a taxa cobrada do lojista, e responde. Ele usa a mare-common, mas isso eu deduzi do código: o dono ainda não confirmou.",
+          "line": "O authorizer calcula o MDR, a taxa cobrada do lojista, e responde. Ele usa a tail-common, mas isso eu deduzi do código: o dono ainda não confirmou.",
           "actions": [
             { "type": "reveal", "targets": ["common", "e-auth-common"] },
             { "type": "highlight", "targets": ["common", "e-auth-common"], "tone": "warn" }
@@ -406,7 +406,7 @@
         {
           "id": "qc-common",
           "goal": "Admitir quando o dono não está confirmado",
-          "line": "Sobre a mare-common, eu não encontrei um responsável confirmado. Em vez de chutar, a dica é perguntar para a Júlia, que usa a biblioteca no authorizer. Já deixei essa dúvida anotada.",
+          "line": "Sobre a tail-common, eu não encontrei um responsável confirmado. Em vez de chutar, a dica é perguntar para a Júlia, que usa a biblioteca no authorizer. Já deixei essa dúvida anotada.",
           "actions": [
             { "type": "clear_highlight" },
             { "type": "highlight", "targets": ["common"], "tone": "warn" },

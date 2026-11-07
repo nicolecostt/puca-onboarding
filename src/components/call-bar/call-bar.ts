@@ -25,6 +25,8 @@ export interface CallBarOptions {
   /** Painel de chat que o botão de chat abre e fecha. */
   chat?: ChatPanel;
   parent?: HTMLElement;
+  /** false = barra fixa no lugar padrão, sem arrastar (padrão: true). */
+  draggable?: boolean;
 }
 
 export interface CallBar {
@@ -94,7 +96,11 @@ export function mountCallBar(opts: CallBarOptions = {}): CallBar {
     ring.classList.add("is-pulsing");
   }
 
-  const drag = makeDraggable(dock, { storageKey: "callbar:pos", threshold: 5, suppressClickAfterDrag: true });
+  const drag =
+    opts.draggable === false
+      ? { reset: () => {} }
+      : makeDraggable(dock, { storageKey: "callbar:pos", threshold: 5, suppressClickAfterDrag: true });
+  dock.classList.toggle("is-fixed", opts.draggable === false);
 
   const api: CallBar = {
     el: dock,

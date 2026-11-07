@@ -1,5 +1,5 @@
 /* Aula no quadro (Figma: "03 · Aula no quadro — o wow").
-   O quadro (src/journey/board) ocupa a tela toda abaixo do cabeçalho; os cartões flutuam por cima. */
+   O quadro ocupa a tela toda abaixo do cabeçalho; os cartões flutuam por cima. */
 body {
   overflow: hidden;
 }
@@ -10,57 +10,6 @@ body {
 .lesson__board {
   position: absolute;
   inset: 0;
-}
-/* o desenho fica entre o título (em cima) e a legenda + barra de call (embaixo);
-   o fundo pontilhado continua na tela toda */
-.lesson__board .board__svg {
-  position: absolute;
-  left: 24px;
-  top: 104px;
-  width: calc(100% - 48px);
-  height: calc(100% - 104px - 150px);
-}
-
-/* ---- Abertura e encerramento (vista "logo") ---- */
-.opening {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding-bottom: 120px; /* espaço da legenda e da barra de call */
-  text-align: center;
-  background-color: var(--color-board);
-  background-image: radial-gradient(var(--color-board-dot) 1px, transparent 1.2px);
-  background-size: 22px 22px;
-}
-.opening[hidden] {
-  display: none;
-}
-.opening__company {
-  margin: 0;
-  font: 400 clamp(36px, 5vw, 56px) / 1.1 var(--font-hand);
-  color: var(--color-sketch);
-}
-.opening__title {
-  margin: 0;
-  font-size: var(--text-lg);
-  color: var(--color-muted);
-}
-.opening__who {
-  margin: 10px 0 0;
-  height: 26px;
-  padding: 0 12px;
-  display: inline-flex;
-  align-items: center;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-chip);
-  font-size: var(--text-sm);
-  font-weight: 500;
 }
 
 /* ---- Peças comuns ---- */
@@ -128,7 +77,7 @@ body {
   bottom: 72px; /* 12px acima da barra de call */
   transform: translateX(-50%);
   width: min(760px, calc(100% - 32px));
-  min-height: 44px;
+  min-height: 62px; /* sempre duas linhas: não pula quando a fala quebra a linha */
   padding: 10px 16px;
   display: flex;
   align-items: flex-start;
@@ -141,7 +90,6 @@ body {
 }
 .caption:has(.caption__text:empty) {
   opacity: 0;
-  pointer-events: none;
 }
 .caption__logo {
   flex: none;
@@ -155,86 +103,26 @@ body {
   color: #fafafa;
   font: 700 12px/1 var(--font-hand);
 }
-.caption__body {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.caption__body p {
-  margin: 0;
-}
 .caption__text {
+  margin: 0;
   font-size: var(--text-base);
   line-height: 21px;
 }
+.caption__text mark {
+  background: var(--color-highlight);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 1px;
+}
 .caption__you {
-  font-size: var(--text-md);
   color: var(--color-muted);
 }
-.caption__you:empty,
-.caption__hint:empty,
-.caption__replies:empty {
-  display: none;
-}
-.caption__you::before {
-  content: "Você: ";
-  color: var(--color-subtle);
-}
-.caption__hint {
-  font-size: var(--text-sm);
-  color: var(--color-subtle);
-}
 
-/* respostas sugeridas: pílulas pequenas dentro da legenda */
-.caption__replies {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding-top: 2px;
-}
-.reply {
-  all: unset;
-  box-sizing: border-box;
-  height: 28px;
-  padding: 0 12px;
-  display: inline-flex;
-  align-items: center;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-chip);
-  font-size: var(--text-md);
-  font-weight: 500;
-  color: var(--color-text);
-  cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
-  animation: reply-in 0.3s ease both;
-}
-.reply:hover {
-  border-color: var(--color-subtle);
-}
-.reply:focus-visible {
-  outline: 2px solid var(--color-info);
-  outline-offset: 2px;
-}
-.reply[disabled] {
-  opacity: 0.45;
-  cursor: default;
-}
-@keyframes reply-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-}
-
-/* ---- Ondas de voz ao lado da barra de call (a barra tem 42px de altura) ---- */
+/* ---- Ao lado da barra de call (a barra tem 270px de largura e 42px de altura) ---- */
 .voice {
-  position: absolute; /* dentro da barra de call (main.ts), à esquerda dela */
-  bottom: 0;
-  right: calc(100% + 12px);
+  position: fixed;
+  bottom: 18px; /* mesma base da barra de call */
+  right: calc(50% + 147px); /* metade da barra (135px) + 12px */
   height: 42px;
   padding: 0 14px;
   display: flex;
@@ -255,19 +143,16 @@ body {
   height: 4px;
   border-radius: 2px;
   background: var(--color-text);
-  transition: height 0.2s ease, opacity 0.2s ease;
 }
+/* ondas paradas: falando = alturas fixas variadas; ouvindo/pausada = pontinhos */
 .voice[data-state="talk"] .voice__bars i {
-  animation: voice-bar 0.9s ease-in-out infinite;
+  height: 10px;
 }
-.voice__bars i:nth-child(2n) {
-  animation-delay: -0.3s !important;
+.voice[data-state="talk"] .voice__bars i:nth-child(3n) {
+  height: 16px;
 }
-.voice__bars i:nth-child(3n) {
-  animation-delay: -0.55s !important;
-}
-.voice__bars i:nth-child(5n) {
-  animation-delay: -0.15s !important;
+.voice[data-state="talk"] .voice__bars i:nth-child(4n + 1) {
+  height: 6px;
 }
 .voice[data-state="listen"] .voice__bars i {
   height: 4px;
@@ -276,15 +161,6 @@ body {
 .voice[data-state="paused"] .voice__bars i {
   height: 3px;
   opacity: 0.3;
-}
-@keyframes voice-bar {
-  0%,
-  100% {
-    height: 5px;
-  }
-  50% {
-    height: 18px;
-  }
 }
 
 /* ---- Telas menores: tira o que é secundário ---- */
@@ -301,12 +177,4 @@ body {
     bottom: 140px;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .reply {
-    animation: none;
-  }
-  .voice[data-state="talk"] .voice__bars i {
-    animation: none;
-    height: 10px;
-  }
-}
+

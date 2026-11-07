@@ -1,0 +1,84 @@
+/* Cursor da Puca: seta + etiqueta com o nome, na cor da Puca. A ponta da seta fica no ponto (0, 0). */
+.agent-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 997; /* acima da tela; abaixo da câmera, do chat e da barra de call */
+  pointer-events: none;
+  transition-property: transform, opacity;
+  transition-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
+  font-family: var(--font-sans);
+}
+.agent-cursor.is-hidden {
+  opacity: 0;
+}
+.agent-cursor__arrow {
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  width: 30px;
+  height: 30px;
+  fill: var(--color-puca);
+  stroke: var(--color-puca-text);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.18));
+  transform-origin: 4px 4px;
+  transition: transform 0.12s ease;
+}
+.agent-cursor__tag {
+  position: absolute;
+  left: 22px;
+  top: 24px;
+  height: 28px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--color-puca);
+  color: var(--color-puca-text);
+  font-size: var(--text-base);
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+}
+
+/* clique: a seta aperta e um anel sai da ponta */
+.agent-cursor__ring {
+  position: absolute;
+  left: -14px;
+  top: -14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--color-puca);
+  opacity: 0;
+}
+.agent-cursor.is-clicking .agent-cursor__arrow {
+  animation: agent-cursor-press 0.3s ease;
+}
+.agent-cursor.is-clicking .agent-cursor__ring {
+  animation: agent-cursor-ring 0.45s ease-out;
+}
+@keyframes agent-cursor-press {
+  50% {
+    transform: scale(0.82);
+  }
+}
+@keyframes agent-cursor-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-cursor.is-clicking .agent-cursor__arrow,
+  .agent-cursor.is-clicking .agent-cursor__ring {
+    animation: none;
+  }
+}

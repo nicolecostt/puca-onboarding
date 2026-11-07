@@ -1,0 +1,313 @@
+/* Quadro da aula. Tudo dentro de .wb__stage está em px do Figma (1440×844)
+   e é escalado pelo JS para caber na área. */
+.wb {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--color-board);
+  background-image: radial-gradient(var(--color-board-dot) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.wb__stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center;
+}
+.wb__edges {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* ---- Estados de cada elemento ---- */
+/* (os nós usam all:unset, então a regra de escondido precisa vir depois deles: ver "Nós") */
+.wb-node,
+.wb-label,
+.wb-badge,
+.wb-edge {
+  opacity: 0;
+  transition: opacity 0.45s ease, transform 0.45s ease, box-shadow 0.3s ease;
+}
+.wb-label,
+.wb-badge {
+  transform: translateY(4px) scale(0.97);
+  pointer-events: none;
+}
+.wb .is-upcoming {
+  opacity: 0.3;
+  transform: none;
+}
+.wb .wb-label.is-upcoming {
+  opacity: 0.45;
+}
+.wb .wb-edge.is-upcoming {
+  opacity: 0.3;
+}
+.wb .is-shown {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+/* ---- Setas ---- */
+.wb-edge path {
+  fill: none;
+  stroke: var(--color-sketch);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* seta "se desenha" ao aparecer */
+.wb-edge--solid .wb-edge__line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.7s ease;
+}
+.wb-edge--solid.is-shown .wb-edge__line,
+.wb-edge--solid.is-upcoming .wb-edge__line {
+  stroke-dashoffset: 0;
+}
+.wb-edge__head {
+  transition: opacity 0.2s ease 0.55s;
+  opacity: 0;
+}
+.wb-edge.is-shown .wb-edge__head,
+.wb-edge.is-upcoming .wb-edge__head {
+  opacity: 1;
+}
+.wb-edge--inferred path {
+  stroke: #a1a1a1;
+}
+.wb-edge--inferred .wb-edge__line {
+  stroke-dasharray: 5 5;
+}
+.wb-edge--retry path {
+  stroke: var(--color-danger);
+}
+.wb-edge--retry .wb-edge__line {
+  stroke-dasharray: 5 5;
+}
+.wb-edge--retry.is-shown {
+  opacity: 0.6;
+}
+
+/* ---- Nós ---- */
+.wb-node {
+  all: unset;
+  box-sizing: border-box;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-sketch);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sketch);
+  text-align: center;
+  cursor: pointer;
+  /* escondido até ser revelado */
+  opacity: 0;
+  transform: translateY(4px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.45s ease, box-shadow 0.3s ease;
+}
+.wb .wb-node.is-upcoming {
+  opacity: 0.3;
+  transform: none;
+}
+.wb .wb-node.is-shown {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.wb-node:focus-visible {
+  outline: 2px solid var(--color-info);
+  outline-offset: 3px;
+}
+.wb-node__label {
+  font: 400 16px/18.4px var(--font-hand);
+  color: var(--color-sketch);
+  white-space: nowrap;
+}
+.wb-node__owner {
+  padding-top: 3px;
+  font: 400 10px/11.5px var(--font-sans);
+  color: var(--color-faint);
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border-radius: 3px;
+}
+.wb--owners .wb-node__owner {
+  color: var(--color-text);
+  font-weight: 600;
+  background: var(--color-highlight);
+  padding: 2px 4px 0;
+  margin-top: 2px;
+}
+.wb-node:hover {
+  box-shadow: var(--shadow-sketch), 0 0 0 4px rgba(23, 23, 23, 0.06);
+}
+.wb-node.is-open {
+  box-shadow: var(--shadow-sketch), 0 0 0 4px rgba(25, 113, 194, 0.18);
+}
+
+.wb-node--topic {
+  padding: 8px 6px;
+  background: var(--color-info-bg);
+  border-color: var(--color-info);
+  border-radius: var(--radius-node-pill);
+}
+.wb-node--topic .wb-node__label {
+  color: var(--color-info-text);
+}
+.wb-node--blackbox {
+  background: #f4f4f4;
+  border: 2px dashed var(--color-subtle);
+}
+.wb-node--blackbox .wb-node__label {
+  color: var(--color-subtle);
+}
+.wb-node--dlq {
+  background: var(--color-danger-bg);
+  border: 2px dashed var(--color-danger);
+  border-radius: var(--radius-node-pill);
+}
+.wb-node--dlq .wb-node__label {
+  color: var(--color-danger-text);
+}
+
+/* foco: anel amarelo (o que o agente está explicando agora) */
+.wb-node.is-focus {
+  box-shadow: 0 0 0 6px var(--color-highlight), var(--shadow-sketch);
+}
+
+.wb-node__lock {
+  position: absolute;
+  right: -9px;
+  top: -11px;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--color-muted);
+  border: 2px solid var(--color-board);
+}
+.wb-node__lock img,
+.wb-node__note img {
+  display: block;
+}
+.wb-node__note {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 11px);
+  transform: translateX(-50%);
+  height: 20px;
+  padding: 0 7px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f4f4f4;
+  border: 1px dashed var(--color-subtle);
+  border-radius: var(--radius-sm);
+  font: 500 var(--text-xs) / 1 var(--font-sans);
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+/* ---- Rótulos e selos ---- */
+.wb-label {
+  position: absolute;
+  white-space: nowrap;
+}
+.wb-label--hand {
+  font: 400 14px/18px var(--font-hand);
+  color: var(--color-sketch);
+}
+.wb-label--mono {
+  font: 400 11px/18px var(--font-mono);
+  color: var(--color-faint);
+}
+.wb-label--danger {
+  color: var(--color-danger-text);
+}
+.wb-label--danger.is-shown {
+  opacity: 0.7;
+}
+
+.wb-badge {
+  position: absolute;
+  height: 20px;
+  padding: 0 7px;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  font: 600 10.5px/1 var(--font-sans);
+  white-space: nowrap;
+}
+.wb-badge--proven {
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
+  color: var(--color-success);
+}
+.wb-badge--inferred {
+  background: var(--color-surface-muted);
+  border: 1px dashed #a1a1a1;
+  color: var(--color-muted);
+}
+
+/* ---- Detalhes do nó ---- */
+.wb-pop {
+  position: absolute;
+  z-index: 5;
+  width: 280px;
+  padding: 12px 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+  font-family: var(--font-sans);
+}
+.wb-pop[hidden] {
+  display: none;
+}
+.wb-pop p {
+  margin: 0;
+}
+.wb-pop__title {
+  font: 400 17px/1.3 var(--font-hand);
+  color: var(--color-sketch);
+  margin-bottom: 4px !important;
+}
+.wb-pop__what {
+  font-size: var(--text-md);
+  line-height: 1.5;
+  color: var(--color-text);
+}
+.wb-pop__row {
+  margin-top: 8px !important;
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 8px;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+.wb-pop__row span {
+  color: var(--color-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wb-node,
+  .wb-label,
+  .wb-badge,
+  .wb-edge,
+  .wb-edge__line,
+  .wb-edge__head {
+    transition: none;
+  }
+}

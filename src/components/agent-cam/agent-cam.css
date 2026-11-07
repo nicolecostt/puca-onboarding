@@ -39,16 +39,17 @@
 }
 .agent-cam__dot{width:6px;height:6px;border-radius:50%;background:var(--cam-dot, var(--color-subtle))} /* cor vem do JS */
 
-/* o chat abre logo acima da câmera (se não foi arrastado) */
+/* o chat abre colado na câmera, onde ela estiver (posição calculada no agent-cam.ts),
+   a menos que o próprio chat tenha sido arrastado */
 body.has-agent-cam .chat-panel:not(.is-placed){
-  bottom:calc(24px + var(--agent-cam-size, 176px) + 12px);
-  height:min(560px, calc(100vh - 24px - var(--agent-cam-size, 176px) - 12px - 24px));
+  right:var(--chat-right, 24px);
+  bottom:var(--chat-bottom, 212px);
+  top:var(--chat-top, auto);
+  height:min(560px, var(--chat-space, 560px));
 }
 
 @media (max-width:760px){
   .agent-cam{--cam-size:120px;right:16px;bottom:116px}
-  body.has-agent-cam{--agent-cam-size:120px}
-  body.has-agent-cam .chat-panel:not(.is-placed){bottom:calc(116px + 120px + 12px);height:min(560px, calc(100vh - 116px - 120px - 12px - 16px))}
 }
 @media (prefers-reduced-motion:reduce){
   .agent-cam,.agent-cam__view{transition:none}

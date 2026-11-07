@@ -74,15 +74,33 @@ export function mountAgentCam(opts: AgentCamOptions = {}): AgentCam {
     requestAnimationFrame(tint);
   })();
 
-  // Arrastar. Fora do canto, o chat deixa de abrir "em cima" dela.
+  // O chat abre colado na câmera, onde quer que ela esteja: acima dela, ou abaixo se não couber.
+  // Passa a posição para o CSS do chat por variáveis no body (ver agent-cam.css).
+  function syncChat(): void {
+    const r = cam.getBoundingClientRect();
+    const visible = !cam.classList.contains("is-hidden");
+    document.body.classList.toggle("has-agent-cam", visible);
+    if (!visible) return;
+    const gap = 12;
+    const below = r.top < 320; // pouco espaço em cima: abre embaixo
+    const style = document.body.style;
+    style.setProperty("--chat-right", `${Math.max(8, innerWidth - r.right)}px`);
+    style.setProperty("--chat-bottom", below ? "auto" : `${innerHeight - r.top + gap}px`);
+    style.setProperty("--chat-top", below ? `${r.bottom + gap}px` : "auto");
+    style.setProperty("--chat-space", `${below ? innerHeight - r.bottom - gap - 16 : r.top - gap - 16}px`);
+  }
+
+  // Arrastar: o chat acompanha.
   const drag = makeDraggable(cam, {
     storageKey: "agentcam:pos",
     threshold: 3,
     preventDefault: true,
     dblClickOnButtons: true,
-    onPlace: () => document.body.classList.remove("has-agent-cam"),
-    onReset: () => document.body.classList.add("has-agent-cam"),
+    onPlace: syncChat,
+    onReset: syncChat,
   });
+  addEventListener("resize", syncChat);
+  requestAnimationFrame(syncChat);
 
   const api: AgentCam = {
     el: cam,
@@ -103,9 +121,11 @@ export function mountAgentCam(opts: AgentCamOptions = {}): AgentCam {
     },
     show() {
       cam.classList.remove("is-hidden");
+      syncChat();
     },
     hide() {
       cam.classList.add("is-hidden");
+      syncChat();
     },
     resetPosition: drag.reset,
   };
