@@ -9,7 +9,7 @@ import { loadAgentVisual, type AgentVisualState } from "../../lib/agent-visual";
 
 async function main(): Promise<void> {
   const chat = mountChatPanel();
-  mountCallBar({ status: "Abrindo o README que o Lucas mandou…", chat });
+  mountCallBar({ chat }); // sem status por cima do Slack
   const cam = mountAgentCam({ name: "Puca", visual: await loadAgentVisual() });
 
   // Simula a Puca conversando: fala por um tempo, faz uma pausa, às vezes pensa
