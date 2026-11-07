@@ -1,10 +1,10 @@
 // Arrastar um elemento fixo pela tela. Usado pela barra de call, pelo chat e pela câmera.
 // Regras comuns: só vira arraste depois de mexer alguns px, não sai da tela,
-// lembra a posição (localStorage) e duplo clique volta para o lugar original.
+// lembra a posição de cada tela (localStorage) e duplo clique volta para o lugar original.
 import { targetEl } from "./dom";
 
 export interface DraggableOptions {
-  /** Chave no localStorage para lembrar a posição. */
+  /** Chave no localStorage para lembrar a posição (vale por tela). */
   storageKey: string;
   /** Onde o arraste começa (padrão: o próprio elemento). */
   handle?: HTMLElement;
@@ -31,6 +31,8 @@ const MARGIN = 8;
 
 export function makeDraggable(el: HTMLElement, opts: DraggableOptions): { reset: () => void } {
   const handle = opts.handle ?? el;
+  // cada tela lembra a sua posição: o layout muda de uma tela para outra
+  const storageKey = `${opts.storageKey}@${location.pathname}`;
   const threshold = opts.threshold ?? 5;
 
   function place(x: number, y: number): Point {
@@ -48,7 +50,7 @@ export function makeDraggable(el: HTMLElement, opts: DraggableOptions): { reset:
     el.classList.remove("is-placed");
     el.style.left = el.style.top = "";
     try {
-      localStorage.removeItem(opts.storageKey);
+      localStorage.removeItem(storageKey);
     } catch {
       /* sem localStorage: tudo bem */
     }
@@ -84,7 +86,7 @@ export function makeDraggable(el: HTMLElement, opts: DraggableOptions): { reset:
       justDragged = true;
       setTimeout(() => (justDragged = false), 0); // o click vem logo depois do pointerup
       try {
-        localStorage.setItem(opts.storageKey, JSON.stringify(drag.last));
+        localStorage.setItem(storageKey, JSON.stringify(drag.last));
       } catch {
         /* sem localStorage: tudo bem */
       }
@@ -120,7 +122,7 @@ export function makeDraggable(el: HTMLElement, opts: DraggableOptions): { reset:
 
   // posição salva da última vez
   try {
-    const saved = JSON.parse(localStorage.getItem(opts.storageKey) ?? "null") as Partial<Point> | null;
+    const saved = JSON.parse(localStorage.getItem(storageKey) ?? "null") as Partial<Point> | null;
     if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) place(saved.x as number, saved.y as number);
   } catch {
     /* posição inválida ou sem localStorage */

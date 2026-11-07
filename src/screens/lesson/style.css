@@ -230,11 +230,11 @@ body {
   }
 }
 
-/* ---- Ao lado da barra de call (a barra tem 270px de largura e 42px de altura) ---- */
+/* ---- Ondas de voz ao lado da barra de call (a barra tem 42px de altura) ---- */
 .voice {
-  position: fixed;
-  bottom: 18px; /* mesma base da barra de call */
-  right: calc(50% + 147px); /* metade da barra (135px) + 12px */
+  position: absolute; /* dentro da barra de call (main.ts), à esquerda dela */
+  bottom: 0;
+  right: calc(100% + 12px);
   height: 42px;
   padding: 0 14px;
   display: flex;

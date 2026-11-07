@@ -70,7 +70,8 @@ async function main(): Promise<void> {
   const clock = createClock();
   const board = mountBoard(el.boardHost);
   const chat = mountChatPanel({ title: "Transcrição da aula", messages: [] });
-  mountCallBar({ chat }); // sem status: a legenda já mostra o que está acontecendo
+  const call = mountCallBar({ chat }); // sem status: a legenda já mostra o que está acontecendo
+  call.el.append(el.voice); // ondas de voz andam junto com a barra quando ela é arrastada
   // a Puca aparece na "câmera" do canto, como numa videochamada
   const cam = mountAgentCam({ name: journey.agent.name, visual: await loadAgentVisual() });
 
