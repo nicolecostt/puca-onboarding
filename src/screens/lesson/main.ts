@@ -1,5 +1,5 @@
 // Aula no quadro: a Puca explica "o caminho de uma transação" e o quadro vai se montando
-// junto com a fala. A pessoa pode perguntar a qualquer momento (sugestões ou chat),
+// junto com a fala. A pessoa pode perguntar a qualquer momento pelo chat,
 // pedir "mais fundo" / "mais simples" e pausar pela barra de call.
 // Por enquanto a fala é simulada (texto dos dados da aula, palavra por palavra).
 import "../../styles/base.css";
@@ -8,6 +8,8 @@ import { mountAppHeader } from "../../components/app-header/app-header";
 import { mountWhiteboard } from "../../components/whiteboard/whiteboard";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
+import { mountAgentCam } from "../../components/agent-cam/agent-cam";
+import { loadAgentVisual } from "../../lib/agent-visual";
 import { activeProfile, company, transactionPath, type LessonBeat } from "../../data";
 import { esc, qs, targetEl } from "../../lib/dom";
 
@@ -20,6 +22,8 @@ mountAppHeader({ current: "lesson", profile });
 const board = mountWhiteboard(qs(document, "#board"), lesson);
 const chat = mountChatPanel({ title: "Transcrição da aula", messages: [] });
 mountCallBar({ chat }); // sem status: a legenda já mostra o que está acontecendo
+// a Puca aparece na "câmera" do canto, como numa videochamada
+const cam = mountAgentCam({ name: "Puca", visual: await loadAgentVisual() });
 
 const el = {
   caption: qs(document, "#caption"),
@@ -28,7 +32,6 @@ const el = {
   sectionCount: qs(document, "#section-count"),
   voice: qs(document, "#voice"),
   voiceLabel: qs(document, "#voice-label"),
-  askList: qs(document, "#ask-list"),
   textToggle: qs<HTMLButtonElement>(document, '[data-tweak="text"]'),
 };
 
@@ -40,13 +43,10 @@ qs(document, "#calib-list").innerHTML = profile.calibration
       <dd><span class="chip${c.tone === "neutral" ? "" : ` chip--${c.tone}`}">${esc(c.value)}</span></dd></div>`,
   )
   .join("");
-el.askList.innerHTML = lesson.questions
-  .map((q, i) => `<button class="pill" data-question="${i}">${esc(q.question)}</button>`)
-  .join("");
 
 // ---- Estado da aula ----
 const state = { paused: false, ended: false, seconds: 0, done: false, section: 0 };
-type Interrupt = { kind: "question"; index: number } | { kind: "custom"; question: string } | { kind: "deeper" | "simpler" };
+type Interrupt = { kind: "question"; question: string } | { kind: "deeper" | "simpler" };
 const interrupts: Interrupt[] = [];
 
 function renderSection(): void {
@@ -62,6 +62,14 @@ function setVoice(v: Voice): void {
   el.voiceLabel.textContent =
     state.ended ? "Aula pausada" : state.paused ? "Puca pausada" : shown === "talk" ? "Puca falando" : "Puca ouvindo";
   el.liveDot.classList.toggle("is-off", state.paused || state.ended);
+  // câmera acompanha: fala, quieta ouvindo, apagada pausada
+  cam.setPaused(state.paused || state.ended);
+  if (shown !== "paused") cam.setState(shown === "talk" ? "talk" : "idle");
+}
+
+/** Compara perguntas ignorando acento, maiúsculas e pontuação. */
+function normalize(text: string): string {
+  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
 }
 
 // Espera que só corre com a aula ativa (pausar segura o tempo)
@@ -112,14 +120,11 @@ async function say(beat: LessonBeat, toChat = true): Promise<void> {
 // ---- Perguntas e ajustes (interrompem a aula entre um trecho e outro) ----
 async function handleInterrupt(it: Interrupt): Promise<void> {
   board.showOwners(false);
-  if (it.kind === "question" || it.kind === "custom") {
-    const known =
-      it.kind === "question"
-        ? lesson.questions[it.index]
-        : lesson.questions.find((q) => q.question.toLowerCase() === it.question.toLowerCase().replace(/\?*$/, "?"));
-    const question = it.kind === "question" ? lesson.questions[it.index].question : it.question;
-    el.caption.innerHTML = `<span class="caption__you">Você: ${esc(question)}</span>`;
-    await wait(900);
+  if (it.kind === "question") {
+    const known = lesson.questions.find((q) => normalize(q.question) === normalize(it.question));
+    el.caption.innerHTML = `<span class="caption__you">Você: ${esc(it.question)}</span>`;
+    cam.setState("think"); // pensa (esquenta) antes de responder
+    await wait(1200);
     if (known) {
       if (/dono/.test(known.question)) board.showOwners(true);
       await say({ say: known.answer, focus: known.focus ?? null });
@@ -146,18 +151,8 @@ async function drainInterrupts(): Promise<void> {
   }
 }
 
-el.askList.addEventListener("click", (e) => {
-  const btn = targetEl(e)?.closest<HTMLButtonElement>("[data-question]");
-  if (!btn || btn.disabled) return;
-  btn.disabled = true; // cada sugestão uma vez
-  const index = Number(btn.dataset.question);
-  chat.addMessage({ from: "user", text: lesson.questions[index].question });
-  interrupts.push({ kind: "question", index });
-  if (state.done) void drainInterrupts();
-});
-
 document.addEventListener("chatpanel:send", (e) => {
-  interrupts.push({ kind: "custom", question: e.detail.text });
+  interrupts.push({ kind: "question", question: e.detail.text });
   if (state.done) void drainInterrupts();
 });
 
@@ -184,10 +179,12 @@ document.addEventListener("callbar:pause", (e) => {
 document.addEventListener("callbar:end", () => {
   state.ended = true;
   setVoice("paused");
+  cam.hide();
 });
 document.addEventListener("callbar:start", () => {
   state.ended = false;
   setVoice("listen");
+  cam.show();
 });
 
 // ---- Aula ----
