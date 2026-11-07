@@ -31,8 +31,8 @@ Estado em 2026-11-07: **existe** (funciona, ainda que simulado), **parcial** ou 
 | 5 | Task | falta | — |
 | 6 | Progresso salvo | falta | hoje só o perfil, em `sessionStorage` |
 | 7 | Pergunta que muda o rumo | existe | na aula, por voz ou chat: pedir para mudar de assunto (pulo) ou perguntar; ordem em `src/journey/route.ts` |
-| 8 | Dúvida que vira encaminhamento | parcial | na aula, perguntar algo sem fonte: a Puca diz que não confirmou e que anotou para a buddy (nada é enviado ainda) |
-| 9 | Tela de auxílio (computer use) | existe, simulada | `/src/screens/live-session/`: barra de call, chat, câmera e cursor da Puca no Slack |
+| 8 | Dúvida que vira encaminhamento | existe, simulado | no momento "O caminho de uma transação", perguntar "quem cuida do tail-common?": a Puca diz que não há responsável confirmado e aparece "Encaminhado à Paula Nunes no Slack · Abrir Slack". No Slack, a Puca abre a DM da Paula, escreve a dúvida com o que consultou e o motivo, e envia; a Paula confirma. Com `dev:server`, uma pergunta sem fonte (ex.: "qual a política de home office do time?") também encaminha, pelo agente |
+| 9 | Tela de auxílio (computer use) | existe, simulada | `/src/screens/live-session/`: barra de call, chat, câmera e cursor da Puca no Slack; o cursor opera de verdade o envio do encaminhamento (passo 8) |
 
 Em todos: console do navegador sem erro vermelho.
 
