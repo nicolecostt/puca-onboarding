@@ -25,7 +25,7 @@ Estado em 2026-11-07: **existe** (funciona, ainda que simulado), **parcial** ou 
 | # | Passo | Estado | Onde ver / o que precisa acontecer |
 |---|---|---|---|
 | 1 | Call inicial (cargo, time, conhecimentos, objetivos) | existe, simulada | `/src/screens/onboarding-call/?perfil=ana` e `?perfil=bruno`; no fim, "Começar a aula →" leva à aula |
-| 2 | Jornada com metas e próximos passos | parcial | hoje só as etapas no cabeçalho (`src/data/company.ts`) |
+| 2 | Jornada com objetivos e próximos passos | parcial | hoje só as etapas no cabeçalho (`src/data/company.ts`) |
 | 3 | Aula no quadro, com voz | existe | `/src/screens/lesson/?perfil=ana&auto=1` (institucional) e `?perfil=bruno&auto=1` (direto ao time); voz de verdade com `dev:server` e chaves |
 | 4 | Verificação de compreensão | parcial | passos `wait`/`select` da jornada: responder e tocar no nó certo |
 | 5 | Task | falta | — |

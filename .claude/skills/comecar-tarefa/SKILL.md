@@ -8,6 +8,9 @@ argument-hint: "[descrição da tarefa ou número da issue]"
 
 Tarefa: $ARGUMENTS
 
+> **Base do sistema:** o glossário do `CONTEXT.md` já está no seu contexto (o `CLAUDE.md` importa); use os termos dele.
+> Toda tarefa começa pela seção do `PRODUCT.md` que ela toca (passo 3). Se o pedido contradiz o `PRODUCT.md`, pare e mostre a contradição. Se algo novo precisa entrar na base, use a skill `contexto-base`.
+
 ## Passos
 
 0. **Sincronize primeiro** (skill `sincronizar`): `git fetch`, traga a `main` e veja se alguém mudou os arquivos
@@ -19,11 +22,11 @@ Tarefa: $ARGUMENTS
 2. **Estado do git.** `git status -sb` e `git fetch`. Se houver alteração não commitada que não é sua, não mexa: pergunte.
    Crie a branch a partir da `main` atualizada: `git switch -c tipo/<n>-assunto-curto origin/main`.
    Se for retomar, leia `git log --oneline -10`, a issue e o PR aberto da branch (`gh pr view`) antes de qualquer coisa.
-3. **Contexto mínimo.** O `CLAUDE.md` já está carregado. Use os termos do `CONTEXT.md`. Leia só o que a tarefa toca:
+3. **Base do sistema e contexto mínimo.** Leia o **sumário** do `PRODUCT.md` e a(s) seção(ões) que a tarefa toca
+   (cenário, funcionalidade, prioridade ou limite do hackathon). Confira se a issue bate com elas. Depois, só o que a tarefa toca:
    - tela ou componente → o `main.ts`/`.ts` dele e a seção do `README.md`;
    - jornada ou aula → `docs/journey-format.md` (e use a skill `nova-jornada`);
    - voz ou servidor → `src/voice/`, `server/src/app.ts` e a regra da `src/journey/route.ts` (a resposta nunca espera o LLM);
-   - produto/regra de negócio → a seção certa do `PRODUCT.md`, não o arquivo inteiro;
    - decisões já tomadas → títulos em `docs/decisoes/`.
 4. **Conflito com o time.** `gh pr list` e veja se algum PR aberto mexe nos mesmos arquivos. Se sim, avise antes de editar.
 5. **Contratos.** Confira em `docs/contratos.md` se a tarefa muda ou cria algum (inclusive os "que vão surgir").
@@ -34,6 +37,7 @@ Tarefa: $ARGUMENTS
 ## Saída (curta, antes de editar)
 
 - Issue, objetivo e critério de aceite
+- Seções do `PRODUCT.md` que valem para a tarefa (ex.: §4.5, §12.2) e termos do glossário envolvidos
 - Branch
 - Arquivos que vai mexer (e os que **não** vai)
 - Contratos afetados: nenhum | quais

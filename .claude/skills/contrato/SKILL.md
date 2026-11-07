@@ -8,6 +8,9 @@ argument-hint: "[qual contrato e o que muda]"
 
 Mudança: $ARGUMENTS
 
+> **Base do sistema:** o glossário do `CONTEXT.md` já está no seu contexto (o `CLAUDE.md` importa); use os termos dele.
+> Quando o conceito existe no glossário, o nome do tipo, campo ou evento segue o termo dele. Confira no `PRODUCT.md` se o formato atende o que a funcionalidade promete (ex.: fonte junto da resposta, §4.3). Se o pedido contradiz o `PRODUCT.md`, pare e mostre a contradição. Se algo novo precisa entrar na base, use a skill `contexto-base`.
+
 A lista de contratos e quem depende de cada um está em `docs/contratos.md`. Comece por ela.
 
 ## Passos

@@ -15,6 +15,8 @@ Closes #
 
 ## Impacto nos outros
 
+- [ ] Mudou `PRODUCT.md` ou `CONTEXT.md`? Seguiu `/contexto-base` (padrão, `check:contexto`, issues e docs atualizados)
+
 <!-- Contratos de docs/contratos.md que mudaram? Escreva "⚠️ quebra contrato" se quebra. Decisão nova em docs/decisoes/? -->
 
 ## Pendências

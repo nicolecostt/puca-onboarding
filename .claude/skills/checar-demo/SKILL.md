@@ -5,7 +5,8 @@ description: Use antes da apresentação, depois de integrar PRs na main ou quan
 
 # Checar a demo
 
-A lista de fluxos está em `docs/demo.md`. Ela é a fonte: se um fluxo não estiver lá, não é da demo.
+A lista de fluxos está em `docs/demo.md`. O que a demo **precisa** mostrar vem do `PRODUCT.md` (perfis em §7, o processo
+e os pontos obrigatórios do desafio em §12). Se o `PRODUCT.md` pede algo que o `docs/demo.md` não lista, aponte a diferença.
 
 ## Passos
 

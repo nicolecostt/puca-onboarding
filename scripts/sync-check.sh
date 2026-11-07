@@ -36,6 +36,7 @@ atras=$(git rev-list --count HEAD.."$base" 2>/dev/null || echo 0)
 if [ "$atras" -gt 0 ]; then
   linha "[sync] A main tem $atras commit(s) que você não tem (branch: ${branch:-detached})."
   vindos=$(git diff --name-only HEAD..."$base" 2>/dev/null | sort -u)
+  base_mudou=$(grep -x -E 'PRODUCT\.md|CONTEXT\.md' <<<"$vindos" | tr '\n' ' ' | sed 's/ $//')
   cruzam=$(comm -12 <(echo "$meus") <(echo "$vindos") | sed '/^$/d' | limpa)
   if [ -n "$cruzam" ]; then
     linha "[sync] ⚠️ A main mudou arquivos que você também está mexendo:"
@@ -43,6 +44,10 @@ if [ "$atras" -gt 0 ]; then
     linha "[sync] Veja o que mudou (git log HEAD..$base -- <arquivo>) e traga a main antes de seguir (skill /sincronizar)."
   else
     linha "[sync] Nada cruza com os seus arquivos. Traga a main quando der (skill /sincronizar)."
+  fi
+  if [ -n "$base_mudou" ]; then
+    linha "[sync] 📌 A base do sistema mudou na main: $base_mudou. Releia o que mudou antes de seguir:"
+    linha "[sync]    git diff HEAD...$base -- PRODUCT.md CONTEXT.md"
   fi
 fi
 

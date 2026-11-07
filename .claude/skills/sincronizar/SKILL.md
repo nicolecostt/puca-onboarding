@@ -19,7 +19,9 @@ description: Use SEMPRE antes de começar a editar, antes de commitar e antes de
    `git log --oneline HEAD..origin/main -- <arquivo>` e `git diff HEAD...origin/main -- <arquivo>`.
    Conte para a pessoa em 1–2 frases o que mudou e se afeta o que vocês estão fazendo (contrato, função renomeada,
    comportamento novo).
-5. **Se um PR aberto mexe nos mesmos arquivos**, não siga editando esses arquivos sem avisar: diga qual PR, de quem,
+5. **Se a base do sistema mudou** (`PRODUCT.md` ou `CONTEXT.md` na `main`), leia o que mudou
+   (`git diff HEAD...origin/main -- PRODUCT.md CONTEXT.md`) e diga se muda a tarefa atual: regra nova, prioridade, termo renomeado.
+6. **Se um PR aberto mexe nos mesmos arquivos**, não siga editando esses arquivos sem avisar: diga qual PR, de quem,
    e sugira combinar (quem integra primeiro, ou dividir o trabalho).
 
 ## Saída
