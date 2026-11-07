@@ -1,7 +1,7 @@
 # Contexto de negócio da Puca
 
 > Pesquisa de Joaquim, consolidada em 2026-11-07. Fontes e números conferidos na mesma data.
-> As decisões (quem compra, como cobramos, o que prometemos) estão no [`PRODUCT.md` §13](../../PRODUCT.md#13-modelo-de-negócio-quem-compra-e-como-cobramos). Aqui ficam o detalhe, o mercado e as evidências.
+> As decisões (quem compra, como cobramos, o que prometemos) estão no [`PRODUCT.md` §14](../../PRODUCT.md#14-modelo-de-negócio-quem-compra-e-como-cobramos). Aqui ficam o detalhe, o mercado e as evidências.
 
 Estágio: hackathon, MVP em construção. Este documento não comprova funcionalidade pronta, resultado de cliente nem viabilidade econômica.
 
