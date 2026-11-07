@@ -34,7 +34,7 @@ src/
     profiles.ts          os dois perfis: ?perfil=bruno (transição) | ?perfil=ana (recém-contratada)
     lessons/             aulas do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css
-    onboarding-call/     call inicial: o agente entrevista a pessoa
+    onboarding-call/     call inicial: o agente entrevista a pessoa e grava a calibragem
     lesson/              aula no quadro: o quadro se monta junto com a fala
     live-session/        tela de auxílio: barra de call, chat e câmera por cima de uma tela
   components/            peças reutilizáveis (cada uma com .ts, .css e icons/)
@@ -44,7 +44,7 @@ src/
     chat-panel/          chat flutuante (Figma: "Chat (floating window)")
     agent-cam/           "câmera" do agente no canto da tela
     agent-cursor/        cursor da Puca (seta + "Puca") mexendo na tela, por enquanto simulado
-  journey/               jornada da aula em JSON: tipos, validador, motor, perfil e intenções (pulo, perguntas)
+  journey/               jornada da aula em JSON: tipos, validador, motor, perfil, calibragem e intenções (pulo, perguntas)
     data/                jornadas em JSON (tail.journey.json é a demo)
   lib/                   código compartilhado
     events.ts            eventos tipados (callbar:*, chatpanel:*, onboarding:*)
