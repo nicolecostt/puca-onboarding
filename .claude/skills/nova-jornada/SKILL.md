@@ -1,6 +1,6 @@
 ---
 name: nova-jornada
-description: Use para criar ou editar uma jornada da aula no quadro (arquivos src/journey/data/*.journey.json) — momentos, passos, falas, quadro, nós, setas, transições, perguntas e conhecimento. Não use para mudar o motor ou o formato em si (isso é a skill contrato).
+description: Chame automaticamente para criar ou editar uma aula ou jornada (src/journey/data/*.journey.json) — ex.: "cria uma aula sobre X", "muda a fala do passo Y", "adiciona um nó no quadro", momentos, passos, transições, perguntas e conhecimento. Não use para mudar o motor ou o formato da jornada (isso é a skill contrato).
 argument-hint: "[assunto da aula ou o que mudar na jornada]"
 ---
 
