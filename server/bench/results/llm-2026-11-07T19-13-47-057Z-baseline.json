@@ -1,0 +1,1255 @@
+{
+  "at": "2026-11-07T19:13:47.057Z",
+  "n": 3,
+  "summary": [
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "ttft_p50": 907,
+      "ttft_p95": 1326,
+      "first_sentence_p50": 1017,
+      "first_sentence_p95": 2148,
+      "errors": 0,
+      "expected_tool": "0/6",
+      "runs": 9
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-default",
+      "ttft_p50": 5770,
+      "ttft_p95": 8342,
+      "first_sentence_p50": 5132,
+      "first_sentence_p95": 5132,
+      "errors": 0,
+      "expected_tool": "2/6",
+      "runs": 9
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "full-nothink",
+      "ttft_p50": 973,
+      "ttft_p95": 2236,
+      "first_sentence_p50": 1319,
+      "first_sentence_p95": 3222,
+      "errors": 0,
+      "expected_tool": "0/6",
+      "runs": 9
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-nothink",
+      "ttft_p50": 4771,
+      "ttft_p95": 7408,
+      "first_sentence_p50": 4416,
+      "first_sentence_p95": 4416,
+      "errors": 1,
+      "expected_tool": "5/6",
+      "runs": 9
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-default",
+      "ttft_p50": 14989,
+      "ttft_p95": 18772,
+      "first_sentence_p50": 4994,
+      "first_sentence_p95": 4994,
+      "errors": 0,
+      "expected_tool": "3/6",
+      "runs": 9
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "full-nothink",
+      "ttft_p50": 2035,
+      "ttft_p95": 3958,
+      "first_sentence_p50": 2041,
+      "first_sentence_p95": 3962,
+      "errors": 0,
+      "expected_tool": "0/6",
+      "runs": 9
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-nothink",
+      "ttft_p50": 11381,
+      "ttft_p95": 19420,
+      "first_sentence_p50": 11550,
+      "first_sentence_p95": 19423,
+      "errors": 5,
+      "expected_tool": "0/6",
+      "runs": 9
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-default",
+      "ttft_p50": null,
+      "ttft_p95": null,
+      "first_sentence_p50": null,
+      "first_sentence_p95": null,
+      "errors": 9,
+      "expected_tool": "0/6",
+      "runs": 9
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "full-nothink",
+      "ttft_p50": null,
+      "ttft_p95": null,
+      "first_sentence_p50": null,
+      "first_sentence_p95": null,
+      "errors": 9,
+      "expected_tool": "0/6",
+      "runs": 9
+    }
+  ],
+  "samples": [
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 1325.8212079999998,
+      "firstSentenceMs": 2147.925542,
+      "totalMs": 2865.7612080000004,
+      "reasoningChars": 0,
+      "text": "O payments-api orquestra o fluxo do pagamento. Ele chama o fraud-score, tenta a autorização e salva o resultado no banco.  \n\nQuer ver como ele lida com falhas?",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 1308.0258750000003,
+      "firstSentenceMs": 1580.4722920000004,
+      "totalMs": 3306.2252499999995,
+      "reasoningChars": 0,
+      "text": "O payments-api orquestra o fluxo do pagamento. Ele chama o fraud-score, tenta a autorização e salva o resultado no banco. É o cérebro do processo.  \n\nQuer ver como ele lida com uma falha?",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 690.7411670000001,
+      "firstSentenceMs": 897.9118330000001,
+      "totalMs": 2283.068875000001,
+      "reasoningChars": 0,
+      "text": "O payments-api orquestra o fluxo do pagamento. Ele chama o fraud-score, pede autorização ao PSP e salva o resultado no banco.  \n\nQuer ver como ele lida com falhas?",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 788.8690839999999,
+      "firstSentenceMs": 1042.592333999999,
+      "totalMs": 2102.5605419999993,
+      "reasoningChars": 0,
+      "text": "Vai para a fila de retentativa, retry-queue. Lá, tentamos até 3 vezes. Quer ver como a fila funciona?",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 944.7578749999993,
+      "firstSentenceMs": 1143.7641249999997,
+      "totalMs": 2457.7066669999986,
+      "reasoningChars": 0,
+      "text": "Vai para a fila de retentativa, retry-queue. Lá, o sistema tenta autorizar de novo, até 3 vezes. Quer ver como a fila funciona?",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 948.549665999999,
+      "firstSentenceMs": 1016.9132079999999,
+      "totalMs": 2101.609708,
+      "reasoningChars": 0,
+      "text": "Vai para a fila de retentativa, retry-queue. Lá, tentamos até 3 vezes. Quer ver como a fila funciona?",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 803.2374170000003,
+      "firstSentenceMs": 885.6100420000002,
+      "totalMs": 1832.337875000001,
+      "reasoningChars": 0,
+      "text": "Não consegui confirmar. Vou indicar a sua buddy para te ajudar.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 906.7219169999989,
+      "firstSentenceMs": 972.1395840000005,
+      "totalMs": 1853.3580839999995,
+      "reasoningChars": 0,
+      "text": "Não consegui confirmar. Vou indicar a sua buddy.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 803.9411660000005,
+      "firstSentenceMs": 883.2373750000006,
+      "totalMs": 1714.7795000000006,
+      "reasoningChars": 0,
+      "text": "Não consegui confirmar. Indico a buddy.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-default",
+      "scenario": "segue-passo",
+      "ttftMs": 5819.301500000001,
+      "firstSentenceMs": null,
+      "totalMs": 5819.6888340000005,
+      "reasoningChars": 797,
+      "text": "",
+      "tools": [
+        {
+          "name": "highlight",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-default",
+      "scenario": "segue-passo",
+      "ttftMs": 8342.393041000003,
+      "firstSentenceMs": null,
+      "totalMs": 8342.492665999998,
+      "reasoningChars": 1082,
+      "text": "",
+      "tools": [
+        {
+          "name": "highlight",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-default",
+      "scenario": "segue-passo",
+      "ttftMs": 5769.741582999995,
+      "firstSentenceMs": null,
+      "totalMs": 5769.772333000001,
+      "reasoningChars": 882,
+      "text": "",
+      "tools": [
+        {
+          "name": "highlight",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-default",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 7101.595250000006,
+      "reasoningChars": 1092,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-default",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 8281.150167,
+      "reasoningChars": 1130,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-default",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 6667.244874999997,
+      "reasoningChars": 1102,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-default",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 4987.459875000008,
+      "firstSentenceMs": null,
+      "totalMs": 4987.579957999995,
+      "reasoningChars": 598,
+      "text": "",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-default",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 5031.515291999996,
+      "firstSentenceMs": 5131.712499999994,
+      "totalMs": 6078.113249999995,
+      "reasoningChars": 590,
+      "text": "Não consegui confirmar. Dúvidas sobre salário vão para o RH.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-default",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 4732.834707999995,
+      "firstSentenceMs": null,
+      "totalMs": 4732.9337499999965,
+      "reasoningChars": 560,
+      "text": "",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "full-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 2235.840083000003,
+      "firstSentenceMs": 3222.407250000004,
+      "totalMs": 3728.071291,
+      "reasoningChars": 0,
+      "text": "O payments-api orquestra o fluxo do pagamento: chama o fraud-score, autoriza no PSP, grava no banco e avisa o resultado. É o coração do processo.",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "full-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 852.5125410000037,
+      "firstSentenceMs": 1493.8525410000002,
+      "totalMs": 2327.0823329999985,
+      "reasoningChars": 0,
+      "text": "O payments-api orquestra o fluxo do pagamento, chamando os serviços necessários, como o fraud-score e o PSP, e registrando o resultado. É o coração do processo.",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "full-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 1172.4560420000053,
+      "firstSentenceMs": 1769.9423340000067,
+      "totalMs": 2702.5060000000085,
+      "reasoningChars": 0,
+      "text": "O payments-api orquestra o fluxo do pagamento: ele coordena as etapas de risco, autorização, registro e notificação. É o serviço central que chama os outros sistemas.",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "full-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 824.9451249999984,
+      "firstSentenceMs": 1037.7222080000065,
+      "totalMs": 1841.2491670000018,
+      "reasoningChars": 0,
+      "text": "Quer entender a falha no pagamento? Vamos ver o que acontece.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "full-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 907.7832919999928,
+      "firstSentenceMs": 1285.8801669999957,
+      "totalMs": 2427.266208000001,
+      "reasoningChars": 0,
+      "text": "Se o PSP não responde a tempo, o pagamento vai para a fila de retentativa. Lá, é tentado de novo até 3 vezes.  \n\nQuer ver como isso funciona?",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "full-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 762.8627910000068,
+      "firstSentenceMs": 982.0518750000047,
+      "totalMs": 1673.4309159999975,
+      "reasoningChars": 0,
+      "text": "Quer ver o que acontece quando o pagamento falha?",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "full-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 1282.200416000007,
+      "firstSentenceMs": 1467.0558750000055,
+      "totalMs": 2437.4953749999986,
+      "reasoningChars": 0,
+      "text": "Dúvida sobre salário vai para o RH. Posso resumir a sua pergunta para eles?",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "full-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 972.8690829999978,
+      "firstSentenceMs": 1319.0169579999929,
+      "totalMs": 2357.813832999993,
+      "reasoningChars": 0,
+      "text": "Dúvidas sobre salário ou contrato devem ser encaminhadas ao RH. Posso resumir a sua pergunta para eles, se quiser.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "full-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 1077.994417000009,
+      "firstSentenceMs": 1258.8402500000084,
+      "totalMs": 2261.8627080000006,
+      "reasoningChars": 0,
+      "text": "Essa informação é de responsabilidade do RH. Posso passar um resumo da sua pergunta para eles?",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 4613.7400830000115,
+      "firstSentenceMs": null,
+      "totalMs": 4613.879875000013,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [
+        {
+          "name": "open_card",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 7407.633332999991,
+      "firstSentenceMs": null,
+      "totalMs": 7407.784249999997,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [
+        {
+          "name": "open_card",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 5533.931500000006,
+      "firstSentenceMs": null,
+      "totalMs": 5534.038249999998,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [
+        {
+          "name": "open_card",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 6280.894790999999,
+      "firstSentenceMs": null,
+      "totalMs": 6280.999624999997,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [
+        {
+          "name": "go_to",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 4241.171082999994,
+      "firstSentenceMs": null,
+      "totalMs": 4241.3060419999965,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [
+        {
+          "name": "go_to",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 4770.796667000017,
+      "firstSentenceMs": null,
+      "totalMs": 4770.9054999999935,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [
+        {
+          "name": "go_to",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 4203.507250000024,
+      "firstSentenceMs": 4415.596500000014,
+      "totalMs": 6254.6176250000135,
+      "reasoningChars": 0,
+      "text": "Não tenho essa informação.\nPor favor, consulte o RH.\nVou encaminhar sua dúvida.\n\n",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 3613.535415999999,
+      "firstSentenceMs": 3620.2159580000152,
+      "totalMs": 5712.83258300001,
+      "reasoningChars": 0,
+      "text": "Não tenho essa informação.\nDúvidas sobre salário vão para o RH.\nVou encaminhar um resumo para eles.\n\n",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 30007.22200000001,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "timeout"
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-default",
+      "scenario": "segue-passo",
+      "ttftMs": 14989.136667000013,
+      "firstSentenceMs": null,
+      "totalMs": 14989.260125,
+      "reasoningChars": 706,
+      "text": "",
+      "tools": [
+        {
+          "name": "highlight",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-default",
+      "scenario": "segue-passo",
+      "ttftMs": 6900.297290999995,
+      "firstSentenceMs": null,
+      "totalMs": 6900.407832999976,
+      "reasoningChars": 650,
+      "text": "",
+      "tools": [
+        {
+          "name": "open_card",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-default",
+      "scenario": "segue-passo",
+      "ttftMs": 5037.309083,
+      "firstSentenceMs": null,
+      "totalMs": 5037.394082999992,
+      "reasoningChars": 627,
+      "text": "",
+      "tools": [
+        {
+          "name": "highlight",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-default",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 18772.036165999976,
+      "firstSentenceMs": null,
+      "totalMs": 18772.213582999975,
+      "reasoningChars": 400,
+      "text": "",
+      "tools": [
+        {
+          "name": "go_to",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-default",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 28691.346833999996,
+      "reasoningChars": 997,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-default",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 11894.582334000006,
+      "reasoningChars": 980,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-default",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 10225.33270899998,
+      "reasoningChars": 956,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-default",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 18172.74762499996,
+      "firstSentenceMs": null,
+      "totalMs": 18172.87908299995,
+      "reasoningChars": 580,
+      "text": "",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "min-default",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 4925.319375000021,
+      "firstSentenceMs": 4994.133583999996,
+      "totalMs": 7085.961750000017,
+      "reasoningChars": 409,
+      "text": "Não tenho essa informação. Dúvidas sobre salário vão para o RH. Vou encaminhar sua pergunta para eles.\n\n",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "full-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 2744.9466250000405,
+      "firstSentenceMs": 2865.187708000012,
+      "totalMs": 4100.044832999993,
+      "reasoningChars": 0,
+      "text": "Ele orquestra cada etapa do pagamento.\nChama o fraud-score, autoriza no PSP e grava o resultado.\nQuer ver como ele lida com falhas?",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "full-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 2035.3950419999892,
+      "firstSentenceMs": 2041.4463749999995,
+      "totalMs": 3131.104249999975,
+      "reasoningChars": 0,
+      "text": "Ele orquestra cada etapa do pagamento.\nChama o fraud-score, o PSP e grava o resultado.\nQuer ver o cartão com os detalhes?",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "full-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 1605.9132910000044,
+      "firstSentenceMs": 1607.4977910000016,
+      "totalMs": 2471.486166000017,
+      "reasoningChars": 0,
+      "text": "Ele orquestra cada etapa do pagamento.\nChama o fraud-score, autoriza e registra o resultado.\nQuer que eu mostre o documento de arquitetura dele?",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "full-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 2106.3332079999964,
+      "firstSentenceMs": 2217.145375000022,
+      "totalMs": 3311.3303750000196,
+      "reasoningChars": 0,
+      "text": "O pagamento vai para uma fila.\nEle é tentado de novo até três vezes.\nSe não der, o sistema avisa o cliente.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "full-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 3957.762708000024,
+      "firstSentenceMs": 3961.5690409999806,
+      "totalMs": 4588.662416000036,
+      "reasoningChars": 0,
+      "text": "O PSP vai para a fila de retentativa.\nEle tenta de novo até três vezes.\nIsso evita perder vendas por instabilidade.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "full-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 2151.7120829999913,
+      "firstSentenceMs": 2358.657583000022,
+      "totalMs": 3422.8141249999753,
+      "reasoningChars": 0,
+      "text": "O pagamento vai para uma fila de retentativa. Ele é tentado de novo até três vezes. Quer ver como esse processo funciona no quadro?",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "full-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 1802.3349589999998,
+      "firstSentenceMs": 1807.204625000013,
+      "totalMs": 2945.8528749999823,
+      "reasoningChars": 0,
+      "text": "Não tenho essa informação.\n\nDúvidas sobre salário vão para o RH.\n\nEnvie um resumo da sua dúvida para eles.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "full-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 2033.8373339999816,
+      "firstSentenceMs": 2034.3420000000042,
+      "totalMs": 3014.806666999997,
+      "reasoningChars": 0,
+      "text": "Dúvidas sobre salário vão para o RH.\n\nEnvie um resumo da sua dúvida para eles.\n\nEu não tenho essa informação aqui.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3.5-27B",
+      "config": "full-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 1566.0814999999711,
+      "firstSentenceMs": 1766.8546249999781,
+      "totalMs": 4160.877417000011,
+      "reasoningChars": 0,
+      "text": "Essa dúvida vai para o RH.\n\nResumo: Bruno quer saber o salário de engenheiro pleno.\n\nFale com eles diretamente.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 11380.981250000012,
+      "firstSentenceMs": 11549.991957999999,
+      "totalMs": 18575.264250000007,
+      "reasoningChars": 0,
+      "text": "Orquestra o pagamento: risco, autorização, registro e notificação.  \nÉ o cérebro do processo.  \nQuer ver como ele interage com o fraud-score?",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 2699.7443329999805,
+      "firstSentenceMs": 2886.8544159999583,
+      "totalMs": 3868.4052909999737,
+      "reasoningChars": 0,
+      "text": "Orquestra o pagamento: risco, autorização, registro e notificação.  \nÉ o cérebro do processo.  \nQuer ver como ele interage com o fraud-score?",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 1966.3779169999762,
+      "firstSentenceMs": 2184.013624999963,
+      "totalMs": 3068.2609999999986,
+      "reasoningChars": 0,
+      "text": "Orquestra cada etapa do pagamento: risco, autorização, registro e aviso.  \nÉ o centro do fluxo.  \nQuer ver detalhes?",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 19420.036167000013,
+      "firstSentenceMs": 19423.19233400002,
+      "totalMs": 19423.256417000026,
+      "reasoningChars": 0,
+      "text": "Vamos ver o que acontece quando o PSP não responde.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 42245.818541000015,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "timeout"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 1182.3385419999831,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 4.988916000002064,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 4.063416999997571,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 5.474333000020124,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-default",
+      "scenario": "segue-passo",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 13.737000000022817,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-default",
+      "scenario": "segue-passo",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 42.225333000009414,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-default",
+      "scenario": "segue-passo",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 2.6321250000037253,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-default",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 1.8310420000343584,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-default",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 1.4224169999943115,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-default",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 1.119542000000365,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-default",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 0.9866669999901205,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-default",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 0.9675830000196584,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "min-default",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 1.0380000000004657,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "full-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 1.3341670000227168,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "full-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 1.5057080000406131,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "full-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 4.244999999995343,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "full-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 3.2816669999738224,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "full-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 9.047750000027008,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "full-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 2.525292000034824,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "full-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 3.29991699999664,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "full-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 4.913541999994777,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "model": "Qwen/Qwen3-14B",
+      "config": "full-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": null,
+      "firstSentenceMs": null,
+      "totalMs": 4.414124999952037,
+      "reasoningChars": 0,
+      "text": "",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": "TypeError: fetch failed"
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+{
+  "at": "2026-11-07T19:31:11.217Z",
+  "summary": {
+    "naive": true,
+    "turns": 12,
+    "first_audio_p50": 1480,
+    "first_audio_p95": 8006,
+    "by_path": {
+      "llm": {
+        "n": 12,
+        "p50": 1480,
+        "max": 8006
+      }
+    },
+    "llm_first_sentence_p50": 1394
+  },
+  "rows": [
+    {
+      "path": "llm",
+      "first_speak_ms": 8006,
+      "first_speak_source": "fallback",
+      "first_tts_ms": null,
+      "llm_first_token_ms": null,
+      "llm_first_sentence_ms": null,
+      "total_ms": 8007,
+      "llm_error": "timeout_or_cancel",
+      "text": "O que é ser dono do problema?",
+      "expect": "reply",
+      "said": "[fallback] Não consegui confirmar isso agora. Vale perguntar pra sua buddy."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 8005,
+      "first_speak_source": "fallback",
+      "first_tts_ms": null,
+      "llm_first_token_ms": null,
+      "llm_first_sentence_ms": null,
+      "total_ms": 8005,
+      "llm_error": "timeout_or_cancel",
+      "text": "Pode seguir",
+      "expect": "reply",
+      "said": "[fallback] Não consegui confirmar isso agora. Vale perguntar pra sua buddy."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 8003,
+      "first_speak_source": "fallback",
+      "first_tts_ms": null,
+      "llm_first_token_ms": null,
+      "llm_first_sentence_ms": null,
+      "total_ms": 8003,
+      "llm_error": "timeout_or_cancel",
+      "text": "Quem é a Ana Ribeiro?",
+      "expect": "faq",
+      "said": "[fallback] Não consegui confirmar isso agora. Vale perguntar pra sua buddy."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 8004,
+      "first_speak_source": "fallback",
+      "first_tts_ms": null,
+      "llm_first_token_ms": null,
+      "llm_first_sentence_ms": null,
+      "total_ms": 8004,
+      "llm_error": "timeout_or_cancel",
+      "text": "Qual a diferença entre gestor e buddy?",
+      "expect": "reply",
+      "said": "[fallback] Não consegui confirmar isso agora. Vale perguntar pra sua buddy."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 2001,
+      "first_speak_source": "llm",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 1999,
+      "llm_first_sentence_ms": 2001,
+      "total_ms": 2567,
+      "llm_error": null,
+      "text": "beleza, ficou claro",
+      "expect": "reply",
+      "said": "[llm] Beleza. Vamos para o seu time."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 1265,
+      "first_speak_source": "llm",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 1142,
+      "llm_first_sentence_ms": 1265,
+      "total_ms": 2205,
+      "llm_error": null,
+      "text": "Quem cuida do payments-api?",
+      "expect": "faq",
+      "said": "[llm] Não consegui confirmar isso agora. [llm] Vale perguntar pra sua buddy."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 1383,
+      "first_speak_source": "llm",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 1073,
+      "llm_first_sentence_ms": 1383,
+      "total_ms": 2368,
+      "llm_error": null,
+      "text": "Por que existe o fraud-score?",
+      "expect": "faq",
+      "said": "[llm] O fraud-score ajuda a identificar transações com risco de fraude. [llm] Ele é usado no time TMS para tomar decisões mais seguras."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 1394,
+      "first_speak_source": "llm",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 936,
+      "llm_first_sentence_ms": 1394,
+      "total_ms": 2682,
+      "llm_error": null,
+      "text": "me explica o ledger",
+      "expect": "faq",
+      "said": "[llm] Ledger é o sistema que gerencia as contas e movimentações de dinheiro da Orla. [llm] Ele registra onde o dinheiro entra, sai e como está distribuído. [llm] É como um livro-caixa digital da empresa."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 1480,
+      "first_speak_source": "llm",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 1118,
+      "llm_first_sentence_ms": 1480,
+      "total_ms": 2769,
+      "llm_error": null,
+      "text": "e se der ruim na hora de cobrar o cartão, o que rola?",
+      "expect": "llm",
+      "said": "[llm] Se der ruim na cobrança do cartão, o sistema tenta novamente automaticamente. [llm] Se falhar várias vezes, a transação entra em análise manual ou é cancelada, dependendo da regra configurada."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 1412,
+      "first_speak_source": "llm",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 1246,
+      "llm_first_sentence_ms": 1412,
+      "total_ms": 2671,
+      "llm_error": null,
+      "text": "Quanto ganha um engenheiro pleno aqui na Orla?",
+      "expect": "llm",
+      "said": "[llm] Não consegui confirmar valores salariais. [llm] Recomendo conversar com a equipe de RH ou com a sua buddy."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 1123,
+      "first_speak_source": "llm",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 949,
+      "llm_first_sentence_ms": 1123,
+      "total_ms": 2335,
+      "llm_error": null,
+      "text": "Quem cuida de cada serviço?",
+      "expect": "reply",
+      "said": "[llm] Cada serviço é cuidado por um time específico. [llm] Por exemplo, o ledger é da área de Engenharia. [llm] Quer que eu mostre os times do seu setor?"
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 1151,
+      "first_speak_source": "llm",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 1000,
+      "llm_first_sentence_ms": 1151,
+      "total_ms": 1859,
+      "llm_error": null,
+      "text": "Pode seguir",
+      "expect": "reply",
+      "said": "[llm] Vamos para o seu time, Bruno."
+    }
+  ]
+}

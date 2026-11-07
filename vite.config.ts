@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 const page = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
 export default defineConfig({
+  // O agente roda em server/ (npm run dev:server); em dev o Vite repassa /api para ele.
+  server: { proxy: { "/api": { target: "http://localhost:8787", changeOrigin: true } } },
   build: {
     target: "es2022",
     rollupOptions: {

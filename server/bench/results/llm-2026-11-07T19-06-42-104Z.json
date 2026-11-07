@@ -1,0 +1,58 @@
+{
+  "at": "2026-11-07T19:06:42.105Z",
+  "n": 1,
+  "summary": [
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "ttft_p50": 1073,
+      "ttft_p95": 14475,
+      "first_sentence_p50": 1190,
+      "first_sentence_p95": 14762,
+      "errors": 0,
+      "expected_tool": "0/2",
+      "runs": 3
+    }
+  ],
+  "samples": [
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 14474.568917,
+      "firstSentenceMs": 14761.920042,
+      "totalMs": 16116.927875,
+      "reasoningChars": 0,
+      "text": "O payments-api orquestra o fluxo do pagamento. Ele chama o fraud-score, verifica autorização e atualiza o estado no banco.  \n\nQuer ver como ele lida com uma falha?",
+      "tools": [],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 835.8218340000003,
+      "firstSentenceMs": 1190.4584169999998,
+      "totalMs": 2302.3014170000006,
+      "reasoningChars": 0,
+      "text": "Vai para a fila de retentativa, retry-queue. Lá, tentamos até 3 vezes.  \nQuer ver como funciona a retry-queue?",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "Qwen/Qwen3-32B",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 1072.5892920000006,
+      "firstSentenceMs": 1078.0154169999987,
+      "totalMs": 3551.834332999999,
+      "reasoningChars": 0,
+      "text": "Não consegui confirmar. Pergunta para o RH, por favor.",
+      "tools": [],
+      "expectedToolHit": false,
+      "error": null
+    }
+  ]
+}

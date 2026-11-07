@@ -7,11 +7,12 @@ import "./style.css";
 import demo from "../../journey/data/tail.journey.json";
 import { loadJourney } from "../../journey/validate";
 import { createRunner, type Runner, type RunnerIO } from "../../journey/runner";
-import { answerFromKnowledge, findJump } from "../../journey/intent";
 import { createClock, Cancelled } from "../../journey/clock";
 import { mountWhiteboard, type Whiteboard } from "../../components/whiteboard/whiteboard";
 import { whiteboardFromJourney } from "../../components/whiteboard/from-journey";
-import { matchReply, normalize } from "../../journey/conditions";
+import { buildFaqs } from "../../journey/faq";
+import { routeUtterance } from "../../journey/route";
+import { createAgentVoice } from "../../voice/agent-voice";
 import { interpolateDeep, resolveProfile } from "../../journey/profile";
 import type { Moment, Profile, Step, Vinculo } from "../../journey/types";
 import { mountAppHeader } from "../../components/app-header/app-header";
@@ -83,6 +84,14 @@ async function main(): Promise<void> {
   mountCallBar({ chat, draggable: false }); // fixa; sem status: a legenda já mostra o que está acontecendo
   // a Puca aparece na "câmera" do canto, como numa videochamada
   const cam = mountAgentCam({ name: journey.agent.name, visual: await loadAgentVisual() });
+  // Voz de verdade (servidor em server/): sem ele, a aula segue só com legenda e chat.
+  const voice = await createAgentVoice();
+  const faqs = buildFaqs(journey, profile);
+  const history: { role: "user" | "assistant"; content: string }[] = [];
+  const remember = (role: "user" | "assistant", content: string) => {
+    history.push({ role, content });
+    if (history.length > 6) history.shift();
+  };
 
   let paused = false;
   let ended = false;
@@ -180,41 +189,70 @@ async function main(): Promise<void> {
     p?.reject(new Cancelled());
   }
 
-  // Mensagem da pessoa no chat. Ordem: pedido para mudar de assunto → resposta sugerida → nome de um
-  // item do quadro → pergunta que o conhecimento responde → resposta livre → dúvida anotada para a buddy.
-  document.addEventListener("chatpanel:send", (e) => {
-    const text = e.detail.text.trim();
-    if (!text) return;
-    const isReply = pending?.kind === "reply" && matchReply(text, pending.replies ?? []) !== null;
+  /** Fala dita fora do roteiro (resposta da knowledge/FAQ ou do agente): legenda, chat e voz. */
+  async function speakAside(text: string, play: () => Promise<void> = () => voice.speak(text)): Promise<void> {
+    el.captionAgent.textContent = text;
+    chat.addMessage({ from: "agent", text });
+    remember("assistant", text);
+    await play();
+  }
 
-    const jump = running && !isReply ? findJump(text, journey, currentMoment?.id) : null;
-    if (jump && runner?.jumpTo(jump.id)) {
-      chat.addMessage({ from: "agent", text: `Claro, vamos para ${jump.title.toLowerCase()}.` });
-      interrupt();
-      return;
+  /** O agente pediu outro ponto da aula: resposta do passo atual que leva lá, ou pulo de momento. */
+  function goTo(target: string): void {
+    const t = currentStep?.transitions?.find((tr) => ("moment" in tr.to ? `moment:${tr.to.moment}` : `step:${tr.to.step}`) === target);
+    if (t?.if && "reply" in t.if) return answer(t.if.reply, "chat");
+    const id = target.startsWith("moment:") ? target.slice(7) : null;
+    if (id && runner?.jumpTo(id)) interrupt();
+  }
+
+  // Fala da pessoa (chat ou voz). A ordem está em journey/route.ts: pulo → resposta sugerida → nome de
+  // um item do quadro → conhecimento da aula → FAQ do nó → agente (ponte na hora + LLM no servidor).
+  async function handleUtterance(text: string, from: "chat" | "voz"): Promise<void> {
+    text = text.trim();
+    if (!text) return;
+    if (from === "voz") {
+      el.captionUser.textContent = text;
+      chat.addMessage({ from: "user", text });
     }
-    if (isReply) return answer(text, "chat");
-    if (pending?.kind === "select") {
-      // escreveu o nome de um item do quadro em vez de tocar nele
-      const said = normalize(text);
-      const hit = journey.boards[currentBoard ?? ""]?.nodes.find((n) => said.includes(normalize(n.label)) || said.includes(normalize(n.id)));
-      if (hit) return pickNode(hit.id, text);
+    const waiting = pending?.kind === "reply" ? { kind: "reply" as const, replies: pending.replies ?? [] } : pending?.kind === "select" ? { kind: "select" as const } : null;
+    const route = routeUtterance(text, { journey, moment: currentMoment, step: currentStep, waiting, board: currentBoard, faqs });
+    switch (route.kind) {
+      case "jump":
+        if (running && runner?.jumpTo(route.moment.id)) {
+          voice.stop();
+          interrupt();
+          void speakAside(`Claro, vamos para ${route.moment.title.toLowerCase()}.`);
+        }
+        return;
+      case "reply":
+        return answer(route.reply, "chat");
+      case "select":
+        return pickNode(route.node, text);
+      case "knowledge":
+        remember("user", text);
+        return speakAside(route.text);
+      case "faq":
+        remember("user", text);
+        for (const a of route.faq.actions) io.apply(a);
+        return speakAside(route.faq.text);
     }
-    // pergunta: o conhecimento do momento atual primeiro, depois o da aula toda (sem chutar)
-    const known =
-      answerFromKnowledge(text, currentStep, currentMoment) ??
-      journey.moments.map((m) => answerFromKnowledge(text, null, m)).find((a): a is string => !!a);
-    if (known) {
-      chat.addMessage({ from: "agent", text: known });
-      return;
-    }
+    // ask: o agente responde; a ponte sai na hora e o LLM vem atrás.
+    remember("user", text);
+    const asked =
+      !!currentMoment &&
+      !!currentStep &&
+      (await voice.ask(
+        { text, moment_id: currentMoment.id, step_id: currentStep.id, perfil: profile.vinculo, history: history.slice(0, -1) },
+        { onSpeak: (t, play) => speakAside(t, play), onAction: (a) => io.apply(a), onGoTo: goTo },
+      ));
+    if (asked) return;
     if (pending?.kind === "reply") return answer(text, "chat");
-    // sem fonte confiável: a dúvida fica anotada (§4.5, encaminhamento para uma pessoa)
-    chat.addMessage({
-      from: "agent",
-      text: "Não achei isso confirmado na documentação, então não quero chutar. Anotei a sua pergunta para a sua buddy responder.",
-    });
-  });
+    // sem servidor e sem fonte confiável: a dúvida fica anotada (§4.5, encaminhamento para uma pessoa)
+    void speakAside("Não achei isso confirmado na documentação, então não quero chutar. Anotei a sua pergunta para a sua buddy responder.");
+  }
+
+  document.addEventListener("chatpanel:send", (e) => void handleUtterance(e.detail.text, "chat"));
+  document.addEventListener("callbar:mute", (e) => voice.setMuted(!!e.detail.on));
 
   // ---- Barra de call ----
   document.addEventListener("callbar:pause", (e) => {
@@ -280,12 +318,14 @@ async function main(): Promise<void> {
       // trecho em amarelo: o highlight do passo, se esta fala for a fala do passo
       const highlight = currentStep?.highlight && text.includes(currentStep.highlight) ? currentStep.highlight : undefined;
       const words = text.split(" ");
+      const audio = voice.speak(text); // voz de verdade junto com a legenda (sem servidor, resolve na hora)
       for (let i = 0; i < words.length; i++) {
         el.captionAgent.innerHTML = captionHTML(text, words.slice(0, i + 1).join(" ").length, highlight);
         await clock.wait(150);
       }
       chat.addMessage({ from: "agent", text });
-      await clock.wait(700);
+      await audio;
+      await clock.wait(voice.tts ? 250 : 700);
     },
     listen(replies) {
       setAgent("listening");
@@ -347,7 +387,19 @@ async function main(): Promise<void> {
   }
 
   render();
-  void start();
+  if (!voice.tts && !voice.stt) return void start();
+  // O browser só libera som e microfone depois de um clique.
+  const gate = document.createElement("button");
+  gate.type = "button";
+  gate.className = "voice-gate";
+  gate.textContent = "Começar aula com voz";
+  document.body.append(gate);
+  gate.addEventListener("click", async () => {
+    gate.remove();
+    await voice.unlock();
+    void voice.listen((t) => void handleUtterance(t, "voz"), (t) => (el.captionUser.textContent = t)).catch((e) => console.warn("microfone:", e));
+    void start();
+  });
 }
 
 void main();

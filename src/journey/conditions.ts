@@ -56,6 +56,65 @@ export function matchReply(text: string, replies: readonly string[]): string | n
   return best;
 }
 
+/** Igual a matchReply, mas devolve a confiança (0..1): 1 = igual, fração de palavras-chave da resposta encontradas. */
+export function scoreReply(text: string, replies: readonly string[]): { reply: string | null; score: number } {
+  const said = normalize(text);
+  const exact = replies.find((r) => normalize(r) === said);
+  if (exact) return { reply: exact, score: 1 };
+  const words = keywords(text);
+  let best: string | null = null;
+  let bestScore = 0;
+  for (const r of replies) {
+    const rk = keywords(r);
+    if (!rk.length) continue;
+    const score = rk.filter((k) => words.some((w) => sameWord(w, k))).length / rk.length;
+    if (score > bestScore) {
+      best = r;
+      bestScore = score;
+    }
+  }
+  return { reply: best, score: bestScore };
+}
+
+export type FaqIntent = "what" | "owner" | "why";
+
+// "quem", "que" e "por" são stopwords em keywords(), então a intenção é lida por frase.
+const INTENTS: [FaqIntent, string[]][] = [
+  ["owner", ["quem cuida", "quem e o dono", "quem e dono", "dono", "responsavel", "quem mantem", "falar com quem", "com quem eu falo"]],
+  ["why", ["por que", "porque", "pra que", "para que serve", "motivo", "decisao", "decidiram", "adr"]],
+  ["what", ["o que e", "o que faz", "como funciona", "explica", "me fala", "serve"]],
+];
+
+export function detectIntent(text: string): FaqIntent | null {
+  const t = ` ${normalize(text)} `;
+  for (const [intent, phrases] of INTENTS) if (phrases.some((p) => t.includes(` ${p} `))) return intent;
+  return null;
+}
+
+/**
+ * Acha a resposta pré-computada para "o que é / quem cuida / por que existe" de um nó do quadro.
+ * score 1 = cita o nó e a intenção; 0.5 = cita só o nó (vale "what"); 0 = não cita nó nenhum.
+ */
+export function matchFaq<T extends { node: string; label: string; intent: FaqIntent }>(
+  text: string,
+  faqs: readonly T[],
+): { faq: T | null; score: number } {
+  const said = ` ${normalize(text)} `;
+  const words = keywords(text);
+  const intent = detectIntent(text);
+  const mentions = (f: T) => {
+    const label = normalize(f.label);
+    if (said.includes(` ${label} `) || said.includes(` ${normalize(f.node)} `)) return true;
+    const lk = keywords(f.label);
+    return lk.length > 0 && lk.every((k) => words.some((w) => sameWord(w, k)));
+  };
+  const hit = faqs.filter(mentions);
+  if (!hit.length) return { faq: null, score: 0 };
+  const exact = intent && hit.find((f) => f.intent === intent);
+  if (exact) return { faq: exact, score: 1 };
+  return { faq: hit.find((f) => f.intent === "what") ?? null, score: intent ? 0.3 : 0.5 };
+}
+
 export interface ConditionContext {
   profile: Profile;
   /** Resposta sugerida escolhida (ou reconhecida no texto) no passo atual. */
