@@ -144,7 +144,7 @@ São perguntas, não afirmações de que o concorrente não tem a funcionalidade
 
 **Sana Learn (conferido em 2026-11-07):** a [página de preços](https://sanalabs.com/products/sana-learn/pricing) não mostra valores. A cobrança é por usuário por mês, o plano "Built to scale" começa em 300 usuários e o Enterprise tem preço sob consulta. A página cita "an AI Tutor for every learner". A Sana tem oferta específica de [onboarding de funcionários](https://sanalabs.com/products/sana-learn/solutions/employee-onboarding): "Every new hire gets an AI tutor on day one." Isso confirma que a categoria já oferece tutor com IA para quem chega: o diferencial da Puca precisa estar na forma (voz com quadro, calibragem, encaminhamento, transição entre times), não em "ter IA". O "onboarding" do FAQ de preços é a implantação da própria Sana, não a integração de funcionários.
 
-Integrações, RAG, agentes, voz e computer use são meios. Viram argumento comercial quando produzem um resultado útil, demonstrável e relevante para o RH e para a pessoa. Não alegar ausência de concorrência, melhor precisão, redução percentual de tempo, vantagem de dados ou barreira à cópia sem evidência. A comparação completa é a #43.
+Integrações, RAG, agentes, voz e computer use são meios. Viram argumento comercial quando produzem um resultado útil, demonstrável e relevante para o RH e para a pessoa. Não alegar ausência de concorrência, melhor precisão, redução percentual de tempo, vantagem de dados ou barreira à cópia sem evidência. A comparação completa é a #43; o que a Lousa faz de verdade é a #74.
 
 ## 9. Validação que já temos
 
@@ -199,7 +199,7 @@ A frase descreve a proposta. Antes de usá-la como capacidade pronta, conferir o
 
 | Quando | O quê | Resultado |
 | --- | --- | --- |
-| Agora | Demo dos dois vínculos e matriz de capacidades: o que está no código, o que é simulado e o que pode ser dito no pitch | Mostrar comportamento real |
+| Agora | Demo dos dois vínculos e matriz de capacidades: o que está no código, o que é simulado e o que pode ser dito no pitch (#74) | Mostrar comportamento real |
 | Agora | Comparação com concorrentes em fontes oficiais com data (#43) | Diferenciais que se sustentam |
 | Primeira negociação | Escopo, preço, volume e metas do piloto com o RH | Proposta paga e revisável |
 | Depois da implementação | Custo por sessão e esforço operacional (#52) | Base para preço, mínimo e margem |
