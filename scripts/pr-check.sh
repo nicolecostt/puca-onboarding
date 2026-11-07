@@ -12,7 +12,9 @@ n=${1:-}
 modo=${2:-}
 cd "$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 
-limpa() { perl -CSD -ne 'print if /\A[\p{L}\p{N}._\/\@+ -]+\n?\z/' ; }
+limpa() { perl -CSD -ne 'print if /\A[\p{L}\p{N}._\/\@+-]{1,120}\n?\z/' ; }
+# no --gate, qualquer coisa que impeça a verificação barra o merge (falha fechada)
+falha() { if [ "$modo" = --gate ]; then echo "PR #$n: não consegui verificar ($1). Confira com scripts/pr-check.sh $n antes de integrar." >&2; exit 2; fi; echo "[pr-check] $1."; exit 0; }
 login() { LC_ALL=C tr -cd '[:alnum:]-' | cut -c1-39; }
 linha() { [ "$modo" = --gate ] || printf '%s\n' "$*"; }
 bloqueios=()
@@ -46,7 +48,7 @@ descreve() { # arquivo|mecânicos|de decisão -> texto
   if [ "$arq" = package-lock.json ]; then tipo="lockfile: refazer com npm install depois do merge (mecânico)"
   elif [ "$dec" = 0 ]; then tipo="$mec bloco(s) mecânico(s): manter as duas mudanças (ajustar ordem/numeração se for lista ou seção)"
   else tipo="$dec bloco(s) em que os dois lados alteraram o mesmo trecho de jeitos diferentes: o autor decide$([ "$mec" -gt 0 ] && echo "; mais $mec mecânico(s)")"; fi
-  printf '%s — %s' "$(limpa <<<"$arq")" "$tipo"
+  local nome; nome=$(limpa <<<"$arq"); printf '%s — %s' "${nome:-(arquivo com nome fora do padrão)}" "$tipo"
 }
 junta() { local IFS=';'; local s="$*"; printf '%s' "${s//;/, }"; }
 
@@ -60,10 +62,10 @@ if [ "$n" = --conflitos ]; then
 fi
 
 [[ "$n" =~ ^[0-9]+$ ]] || { echo "uso: scripts/pr-check.sh <número do PR> [--gate] | --conflitos <ref1> <ref2>" >&2; exit 0; }
-command -v gh >/dev/null 2>&1 || { [ "$modo" = --gate ] || echo "[pr-check] sem gh instalado: não dá para ler o PR."; exit 0; }
+command -v gh >/dev/null 2>&1 || falha "sem gh instalado"
 
 json=$(gh pr view "$n" --json number,state,isDraft,headRefName,baseRefName,mergeable,additions,deletions,changedFiles,statusCheckRollup,body,author 2>/dev/null) \
-  || { linha "[pr-check] não achei o PR #$n."; exit 0; }
+  || falha "não achei o PR #$n no GitHub"
 campo() { node -e 'const d=JSON.parse(process.argv[1]);const v=process.argv[2].split(".").reduce((o,k)=>o?.[k],d);process.stdout.write(String(v??""))' "$json" "$1"; }
 
 estado=$(campo state)
@@ -71,11 +73,12 @@ if [ "$estado" != OPEN ]; then linha "[pr-check] PR #$n está $estado; nada a ch
 base=$(campo baseRefName | limpa)
 autor=$(campo author.login | login)
 
-# refs locais da main e de todos os PRs abertos (um fetch só)
-abertos=$(gh pr list --state open --json number --jq '.[].number' 2>/dev/null | tr -cd '0-9\n')
+# refs locais da main e dos PRs abertos (um fetch só); no --gate só os outros PRs não importam
+abertos=$n
+[ "$modo" = --gate ] || abertos=$(gh pr list --state open --json number --jq '.[].number' 2>/dev/null | tr -cd '0-9\n')
 refspecs=("+refs/heads/$base:refs/remotes/origin/$base")
 for m in $abertos; do refspecs+=("+refs/pull/$m/head:refs/puca-pr/$m"); done
-git fetch -q origin "${refspecs[@]}" 2>/dev/null || { linha "[pr-check] não consegui buscar os PRs no GitHub (sem rede?)."; exit 0; }
+git fetch -q origin "${refspecs[@]}" 2>/dev/null || falha "não consegui buscar o PR no GitHub (sem rede?)"
 pr=refs/puca-pr/$n
 main=refs/remotes/origin/$base
 
@@ -101,8 +104,8 @@ ci=$(node -e '
 case $ci in
   verde) linha "[pr-check] ✅ CI verde.";;
   falhou) bloqueios+=("CI vermelho"); linha "[pr-check] ❌ CI falhou: veja com gh pr checks $n.";;
-  rodando) atencao+=("CI ainda rodando"); linha "[pr-check] ⏳ CI ainda rodando.";;
-  *) atencao+=("sem CI"); linha "[pr-check] ⚠️ Sem CI neste PR.";;
+  rodando) bloqueios+=("CI ainda rodando: espere terminar"); linha "[pr-check] ⏳ CI ainda rodando.";;
+  *) bloqueios+=("CI não rodou neste PR"); linha "[pr-check] ⚠️ CI não rodou neste PR.";;
 esac
 
 # 3. base do sistema no resultado do merge (só se o merge é limpo e a base mudou de algum lado)
@@ -122,6 +125,7 @@ if [ -z "$cm" ] && git diff --quiet "$main...$pr" -- PRODUCT.md CONTEXT.md 2>/de
       linha "[pr-check] ✅ Base do sistema (PRODUCT.md/CONTEXT.md) válida depois do merge."
     fi
   else
+    [ "$modo" = --gate ] && falha "o PR mexe na base do sistema e falta npm ci para validar"
     linha "[pr-check] (rode npm ci para validar a base do sistema no resultado do merge)"
   fi
 fi
