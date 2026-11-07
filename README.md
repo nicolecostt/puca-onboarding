@@ -13,7 +13,7 @@ npm run dev        # servidor local; abre a lista de telas
 npm run typecheck  # checa os tipos
 npm test           # testes (validador e motor da jornada)
 npm run build      # build de produção em dist/
-npm run check      # typecheck + testes + build (o que o CI roda em cada PR)
+npm run check      # typecheck + testes + base do sistema + harness + build (o que o CI roda em cada PR)
 ```
 
 Trabalhando com agentes de programação (Claude Code, Codex…): regras do time em [`AGENTS.md`](AGENTS.md).
