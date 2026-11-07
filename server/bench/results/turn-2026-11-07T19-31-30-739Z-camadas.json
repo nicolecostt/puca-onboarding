@@ -1,0 +1,190 @@
+{
+  "at": "2026-11-07T19:31:30.739Z",
+  "summary": {
+    "naive": false,
+    "turns": 12,
+    "first_audio_p50": 0,
+    "first_audio_p95": 2,
+    "by_path": {
+      "reply": {
+        "n": 3,
+        "p50": 0,
+        "max": 2
+      },
+      "llm": {
+        "n": 5,
+        "p50": 0,
+        "max": 0
+      },
+      "faq": {
+        "n": 3,
+        "p50": 0,
+        "max": 0
+      },
+      "select": {
+        "n": 1,
+        "p50": 0,
+        "max": 0
+      }
+    },
+    "llm_first_sentence_p50": 1642
+  },
+  "rows": [
+    {
+      "path": "reply",
+      "first_speak_ms": 0,
+      "first_speak_source": "script",
+      "first_tts_ms": null,
+      "llm_first_token_ms": null,
+      "llm_first_sentence_ms": null,
+      "total_ms": 0,
+      "llm_error": null,
+      "text": "O que é ser dono do problema?",
+      "expect": "reply",
+      "said": "[script] Ser dono do problema quer dizer que quem encontra um problema cuida dele até o fim, ou passa adiante com contexto. É o valor que você mais vai ver no dia a dia da Engenharia. [script] Este é o seu time, TMS — fraud-score. Ele avalia o risco de cada pagamento da Orla antes da autorização. [script] Marcos Vidal lidera o time. É com essa pessoa que você alinha prioridades, metas e acessos. [script] A Ana Ribeiro é a sua buddy. Dúvida do dia a dia, de onde fica cada coisa a como o time trabalha, começa com ela. [script] No time também estão o Rafael, no backend, e a Júlia, em dados. A daily é às nove e meia, e o canal do time no Slack é o tms-fraud-score. [script] Ficou claro quem procurar para cada coisa?"
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 0,
+      "first_speak_source": "bridge",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 1152,
+      "llm_first_sentence_ms": 1187,
+      "total_ms": 2091,
+      "llm_error": null,
+      "text": "Pode seguir",
+      "expect": "reply",
+      "said": "[bridge] Hum, deixa eu pensar um segundo. [llm] Pode seguir. [llm] Vamos entender a diferença entre gestor e buddy."
+    },
+    {
+      "path": "faq",
+      "first_speak_ms": 0,
+      "first_speak_source": "faq",
+      "first_tts_ms": null,
+      "llm_first_token_ms": null,
+      "llm_first_sentence_ms": null,
+      "total_ms": 0,
+      "llm_error": null,
+      "text": "Quem é a Ana Ribeiro?",
+      "expect": "faq",
+      "said": "[faq] Ana Ribeiro: ajuda no dia a dia: onde fica cada coisa, como o time trabalha, quem procurar."
+    },
+    {
+      "path": "reply",
+      "first_speak_ms": 0,
+      "first_speak_source": "script",
+      "first_tts_ms": null,
+      "llm_first_token_ms": null,
+      "llm_first_sentence_ms": null,
+      "total_ms": 0,
+      "llm_error": null,
+      "text": "Qual a diferença entre gestor e buddy?",
+      "expect": "reply",
+      "said": "[script] Marcos Vidal cuida do que você vai fazer e de como você está indo. A Ana cuida de como fazer: ela te ajuda a se achar no dia a dia. Na dúvida, comece pela Ana. [script] Agora a parte técnica. Vou te mostrar o caminho de um pagamento na Orla. Tudo começa no checkout, no app ou no site de quem vende. [script] O pedido chega pelo API Gateway, que autentica e encaminha para o serviço certo. [script] O coração do fluxo é o payments-api. Ele orquestra cada etapa do pagamento. [script] Antes de autorizar, o payments-api pergunta ao fraud-score qual é o risco daquela compra. Esse é o serviço do seu time. [script] Se o risco for aceitável, o pagamento segue para o PSP, o parceiro que autoriza a transação. O resultado fica gravado no payments-db e lançado no ledger. [script] Juntando tudo: checkout, gateway, payments-api, fraud-score e PSP. Esse é o caminho feliz. [script] Quer ver o que acontece quando o pagamento falha?"
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 0,
+      "first_speak_source": "bridge",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 1026,
+      "llm_first_sentence_ms": 2455,
+      "total_ms": 3207,
+      "llm_error": null,
+      "text": "beleza, ficou claro",
+      "expect": "reply",
+      "said": "[bridge] Boa pergunta. Só um instante. [llm] Beleza. Vamos continuar o fluxo."
+    },
+    {
+      "path": "faq",
+      "first_speak_ms": 0,
+      "first_speak_source": "faq",
+      "first_tts_ms": null,
+      "llm_first_token_ms": null,
+      "llm_first_sentence_ms": null,
+      "total_ms": 0,
+      "llm_error": null,
+      "text": "Quem cuida do payments-api?",
+      "expect": "faq",
+      "said": "[faq] Quem cuida do payments-api é Helena Prado, do time Pagamentos Core."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 0,
+      "first_speak_source": "bridge",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 934,
+      "llm_first_sentence_ms": 1345,
+      "total_ms": 2484,
+      "llm_error": null,
+      "text": "Por que existe o fraud-score?",
+      "expect": "faq",
+      "said": "[bridge] Boa. Deixa eu ver a decisão por trás disso. [llm] O fraud-score existe para calcular o risco de cada pagamento rapidamente, antes que ele chegue ao PSP. [llm] Assim, pagamentos com risco alto são bloqueados cedo."
+    },
+    {
+      "path": "faq",
+      "first_speak_ms": 0,
+      "first_speak_source": "faq",
+      "first_tts_ms": null,
+      "llm_first_token_ms": null,
+      "llm_first_sentence_ms": null,
+      "total_ms": 0,
+      "llm_error": null,
+      "text": "me explica o ledger",
+      "expect": "faq",
+      "said": "[faq] ledger: lança cada pagamento no registro contábil da Orla."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 0,
+      "first_speak_source": "bridge",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 953,
+      "llm_first_sentence_ms": 1642,
+      "total_ms": 2690,
+      "llm_error": null,
+      "text": "e se der ruim na hora de cobrar o cartão, o que rola?",
+      "expect": "llm",
+      "said": "[bridge] Deixa eu ver isso pra você. [llm] Se der ruim na autorização do cartão, o pagamento vai para a fila de retentativa (retry-queue) e é tentado de novo até 3 vezes. [llm] Se falhar todas, o status é atualizado e a pessoa é notificada."
+    },
+    {
+      "path": "llm",
+      "first_speak_ms": 0,
+      "first_speak_source": "bridge",
+      "first_tts_ms": null,
+      "llm_first_token_ms": 2276,
+      "llm_first_sentence_ms": 2999,
+      "total_ms": 3729,
+      "llm_error": null,
+      "text": "Quanto ganha um engenheiro pleno aqui na Orla?",
+      "expect": "llm",
+      "said": "[bridge] Hum, deixa eu pensar um segundo. [llm] Questões sobre salários devem ser direcionadas ao RH. [llm] Posso ajudar a resumir sua dúvida para eles?"
+    },
+    {
+      "path": "reply",
+      "first_speak_ms": 2,
+      "first_speak_source": "script",
+      "first_tts_ms": null,
+      "llm_first_token_ms": null,
+      "llm_first_sentence_ms": null,
+      "total_ms": 3,
+      "llm_error": null,
+      "text": "Quem cuida de cada serviço?",
+      "expect": "reply",
+      "said": "[script] O payments-api e o gateway são do time de Pagamentos Core, com a Helena Prado como responsável. O cartão mostra onde ficam os documentos. [script] O fraud-score é do seu time, com Marcos Vidal como responsável. [script] Sobre o ledger, eu não encontrei um responsável confirmado na documentação. Em vez de chutar, a dica é perguntar para a Ana. Já deixei essa dúvida anotada para ela. [script] Uma pergunta rápida, sem nota: se a aprovação dos pagamentos começar a demorar muito, qual serviço você investigaria primeiro? Toque nele no quadro."
+    },
+    {
+      "path": "select",
+      "first_speak_ms": 0,
+      "first_speak_source": "script",
+      "first_tts_ms": null,
+      "llm_first_token_ms": null,
+      "llm_first_sentence_ms": null,
+      "total_ms": 1,
+      "llm_error": null,
+      "text": "(clique fraud-score)",
+      "expect": "reply",
+      "said": "[script] Boa escolha. O payments-api orquestra tudo e o fraud-score fica no caminho de toda aprovação: são os dois primeiros lugares para olhar. [script] Para fechar a parte técnica, separei uma primeira tarefa que o time aprovou: ajustar o limite de score para pagamentos via Pix. O cartão explica o problema, por que importa e onde ler. [script] Ela mexe só no fraud-score, então você não precisa entender o sistema inteiro para começar. Se travar, a Ana pode te ajudar. [script] Por hoje é isso, Bruno. Vimos o seu time, o caminho de um pagamento e a sua primeira tarefa. [script] A Ana recebe um resumo das etapas que você concluiu, não da nossa conversa. Quer rever alguma parte?"
+    }
+  ]
+}

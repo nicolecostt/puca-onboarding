@@ -288,3 +288,11 @@ body {
   }
 }
 
+
+/* Botão de entrada quando há voz: o browser só libera som e microfone depois de um clique. */
+.voice-gate{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;
+  height:44px;padding:0 22px;border:0;border-radius:999px;
+  background:var(--color-fg, #171717);color:#fff;font:inherit;font-weight:600;cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+}

@@ -10,3 +10,6 @@ sandbox/
 # dependências e build
 node_modules/
 dist/
+
+# servidor: cache de áudio gerado
+server/cache/

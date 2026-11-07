@@ -58,6 +58,27 @@ sandbox/                 testes locais, fora do git (ex.: visual da Puca)
 - **Um componente ou tela:** o `.css` ao lado do `.ts`. Pode reescrever à vontade.
 - **Conteúdo** (falas, perguntas, pessoas, perfis): `src/data/`.
 
+## Agente (servidor)
+
+A aula (`src/screens/lesson/`) continua conduzindo a jornada no browser. O servidor em `server/` (Fastify + TS, sem estado)
+dá a voz e o LLM: `POST /api/speak` (fala → áudio ElevenLabs, com cache), `POST /api/ask` (pergunta → ponte na hora + LLM por SSE)
+e `POST /api/voice/token` (microfone via Deepgram). Sem o servidor, a aula segue só com legenda e chat.
+
+```bash
+cp server/.env.example server/.env   # chaves: Featherless (obrigatória), Deepgram e ElevenLabs (voz, opcionais)
+npm run dev:server   # API em :8787 (o Vite repassa /api)
+npm run dev          # abre a lista de telas → "Aula no quadro" → "Começar aula com voz"
+npm run precompute -- --only pontes   # pré-gera áudio (pontes|faq|roteiro; --dry mostra o custo em caracteres)
+npm run bench:llm    # latência do LLM por modelo/config → server/bench/results/
+npm run bench:turn   # tempo até a Puca começar a responder, por caminho (--tts mede o áudio também)
+```
+
+Regra: a resposta nunca espera o LLM. Cada fala (voz ou chat) passa por `src/journey/route.ts`, nesta ordem:
+pulo de assunto → resposta sugerida → nome de um item do quadro → FAQ do nó (nó + intenção) → conhecimento da aula →
+FAQ só pelo nome → agente (`/api/ask`: fala-ponte na hora + LLM em streaming, frase a frase para o TTS).
+
+Sem chave de TTS, a tela usa a voz do browser. Sem chave de STT, use o campo de texto.
+
 ## Nova tela
 
 1. Criar `src/screens/<nome>/` com `index.html`, `main.ts` e `style.css`.

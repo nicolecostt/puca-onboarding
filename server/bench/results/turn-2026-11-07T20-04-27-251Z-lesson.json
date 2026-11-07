@@ -1,0 +1,118 @@
+{
+  "at": "2026-11-07T20:04:27.251Z",
+  "summary": {
+    "turns": 13,
+    "local": 9,
+    "ask": 4,
+    "first_response_p50": 0.13,
+    "first_response_p95": 17,
+    "first_audio_byte_p50": null,
+    "llm_first_sentence_p50": 1003
+  },
+  "rows": [
+    {
+      "text": "O que é ser dono do problema?",
+      "route": "reply",
+      "first_response_ms": 0.13,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: O que é ser dono do problema?)"
+    },
+    {
+      "text": "pode seguir",
+      "route": "reply",
+      "first_response_ms": 0.02,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: Pode seguir)"
+    },
+    {
+      "text": "Qual a diferença entre gestor e buddy?",
+      "route": "reply",
+      "first_response_ms": 0.01,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: Qual a diferença entre gestor e buddy?)"
+    },
+    {
+      "text": "beleza, ficou claro",
+      "route": "reply",
+      "first_response_ms": 0.06,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: Ficou claro)"
+    },
+    {
+      "text": "E se a liquidação falhar?",
+      "route": "reply",
+      "first_response_ms": 0.01,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: E se a liquidação falhar?)"
+    },
+    {
+      "text": "Quem cuida do authorizer?",
+      "route": "knowledge",
+      "first_response_ms": 0.17,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "O MDR é 1,19% no débito e 2,49% no crédito à vista; o cálculo do MDR fica no authorizer, no módulo fees/mdr, com uma tabela por plano do lojista, e quem conhece os detalhes é a Júlia Paiva."
+    },
+    {
+      "text": "me explica o settlement-worker",
+      "route": "knowledge",
+      "first_response_ms": 0.09,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "Se o settlement-worker cair, nada se perde: as vendas ficam esperando na fila transactions.authorized e ele continua de onde parou quando volta."
+    },
+    {
+      "text": "quero ver a primeira tarefa",
+      "route": "jump",
+      "first_response_ms": 0.09,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(pula: Primeira tarefa)"
+    },
+    {
+      "text": "e se der ruim na hora de cobrar o cartão, o que rola?",
+      "route": "ask",
+      "first_response_ms": 17,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": 1761,
+      "said": "[bridge] Hum, deixa eu pensar um segundo. [llm] Se a transação for rejeitada, o authorizer devolve o motivo para a maquininha. [llm] Quer ver como o erro é tratado no sistema?"
+    },
+    {
+      "text": "Quanto ganha um engenheiro pleno aqui?",
+      "route": "ask",
+      "first_response_ms": 7,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": 806,
+      "said": "[bridge] Boa pergunta. Só um instante. [llm] Pergunta sobre salário vai para o RH. [llm] Posso resumir a dúvida para eles."
+    },
+    {
+      "text": "a gente usa kafka ou rabbit nessa fila?",
+      "route": "ask",
+      "first_response_ms": 5,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": 867,
+      "said": "[bridge] Deixa eu ver isso pra você. [llm] Usamos Kafka nessa fila. [llm] O transactions.authorized é um tópico do Kafka. [llm] Perguntas sobre configuração do sistema, a Ana pode perguntar para o Lucas Melo."
+    },
+    {
+      "text": "isso já aconteceu em produção alguma vez?",
+      "route": "ask",
+      "first_response_ms": 4,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": 1003,
+      "said": "[bridge] Hum, deixa eu pensar um segundo. [llm] Já tivemos mensagens na settlement.dlq, sim. [llm] É normal quando há falhas repetidas. [llm] Quer ver quem cuida disso ou quer continuar?"
+    },
+    {
+      "text": "terminar por hoje",
+      "route": "reply",
+      "first_response_ms": 0.37,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: Terminar por hoje)"
+    }
+  ]
+}
