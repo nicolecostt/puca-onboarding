@@ -1,22 +1,17 @@
 /* Tela de call inicial: topo fino, agente no centro (como uma entrevista),
    barra de call flutuando embaixo (componente) e chat à direita (componente). */
+/* atalhos locais para os tokens (src/styles/tokens.css) */
 :root{
-  --bg:#f6f6f6;
-  --surface:#fff;
-  --line:#e5e5e5;
-  --fg:#171717;
-  --muted:#737373;
-  --faint:#a3a3a3;
-  --live:#e40014;
-  --ok:#26911c;
+  --bg:var(--color-bg);
+  --surface:var(--color-surface);
+  --line:var(--color-border);
+  --fg:var(--color-ink);
+  --muted:var(--color-muted);
+  --faint:var(--color-subtle);
+  --live:var(--color-danger);
+  --ok:var(--color-live);
 }
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;background:var(--bg);color:var(--fg);
-  font:14px/1.5 "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing:antialiased;overflow:hidden;
-}
+body{overflow:hidden}
 
 /* ---------- Topo ---------- */
 .topbar{
@@ -32,7 +27,7 @@ body{
 }
 .live{
   display:flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:999px;
-  background:#fdeceb;color:var(--live);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  background:var(--color-danger-bg);color:var(--live);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
 }
 .live__dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.6s ease-in-out infinite}
 .live.is-off{background:#f0f0f0;color:var(--muted)}
@@ -78,12 +73,12 @@ body{
 }
 @keyframes breathe{50%{transform:scale(1.025)}}
 
-/* Teste da Iris: ocupa o lugar do círculo neutro */
-.agent__orb.has-iris{width:390px;height:390px;margin:-80px 0 -70px} /* 300 × 1.3 (BLOB) */
-.agent__orb.has-iris > .agent__core,.agent__orb.has-iris > .agent__ring{display:none}
-.agent__iris{position:absolute;inset:0;transition:opacity .3s ease, filter .3s ease}
-.agent__orb.has-iris[data-state="paused"] .agent__iris,
-.agent__orb.has-iris[data-state="ended"] .agent__iris{opacity:.45;filter:saturate(.4)}
+/* Visual de teste da Puca: ocupa o lugar do círculo neutro */
+.agent__orb.has-visual{width:390px;height:390px;margin:-80px 0 -70px} /* 300 × 1.3 (BLOB) */
+.agent__orb.has-visual > .agent__core,.agent__orb.has-visual > .agent__ring{display:none}
+.agent__visual{position:absolute;inset:0;transition:opacity .3s ease, filter .3s ease}
+.agent__orb.has-visual[data-state="paused"] .agent__visual,
+.agent__orb.has-visual[data-state="ended"] .agent__visual{opacity:.45;filter:saturate(.4)}
 
 .agent__meta{display:flex;flex-direction:column;align-items:center;gap:4px}
 .agent__name{font-size:15px;font-weight:600;letter-spacing:-.15px}
@@ -108,7 +103,7 @@ body{
   .agent__orb{width:168px;height:168px}
   .agent__core{width:124px;height:124px}
   .caption__agent{font-size:18px}
-  .agent__orb.has-iris{width:320px;height:320px;margin:-60px 0 -50px}
+  .agent__orb.has-visual{width:320px;height:320px;margin:-60px 0 -50px}
 }
 @media (prefers-reduced-motion:reduce){
   .agent__orb[data-state="speaking"] .agent__ring,

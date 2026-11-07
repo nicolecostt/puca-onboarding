@@ -18,15 +18,27 @@
   strong{font-weight:500}
   span{font-size:12px;color:#737373}
 </style>
+<script>
+  // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
+  if (location.protocol === "file:") {
+    addEventListener("DOMContentLoaded", function () {
+      document.body.innerHTML =
+        '<div style="max-width:440px;margin:15vh auto;padding:24px;font:15px/1.6 system-ui,sans-serif;color:#171717;background:#fff;border:1px solid #e5e5e5;border-radius:12px">' +
+        "<strong>Esta página precisa do servidor do projeto.</strong><br>" +
+        "No terminal, na pasta do projeto, rode <code>npm run dev</code> e abra " +
+        '<a href="http://localhost:5173/">http://localhost:5173</a>.</div>';
+    });
+  }
+</script>
 </head>
 <body>
   <main>
     <h1>Puca</h1>
-    <p>Telas do agente de onboarding.</p>
+    <p>Telas da Puca, a agente de onboarding.</p>
     <ul>
-      <li><a href="/src/screens/onboarding-call/"><strong>Call inicial</strong><span>O agente entrevista a pessoa e coleta as infos iniciais.</span></a></li>
-      <li><a href="/src/screens/aula-quadro/"><strong>Aula no quadro</strong><span>O agente conduz a jornada e monta o quadro enquanto explica.</span></a></li>
-      <li><a href="/src/screens/live-session/"><strong>Tela de auxílio</strong><span>Barra de call, chat e câmera do agente por cima de uma tela.</span></a></li>
+      <li><a href="src/screens/onboarding-call/"><strong>Call inicial</strong><span>A Puca entrevista a pessoa e coleta as infos iniciais.</span></a></li>
+      <li><a href="src/screens/lesson/"><strong>Aula no quadro</strong><span>A Puca conduz a aula e monta o quadro enquanto explica: a empresa, o time e o caminho de uma transação.</span></a></li>
+      <li><a href="src/screens/live-session/"><strong>Tela de auxílio</strong><span>Barra de call, chat e câmera da Puca por cima de uma tela.</span></a></li>
     </ul>
   </main>
 </body>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import demo from "../data/orla-pagamentos.journey.json";
+import demo from "../data/mare-pagamentos.journey.json";
 import { validateJourney } from "../validate";
 import { matchReply } from "../conditions";
 import { interpolate, vinculoFromAnswer, DEMO_PROFILES } from "../profile";
@@ -40,7 +40,7 @@ describe("validateJourney", () => {
 
   it("recusa transição que espera resposta fora de suggested_replies", () => {
     const j = clone(demo);
-    const t = j.moments[3].steps[6].transitions![0] as unknown as { if: { reply: string } };
+    const t = j.moments.find((m) => m.id === "pagamentos")!.steps.find((s) => s.id === "pg-pergunta")!.transitions![0] as unknown as { if: { reply: string } };
     t.if.reply = "Outra coisa";
     expect(errorsOf(j).join("\n")).toMatch(/não está em suggested_replies/);
   });
@@ -84,7 +84,7 @@ describe("perfil", () => {
   });
 
   it("interpola campos do perfil com texto neutro quando faltam", () => {
-    expect(interpolate("Oi, {nome}! Time {time}.", DEMO_PROFILES.novo)).toBe("Oi, Bruno! Time TMS — fraud-score.");
+    expect(interpolate("Oi, {nome}! Time {time}.", DEMO_PROFILES.novo)).toBe("Oi, Ana! Time Terminais.");
     expect(interpolate("{gestor} lidera.", { nome: "Ana", vinculo: "novo" })).toBe("sua gestão lidera.");
   });
 });

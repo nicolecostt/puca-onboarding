@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aula no quadro</title>
+<script>
+  // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
+  if (location.protocol === "file:") {
+    addEventListener("DOMContentLoaded", function () {
+      document.body.innerHTML =
+        '<div style="max-width:440px;margin:15vh auto;padding:24px;font:15px/1.6 system-ui,sans-serif;color:#171717;background:#fff;border:1px solid #e5e5e5;border-radius:12px">' +
+        "<strong>Esta página precisa do servidor do projeto.</strong><br>" +
+        "No terminal, na pasta do projeto, rode <code>npm run dev</code> e abra " +
+        '<a href="http://localhost:5173/">http://localhost:5173</a>.</div>';
+    });
+  }
+</script>
+</head>
+<body>
+  <!-- o cabeçalho (app-header) entra aqui pelo main.ts -->
+  <main class="lesson">
+    <!-- Vista "quadro": a aula visual -->
+    <div class="lesson__board" id="board-host" hidden></div>
+
+    <!-- Vista "logo": abertura e encerramento -->
+    <section class="opening" id="logo-view" hidden>
+      <h1 class="opening__company" id="logo-company"></h1>
+      <p class="opening__title" id="logo-title"></p>
+      <p class="opening__who" id="logo-who"></p>
+    </section>
+
+    <!-- Título da aula: momento atual e tempo -->
+    <div class="lesson-title" role="status">
+      <span class="lesson-title__dot" id="live-dot" aria-hidden="true"></span>
+      <strong id="lesson-name"></strong>
+      <span class="lesson-title__time" id="timer">00:00</span>
+      <span class="chip" id="moment"></span>
+    </div>
+
+    <!-- Legenda: fala da Puca, resposta da pessoa e respostas sugeridas -->
+    <div class="caption" aria-live="polite">
+      <span class="caption__logo" aria-hidden="true">P</span>
+      <div class="caption__body">
+        <p class="caption__text" id="caption-agent"></p>
+        <p class="caption__you" id="caption-user"></p>
+        <div class="caption__replies" id="replies"></div>
+        <p class="caption__hint" id="caption-hint"></p>
+      </div>
+    </div>
+
+    <!-- Ondas sonoras ao lado da barra de call -->
+    <div class="voice" id="voice" data-state="idle" role="img" aria-label="Puca conectando">
+      <span class="voice__bars" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </span>
+    </div>
+  </main>
+
+<script type="module" src="./main.ts"></script>
+</body>
+</html>

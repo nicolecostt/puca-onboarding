@@ -1,0 +1,312 @@
+/* Aula no quadro (Figma: "03 · Aula no quadro — o wow").
+   O quadro (src/journey/board) ocupa a tela toda abaixo do cabeçalho; os cartões flutuam por cima. */
+body {
+  overflow: hidden;
+}
+.lesson {
+  position: relative;
+  height: calc(100vh - 56px);
+}
+.lesson__board {
+  position: absolute;
+  inset: 0;
+}
+/* o desenho fica entre o título (em cima) e a legenda + barra de call (embaixo);
+   o fundo pontilhado continua na tela toda */
+.lesson__board .board__svg {
+  position: absolute;
+  left: 24px;
+  top: 104px;
+  width: calc(100% - 48px);
+  height: calc(100% - 104px - 150px);
+}
+
+/* ---- Abertura e encerramento (vista "logo") ---- */
+.opening {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-bottom: 120px; /* espaço da legenda e da barra de call */
+  text-align: center;
+  background-color: var(--color-board);
+  background-image: radial-gradient(var(--color-board-dot) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.opening[hidden] {
+  display: none;
+}
+.opening__company {
+  margin: 0;
+  font: 400 clamp(36px, 5vw, 56px) / 1.1 var(--font-hand);
+  color: var(--color-sketch);
+}
+.opening__title {
+  margin: 0;
+  font-size: var(--text-lg);
+  color: var(--color-muted);
+}
+.opening__who {
+  margin: 10px 0 0;
+  height: 26px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-chip);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+/* ---- Peças comuns ---- */
+.chip {
+  height: 20px;
+  padding: 0 7px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+
+/* ---- Título da aula (topo, centro): abraça o conteúdo ---- */
+.lesson-title {
+  position: absolute;
+  left: 50%;
+  top: 16px;
+  transform: translateX(-50%);
+  height: 40px;
+  padding: 0 10px 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-card);
+  font-size: var(--text-md);
+  white-space: nowrap;
+}
+.lesson-title strong {
+  font-weight: 600;
+}
+.lesson-title__dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 4px;
+  background: var(--color-danger);
+  box-shadow: 0 0 0 3px var(--color-danger-bg);
+}
+.lesson-title__dot.is-off {
+  background: var(--color-subtle);
+  box-shadow: 0 0 0 3px var(--color-surface-muted);
+}
+.lesson-title__time {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.lesson-title .chip {
+  padding: 0 9px;
+  border-radius: var(--radius-pill); /* acompanha a curva da pílula */
+}
+
+/* ---- Legenda (embaixo, centro) ---- */
+.caption {
+  position: absolute;
+  left: 50%;
+  bottom: 72px; /* 12px acima da barra de call */
+  transform: translateX(-50%);
+  width: min(760px, calc(100% - 32px));
+  min-height: 44px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+  transition: opacity 0.2s ease;
+}
+.caption:has(.caption__text:empty) {
+  opacity: 0;
+  pointer-events: none;
+}
+.caption__logo {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  background: var(--color-ink);
+  color: #fafafa;
+  font: 700 12px/1 var(--font-hand);
+}
+.caption__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.caption__body p {
+  margin: 0;
+}
+.caption__text {
+  font-size: var(--text-base);
+  line-height: 21px;
+}
+.caption__you {
+  font-size: var(--text-md);
+  color: var(--color-muted);
+}
+.caption__you:empty,
+.caption__hint:empty,
+.caption__replies:empty {
+  display: none;
+}
+.caption__you::before {
+  content: "Você: ";
+  color: var(--color-subtle);
+}
+.caption__hint {
+  font-size: var(--text-sm);
+  color: var(--color-subtle);
+}
+
+/* respostas sugeridas: pílulas pequenas dentro da legenda */
+.caption__replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 2px;
+}
+.reply {
+  all: unset;
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-chip);
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  animation: reply-in 0.3s ease both;
+}
+.reply:hover {
+  border-color: var(--color-subtle);
+}
+.reply:focus-visible {
+  outline: 2px solid var(--color-info);
+  outline-offset: 2px;
+}
+.reply[disabled] {
+  opacity: 0.45;
+  cursor: default;
+}
+@keyframes reply-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* ---- Ondas de voz ao lado da barra de call (a barra tem 42px de altura) ---- */
+.voice {
+  position: absolute; /* dentro da barra de call (main.ts), à esquerda dela */
+  bottom: 0;
+  right: calc(100% + 12px);
+  height: 42px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-card);
+}
+.voice__bars {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.voice__bars i {
+  width: 3px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-text);
+  transition: height 0.2s ease, opacity 0.2s ease;
+}
+.voice[data-state="talk"] .voice__bars i {
+  animation: voice-bar 0.9s ease-in-out infinite;
+}
+.voice__bars i:nth-child(2n) {
+  animation-delay: -0.3s !important;
+}
+.voice__bars i:nth-child(3n) {
+  animation-delay: -0.55s !important;
+}
+.voice__bars i:nth-child(5n) {
+  animation-delay: -0.15s !important;
+}
+.voice[data-state="listen"] .voice__bars i {
+  height: 4px;
+  opacity: 0.5;
+}
+.voice[data-state="paused"] .voice__bars i {
+  height: 3px;
+  opacity: 0.3;
+}
+@keyframes voice-bar {
+  0%,
+  100% {
+    height: 5px;
+  }
+  50% {
+    height: 18px;
+  }
+}
+
+/* ---- Telas menores: tira o que é secundário ---- */
+@media (max-width: 1180px) {
+  .voice {
+    display: none;
+  }
+}
+@media (max-width: 720px) {
+  .lesson-title {
+    width: calc(100% - 32px);
+  }
+  .caption {
+    bottom: 140px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reply {
+    animation: none;
+  }
+  .voice[data-state="talk"] .voice__bars i {
+    animation: none;
+    height: 10px;
+  }
+}

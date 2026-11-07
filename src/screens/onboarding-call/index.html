@@ -4,16 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Call inicial</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<script>
+  // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
+  if (location.protocol === "file:") {
+    addEventListener("DOMContentLoaded", function () {
+      document.body.innerHTML =
+        '<div style="max-width:440px;margin:15vh auto;padding:24px;font:15px/1.6 system-ui,sans-serif;color:#171717;background:#fff;border:1px solid #e5e5e5;border-radius:12px">' +
+        "<strong>Esta página precisa do servidor do projeto.</strong><br>" +
+        "No terminal, na pasta do projeto, rode <code>npm run dev</code> e abra " +
+        '<a href="http://localhost:5173/">http://localhost:5173</a>.</div>';
+    });
+  }
+</script>
 </head>
 <body>
   <!-- Topo: marca, call em andamento e tempo -->
   <header class="topbar">
     <div class="brand">
       <span class="brand__mark" aria-hidden="true"></span>
-      <span class="brand__name">Primeira Semana</span>
+      <span class="brand__name">Lousa</span>
     </div>
     <div class="callinfo">
       <span class="live" id="live"><span class="live__dot"></span>Live</span>
@@ -24,18 +33,18 @@
   </header>
 
   <main class="stage">
-    <!-- Agente no centro (visual ainda em definição) -->
+    <!-- A Puca no centro (visual ainda em definição) -->
     <section class="agent" aria-live="polite">
       <div class="agent__orb" id="orb" data-state="idle">
         <span class="agent__ring agent__ring--1"></span>
         <span class="agent__ring agent__ring--2"></span>
         <span class="agent__ring agent__ring--3"></span>
         <div class="agent__core">
-          <span class="agent__placeholder">Agente</span>
+          <span class="agent__placeholder">Puca</span>
         </div>
       </div>
       <div class="agent__meta">
-        <span class="agent__name">Agente da Primeira Semana</span>
+        <span class="agent__name">Puca</span>
         <span class="agent__state" id="agent-state">Conectando…</span>
       </div>
       <div class="caption">

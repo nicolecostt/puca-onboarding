@@ -4,9 +4,9 @@
   --cam-size:176px;
   position:fixed;right:24px;bottom:24px;z-index:998;
   width:var(--cam-size);height:var(--cam-size);overflow:hidden;
-  background:#fff;border:2px solid var(--cam-accent, #e5e5e5);border-radius:16px;
+  background:var(--color-surface);border:2px solid var(--cam-accent, var(--color-border));border-radius:16px;
   box-shadow:0 16px 32px rgba(0,0,0,.06),0 4px 8px rgba(0,0,0,.05);
-  font-family:"Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family:var(--font-sans);
   transition:opacity .25s ease, transform .25s ease, box-shadow .2s ease;
 }
 /* Arrastável: depois de mover, a posição vira left/top em px (JS) */
@@ -22,11 +22,11 @@
 .agent-cam__view{position:absolute;inset:-24%;transition:opacity .3s ease, filter .3s ease}
 .agent-cam[data-paused] .agent-cam__view{opacity:.45;filter:saturate(.4)}
 
-/* sem a Iris: círculo neutro no lugar */
+/* sem o visual da Puca: círculo neutro no lugar */
 .agent-cam__placeholder{
   position:absolute;left:50%;top:46%;width:44%;aspect-ratio:1;transform:translate(-50%,-50%);
   border-radius:50%;border:1px dashed #d4d4d4;display:grid;place-items:center;
-  font-size:11px;color:#a3a3a3;
+  font-size:11px;color:var(--color-subtle);
 }
 
 /* etiqueta com o nome, como em videochamada */
@@ -35,9 +35,9 @@
   display:flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:999px;
   background:rgba(255,255,255,.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(229,229,229,.8);
-  font-size:11px;font-weight:500;color:#171717;
+  font-size:11px;font-weight:500;color:var(--color-ink);
 }
-.agent-cam__dot{width:6px;height:6px;border-radius:50%;background:var(--cam-dot, #a3a3a3)} /* cor vem do JS */
+.agent-cam__dot{width:6px;height:6px;border-radius:50%;background:var(--cam-dot, var(--color-subtle))} /* cor vem do JS */
 
 /* o chat abre logo acima da câmera (se não foi arrastado) */
 body.has-agent-cam .chat-panel:not(.is-placed){

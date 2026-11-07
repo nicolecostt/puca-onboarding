@@ -1,7 +1,8 @@
 // "Câmera" do agente no canto inferior direito, como numa videochamada.
-//   const cam = mountAgentCam({ name: "Iris", visual: await loadAgentVisual() });
+//   const cam = mountAgentCam({ name: "Puca", visual: await loadAgentVisual() });
 //   cam.setState("talk" | "idle" | "think"); cam.setPaused(true); cam.show(); cam.hide();
 // Sem visual, mostra um círculo neutro.
+import "../../styles/tokens.css";
 import "./agent-cam.css";
 import { esc, qs } from "../../lib/dom";
 import { makeDraggable } from "../../lib/draggable";
@@ -38,7 +39,7 @@ function lighten(c: RGB, k: number): string {
 }
 
 export function mountAgentCam(opts: AgentCamOptions = {}): AgentCam {
-  const name = opts.name ?? "Agente";
+  const name = opts.name ?? "Puca";
   let state: AgentVisualState = "idle";
   let paused = false;
 
@@ -60,7 +61,7 @@ export function mountAgentCam(opts: AgentCamOptions = {}): AgentCam {
   function label(): void {
     const extra = paused ? "pausado" : LABEL[state];
     nameEl.textContent = extra ? `${name} · ${extra}` : name;
-    cam.setAttribute("aria-label", `Câmera do agente ${name}${extra ? `, ${extra}` : ""}`);
+    cam.setAttribute("aria-label", `Câmera da ${name}${extra ? `, ${extra}` : ""}`);
   }
 
   // Borda e bolinha na cor da "emoção" do agente: com visual, a cor dele em tempo real

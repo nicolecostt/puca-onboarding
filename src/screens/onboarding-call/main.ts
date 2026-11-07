@@ -1,12 +1,14 @@
-// Call inicial: o agente se apresenta e coleta as infos iniciais do usuário, como numa entrevista.
+// Call inicial: a Puca se apresenta e coleta as infos iniciais do usuário, como numa entrevista.
 // Por enquanto a conversa é simulada (roteiro abaixo). A pessoa pode responder
 // "por voz" (resposta de exemplo depois de alguns segundos) ou digitando no chat.
+import "../../styles/base.css";
 import "./style.css";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
 import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../lib/agent-visual";
 import { emit } from "../../lib/events";
 import { qs } from "../../lib/dom";
+import { activeProfile, company } from "../../data";
 import { profileFromAnswers, saveProfile } from "../../journey/profile";
 
 // ---- Roteiro ----
@@ -20,19 +22,25 @@ interface Field {
   sample: string;
 }
 
+// Respostas de exemplo vêm do perfil da demo (?perfil=bruno | ana)
+const profile = activeProfile();
 const FIELDS: Field[] = [
-  { key: "nome", label: "Como prefere ser chamado", sample: "Bruno" },
-  { key: "vinculo", label: "Primeira vez ou mudando de time", sample: "Primeira vez" },
-  { key: "cargo", label: "Cargo", sample: "Engenheiro de backend" },
-  { key: "time", label: "Time", sample: "TMS — fraud-score" },
-  { key: "gestor", label: "Gestor(a)", sample: "Marcos Vidal" },
-  { key: "ferramentas", label: "Ferramentas que já usa", sample: "GitHub, Slack e Jira" },
-  { key: "aprender", label: "Como prefere aprender", sample: "Fazendo junto com alguém" },
+  { key: "nome", label: "Como prefere ser chamado", sample: profile.nickname },
+  {
+    key: "vinculo",
+    label: "Primeira vez ou mudando de time",
+    sample: profile.kind === "transfer" ? `Estou mudando de time, vim do ${profile.fromTeam ?? "outro time"}` : "Primeira vez",
+  },
+  { key: "cargo", label: "Cargo", sample: profile.role },
+  { key: "time", label: "Time", sample: profile.toTeam },
+  { key: "gestor", label: "Gestor(a)", sample: company.people[profile.managerId]?.name ?? "" },
+  { key: "ferramentas", label: "Ferramentas que já usa", sample: profile.tools },
+  { key: "aprender", label: "Como prefere aprender", sample: profile.learningStyle },
 ];
 
 const QUESTIONS: Record<FieldKey, (a: Answers) => string> = {
   nome: () =>
-    "Oi! Eu sou o agente que vai te acompanhar na sua primeira semana. Antes de começar, quero te conhecer um pouco. Como você prefere ser chamado?",
+    "Oi! Eu sou a Puca, e vou te acompanhar na sua primeira semana. Antes de começar, quero te conhecer um pouco. Como você prefere ser chamado?",
   vinculo: (a) => `Prazer, ${a.nome}! É a sua primeira vez aqui na empresa ou você está mudando de time?`,
   cargo: () => "E qual vai ser o seu cargo?",
   time: () => "Legal. Em qual time você vai entrar?",
@@ -57,7 +65,7 @@ const LABELS: Record<ShownState, string> = {
   done: "Montando sua semana…",
 };
 const STATUS: Partial<Record<ShownState, string>> = {
-  speaking: "Agente falando…",
+  speaking: "Puca falando…",
   listening: "Ouvindo você…",
   thinking: "Pensando na sua resposta…",
   paused: "Call pausada",
@@ -99,13 +107,13 @@ async function main(): Promise<void> {
   const chat = mountChatPanel({ title: "Transcrição da call", messages: [] });
   const call = mountCallBar({ status: "Conectando…", chat });
 
-  // Visual do agente (teste local). Sem ele, fica o círculo neutro.
+  // Visual da Puca (teste local). Sem ele, fica o círculo neutro.
   let visual: AgentVisual | null = null;
   const factory = await loadAgentVisual();
   if (factory) {
-    el.orb.classList.add("has-iris");
+    el.orb.classList.add("has-visual");
     const holder = document.createElement("div");
-    holder.className = "agent__iris";
+    holder.className = "agent__visual";
     el.orb.appendChild(holder);
     visual = factory(holder);
   }
@@ -141,7 +149,7 @@ async function main(): Promise<void> {
         : shown === "listening"
           ? "Fale normalmente ou responda pelo chat."
           : shown === "ended"
-            ? "Use “Ligar para o agente” para continuar de onde parou."
+            ? "Use “Ligar para a Puca” para continuar de onde parou."
             : "";
   }
 
@@ -242,7 +250,7 @@ async function main(): Promise<void> {
   saveProfile(profileFromAnswers(answers));
   const next = document.createElement("a");
   next.className = "caption__next";
-  next.href = "../aula-quadro/";
+  next.href = "../lesson/";
   next.textContent = "Começar a aula →";
   el.captionHint.after(next);
 }

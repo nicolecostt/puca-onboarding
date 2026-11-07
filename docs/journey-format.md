@@ -6,16 +6,16 @@ O modelo segue a ideia de jornadas usada em agentes de demonstração por voz:
 uma vista nova, o **quadro**, que o agente monta enquanto explica (§4.1 do [`context.md`](context.md)).
 
 Tipos: [`src/journey/types.ts`](../src/journey/types.ts). Validação: [`src/journey/validate.ts`](../src/journey/validate.ts).
-Jornada de exemplo: [`orla-pagamentos.journey.json`](../src/journey/data/orla-pagamentos.journey.json).
+Jornada de exemplo: [`mare-pagamentos.journey.json`](../src/journey/data/mare-pagamentos.journey.json).
 
 ## Estrutura
 
 ```jsonc
 {
   "version": 1,
-  "id": "orla-pagamentos-fraud-score",
+  "id": "mare-pagamentos-terminais",
   "title": "Primeira semana — time fraud-score",
-  "company": "Orla",
+  "company": "Maré Pagamentos",
   "agent": { "name": "Puca", "guidelines": { "core_identity": "…", "personality_and_tone": "…", "safety_and_escalation": "…" } },
   "boards": { "<nome>": { "title": "…", "nodes": [ … ], "edges": [ … ] } },
   "moments": [ … ]
@@ -102,7 +102,7 @@ Um passo `wait` precisa terminar em pergunta ou ter `suggested_replies`, senão 
 `{ nome, cargo?, time?, gestor?, ferramentas?, aprender?, vinculo: "novo" | "transicao" }`.
 
 A aula escolhe o perfil nesta ordem:
-1. `?perfil=novo` ou `?perfil=transicao` na URL;
+1. `?perfil=ana` (ou `novo`) e `?perfil=bruno` (ou `transicao`) na URL;
 2. o perfil salvo pela call de entrevista (sessionStorage `puca:profile`);
 3. o perfil de demonstração "novo".
 

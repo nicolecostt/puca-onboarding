@@ -12,7 +12,7 @@ export default defineConfig({
         index: page("./index.html"),
         onboarding: page("./src/screens/onboarding-call/index.html"),
         liveSession: page("./src/screens/live-session/index.html"),
-        aulaQuadro: page("./src/screens/aula-quadro/index.html"),
+        lesson: page("./src/screens/lesson/index.html"),
       },
     },
   },
