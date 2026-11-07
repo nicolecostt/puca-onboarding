@@ -66,7 +66,11 @@ Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o
 6. **Decisão que afeta os outros** vira um arquivo em `docs/decisoes/`. Conversa do dia a dia não vira documento.
 7. **Git seguro:** sem `push --force`, `reset --hard`, `checkout -- .` ou `clean` sem a pessoa pedir; não descarte
    alteração não commitada que você não fez. Nunca commite `.env`, chaves de API, `sandbox/` ou `dist/`.
-8. **Material que não é código** (negócio, pitch, TAM/SAM/SOM, ferramentas da submissão) vai em `docs/negocio/`.
+8. **Revisão e merge de PR** seguem a skill `revisar`: a pergunta é "dá para integrar sem quebrar nada nem atrapalhar
+   ninguém?", e só conta problema com evidência e cenário concreto. `scripts/pr-check.sh <n>` dá os fatos (merge com a
+   `main`, conflitos reais com outros PRs e se são mecânicos, CI, base depois do merge). Hooks: pedido de revisão traz
+   esses fatos sozinho; `gh pr merge` e aprovar são barrados com conflito com a `main`, CI vermelho ou base quebrada.
+9. **Material que não é código** (negócio, pitch, TAM/SAM/SOM, ferramentas da submissão) vai em `docs/negocio/`.
 
 ## Skills da equipe: chame sozinho, ninguém vai pedir
 
@@ -82,7 +86,7 @@ Mais de uma situação ao mesmo tempo? Chame na ordem da tabela.
 | Mudar um formato que outra parte usa: campo de API, tipo, evento, payload | `contrato` |
 | Criar ou editar aula/jornada (`*.journey.json`) | `nova-jornada` |
 | Criar tela ou componente | `nova-tela` |
-| "Revisa", "tá bom pra subir?", revisar PR de alguém | `revisar` (usa o subagente `revisor`) |
+| "Revisa", "tá bom pra subir?", "pode aprovar?", "dá pra mergear?", revisar PR de alguém | `revisar` (usa o subagente `revisor`) |
 | "Terminei", "pronto", "pode subir", "abre o PR" | `handoff` |
 | "A demo funciona?", antes de apresentar, depois de merges | `checar-demo` |
 
