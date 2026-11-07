@@ -111,3 +111,13 @@
   .call-live,.call-redial{transition:none}
   .call-mic__ring.is-pulsing{animation-duration:.01s}
 }
+
+/* ---- Presa embaixo da câmera da Puca (opção attachTo): compacta, da largura da câmera ---- */
+.call-dock.is-attached{left:0;top:0;bottom:auto;transform:none;justify-items:stretch}
+.call-dock.is-attached .call-live{align-items:stretch}
+.call-dock.is-attached .call-bar{justify-content:space-between;gap:6px;padding:4px 7px}
+.call-dock.is-attached .call-btn{width:36px}
+.call-dock.is-attached .call-btn--chat img{width:36px;height:auto}
+.call-dock.is-attached .call-redial{justify-self:center}
+/* status: à esquerda da peça, alinhado com a barra */
+.call-dock.is-attached .call-status{position:absolute;right:calc(100% + 8px);bottom:6px;margin:0}

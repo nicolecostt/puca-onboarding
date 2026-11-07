@@ -20,22 +20,33 @@
 <body>
   <!-- o cabeçalho (app-header) entra aqui pelo main.ts -->
   <main class="lesson">
-    <div class="lesson__board" id="board"></div>
+    <!-- Vista "quadro": a aula visual -->
+    <div class="lesson__board" id="board-host" hidden></div>
 
+    <!-- Vista "logo": abertura e encerramento -->
+    <section class="opening" id="logo-view" hidden>
+      <h1 class="opening__company" id="logo-company"></h1>
+      <p class="opening__title" id="logo-title"></p>
+      <p class="opening__who" id="logo-who"></p>
+    </section>
 
-    <!-- Título da aula -->
+    <!-- Título da aula: momento atual e tempo -->
     <div class="lesson-title" role="status">
       <span class="lesson-title__dot" id="live-dot" aria-hidden="true"></span>
       <strong id="lesson-name"></strong>
       <span class="lesson-title__time" id="timer">00:00</span>
-      <span class="chip" id="section-count"></span>
+      <span class="chip" id="moment"></span>
     </div>
 
-
-    <!-- Legenda do que a Puca está falando -->
+    <!-- Legenda: fala da Puca, resposta da pessoa e respostas sugeridas -->
     <div class="caption" aria-live="polite">
       <span class="caption__logo" aria-hidden="true">P</span>
-      <p class="caption__text" id="caption"></p>
+      <div class="caption__body">
+        <p class="caption__text" id="caption-agent"></p>
+        <p class="caption__you" id="caption-user"></p>
+        <div class="caption__replies" id="replies"></div>
+        <p class="caption__hint" id="caption-hint"></p>
+      </div>
     </div>
 
     <!-- Ondas sonoras ao lado da barra de call -->

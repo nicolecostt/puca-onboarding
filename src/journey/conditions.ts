@@ -19,14 +19,14 @@ const STOPWORDS = new Set([
   "eu", "voce", "me", "pode", "por", "favor", "pra", "para", "em", "no", "na", "nos", "nas", "cada", "qual", "quais",
 ]);
 
-function keywords(text: string): string[] {
+export function keywords(text: string): string[] {
   return normalize(text)
     .split(" ")
     .filter((w) => w.length > 2 && !STOPWORDS.has(w));
 }
 
 /** Prefixo comum de 4+ letras conta como a mesma palavra ("falhar" ≈ "falha", "cuida" ≈ "cuidam"). */
-function sameWord(a: string, b: string): boolean {
+export function sameWord(a: string, b: string): boolean {
   if (a === b) return true;
   const n = Math.min(a.length, b.length);
   return n >= 4 && a.slice(0, Math.max(4, n - 1)) === b.slice(0, Math.max(4, n - 1));

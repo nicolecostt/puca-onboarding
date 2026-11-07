@@ -1,13 +1,16 @@
-// Quadro da aula (Figma: "03 · Aula no quadro"). Desenha nós, setas e selos a partir
-// dos dados da aula e vai revelando aos poucos, acompanhando a fala do agente.
-//   const board = mountWhiteboard(el, lesson);
-//   board.reveal(["gateway", "pos-gateway"]); board.setFocus("gateway");
+// Quadro da aula (Figma: "03 · Aula no quadro"). Desenha nós, setas e selos e vai revelando aos poucos,
+// acompanhando a fala da Puca. Os dados vêm da jornada (ver from-journey.ts).
+//   const board = mountWhiteboard(el, spec);
+//   board.reveal(["gateway", "e-pos-gw"]); board.setFocus("gateway"); board.highlight(["dlq"], "warn");
+//   board.openCard("gateway"); board.flow(["e-pos-gw", "e-gw-topic"]); board.setSelectable(true);
 import "../../styles/tokens.css";
 import "./whiteboard.css";
 import lockWhiteIcon from "./icons/lock-white.svg";
 import lockIcon from "./icons/lock.svg";
 import { esc, targetEl } from "../../lib/dom";
-import { company, type BoardEdge, type BoardNode, type Lesson } from "../../data";
+import { company, type BoardEdge, type BoardNode, type WhiteboardSpec } from "../../data";
+
+export type HighlightTone = "focus" | "warn" | "ok";
 
 /** Tamanho do quadro no Figma; tudo é desenhado nessa escala e depois ajustado à tela. */
 export const BOARD_W = 1440;
@@ -24,6 +27,19 @@ export interface Whiteboard {
   isShown(id: string): boolean;
   /** Volta ao começo (só o que é "ainda não explicado" aparece). */
   reset(): void;
+  /** Destaca nós/setas num tom (o resto fica apagado até limpar). */
+  highlight(ids: string[], tone: HighlightTone): void;
+  clearHighlight(): void;
+  /** Abre o cartão de detalhes do nó (o mesmo do clique). */
+  openCard(id: string): void;
+  closeCard(): void;
+  /** Uma bolinha percorre as setas, em ordem. */
+  flow(edgeIds: string[]): void;
+  /** Modo de escolha: tocar num nó visível chama onSelect em vez de abrir o cartão. */
+  setSelectable(on: boolean): void;
+  onSelect(cb: (id: string) => void): void;
+  /** Tira o quadro da tela. */
+  destroy(): void;
 }
 
 function ownerText(n: BoardNode): string {
@@ -70,13 +86,14 @@ function edgeExtrasHTML(e: BoardEdge): string {
   return html;
 }
 
-export function mountWhiteboard(parent: HTMLElement, lesson: Lesson): Whiteboard {
+export function mountWhiteboard(parent: HTMLElement, lesson: WhiteboardSpec): Whiteboard {
   const root = document.createElement("div");
   root.className = "wb";
   root.innerHTML = `
     <div class="wb__stage" style="width:${BOARD_W}px;height:${BOARD_H}px">
       <svg class="wb__edges" viewBox="0 0 ${BOARD_W} ${BOARD_H}" width="${BOARD_W}" height="${BOARD_H}" aria-hidden="true">
         ${lesson.edges.map(edgeSVG).join("")}
+        <circle class="wb-pulse" r="7"/>
       </svg>
       ${lesson.edges.map(edgeExtrasHTML).join("")}
       ${lesson.labels.map((l) => `<span class="wb-label wb-label--hand wb-label--section" data-id="${l.id}" style="left:${l.x}px;top:${l.y}px">${esc(l.text)}</span>`).join("")}
@@ -107,7 +124,8 @@ export function mountWhiteboard(parent: HTMLElement, lesson: Lesson): Whiteboard
     const s = Math.min(root.clientWidth / BOARD_W, root.clientHeight / BOARD_H);
     stage.style.transform = `translate(-50%, -50%) scale(${s})`;
   }
-  new ResizeObserver(fit).observe(root);
+  const resize = new ResizeObserver(fit);
+  resize.observe(root);
 
   // ---- detalhes ao clicar num nó ----
   function closePop(): void {
@@ -118,12 +136,16 @@ export function mountWhiteboard(parent: HTMLElement, lesson: Lesson): Whiteboard
   function openPop(btn: HTMLElement, n: BoardNode): void {
     const owner = n.ownerId ? company.people[n.ownerId] : undefined;
     const d = n.details;
+    const row = (label: string, value: string) => `<p class="wb-pop__row"><span>${esc(label)}</span>${value}</p>`;
     pop.innerHTML = `
       <p class="wb-pop__title">${esc(n.label.replace("\n", " "))}</p>
-      ${d ? `<p class="wb-pop__what">${esc(d.what)}</p>` : ""}
-      ${owner ? `<p class="wb-pop__row"><span>Dono</span>${esc(owner.name)} · ${esc(owner.team)}</p>` : ""}
-      ${d?.docs?.length ? `<p class="wb-pop__row"><span>Fontes</span>${d.docs.map(esc).join("<br>")}</p>` : ""}
-      ${d?.help ? `<p class="wb-pop__row"><span>Ajuda</span>${esc(d.help)}</p>` : ""}`;
+      ${d?.what ? `<p class="wb-pop__what">${esc(d.what)}</p>` : ""}
+      ${owner ? row("Dono", `${esc(owner.name)} · ${esc(owner.team)}`) : ""}
+      ${(d?.rows ?? []).map((r) => row(r.label, esc(r.value))).join("")}
+      ${d?.warn ? `<p class="wb-pop__warn">${esc(d.warn)}</p>` : ""}
+      ${d?.list?.length ? `<ul class="wb-pop__list">${d.list.map((li) => `<li>${esc(li)}</li>`).join("")}</ul>` : ""}
+      ${d?.docs?.length ? row("Fontes", d.docs.map(esc).join("<br>")) : ""}
+      ${d?.help ? row("Ajuda", esc(d.help)) : ""}`;
     pop.hidden = false;
     btn.classList.add("is-open");
     // posiciona perto do nó (em px da tela)
@@ -136,6 +158,9 @@ export function mountWhiteboard(parent: HTMLElement, lesson: Lesson): Whiteboard
     pop.style.top = `${Math.max(12, top)}px`;
   }
 
+  let selecting = false;
+  let selectCb: ((id: string) => void) | null = null;
+
   root.addEventListener("click", (e) => {
     const btn = targetEl(e)?.closest<HTMLElement>(".wb-node");
     if (!btn || !btn.classList.contains("is-shown")) {
@@ -144,15 +169,65 @@ export function mountWhiteboard(parent: HTMLElement, lesson: Lesson): Whiteboard
     }
     const n = nodesById.get(btn.dataset.id ?? "");
     if (!n) return;
+    if (selecting) {
+      closePop();
+      selectCb?.(n.id);
+      return;
+    }
     if (btn.classList.contains("is-open")) closePop();
     else {
       closePop();
       openPop(btn, n);
     }
   });
-  document.addEventListener("keydown", (e) => {
+  const onKey = (e: KeyboardEvent) => {
     if (e.key === "Escape") closePop();
-  });
+  };
+  document.addEventListener("keydown", onKey);
+
+  // ---- pulso percorrendo as setas ----
+  const svgEl = root.querySelector<SVGSVGElement>(".wb__edges")!;
+  const pulse = root.querySelector<SVGCircleElement>(".wb-pulse")!;
+  let flowAnim = 0;
+  function runFlow(edgeIds: string[]): void {
+    cancelAnimationFrame(flowAnim);
+    // caminho de medida sem pathLength (o pathLength="1" do traço muda as contas de distância)
+    const paths = edgeIds
+      .filter((id) => shown.has(id))
+      .map((id) => lesson.edges.find((e) => e.id === id))
+      .filter((e): e is BoardEdge => !!e)
+      .map((e) => {
+        const m = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        m.setAttribute("d", e.path);
+        m.setAttribute("fill", "none");
+        m.setAttribute("stroke", "none");
+        svgEl.appendChild(m);
+        return m;
+      });
+    if (!paths.length || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      paths.forEach((m) => m.remove());
+      return;
+    }
+    const per = 650;
+    const start = performance.now() + 200;
+    const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    pulse.classList.add("is-on");
+    const step = (now: number) => {
+      const t = Math.max(0, now - start);
+      const i = Math.floor(t / per);
+      if (i >= paths.length) {
+        pulse.classList.remove("is-on");
+        paths.forEach((m) => m.remove());
+        return;
+      }
+      const m = paths[i];
+      const pt = m.getPointAtLength(m.getTotalLength() * ease((t % per) / per));
+      pulse.setAttribute("cx", String(pt.x));
+      pulse.setAttribute("cy", String(pt.y));
+      flowAnim = requestAnimationFrame(step);
+    };
+    flowAnim = requestAnimationFrame(step);
+  }
 
   const shown = new Set<string>();
 
@@ -180,6 +255,43 @@ export function mountWhiteboard(parent: HTMLElement, lesson: Lesson): Whiteboard
       const all = [...lesson.nodes.map((n) => n.id), ...lesson.edges.map((e) => e.id), ...lesson.labels.map((l) => l.id)];
       for (const id of all) setState(id, lesson.upcoming.includes(id) ? "upcoming" : "hidden");
       api.setFocus(null);
+      api.clearHighlight();
+    },
+    highlight(ids, tone) {
+      for (const id of ids) {
+        for (const el of elementsOf(id)) {
+          el.classList.remove("tone-focus", "tone-warn", "tone-ok");
+          el.classList.add(`tone-${tone}`);
+        }
+      }
+      root.classList.add("wb--highlight");
+    },
+    clearHighlight() {
+      root.querySelectorAll(".tone-focus, .tone-warn, .tone-ok").forEach((el) => el.classList.remove("tone-focus", "tone-warn", "tone-ok"));
+      root.classList.remove("wb--highlight");
+    },
+    openCard(id) {
+      const btn = root.querySelector<HTMLElement>(`.wb-node[data-id="${id}"]`);
+      const n = nodesById.get(id);
+      if (!btn || !n) return;
+      if (!shown.has(id)) api.reveal([id]);
+      closePop();
+      openPop(btn, n);
+    },
+    closeCard: () => closePop(),
+    flow: (ids) => runFlow(ids),
+    setSelectable(on) {
+      selecting = on;
+      root.classList.toggle("wb--selecting", on);
+    },
+    onSelect(cb) {
+      selectCb = cb;
+    },
+    destroy() {
+      cancelAnimationFrame(flowAnim);
+      resize.disconnect();
+      document.removeEventListener("keydown", onKey);
+      root.remove();
     },
   };
 

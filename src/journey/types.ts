@@ -49,13 +49,20 @@ export interface NodeInfo {
 
 export interface BoardNode {
   id: string;
+  /** Rótulo (pode ter quebra de linha com \n). */
   label: string;
   kind: NodeKind;
-  /** Centro do nó no espaço virtual do quadro (1200 × 700). */
+  /** Centro do nó no quadro, que tem 1440 × 844 (o tamanho do Figma). */
   x: number;
   y: number;
-  /** Texto menor embaixo do rótulo. */
+  /** Texto menor embaixo do rótulo (ex.: @dono). */
   sublabel?: string;
+  /** Largura no quadro (sem ela, sai do tamanho do rótulo). */
+  w?: number;
+  /** Visual especial: caixa preta (sem documentação confirmada) ou fila de mensagens com erro. */
+  look?: "blackbox" | "dlq";
+  /** Selo embaixo do nó (ex.: "caixa preta · aguardando Carla"). */
+  note?: string;
   info?: NodeInfo;
 }
 
@@ -66,12 +73,24 @@ export interface BoardEdge {
   label?: string;
   /** inferred = ligação deduzida, sem confirmação (tracejada) · retry = caminho de erro/retentativa. */
   style?: "inferred" | "retry";
+  /** Desenho exato da seta (caminho SVG da linha e da ponta), em coordenadas do quadro. Sem ele, é calculado. */
+  path?: string;
+  head?: string;
+  /** Onde fica o rótulo (canto de cima à esquerda) e a letra (à mão ou de código). */
+  label_at?: { x: number; y: number };
+  label_font?: "hand" | "mono";
+  /** Selo de confiança: provado (confirmado) ou inferido (deduzido, sem confirmação do dono). */
+  evidence?: { kind: "proven" | "inferred"; x: number; y: number };
 }
 
 export interface BoardSpec {
   title?: string;
   nodes: BoardNode[];
   edges: BoardEdge[];
+  /** Nós e setas que já aparecem apagados desde o começo ("ainda não explicado"). */
+  upcoming?: string[];
+  /** Textos soltos no quadro (canto de cima à esquerda). */
+  labels?: { id: string; text: string; x: number; y: number }[];
 }
 
 export type HighlightTone = "focus" | "warn" | "ok";
@@ -125,6 +144,8 @@ export interface Step {
   goal: string;
   /** O que o agente fala. Aceita {nome}, {time}, {gestor}… do perfil. */
   line: string;
+  /** Pedaço da fala destacado em amarelo na legenda. */
+  highlight?: string;
   knowledge?: string;
   actions?: BoardAction[];
   decision?: Decision;

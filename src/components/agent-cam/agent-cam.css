@@ -51,6 +51,9 @@ body.has-agent-cam .chat-panel:not(.is-placed){
 @media (max-width:760px){
   .agent-cam{--cam-size:120px;right:16px;bottom:116px}
 }
+/* com a barra de call presa embaixo: a câmera sobe para dar lugar e fica da largura da barra compacta */
+body.has-attached-callbar .agent-cam{--cam-size:230px} /* largura da barra com espaço igual entre os botões */
+body.has-attached-callbar .agent-cam:not(.is-placed){bottom:74px}
 @media (prefers-reduced-motion:reduce){
   .agent-cam,.agent-cam__view{transition:none}
 }

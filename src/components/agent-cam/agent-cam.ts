@@ -6,6 +6,7 @@ import "../../styles/tokens.css";
 import "./agent-cam.css";
 import { esc, qs } from "../../lib/dom";
 import { makeDraggable } from "../../lib/draggable";
+import { emit } from "../../lib/events";
 import type { AgentVisualFactory, AgentVisualState, RGB } from "../../lib/agent-visual";
 
 export interface AgentCamOptions {
@@ -21,6 +22,8 @@ export interface AgentCam {
   show(): void;
   hide(): void;
   resetPosition(): void;
+  /** Reavisa a posição (agentcam:move) e reposiciona o chat. */
+  sync(): void;
 }
 
 const LABEL: Record<AgentVisualState, string> = { talk: "falando", idle: "", think: "pensando" };
@@ -79,15 +82,19 @@ export function mountAgentCam(opts: AgentCamOptions = {}): AgentCam {
   function syncChat(): void {
     const r = cam.getBoundingClientRect();
     const visible = !cam.classList.contains("is-hidden");
+    emit("agentcam:move", { rect: r, visible });
     document.body.classList.toggle("has-agent-cam", visible);
     if (!visible) return;
     const gap = 12;
+    // barra de call presa embaixo da câmera: o chat desvia dela
+    const bar = document.querySelector<HTMLElement>(".call-dock.is-attached");
+    const barBelow = bar && bar.getBoundingClientRect().top >= r.bottom ? bar.offsetHeight + 8 : 0;
     const below = r.top < 320; // pouco espaço em cima: abre embaixo
     const style = document.body.style;
     style.setProperty("--chat-right", `${Math.max(8, innerWidth - r.right)}px`);
     style.setProperty("--chat-bottom", below ? "auto" : `${innerHeight - r.top + gap}px`);
-    style.setProperty("--chat-top", below ? `${r.bottom + gap}px` : "auto");
-    style.setProperty("--chat-space", `${below ? innerHeight - r.bottom - gap - 16 : r.top - gap - 16}px`);
+    style.setProperty("--chat-top", below ? `${r.bottom + barBelow + gap}px` : "auto");
+    style.setProperty("--chat-space", `${below ? innerHeight - r.bottom - barBelow - gap - 16 : r.top - gap - 16}px`);
   }
 
   // Arrastar: o chat acompanha.
@@ -128,6 +135,7 @@ export function mountAgentCam(opts: AgentCamOptions = {}): AgentCam {
       syncChat();
     },
     resetPosition: drag.reset,
+    sync: syncChat,
   };
   label();
   return api;

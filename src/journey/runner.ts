@@ -19,6 +19,17 @@ export interface RunnerIO {
   onStep?(step: Step, moment: Moment): void;
 }
 
+/** O que o runner devolve: rodar a jornada e pedir um pulo para outro momento no meio dela. */
+export interface Runner {
+  run(): Promise<RunResult>;
+  /**
+   * Pede para ir ao início de outro momento (a pessoa pediu para mudar de assunto).
+   * A tela deve interromper o que estiver esperando (fala, resposta, clique); o runner trata a
+   * interrupção como o pulo. Entre momentos, sempre pelo primeiro passo. Devolve false se o momento não existe.
+   */
+  jumpTo(momentId: string): boolean;
+}
+
 export interface RunResult {
   /** "done" = chegou ao fim; "limit" = parou no limite de passos (laço de transições). */
   ended: "done" | "limit";
@@ -33,11 +44,12 @@ export interface RunnerOptions {
   maxSteps?: number;
 }
 
-export function createRunner(journey: Journey, profile: Profile, io: RunnerIO, opts: RunnerOptions = {}) {
+export function createRunner(journey: Journey, profile: Profile, io: RunnerIO, opts: RunnerOptions = {}): Runner {
   const maxSteps = opts.maxSteps ?? 200;
   const views = effectiveViews(journey.moments);
   const momentIndex = new Map(journey.moments.map((m, i) => [m.id, i]));
   const say = (text: string) => io.say(interpolate(text, profile));
+  let jumpRequest: number | null = null;
 
   function enterMoment(mi: number, result: RunResult): void {
     const m = journey.moments[mi];
@@ -86,17 +98,28 @@ export function createRunner(journey: Journey, profile: Profile, io: RunnerIO, o
       result.steps.push(step.id);
       io.onStep?.(step, moment);
 
-      for (const a of step.actions ?? []) io.apply(a);
-      await say(step.line);
-
       let reply: string | null = null;
-      const decision = step.decision ?? "auto";
-      if (decision === "wait") {
-        const replies = step.suggested_replies ?? [];
-        const said = await io.listen(replies);
-        reply = matchReply(said, replies);
-      } else if (decision === "select") {
-        await runSelect(step);
+      try {
+        for (const a of step.actions ?? []) io.apply(a);
+        await say(step.line);
+
+        const decision = step.decision ?? "auto";
+        if (decision === "wait") {
+          const replies = step.suggested_replies ?? [];
+          const said = await io.listen(replies);
+          reply = matchReply(said, replies);
+        } else if (decision === "select") {
+          await runSelect(step);
+        }
+        if (jumpRequest !== null) throw new Error("pulo pedido");
+      } catch (err) {
+        // interrupção por pulo: vai para o início do momento pedido
+        if (jumpRequest === null) throw err;
+        mi = jumpRequest;
+        si = 0;
+        jumpRequest = null;
+        enterMoment(mi, result);
+        continue;
       }
 
       // Primeira transição cuja condição vale; sem nenhuma, segue a ordem.
@@ -128,5 +151,12 @@ export function createRunner(journey: Journey, profile: Profile, io: RunnerIO, o
     }
   }
 
-  return { run };
+  function jumpTo(momentId: string): boolean {
+    const i = momentIndex.get(momentId);
+    if (i === undefined) return false;
+    jumpRequest = i;
+    return true;
+  }
+
+  return { run, jumpTo };
 }

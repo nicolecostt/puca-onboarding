@@ -22,6 +22,8 @@ declare global {
     /** Aula no quadro: entrou num momento / começou um passo da jornada. */
     "journey:moment": CustomEvent<{ id: string; title: string }>;
     "journey:step": CustomEvent<{ id: string; moment: string }>;
+    /** A câmera da Puca mudou de lugar ou de visibilidade (a barra presa nela acompanha). */
+    "agentcam:move": CustomEvent<{ rect: DOMRect; visible: boolean }>;
   }
 }
 

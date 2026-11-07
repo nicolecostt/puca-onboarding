@@ -15,6 +15,7 @@ import { qs, targetEl } from "../../lib/dom";
 import { emit, type CallBarAction } from "../../lib/events";
 import { makeDraggable } from "../../lib/draggable";
 import type { ChatPanel } from "../chat-panel/chat-panel";
+import type { AgentCam } from "../agent-cam/agent-cam";
 
 // Ícone de telefone do botão "ligar" (não existe no Figma; mesmo traço dos outros ícones)
 const PHONE_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
@@ -27,6 +28,8 @@ export interface CallBarOptions {
   parent?: HTMLElement;
   /** false = barra fixa no lugar padrão, sem arrastar (padrão: true). */
   draggable?: boolean;
+  /** Prende a barra embaixo da câmera da Puca, compacta e da largura dela. Arrastar a câmera leva as duas. */
+  attachTo?: AgentCam;
 }
 
 export interface CallBar {
@@ -96,11 +99,33 @@ export function mountCallBar(opts: CallBarOptions = {}): CallBar {
     ring.classList.add("is-pulsing");
   }
 
+  const attached = opts.attachTo ?? null;
   const drag =
-    opts.draggable === false
+    opts.draggable === false || attached
       ? { reset: () => {} }
       : makeDraggable(dock, { storageKey: "callbar:pos", threshold: 5, suppressClickAfterDrag: true });
   dock.classList.toggle("is-fixed", opts.draggable === false);
+
+  // Presa na câmera: fica logo embaixo dela (ou em cima, se não couber), com a mesma largura.
+  if (attached) {
+    dock.classList.add("is-attached");
+    document.body.classList.add("has-attached-callbar");
+    const GAP = 8;
+    let last: DOMRect | null = null;
+    const follow = (r: DOMRect) => {
+      last = r;
+      const h = qs(dock, ".call-bar").offsetHeight || 42;
+      const below = r.bottom + GAP + h <= innerHeight - 8;
+      dock.style.width = `${r.width}px`;
+      dock.style.left = `${r.left}px`;
+      dock.style.top = `${below ? r.bottom + GAP : r.top - GAP - h}px`;
+    };
+    document.addEventListener("agentcam:move", (e) => {
+      // escondida (call encerrada): a barra fica onde estava, com o botão de ligar
+      if (e.detail.visible || !last) follow(e.detail.rect);
+    });
+    requestAnimationFrame(() => attached.sync());
+  }
 
   const api: CallBar = {
     el: dock,

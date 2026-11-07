@@ -72,8 +72,20 @@ export interface BoardNode {
   caption?: string;
   /** Texto do selo embaixo do nó (ex.: "caixa preta · aguardando Carla"). */
   note?: string;
-  /** Detalhes ao clicar no nó. */
-  details?: { what: string; docs?: string[]; help?: string };
+  /** Detalhes ao clicar no nó (ou quando a Puca abre o cartão). */
+  details?: NodeDetails;
+}
+
+export interface NodeDetails {
+  what?: string;
+  /** Linhas "rótulo: valor" (ex.: Time, Dono). */
+  rows?: { label: string; value: string }[];
+  /** Aviso (ex.: dono não confirmado). */
+  warn?: string;
+  /** Lista livre (ex.: detalhes da tarefa, resumo de uma decisão). */
+  list?: string[];
+  docs?: string[];
+  help?: string;
 }
 
 export interface BoardEdge {
@@ -95,36 +107,11 @@ export interface BoardLabel {
   y: number;
 }
 
-/** Um momento da aula: o que o agente fala e o que aparece no quadro. */
-export interface LessonBeat {
-  say: string;
-  /** Pedaço de `say` que fica destacado em amarelo (o que está acontecendo agora). */
-  highlight?: string;
-  /** Nós, setas e rótulos que aparecem neste momento. */
-  reveal?: string[];
-  /** Nó em foco (anel amarelo). */
-  focus?: string | null;
-}
-
-export interface LessonSection {
-  title: string;
-  beats: LessonBeat[];
-}
-
-export interface LessonQuestion {
-  question: string;
-  answer: string;
-  focus?: string;
-}
-
-export interface Lesson {
-  id: string;
-  title: string;
+/** O que o quadro desenha: nós, setas, textos soltos e o que já aparece apagado. */
+export interface WhiteboardSpec {
   nodes: BoardNode[];
   edges: BoardEdge[];
   labels: BoardLabel[];
   /** Nós mostrados apagados desde o começo ("ainda não explicado"). */
   upcoming: string[];
-  sections: LessonSection[];
-  questions: LessonQuestion[];
 }

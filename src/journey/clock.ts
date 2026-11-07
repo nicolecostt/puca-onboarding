@@ -17,6 +17,8 @@ export interface Clock {
   whenRunning(): Promise<void>;
   /** Cancela todas as esperas pendentes (troca de perfil, reinício). */
   cancel(): void;
+  /** Interrompe as esperas pendentes sem zerar o tempo da aula (pulo de momento). */
+  interrupt(): void;
   /** Segundos de call ativa desde o início. */
   readonly seconds: number;
 }
@@ -77,6 +79,9 @@ export function createClock(): Clock {
     cancel() {
       generation++;
       elapsed = 0;
+    },
+    interrupt() {
+      generation++;
     },
   };
 }
