@@ -50,7 +50,7 @@ _Avoid_: diagnóstico, avaliação
 ## Conversa
 
 **Call inicial**:
-A primeira conversa, em que a Puca acolhe a pessoa e preenche o perfil.
+A primeira conversa, em que a Puca acolhe a pessoa, faz o onboarding cultural e preenche o perfil.
 _Avoid_: entrevista, kickoff
 
 **Aula**:
