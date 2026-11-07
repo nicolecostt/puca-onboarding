@@ -41,6 +41,7 @@ src/
     call-bar/            barra de call flutuante (Figma: "Session control bar")
     chat-panel/          chat flutuante (Figma: "Chat (floating window)")
     agent-cam/           "câmera" do agente no canto da tela
+    agent-cursor/        cursor da Puca (seta + "Puca") mexendo na tela, por enquanto simulado
   journey/               motor de jornada em JSON: tipos, validador, motor, perfil e quadro (SVG)
     data/                jornadas em JSON (tail.journey.json é a demo)
     board/               renderizador do quadro

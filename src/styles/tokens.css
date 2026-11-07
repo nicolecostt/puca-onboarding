@@ -41,6 +41,9 @@
   --color-info-bg: #eef6ff;
   --color-info-text: #0b4a8a;
 
+  --color-puca: #0593c6; /* cursor da Puca mexendo na tela */
+  --color-puca-text: #ffffff;
+
   --color-highlight: rgba(250, 204, 21, 0.35); /* trecho sendo falado / foco no quadro */
 
   /* ---- Formas ---- */
