@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;1,400&display=swap">
 <link rel="stylesheet" href="../src/components/call-bar/call-bar.css">
 <link rel="stylesheet" href="../src/components/chat-panel/chat-panel.css">
+<link rel="stylesheet" href="../src/components/agent-cam/agent-cam.css">
 <style>
   body{margin:0;min-height:100vh;background:#f5f5f5;font-family:Inter,system-ui,sans-serif;color:#0a0a0a}
   /* Tela de fundo só para testar a barra por cima */
@@ -26,9 +27,26 @@
 
 <script src="../src/components/chat-panel/chat-panel.js"></script>
 <script src="../src/components/call-bar/call-bar.js"></script>
+<!-- TESTE: visual da Iris (arquivo fora do git). Sem ele a câmera mostra um círculo neutro. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../src/screens/onboarding-call/iris-teste.js"></script>
+<script src="../src/components/agent-cam/agent-cam.js"></script>
 <script>
   const chat = ChatPanel.mount();
   const call = CallBar.mount({ status: "Clicking “Compare plans”…", chat });
+  const cam = AgentCam.mount({ name: "Iris" });
+
+  // Simula a Iris conversando: fala por um tempo, faz uma pausa, às vezes pensa
+  const script = [["talk", 3200], ["idle", 1600], ["talk", 2400], ["think", 1800], ["talk", 3000], ["idle", 2200]];
+  let step = 0, paused = false, ended = false;
+  (function next() {
+    const [s, ms] = script[step++ % script.length];
+    if (!paused && !ended) cam.setState(s);
+    setTimeout(next, ms);
+  })();
+  document.addEventListener("callbar:pause", (e) => { paused = e.detail.on; cam.setPaused(paused); });
+  document.addEventListener("callbar:end", () => { ended = true; cam.setState("idle"); cam.hide(); });
+  document.addEventListener("callbar:start", () => { ended = false; cam.show(); });
 
   const log = document.getElementById("log");
   ["pause","control","mute","chat","end","start"].forEach(a =>

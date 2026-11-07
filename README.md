@@ -15,6 +15,9 @@ src/
       chat-panel.css
       chat-panel.js
       icons/
+    agent-cam/       "câmera" do agente no canto inferior direito (quadrado branco)
+      agent-cam.css
+      agent-cam.js
   screens/           telas (uma pasta por tela)
     onboarding-call/ call inicial: agente coleta as infos do usuário
 demos/               páginas para testar componentes isolados

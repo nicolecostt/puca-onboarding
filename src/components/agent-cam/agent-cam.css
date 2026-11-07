@@ -1,0 +1,55 @@
+/* "Câmera" do agente: quadrado branco no canto inferior direito, como numa videochamada.
+   Quando existe, o chat abre logo acima dele (ver regra no fim). */
+.agent-cam{
+  --cam-size:176px;
+  position:fixed;right:24px;bottom:24px;z-index:998;
+  width:var(--cam-size);height:var(--cam-size);overflow:hidden;
+  background:#fff;border:2px solid var(--cam-accent, #e5e5e5);border-radius:16px;
+  box-shadow:0 16px 32px rgba(0,0,0,.06),0 4px 8px rgba(0,0,0,.05);
+  font-family:"Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  transition:opacity .25s ease, transform .25s ease, box-shadow .2s ease;
+}
+/* Arrastável: depois de mover, a posição vira left/top em px (JS) */
+.agent-cam{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.agent-cam.is-placed{right:auto;bottom:auto}
+.agent-cam.is-dragging{cursor:grabbing;transition:none;
+  box-shadow:0 28px 48px rgba(0,0,0,.12),0 8px 16px rgba(0,0,0,.08)}
+.agent-cam.is-hidden{opacity:0;transform:translateY(12px) scale(.96);pointer-events:none}
+
+/* A borda usa a cor da "emoção" do agente (--cam-accent, definida no JS):
+   forte quando fala/pensa, fraquinha quando está quieto. */
+
+.agent-cam__view{position:absolute;inset:-24%;transition:opacity .3s ease, filter .3s ease}
+.agent-cam[data-paused] .agent-cam__view{opacity:.45;filter:saturate(.4)}
+
+/* sem a Iris: círculo neutro no lugar */
+.agent-cam__placeholder{
+  position:absolute;left:50%;top:46%;width:44%;aspect-ratio:1;transform:translate(-50%,-50%);
+  border-radius:50%;border:1px dashed #d4d4d4;display:grid;place-items:center;
+  font-size:11px;color:#a3a3a3;
+}
+
+/* etiqueta com o nome, como em videochamada */
+.agent-cam__tag{
+  position:absolute;left:8px;bottom:8px;
+  display:flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:999px;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(229,229,229,.8);
+  font-size:11px;font-weight:500;color:#171717;
+}
+.agent-cam__dot{width:6px;height:6px;border-radius:50%;background:var(--cam-dot, #a3a3a3)} /* cor vem do JS */
+
+/* o chat abre logo acima da câmera (se não foi arrastado) */
+body.has-agent-cam .chat-panel:not(.is-placed){
+  bottom:calc(24px + var(--agent-cam-size, 176px) + 12px);
+  height:min(560px, calc(100vh - 24px - var(--agent-cam-size, 176px) - 12px - 24px));
+}
+
+@media (max-width:760px){
+  .agent-cam{--cam-size:120px;right:16px;bottom:116px}
+  body.has-agent-cam{--agent-cam-size:120px}
+  body.has-agent-cam .chat-panel:not(.is-placed){bottom:calc(116px + 120px + 12px);height:min(560px, calc(100vh - 116px - 120px - 12px - 16px))}
+}
+@media (prefers-reduced-motion:reduce){
+  .agent-cam,.agent-cam__view{transition:none}
+}
