@@ -10,6 +10,7 @@
 .call-dock{user-select:none;-webkit-user-select:none;touch-action:none}
 .call-dock.is-placed{bottom:auto;transform:none}
 .call-bar,.call-redial{cursor:grab}
+.call-dock.is-fixed .call-bar,.call-dock.is-fixed .call-redial{cursor:default}
 .call-dock.is-dragging,.call-dock.is-dragging *{cursor:grabbing !important}
 .call-dock.is-dragging .call-bar,.call-dock.is-dragging .call-redial{
   filter:drop-shadow(0 16px 20px rgba(0,0,0,.10)) drop-shadow(0 6px 8px rgba(0,0,0,.06));
@@ -39,9 +40,12 @@
 }
 
 /* Linha de status acima da barra ("Clicking “Compare plans”…") */
+/* status numa pílula branca: dá para ler por cima de qualquer tela */
 .call-status{
   display:flex;align-items:center;gap:8px;
-  padding:12px 0 10px;
+  margin:0 0 8px;padding:3px 12px;
+  background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-pill);
+  box-shadow:var(--shadow-chip);
   font-size:12px;line-height:18px;font-style:italic;color:var(--color-muted);white-space:nowrap;
 }
 .call-status:empty{display:none}

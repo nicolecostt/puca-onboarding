@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import demo from "../data/mare-pagamentos.journey.json";
+import demo from "../data/tail.journey.json";
 import { loadJourney } from "../validate";
 import { createRunner, type RunnerIO } from "../runner";
 import { DEMO_PROFILES } from "../profile";
