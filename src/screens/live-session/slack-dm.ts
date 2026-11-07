@@ -5,9 +5,11 @@ import type { AgentCursor } from "../../components/agent-cursor/agent-cursor";
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel);
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
-/** Item da lista de mensagens diretas cujo texto começa pelo nome. */
+/** Item da lista de mensagens diretas cujo nome (sem a inicial do avatar) começa pelo nome. */
 export function findDm(name: string): HTMLElement | null {
-  return [...document.querySelectorAll<HTMLElement>(".sk-dm")].find((li) => li.textContent?.trim().startsWith(name)) ?? null;
+  const label = (li: HTMLElement) =>
+    [...li.childNodes].filter((n) => !(n instanceof HTMLElement && n.classList.contains("sk-av"))).map((n) => n.textContent ?? "").join("").trim();
+  return [...document.querySelectorAll<HTMLElement>(".sk-dm")].find((li) => label(li).startsWith(name)) ?? null;
 }
 
 /** Abre a conversa direta: título, item marcado na lateral, feed com a introdução da DM e o campo de mensagem. */
