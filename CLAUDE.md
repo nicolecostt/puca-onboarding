@@ -68,11 +68,25 @@ Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o
    alteração não commitada que você não fez. Nunca commite `.env`, chaves de API, `sandbox/` ou `dist/`.
 8. **Material que não é código** (negócio, pitch, TAM/SAM/SOM, ferramentas da submissão) vai em `docs/negocio/`.
 
-## Skills da equipe (Claude Code)
+## Skills da equipe: chame sozinho, ninguém vai pedir
 
-Em `.claude/skills/`, chame com `/nome`: `/sincronizar` (antes de tudo), `/comecar-tarefa` (início ou retomada),
-`/contexto-base` (mudar `PRODUCT.md` ou `CONTEXT.md`), `/nova-tela`, `/nova-jornada`,
-`/contrato`, `/revisar` (usa o subagente `revisor`), `/handoff` (check + PR; só roda quando você chama) e `/checar-demo`.
+As pessoas **não** digitam `/nome`. Quando a situação aparecer, **chame a skill com a ferramenta Skill antes de agir**.
+Não faça o procedimento de memória nem leia o `SKILL.md` com `cat`: chamar a skill é o que garante o passo a passo.
+Mais de uma situação ao mesmo tempo? Chame na ordem da tabela.
+
+| Situação (exemplos do que a pessoa fala) | Skill |
+|---|---|
+| Vai editar, commitar ou abrir PR; apareceu `[sync]`; "alguém mexeu na main?" | `sincronizar` |
+| Começar ou retomar trabalho: "pega a issue 17", "bora fazer X", "implementa Y", "continua" | `comecar-tarefa` |
+| Algo entra ou muda no `PRODUCT.md`/`CONTEXT.md`: "anota no PRODUCT", "novo insight", "alinhamos que…", termo novo | `contexto-base` |
+| Mudar um formato que outra parte usa: campo de API, tipo, evento, payload | `contrato` |
+| Criar ou editar aula/jornada (`*.journey.json`) | `nova-jornada` |
+| Criar tela ou componente | `nova-tela` |
+| "Revisa", "tá bom pra subir?", revisar PR de alguém | `revisar` (usa o subagente `revisor`) |
+| "Terminei", "pronto", "pode subir", "abre o PR" | `handoff` |
+| "A demo funciona?", antes de apresentar, depois de merges | `checar-demo` |
+
+A pessoa também pode chamar qualquer uma com `/nome`.
 Duas sessões na mesma máquina: `claude -w <nome-da-tarefa>` cria um worktree separado.
 Preferências pessoais: `CLAUDE.local.md` ou `.claude/settings.local.json` (fora do git).
 
