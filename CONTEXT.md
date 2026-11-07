@@ -131,3 +131,21 @@ _Avoid_: documento, referência
 
 **ADR**:
 Registro de uma decisão técnica do time e do porquê dela.
+
+## Avaliação
+
+**Tail**:
+A empresa fictícia onde se passam a demo e o teste dos jurados.
+_Avoid_: empresa de exemplo, empresa mock
+
+**Kit da Tail**:
+Os materiais falsos, mas realistas, da Tail (repos, código, ADRs, Notion, políticas, organograma). É a fonte da Puca e a prova que o jurado confere.
+_Avoid_: mock, dados fake, dataset
+
+**Guia de uso**:
+O que acompanha o kit para o jurado: quem ele é na história, como escolher o perfil, onde estão os materiais e o que vale tentar.
+_Avoid_: manual, tutorial
+
+**Jurado**:
+Quem avalia a Lousa no hackathon. Vive a pessoa: escolhe o perfil e passa pela jornada.
+_Avoid_: avaliador, juiz

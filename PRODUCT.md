@@ -16,6 +16,7 @@
 10. [Complementos do alinhamento com Joaquim](#10-complementos-do-alinhamento-com-joaquim)
 11. [Posicionamento: Sana Learn como referência e foco em just-in-time learning](#11-posicionamento-sana-learn-como-referência-e-foco-em-just-in-time-learning)
 12. [Encaixe no Desafio Tako: a Puca como digital worker de onboarding](#12-encaixe-no-desafio-tako-a-puca-como-digital-worker-de-onboarding)
+13. [Avaliação pelos jurados: o mundo fictício da Tail](#13-avaliação-pelos-jurados-o-mundo-fictício-da-tail)
 
 ---
 
@@ -394,3 +395,53 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 - **Custo.** Mostrar quanto custa uma sessão em tempo e tokens, comparado com as horas que o buddy gastaria explicando a mesma coisa.
 
 > **Limites que o desafio impõe:** decisões sobre pessoas ficam com humanos, e a demo usa só dados sintéticos. A calibragem e o andamento descrevem o processo de integração, e não avaliam o desempenho da pessoa (ver o aviso de privacidade em [§5](#5-visibilidade-para-buddy-gestor-e-rh)).
+
+---
+
+## 13. Avaliação pelos jurados: o mundo fictício da Tail
+
+> Alinhamento com Joaquim em 2026-11-07.
+
+Não temos como prever **como** cada jurado vai testar a Puca, e o desafio pede só dados sintéticos ([§12.2](#122-o-que-precisa-aparecer-na-demo)). Então, em vez de roteirizar o teste, controlamos o
+**mundo** em que ele cai: a Tail, uma empresa fictícia completa, que a Puca conhece e que o jurado também recebe.
+
+### 13.1. O jurado vive a pessoa
+
+O jurado não assiste a uma demo: ele **é a pessoa** sendo integrada e **escolhe o perfil** com que entra:
+
+- **Novo**: acabou de entrar na Tail (como a Ana).
+- **Transição**: já está na Tail e muda de time (como o Bruno).
+
+A escolha muda a jornada, como em [§7](#7-demonstração-dos-dois-perfis).
+
+### 13.2. O kit da Tail: fonte e prova ao mesmo tempo
+
+O mundo fictício é um conjunto de materiais falsos, mas realistas o bastante para simular o primeiro dia numa empresa de verdade:
+
+- **Repositórios** falsos: código, README e ADRs;
+- **Documentação** falsa: Notion, políticas, organograma, rituais, responsáveis por sistema;
+- o que mais a Puca precisar citar como **fonte**.
+
+O kit tem dois papéis:
+
+1. **Fonte**: é de onde a Puca tira o que explica.
+2. **Prova**: o jurado recebe o mesmo kit e pode conferir que a Puca não inventou.
+
+Por isso o mundo precisa ser **coerente**: se a Puca diz "o serviço de pagamentos é do time X, por causa do ADR-003",
+o jurado tem que achar isso no repo. Afirmação sem fonte no kit cai no **encaminhamento** ([§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano)).
+
+### 13.3. Guia de uso
+
+O kit vai junto com um **guia de uso** para o jurado: quem ele é na história, como escolher o perfil, onde estão os
+materiais e o que vale tentar (inclusive perguntas fora do roteiro e dúvidas sem resposta na base).
+
+### 13.4. O que já existe é referência, não contrato
+
+A Tail de hoje (`src/data/company.ts`, `src/data/profiles.ts`) e a jornada de demo (`src/journey/data/tail.journey.json`)
+são **referência**. O mundo fictício pode redesenhar a Tail, as pessoas e a jornada do jeito que funcionar melhor.
+
+### 13.5. Em aberto
+
+- A jornada continua escrita à mão ou passa a ser derivada do kit (repos e docs)?
+- Como o kit chega ao jurado (repos públicos no GitHub, Notion público, arquivo junto do app)?
+- O que o jurado precisa conseguir fazer com o kit para acreditar que a Puca é de verdade, e não um roteiro?
