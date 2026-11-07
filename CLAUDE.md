@@ -6,6 +6,7 @@ Somos 4 pessoas, cada uma com seu agente, e todo mundo mexe um pouco em tudo. Se
 o que não estiver no código, numa issue, num PR ou nestes docs, os outros agentes não sabem.
 
 - Vocabulário do domínio: [`CONTEXT.md`](CONTEXT.md). Use esses termos no código, nos commits e nas conversas; respeite os `_Avoid_`.
+  O glossário inteiro está no fim deste arquivo.
 - Visão de produto (cenários, funcionalidades, prioridades do hackathon): [`PRODUCT.md`](PRODUCT.md).
 - Formato da jornada: [`docs/journey-format.md`](docs/journey-format.md).
 - Como rodar e a estrutura de pastas: [`README.md`](README.md).
@@ -14,6 +15,16 @@ o que não estiver no código, numa issue, num PR ou nestes docs, os outros agen
 - Roteiro e testes da demo: [`docs/demo.md`](docs/demo.md).
 - Tarefas: GitHub Issues, por label (`app`, `voz`, `company-brain`, `demo`, `teste`, `negocio`, `acesso`).
 
+## Base do sistema
+
+`PRODUCT.md` (o quê e por quê do produto) e `CONTEXT.md` (o vocabulário) são a base de tudo:
+
+- **Toda tarefa começa pela seção do `PRODUCT.md` que ela toca** (o sumário fica no topo). Se a tarefa contradiz o
+  `PRODUCT.md`, pare e mostre a contradição antes de implementar.
+- **Todo texto usa os termos do glossário**: código, interface, commits, issues, PRs e docs.
+- **Adicionar ou mudar algo nos dois só pela skill `/contexto-base`**: ela diz onde cada coisa vai, segue o modelo,
+  valida (`npm run check:contexto`) e leva a mudança para as issues e os docs afetados.
+
 ## Comandos
 
 ```bash
@@ -21,7 +32,8 @@ npm run dev          # telas (Vite)
 npm run dev:server   # API em :8787 (o Vite repassa /api)
 npm run typecheck
 npm test             # valida a jornada de demo e o motor
-npm run check        # typecheck + testes + build (o que o CI roda em cada PR)
+npm run check        # typecheck + testes + base do sistema + build (o que o CI roda em cada PR)
+npm run check:contexto  # só a base: sumário e âncoras do PRODUCT.md, formato do CONTEXT.md
 ```
 
 Antes de dizer que terminou: `npm run check` (ou, no mínimo, `npm run typecheck && npm test`). Nunca diga que passou sem ter rodado.
@@ -58,7 +70,8 @@ Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o
 
 ## Skills da equipe (Claude Code)
 
-Em `.claude/skills/`, chame com `/nome`: `/sincronizar` (antes de tudo), `/comecar-tarefa` (início ou retomada), `/nova-tela`, `/nova-jornada`,
+Em `.claude/skills/`, chame com `/nome`: `/sincronizar` (antes de tudo), `/comecar-tarefa` (início ou retomada),
+`/contexto-base` (mudar `PRODUCT.md` ou `CONTEXT.md`), `/nova-tela`, `/nova-jornada`,
 `/contrato`, `/revisar` (usa o subagente `revisor`), `/handoff` (check + PR; só roda quando você chama) e `/checar-demo`.
 Duas sessões na mesma máquina: `claude -w <nome-da-tarefa>` cria um worktree separado.
 Preferências pessoais: `CLAUDE.local.md` ou `.claude/settings.local.json` (fora do git).
@@ -81,3 +94,9 @@ docs(context): glossário do domínio em CONTEXT.md
 ```
 
 **Nunca** adicione `Co-Authored-By`, "Generated with Claude Code" ou qualquer outra linha de coautoria/atribuição, nem em commits nem em PRs.
+
+## Glossário (CONTEXT.md)
+
+Importado para estar sempre no contexto. Para mudar, use `/contexto-base`.
+
+@CONTEXT.md

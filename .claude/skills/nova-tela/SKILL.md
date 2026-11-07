@@ -8,6 +8,9 @@ argument-hint: "[nome e objetivo da tela ou componente]"
 
 Pedido: $ARGUMENTS
 
+> **Base do sistema:** o glossário do `CONTEXT.md` já está no seu contexto (o `CLAUDE.md` importa); use os termos dele.
+> Antes de desenhar, leia no `PRODUCT.md` o cenário ou a funcionalidade que a tela atende. Textos da interface usam os termos do glossário (ex.: pessoa, aula, quadro, encaminhamento). Se o pedido contradiz o `PRODUCT.md`, pare e mostre a contradição. Se algo novo precisa entrar na base, use a skill `contexto-base`.
+
 ## Tela nova
 
 1. `src/screens/<nome>/` com `index.html`, `main.ts` e `style.css`. Copie a estrutura de uma tela parecida.

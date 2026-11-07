@@ -8,6 +8,9 @@ argument-hint: "[assunto da aula ou o que mudar na jornada]"
 
 Pedido: $ARGUMENTS
 
+> **Base do sistema:** o glossário do `CONTEXT.md` já está no seu contexto (o `CLAUDE.md` importa); use os termos dele.
+> Uma jornada é conteúdo de produto: leia no `PRODUCT.md` a aula (§4.1–4.3), os perfis (§7) e o que a demo precisa mostrar. Falas, títulos e `goal` usam os termos do glossário (momento, passo, nó, fonte, encaminhamento). Se o pedido contradiz o `PRODUCT.md`, pare e mostre a contradição. Se algo novo precisa entrar na base, use a skill `contexto-base`.
+
 O formato completo está em `docs/journey-format.md`. Leia antes de escrever. Use `src/journey/data/tail.journey.json`
 como exemplo do que já funciona.
 

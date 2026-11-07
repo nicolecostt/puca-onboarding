@@ -23,8 +23,10 @@ Opções: $ARGUMENTS
    (modelo em `docs/decisoes/README.md`). Se não houver, não crie nada.
 5. **Docs.** README, `journey-format.md` ou `demo.md` precisam refletir a mudança?
 6. **Commit.** Mostre a mensagem no padrão `tipo(escopo): o que mudou` e só commite com o ok da pessoa.
-7. **Demo.** Se a mudança mexe num passo de `docs/demo.md`, atualize o estado dele na tabela.
-8. **PR.** Escreva a descrição seguindo `.github/pull_request_template.md`, com `Closes #<n>` da issue (o número
+7. **Base do sistema.** A mudança altera algo descrito no `PRODUCT.md` ou cria/renomeia um termo? Atualize pela skill
+   `contexto-base` (padrão + propagar para issues). Código novo, textos e o PR usam os termos do glossário.
+8. **Demo.** Se a mudança mexe num passo de `docs/demo.md`, atualize o estado dele na tabela.
+9. **PR.** Escreva a descrição seguindo `.github/pull_request_template.md`, com `Closes #<n>` da issue (o número
    costuma estar no nome da branch). Com `--abrir` (e ok da pessoa), faça
    `git push -u origin HEAD` e `gh pr create --base main --title "…" --body-file <arquivo>`. Sem `--abrir`, só mostre o texto.
 
