@@ -1,6 +1,6 @@
 ---
 name: sincronizar
-description: Use SEMPRE antes de começar a editar, antes de commitar e antes de abrir PR, e quando aparecer um aviso "[sync]" no contexto. Traz a main atualizada e confere se outra pessoa mudou (na main ou num PR aberto) os mesmos arquivos que você está mexendo. Com quatro pessoas mexendo em tudo ao mesmo tempo, isso evita trabalhar em cima de código velho.
+description: Chame automaticamente antes de editar, antes de commitar e antes de abrir PR, quando aparecer um aviso "[sync]" e quando a pessoa perguntar "alguém mexeu na main?", "tem algo novo?", "atualiza aí". Traz a main e mostra se outra pessoa mudou (na main ou num PR aberto) os arquivos que você está mexendo.
 ---
 
 # Sincronizar com o time

@@ -1,6 +1,6 @@
 ---
 name: contrato
-description: Use quando uma mudança altera um formato que outra parte do código ou outra pessoa usa — tipos da jornada (src/journey/types.ts), eventos em src/lib/events.ts, perfil, tipos de src/data/types.ts, opções de uma função mount… de componente, o contrato do visual da Puca — ou quando for definir um formato novo (ex.: request/response de LLM ou backend). Não use para mudanças internas de um arquivo que ninguém mais importa.
+description: Chame automaticamente quando uma mudança mexe num formato que outra parte do código usa — ex.: "adiciona um campo na resposta do /api/ask", "muda o tipo do perfil", "cria um evento novo", "o front e o servidor precisam combinar o formato", tipos da jornada, eventos de src/lib/events.ts, opções de mount…, API do servidor, tipos de voz. Define o formato antes de implementar os dois lados. Não use para mudança interna de um arquivo que ninguém mais importa.
 argument-hint: "[qual contrato e o que muda]"
 ---
 

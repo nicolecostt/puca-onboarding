@@ -1,6 +1,6 @@
 ---
 name: comecar-tarefa
-description: Use ao começar uma tarefa nova neste repo (feature, correção, tela, jornada) ou ao retomar trabalho numa sessão nova. Junta o contexto, confere a branch e fecha o escopo antes de editar código. Não use para perguntas rápidas que não mudam arquivos.
+description: Chame automaticamente, antes de qualquer edição, sempre que a pessoa for começar ou retomar um trabalho neste repo — ex.: "pega a issue 17", "bora fazer X", "vou mexer em Y", "continua de onde parei", "implementa Z". Lê a issue e a base do sistema, confere quem está atribuído, cria a branch e fecha o escopo. Não use para perguntas rápidas que não mudam arquivos.
 argument-hint: "[descrição da tarefa ou número da issue]"
 ---
 
@@ -43,4 +43,4 @@ Tarefa: $ARGUMENTS
 - Contratos afetados: nenhum | quais
 - Como vai verificar (comando + tela/endereço)
 
-Depois, implemente dentro desse escopo e termine com `npm run check`. Para entregar, a pessoa chama `/handoff`.
+Depois, implemente dentro desse escopo e termine com `npm run check`. Quando a tarefa terminar, chame a skill `handoff`.
