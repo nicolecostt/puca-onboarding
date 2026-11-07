@@ -20,6 +20,8 @@ export interface AskHandlers {
   onSpeak(text: string, play: () => Promise<void>): Promise<void>;
   onAction(action: BoardAction): void;
   onGoTo(target: string): void;
+  /** O agente não achou fonte confiável: a tela encaminha a dúvida à buddy (resumo do agente). */
+  onEscalate?(summary: string): void;
 }
 
 export interface AgentVoice {
@@ -126,6 +128,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
               spoken.push(h.onSpeak(ev.text, play));
             } else if (ev.type === "action") h.onAction(ev.action);
             else if (ev.type === "go_to") h.onGoTo(ev.target);
+            else if (ev.type === "escalate") h.onEscalate?.(ev.summary);
           }
         }
       } catch {

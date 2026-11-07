@@ -17,6 +17,8 @@ export type AskEvent =
   | { type: "action"; action: BoardAction }
   /** A pessoa pediu outro ponto da aula: "moment:<id>" ou "step:<id>" (transições do passo atual). */
   | { type: "go_to"; target: string }
+  /** Sem fonte confiável: a tela encaminha a dúvida à buddy (no máximo um por pedido, antes do timing). */
+  | { type: "escalate"; summary: string }
   | { type: "timing"; timing: AskTiming };
 
 export interface AskTiming {
@@ -42,6 +44,9 @@ export interface AskInput {
   signal?: AbortSignal;
 }
 
+// O LLM às vezes admite que não confirmou sem chamar escalate_to_buddy: vale como encaminhamento.
+const NO_SOURCE = /não (consegui|consigo) confirmar|não (achei|tenho) (isso )?confirmad/i;
+
 export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promise<AskTiming> {
   const t0 = performance.now();
   const ms = () => Math.round(performance.now() - t0);
@@ -63,10 +68,19 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   const splitter = new SentenceSplitter();
   let spoke = false;
   let wentTo = false;
+  let escalated = false;
+  let saidNoSource = false;
+  const escalate = (summary: string) => {
+    if (escalated) return;
+    escalated = true;
+    emit({ type: "escalate", summary });
+  };
   const sentence = (s: string) => {
     timing.llm_first_sentence_ms ??= ms();
     spoke = true;
     say(s, "llm");
+    // só marca: se o LLM chamar escalate_to_buddy logo depois, vale o resumo dele
+    if (NO_SOURCE.test(s)) saidNoSource = true;
   };
 
   try {
@@ -80,6 +94,9 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
         if (targets.length) emit({ type: "action", action: { type: "highlight", targets, tone: "focus" } });
       } else if (ev.name === "open_card" && a?.target && ids.has(a.target)) {
         emit({ type: "action", action: { type: "card", target: a.target } });
+      } else if (ev.name === "escalate_to_buddy") {
+        const summary = (ev.args as { summary?: unknown } | null)?.summary;
+        escalate(typeof summary === "string" && summary.trim() ? summary.trim() : input.text);
       } else if (ev.name === "go_to" && typeof a?.target === "string") {
         wentTo = true;
         emit({ type: "go_to", target: a.target });
@@ -92,7 +109,11 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   } finally {
     clearTimeout(timer);
   }
-  if (!spoke && !wentTo && !input.signal?.aborted) say(FALLBACK_LINE, "fallback");
+  if (saidNoSource) escalate(input.text);
+  if (!spoke && !wentTo && !input.signal?.aborted) {
+    say(FALLBACK_LINE, "fallback");
+    escalate(input.text);
+  }
   timing.total_ms = ms();
   emit({ type: "timing", timing });
   return timing;

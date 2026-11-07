@@ -17,6 +17,8 @@ describe("ask", () => {
     );
     const speaks = evs.filter((e) => e.type === "speak");
     expect(speaks.map((s) => s.source)).toEqual(["bridge", "fallback"]);
+    // sem agente, a dúvida vira encaminhamento
+    expect(evs.filter((e) => e.type === "escalate")).toEqual([{ type: "escalate", summary: "Quanto ganha um pleno aqui?" }]);
     expect(t.first_speak_ms!).toBeLessThan(50);
     expect(t.llm_error).not.toBeNull();
     expect(evs.at(-1)?.type).toBe("timing");
