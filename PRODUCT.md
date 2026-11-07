@@ -306,6 +306,17 @@ A call inicial é o momento de identificar **o que a pessoa já conhece**, suas 
 | **Entrando na empresa** | Combina acolhimento e onboarding cultural com o levantamento do repertório técnico e das necessidades da função. |
 | **Saindo de um time e entrando em outro** | Considera o contexto anterior, confirma os conhecimentos que podem ser aproveitados e investiga as diferenças do novo time: sistemas, responsabilidades, pessoas, práticas e rituais. A jornada é ajustada a partir dessa conversa. |
 
+**A call inicial não é só coleta de informações.** Além de levantar o que a pessoa já sabe, a Puca faz o **onboarding cultural**: explica como a empresa funciona e o que ela valoriza, para a pessoa chegar à primeira aula sabendo onde está entrando.
+
+- **O que a Puca explica:** missão e valores, o jeito de trabalhar (rituais, combinados, como a comunicação acontece e onde pedir ajuda) e quem são as pessoas de referência (buddy, gestor, time).
+- **Como explica:** em conversa, intercalando com as perguntas, e não como uma palestra antes delas. Cada trecho é curto e se liga ao que a pessoa contou (ex.: quem vem de uma empresa grande ouve como as decisões andam aqui).
+- **De onde vem:** só da documentação oficial da empresa, com as mesmas regras de fonte da [§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano). O que não está documentado a Puca não inventa.
+- **Na transição entre times:** só as particularidades culturais do novo time, sem repetir a apresentação institucional ([Cenário B](#cenário-b--funcionário-em-transição-interna)).
+
+> **Exemplo:** “Antes de seguir, uma coisa sobre como a Tail trabalha: aqui quem encontra um problema é dono dele até alguém assumir. Você vai ver isso no seu primeiro ticket. E no seu time anterior, como funcionava?”
+
+> **No hackathon:** a tela da call inicial (`src/screens/onboarding-call`) hoje só faz perguntas; a cultura aparece na aula, no momento “empresa e cultura” da jornada da Tail. Trazer o onboarding cultural para a call está em #57.
+
 ### 10.2. Incorporação de respostas à base — opcional no hackathon
 
 O plano inclui a possibilidade de incorporar à base de conhecimento **respostas confirmadas por especialistas**, aproveitando a solução que João está desenvolvendo. Essa funcionalidade é uma **entrega opcional do hackathon**, condicionada ao tempo disponível.
@@ -370,7 +381,7 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 
 | # | O que a Puca faz | O que isso mostra | Onde o humano entra |
 |---|---|---|---|
-| 1 | Na **call inicial**, levanta o que a pessoa já sabe, registra a calibragem e **monta a jornada dela** ([§10.1](#101-call-inicial-e-conhecimento-prévio)). | O agente planeja a partir de um objetivo. | — |
+| 1 | Na **call inicial**, faz o onboarding cultural, levanta o que a pessoa já sabe, registra a calibragem e **monta a jornada dela** ([§10.1](#101-call-inicial-e-conhecimento-prévio)). | O agente planeja a partir de um objetivo. | — |
 | 2 | Conduz a **aula** no quadro, seguindo a jornada e respondendo na hora ao que a pessoa diz: perguntas, pulos e interrupções. | O agente executa e se adapta, sem roteiro fixo. | — |
 | 3 | Faz uma **checagem leve de entendimento** e atualiza os objetivos que ainda faltam. | O agente acompanha o resultado do próprio trabalho. | — |
 | 4 | Quando falta fonte confiável, faz o **encaminhamento** ao buddy no Slack, com a dúvida, as fontes já consultadas e o motivo de não ter respondido ([§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano)). | O agente trata a exceção e passa para um humano *"com o contexto pronto para decidir"*. | O buddy responde ou indica o responsável. |
