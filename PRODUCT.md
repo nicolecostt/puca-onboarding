@@ -16,6 +16,7 @@
 10. [Complementos do alinhamento com Joaquim](#10-complementos-do-alinhamento-com-joaquim)
 11. [Posicionamento: Sana Learn como referência e foco em just-in-time learning](#11-posicionamento-sana-learn-como-referência-e-foco-em-just-in-time-learning)
 12. [Encaixe no Desafio Tako: a Puca como digital worker de onboarding](#12-encaixe-no-desafio-tako-a-puca-como-digital-worker-de-onboarding)
+13. [Modelo de negócio: quem compra e como cobramos](#13-modelo-de-negócio-quem-compra-e-como-cobramos)
 
 ---
 
@@ -383,3 +384,57 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 - **Custo.** Mostrar quanto custa uma sessão em tempo e tokens, comparado com as horas que o buddy gastaria explicando a mesma coisa.
 
 > **Limites que o desafio impõe:** decisões sobre pessoas ficam com humanos, e a demo usa só dados sintéticos. A calibragem e o andamento descrevem o processo de integração, e não avaliam o desempenho da pessoa (ver o aviso de privacidade em [§5](#5-visibilidade-para-buddy-gestor-e-rh)).
+
+---
+
+## 13. Modelo de negócio: quem compra e como cobramos
+
+> Pesquisa e alinhamento de Joaquim em 2026-11-07. Mercado, métricas, evidências externas e fontes: [`docs/negocio/contexto-de-negocio.md`](docs/negocio/contexto-de-negocio.md).
+
+A Puca é vendida para empresas (B2B): **a empresa compra e o RH aprova**. A entrada é um **piloto** pago e pequeno, que vira contrato anual medido em **integrações**.
+
+### 13.1. Quem compra e quem participa
+
+| Papel | No modelo |
+|---|---|
+| **Empresa** | Contrata e paga. |
+| **RH** | Aprova a compra e acompanha o valor para a integração. Ninguém substitui o RH como aprovador por inferência. |
+| **Gestor e engenharia** | Ajudam a definir tarefas, contexto e qualidade esperada. |
+| **Buddy** | Orienta quando precisa e mostra onde há repetição ou bloqueio. |
+| **TI e segurança** | Participam das integrações de sistemas e da avaliação de acessos, quando for o caso. |
+| **Pessoa** | Usa a Lousa para aprender e fazer as primeiras tarefas. |
+
+Foco inicial: empresas com times de tecnologia, contratações ou mudanças de time recorrentes e conhecimento espalhado em várias fontes. Não há corte de tamanho definido. Grandes empresas são um bom começo, não um limite.
+
+Os dois vínculos, novo e transição ([§3](#3-cenários-principais-de-uso)), fazem parte da proposta e aparecem na demo.
+
+### 13.2. Como cobramos
+
+- **Unidade:** a integração, ou seja, uma pessoa entrando num contexto de destino. Novo e transição consomem o **mesmo saldo**, com o mesmo preço, até os dados mostrarem diferença de custo ou de valor.
+- **Piloto pago:** preço e número de integrações menores que no contrato anual. Padrão de partida: **60 dias de uso**, contados depois que fontes e acessos estão disponíveis, em uma equipe. Revisão no meio e revisão comercial no fim.
+- **Contrato anual:** volume de integrações com **quantidade mínima**.
+- **Implantação:** a equipe já está trabalhando nela. Uma taxa separada só será proposta se o esforço observado justificar.
+
+O piloto vira contrato anual quando três coisas acontecem juntas:
+
+1. **Valor observado:** melhora em 1 ou 2 métricas combinadas antes do piloto, sem piorar a qualidade das tarefas nem esconder esforço.
+2. **Uso e viabilidade:** as pessoas usam o fluxo, o contexto é utilizável e o esforço de implantação é aceitável.
+3. **Continuidade:** o RH aprova e há volume futuro que justifique o mínimo anual.
+
+Sem informação suficiente, a decisão é explícita: encerrar, corrigir o escopo ou estender o piloto em acordo. Não há conversão automática nem piloto gratuito indefinido.
+
+### 13.3. O que prometemos
+
+- **Resultado principal:** menos tempo bloqueado por falta de contexto e menos explicação repetida para buddies e gestores ([§8](#8-proposta-de-valor)).
+- **Efeito a acompanhar, não promessa:** retenção e experiência nos primeiros 90 dias.
+- **Métricas do piloto:** tempo até autonomia, tempo bloqueado por contexto, esforço do buddy, qualidade das tarefas, clareza de papel e uso efetivo. Escolher 1 ou 2 por piloto.
+
+> ⚠️ **Sem medição própria, não afirmamos:** redução percentual de tempo ou de turnover, ausência de concorrência, preço validado, margem conhecida ou clientes na lista de empresas pesquisadas. A lista completa está no doc de negócio.
+
+### 13.4. Em aberto
+
+- Preço por integração. Os R$ 900 do exercício de mercado são só uma premissa.
+- Quantidade mínima do contrato anual e forma de pagamento (antecipado ou parcelado).
+- O que uma integração cobre: duração, reabertura, troca de contexto, excedentes e validade do saldo.
+- Custos e margem: só depois da implementação, a partir do custo medido da sessão (#52).
+
