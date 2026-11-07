@@ -3,4 +3,3 @@
 export * from "./types";
 export { company, journey } from "./company";
 export { profiles, activeProfile, teamLine } from "./profiles";
-export { transactionPath } from "./lessons/transaction-path";

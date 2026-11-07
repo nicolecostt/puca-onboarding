@@ -12,6 +12,48 @@ body {
   inset: 0;
 }
 
+/* ---- Abertura e encerramento (vista "logo") ---- */
+.opening {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-bottom: 120px; /* espaço da legenda e da barra de call */
+  text-align: center;
+  background-color: var(--color-board);
+  background-image: radial-gradient(var(--color-board-dot) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.opening[hidden] {
+  display: none;
+}
+.opening__company {
+  margin: 0;
+  font: 400 clamp(36px, 5vw, 56px) / 1.1 var(--font-hand);
+  color: var(--color-sketch);
+}
+.opening__title {
+  margin: 0;
+  font-size: var(--text-lg);
+  color: var(--color-muted);
+}
+.opening__who {
+  margin: 10px 0 0;
+  height: 26px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-chip);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
 /* ---- Peças comuns ---- */
 .chip {
   height: 20px;
@@ -90,6 +132,7 @@ body {
 }
 .caption:has(.caption__text:empty) {
   opacity: 0;
+  pointer-events: none;
 }
 .caption__logo {
   flex: none;
@@ -103,6 +146,16 @@ body {
   color: #fafafa;
   font: 700 12px/1 var(--font-hand);
 }
+.caption__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.caption__body p {
+  margin: 0;
+}
 .caption__text {
   margin: 0;
   font-size: var(--text-base);
@@ -115,7 +168,64 @@ body {
   padding: 0 1px;
 }
 .caption__you {
+  font-size: var(--text-md);
   color: var(--color-muted);
+}
+.caption__you:empty,
+.caption__hint:empty,
+.caption__replies:empty {
+  display: none;
+}
+.caption__you::before {
+  content: "Você: ";
+  color: var(--color-subtle);
+}
+.caption__hint {
+  font-size: var(--text-sm);
+  color: var(--color-subtle);
+}
+
+/* respostas sugeridas: pílulas pequenas dentro da legenda */
+.caption__replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 2px;
+}
+.reply {
+  all: unset;
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-chip);
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  animation: reply-in 0.3s ease both;
+}
+.reply:hover {
+  border-color: var(--color-subtle);
+}
+.reply:focus-visible {
+  outline: 2px solid var(--color-info);
+  outline-offset: 2px;
+}
+.reply[disabled] {
+  opacity: 0.45;
+  cursor: default;
+}
+@keyframes reply-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
 }
 
 /* ---- Ao lado da barra de call (a barra tem 270px de largura e 42px de altura) ---- */

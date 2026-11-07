@@ -1,86 +1,46 @@
-// Aula no quadro: a Puca explica "o caminho de uma transação" e o quadro vai se montando
-// junto com a fala. A pessoa pode perguntar a qualquer momento pelo chat,
-// e pausar pela barra de call.
-// Por enquanto a fala é simulada (texto dos dados da aula, palavra por palavra).
+// Aula no quadro: a Puca conduz a jornada (src/journey/data/*.journey.json) e monta o quadro
+// do Figma (components/whiteboard) enquanto explica. Conversa simulada: a pessoa responde pelas respostas sugeridas, pelo chat
+// ou tocando no quadro. O perfil vem da call de entrevista; ?perfil=ana|bruno (ou novo|transicao)
+// força um perfil da demo; ?auto=1 responde sozinho, para apresentar sem mexer no mouse.
 import "../../styles/base.css";
 import "./style.css";
+import demo from "../../journey/data/tail.journey.json";
+import { loadJourney } from "../../journey/validate";
+import { createRunner, type RunnerIO } from "../../journey/runner";
+import { createClock, Cancelled } from "../../journey/clock";
+import { mountWhiteboard, type Whiteboard } from "../../components/whiteboard/whiteboard";
+import { whiteboardFromJourney } from "../../components/whiteboard/from-journey";
+import { normalize } from "../../journey/conditions";
+import { interpolateDeep, resolveProfile } from "../../journey/profile";
+import type { Profile, Step, Vinculo } from "../../journey/types";
 import { mountAppHeader } from "../../components/app-header/app-header";
-import { mountWhiteboard } from "../../components/whiteboard/whiteboard";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
 import { mountAgentCam } from "../../components/agent-cam/agent-cam";
-import { loadAgentVisual } from "../../lib/agent-visual";
-import { activeProfile, company, transactionPath, type LessonBeat } from "../../data";
+import { loadAgentVisual, type AgentVisualState } from "../../lib/agent-visual";
+import { emit } from "../../lib/events";
 import { esc, qs } from "../../lib/dom";
+import { profiles, type Profile as DemoProfile } from "../../data";
 
-const lesson = transactionPath;
-const profile = activeProfile();
-const buddy = company.people[profile.buddyId];
+type AgentState = "speaking" | "listening" | "choosing" | "thinking" | "done";
 
-// ---- Montagem da tela ----
-mountAppHeader({ current: "lesson", profile });
-const board = mountWhiteboard(qs(document, "#board"), lesson);
-const chat = mountChatPanel({ title: "Transcrição da aula", messages: [] });
-mountCallBar({ chat, draggable: false }); // sem status: a legenda já mostra o que está acontecendo
-// a Puca aparece na "câmera" do canto, como numa videochamada
-const cam = mountAgentCam({ name: "Puca", visual: await loadAgentVisual() });
-
-const el = {
-  caption: qs(document, "#caption"),
-  timer: qs(document, "#timer"),
-  liveDot: qs(document, "#live-dot"),
-  sectionCount: qs(document, "#section-count"),
-  voice: qs(document, "#voice"),
+const CAM_STATE: Record<AgentState, AgentVisualState> = {
+  speaking: "talk",
+  listening: "idle",
+  choosing: "idle",
+  thinking: "think",
+  done: "idle",
 };
+const VINCULO_LABEL: Record<Vinculo, string> = { novo: "Começando na empresa", transicao: "Mudando de time" };
 
-qs(document, "#lesson-name").textContent = lesson.title;
-
-// ---- Estado da aula ----
-const state = { paused: false, ended: false, seconds: 0, done: false, section: 0 };
-const questions: string[] = []; // perguntas do chat, respondidas entre um trecho e outro
-
-function renderSection(): void {
-  el.sectionCount.textContent = state.done
-    ? "aula completa"
-    : `${state.section + 1} de ${lesson.sections.length} trechos`;
+/** Pessoa mostrada no cabeçalho: o perfil da demo, ou o que a entrevista coletou. */
+function headerPerson(p: Profile, fromInterview: boolean): DemoProfile {
+  const base = p.vinculo === "transicao" ? profiles.bruno : profiles.ana;
+  if (!fromInterview) return base;
+  const initials = p.nome.split(/\s+/).map((w) => w[0] ?? "").join("").slice(0, 2).toUpperCase();
+  // a entrevista não pergunta o time de origem
+  return { ...base, name: p.nome, nickname: p.nome, initials, role: p.cargo ?? base.role, toTeam: p.time ?? base.toTeam, fromTeam: undefined };
 }
-
-type Voice = "talk" | "listen" | "paused";
-function setVoice(v: Voice): void {
-  const shown: Voice = state.paused || state.ended ? "paused" : v;
-  el.voice.dataset.state = shown;
-  el.voice.setAttribute("aria-label", state.ended ? "Aula pausada" : state.paused ? "Puca pausada" : shown === "talk" ? "Puca falando" : "Puca ouvindo");
-  el.liveDot.classList.toggle("is-off", state.paused || state.ended);
-  // câmera acompanha: fala, quieta ouvindo, apagada pausada
-  cam.setPaused(state.paused || state.ended);
-  if (shown !== "paused") cam.setState(shown === "talk" ? "talk" : "idle");
-}
-
-/** Compara perguntas ignorando acento, maiúsculas e pontuação. */
-function normalize(text: string): string {
-  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
-}
-
-// Espera que só corre com a aula ativa (pausar segura o tempo)
-function wait(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    let left = ms;
-    const t = setInterval(() => {
-      if (state.paused || state.ended) return;
-      left -= 50;
-      if (left <= 0) {
-        clearInterval(t);
-        resolve();
-      }
-    }, 50);
-  });
-}
-
-setInterval(() => {
-  if (state.paused || state.ended || state.done) return;
-  state.seconds++;
-  el.timer.textContent = `${String(Math.floor(state.seconds / 60)).padStart(2, "0")}:${String(state.seconds % 60).padStart(2, "0")}`;
-}, 1000);
 
 /** Legenda até onde já foi falado, com o trecho de destaque marcado (se já chegou nele). */
 function captionHTML(full: string, spokenLength: number, highlight?: string): string {
@@ -91,88 +51,266 @@ function captionHTML(full: string, spokenLength: number, highlight?: string): st
   return `${esc(spoken.slice(0, from))}<mark>${esc(spoken.slice(from, to))}</mark>${esc(spoken.slice(to))}`;
 }
 
-/** O agente fala um trecho: legenda palavra por palavra, quadro acompanha. */
-async function say(beat: LessonBeat, toChat = true): Promise<void> {
-  setVoice("talk");
-  if (beat.reveal) board.reveal(beat.reveal);
-  if (beat.focus !== undefined) board.setFocus(beat.focus);
-  const words = beat.say.split(" ");
-  for (let i = 0; i < words.length; i++) {
-    const spokenLength = words.slice(0, i + 1).join(" ").length;
-    el.caption.innerHTML = captionHTML(beat.say, spokenLength, beat.highlight);
-    await wait(150);
-  }
-  if (toChat) chat.addMessage({ from: "agent", text: beat.say });
-  setVoice("listen");
-}
+async function main(): Promise<void> {
+  const journey = loadJourney(demo);
+  const auto = new URLSearchParams(location.search).get("auto") === "1";
+  const resolved = resolveProfile(location.search);
+  const profile = resolved.profile;
 
-// ---- Perguntas pelo chat (interrompem a aula entre um trecho e outro) ----
-async function answer(question: string): Promise<void> {
-  board.showOwners(false);
-  const known = lesson.questions.find((q) => normalize(q.question) === normalize(question));
-  el.caption.innerHTML = `<span class="caption__you">Você: ${esc(question)}</span>`;
-  cam.setState("think"); // pensa (esquenta) antes de responder
-  await wait(1200);
-  if (known) {
-    if (/dono/.test(known.question)) board.showOwners(true);
-    await say({ say: known.answer, focus: known.focus ?? null });
-  } else {
-    // sem fonte confiável: deixa claro e encaminha para uma pessoa (contexto 4.5)
-    await say({
-      say: `Boa pergunta. Não achei isso confirmado na documentação, então não quero chutar. Vou anotar e perguntar para ${buddy?.name ?? "sua buddy"}, que é sua buddy, e te aviso.`,
-      highlight: "Não achei isso confirmado na documentação",
-      focus: null,
+  // ---- Montagem da tela ----
+  mountAppHeader({ current: "lesson", profile: headerPerson(profile, resolved.source === "entrevista") });
+  const el = {
+    boardHost: qs(document, "#board-host"),
+    logoView: qs(document, "#logo-view"),
+    logoCompany: qs(document, "#logo-company"),
+    logoTitle: qs(document, "#logo-title"),
+    logoWho: qs(document, "#logo-who"),
+    lessonName: qs(document, "#lesson-name"),
+    moment: qs(document, "#moment"),
+    timer: qs(document, "#timer"),
+    liveDot: qs(document, "#live-dot"),
+    captionAgent: qs(document, "#caption-agent"),
+    captionUser: qs(document, "#caption-user"),
+    replies: qs(document, "#replies"),
+    hint: qs(document, "#caption-hint"),
+    voice: qs(document, "#voice"),
+  };
+  el.lessonName.textContent = journey.title;
+
+  const clock = createClock();
+  const chat = mountChatPanel({ title: "Transcrição da aula", messages: [] });
+  mountCallBar({ chat, draggable: false }); // fixa; sem status: a legenda já mostra o que está acontecendo
+  // a Puca aparece na "câmera" do canto, como numa videochamada
+  const cam = mountAgentCam({ name: journey.agent.name, visual: await loadAgentVisual() });
+
+  let paused = false;
+  let ended = false;
+  let agentState: AgentState = "thinking";
+  let currentBoard: string | null = null;
+  let board: Whiteboard | null = null;
+  let currentStep: Step | null = null;
+
+  // Resposta pendente: resposta sugerida, chat ou clique no quadro resolvem.
+  let pending: { kind: "reply" | "select"; resolve: (v: string) => void; reject: (e: Error) => void } | null = null;
+
+  // ---- Estado visível ----
+  function setAgent(s: AgentState): void {
+    agentState = s;
+    render();
+  }
+
+  function render(): void {
+    const off = paused || ended;
+    const voice = off ? "paused" : agentState === "speaking" ? "talk" : "listen";
+    el.voice.dataset.state = voice;
+    el.voice.setAttribute("aria-label", ended ? "Aula encerrada" : paused ? "Puca pausada" : voice === "talk" ? "Puca falando" : "Puca ouvindo");
+    el.liveDot.classList.toggle("is-off", off);
+    cam.setPaused(off);
+    if (!off) cam.setState(CAM_STATE[agentState]);
+    for (const b of el.replies.querySelectorAll<HTMLButtonElement>("button")) b.disabled = off;
+    el.hint.textContent = ended
+      ? "Use “Ligar para a Puca” para continuar de onde parou."
+      : paused
+        ? "Aula pausada."
+        : agentState === "listening"
+          ? "Escolha uma opção ou responda pelo chat."
+          : agentState === "choosing"
+            ? "Toque num item do quadro (ou escreva o nome no chat)."
+            : "";
+  }
+
+  setInterval(() => {
+    const s = clock.seconds;
+    el.timer.textContent = `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+  }, 250);
+
+  // ---- Respostas ----
+  function showReplies(replies: string[]): void {
+    el.replies.replaceChildren(
+      ...replies.map((r, i) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "reply";
+        b.textContent = r;
+        b.style.animationDelay = `${i * 60}ms`;
+        b.addEventListener("click", () => answer(r, "chip"));
+        return b;
+      }),
+    );
+    render();
+  }
+
+  /** Resposta da pessoa chegou (botão, chat ou modo auto). */
+  function answer(text: string, from: "chip" | "chat" | "auto"): void {
+    if (!pending || pending.kind !== "reply" || paused || ended) return;
+    const p = pending;
+    pending = null;
+    el.replies.replaceChildren();
+    el.captionUser.textContent = text;
+    if (from !== "chat") chat.addMessage({ from: "user", text });
+    p.resolve(text);
+  }
+
+  function pickNode(id: string, said: string): void {
+    if (!pending || pending.kind !== "select" || paused || ended) return;
+    const p = pending;
+    pending = null;
+    board?.setSelectable(false);
+    el.captionUser.textContent = said;
+    p.resolve(id);
+  }
+
+  function onBoardSelect(id: string): void {
+    const label = (journey.boards[currentBoard ?? ""]?.nodes.find((n) => n.id === id)?.label ?? id).replace("\n", " ");
+    if (pending?.kind === "select") chat.addMessage({ from: "user", text: `(tocou em ${label})` });
+    pickNode(id, label);
+  }
+
+  document.addEventListener("chatpanel:send", (e) => {
+    const text = e.detail.text.trim();
+    if (!text) return;
+    if (pending?.kind === "reply") return answer(text, "chat");
+    if (pending?.kind === "select") {
+      // escreveu o nome de um item do quadro em vez de tocar nele
+      const said = normalize(text);
+      const hit = journey.boards[currentBoard ?? ""]?.nodes.find((n) => said.includes(normalize(n.label)) || said.includes(normalize(n.id)));
+      if (hit) return pickNode(hit.id, text);
+    }
+    // O roteiro é fixo nesta versão: a pergunta fica anotada (§4.5, encaminhamento para uma pessoa).
+    chat.addMessage({
+      from: "agent",
+      text: "Anotei a sua pergunta. Nesta versão eu sigo o roteiro da aula, mas ela fica registrada para a sua buddy responder.",
     });
+  });
+
+  // ---- Barra de call ----
+  document.addEventListener("callbar:pause", (e) => {
+    paused = !!e.detail.on;
+    clock.setPaused(paused);
+    render();
+  });
+  document.addEventListener("callbar:end", () => {
+    ended = true;
+    clock.setEnded(true);
+    cam.hide();
+    render();
+  });
+  document.addEventListener("callbar:start", () => {
+    ended = false;
+    clock.setEnded(false);
+    cam.show();
+    render();
+  });
+
+  // ---- Vistas ----
+  function showLogo(): void {
+    el.boardHost.hidden = true;
+    el.logoView.hidden = false;
+    el.logoCompany.textContent = journey.company;
+    el.logoTitle.textContent = journey.title;
+    el.logoWho.textContent = `${profile.nome} · ${VINCULO_LABEL[profile.vinculo]}`;
   }
-  await wait(1500);
-  board.showOwners(false);
-}
 
-async function answerPending(): Promise<void> {
-  while (questions.length) {
-    const q = questions.shift();
-    if (q) await answer(q);
-  }
-}
-
-document.addEventListener("chatpanel:send", (e) => {
-  questions.push(e.detail.text);
-  if (state.done) void answerPending();
-});
-
-// ---- Barra de call ----
-document.addEventListener("callbar:pause", (e) => {
-  state.paused = !!e.detail.on;
-  setVoice(state.paused ? "paused" : "listen");
-});
-document.addEventListener("callbar:end", () => {
-  state.ended = true;
-  setVoice("paused");
-  cam.hide();
-});
-document.addEventListener("callbar:start", () => {
-  state.ended = false;
-  setVoice("listen");
-  cam.show();
-});
-
-// ---- Aula ----
-async function run(): Promise<void> {
-  renderSection();
-  setVoice("listen");
-  await wait(800);
-  for (let s = 0; s < lesson.sections.length; s++) {
-    state.section = s;
-    renderSection();
-    for (const beat of lesson.sections[s].beats) {
-      await answerPending();
-      await say(beat);
-      await wait(1300);
+  function showBoard(name: string, fresh: boolean): void {
+    el.logoView.hidden = true;
+    el.boardHost.hidden = false;
+    if (fresh || name !== currentBoard) {
+      board?.destroy();
+      board = mountWhiteboard(el.boardHost, whiteboardFromJourney(interpolateDeep(journey.boards[name], profile)));
+      board.onSelect(onBoardSelect);
+      currentBoard = name;
     }
   }
-  await answerPending();
-  state.done = true;
-  renderSection();
+
+  // ---- io do motor ----
+  const io: RunnerIO = {
+    enterView(view, fresh) {
+      if (view.mode === "logo") showLogo();
+      else showBoard(view.board, fresh);
+    },
+    apply(a) {
+      if (!board) return;
+      switch (a.type) {
+        case "reveal": return board.reveal(a.targets);
+        case "highlight": return board.highlight(a.targets, a.tone ?? "focus");
+        case "clear_highlight": return board.clearHighlight();
+        case "focus": return board.setFocus(a.target);
+        case "flow": return board.flow(a.path);
+        case "card": return board.openCard(a.target);
+        case "close_card": return board.closeCard();
+        case "reset": return board.reset();
+      }
+    },
+    async say(text) {
+      setAgent("speaking");
+      el.captionUser.textContent = "";
+      // trecho em amarelo: o highlight do passo, se esta fala for a fala do passo
+      const highlight = currentStep?.highlight && text.includes(currentStep.highlight) ? currentStep.highlight : undefined;
+      const words = text.split(" ");
+      for (let i = 0; i < words.length; i++) {
+        el.captionAgent.innerHTML = captionHTML(text, words.slice(0, i + 1).join(" ").length, highlight);
+        await clock.wait(150);
+      }
+      chat.addMessage({ from: "agent", text });
+      await clock.wait(700);
+    },
+    listen(replies) {
+      setAgent("listening");
+      return new Promise<string>((resolve, reject) => {
+        pending = { kind: "reply", resolve, reject };
+        showReplies(replies);
+        if (auto && replies.length) void clock.wait(2200).then(() => answer(replies[0], "auto"), () => {});
+      }).then(async (text) => {
+        setAgent("thinking");
+        await clock.wait(700);
+        return text;
+      });
+    },
+    select(nodes) {
+      setAgent("choosing");
+      board?.setSelectable(true);
+      return new Promise<string>((resolve, reject) => {
+        pending = { kind: "select", resolve, reject };
+        if (auto) void clock.wait(2200).then(() => pickNode(nodes[0], nodes[0]), () => {});
+      });
+    },
+    onMoment(m) {
+      el.moment.textContent = m.title;
+      emit("journey:moment", { id: m.id, title: m.title });
+    },
+    onStep(s, m) {
+      currentStep = s;
+      emit("journey:step", { id: s.id, moment: m.id });
+    },
+  };
+
+  // ---- Rodar / recomeçar ----
+  async function start(): Promise<void> {
+    clock.cancel(); // derruba esperas da execução anterior
+    pending?.reject(new Cancelled());
+    pending = null;
+    board?.setSelectable(false);
+    el.replies.replaceChildren();
+    el.captionAgent.textContent = "";
+    el.captionUser.textContent = "";
+    currentBoard = null;
+    try {
+      setAgent("thinking");
+      await clock.wait(600);
+      await createRunner(journey, profile, io).run();
+      setAgent("done");
+      el.moment.textContent = "aula completa";
+      showReplies(["Recomeçar a aula"]);
+      pending = { kind: "reply", resolve: () => void start(), reject: () => {} };
+      el.hint.textContent = "Fim da aula.";
+    } catch (err) {
+      if (err instanceof Cancelled) return; // a aula recomeçou
+      throw err;
+    }
+  }
+
+  render();
+  void start();
 }
 
-void run();
+void main();
