@@ -44,7 +44,8 @@ src/
     chat-panel/          chat flutuante (Figma: "Chat (floating window)")
     agent-cam/           "câmera" do agente no canto da tela
     agent-cursor/        cursor da Puca (seta + "Puca") mexendo na tela, por enquanto simulado
-  journey/               jornada da aula em JSON: tipos, validador, motor, perfil, calibragem e intenções (pulo, perguntas)
+    journey-panel/       painel "Sua jornada" da aula: objetivo, momentos marcados pela calibragem e próximos passos
+  journey/               jornada da aula em JSON: tipos, validador, motor, perfil, calibragem, jornada da pessoa e intenções (pulo, perguntas)
     data/                jornadas em JSON (tail.journey.json é a demo)
   lib/                   código compartilhado
     events.ts            eventos tipados (callbar:*, chatpanel:*, onboarding:*)
