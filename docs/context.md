@@ -13,6 +13,8 @@
 7. [Demonstração dos dois perfis](#7-demonstração-dos-dois-perfis)
 8. [Proposta de valor](#8-proposta-de-valor)
 9. [Direcionamento do produto](#9-direcionamento-do-produto)
+10. [Complementos do alinhamento com Joaquim](#10-complementos-do-alinhamento-com-joaquim)
+11. [Posicionamento: Sana Learn como referência e foco em just-in-time learning](#11-posicionamento-sana-learn-como-referência-e-foco-em-just-in-time-learning)
 
 ---
 
@@ -191,6 +193,8 @@ Assim, o funcionário não precisa explicar toda a situação de novo.
 
 No futuro, respostas confirmadas por especialistas poderão ser incorporadas à base de conhecimento, **mediante autorização e validação**. Dessa forma, Puca não só usa o conhecimento existente, como também ajuda a documentar e reaproveitar dúvidas recorrentes.
 
+> **No hackathon:** essa incorporação passou a ser uma entrega opcional, condicionada ao tempo disponível. Ver [§10.2](#102-incorporação-de-respostas-à-base--opcional-no-hackathon).
+
 ---
 
 ## 5. Visibilidade para buddy, gestor e RH
@@ -287,3 +291,68 @@ O diferencial está na combinação de:
 - **Acompanhamento** da jornada.
 
 **Visão de longo prazo:** permitir que qualquer profissional, novo na organização ou mudando de equipe, compreenda mais rapidamente seu ambiente, suas responsabilidades e os conhecimentos necessários para começar a contribuir.
+
+---
+
+## 10. Complementos do alinhamento com Joaquim
+
+### 10.1. Call inicial e conhecimento prévio
+
+A call inicial é o momento de identificar **o que a pessoa já conhece**, suas experiências, necessidades e objetivos, combinando a conversa com as informações disponíveis sobre cargo e equipe. Esse diagnóstico orienta a trilha, a profundidade das explicações e os próximos passos, e pode ser atualizado durante o acompanhamento.
+
+| Perfil | Foco da call inicial |
+|---|---|
+| **Entrando na empresa** | Combina acolhimento e onboarding cultural com o levantamento do repertório técnico e das necessidades da função. |
+| **Saindo de um time e entrando em outro** | Considera o contexto anterior, confirma os conhecimentos que podem ser aproveitados e investiga as diferenças do novo time: sistemas, responsabilidades, pessoas, práticas e rituais. A jornada é ajustada a partir dessa conversa. |
+
+### 10.2. Incorporação de respostas à base — opcional no hackathon
+
+O plano inclui a possibilidade de incorporar à base de conhecimento **respostas confirmadas por especialistas**, aproveitando a solução que João está desenvolvendo. Essa funcionalidade é uma **entrega opcional do hackathon**, condicionada ao tempo disponível.
+
+Fluxo previsto:
+
+1. Puca identifica uma lacuna.
+2. Encaminha a dúvida, com contexto, ao responsável.
+3. Depois que a resposta é validada e autorizada para reutilização, registra o conhecimento com sua fonte e contexto.
+4. Em uma dúvida futura, reutiliza essa resposta e indica sua origem.
+
+> **Prioridade:** a experiência principal de tutoria visual, personalizada e acompanhada vem primeiro. A incorporação à base entra como complemento se houver tempo.
+
+---
+
+## 11. Posicionamento: Sana Learn como referência e foco em just-in-time learning
+
+A partir das capturas da página de onboarding da Sana Learn compartilhadas por Joaquim, a intenção é buscar **pelo menos uma cobertura equivalente** das funcionalidades apresentadas, concentrando o principal esforço de diferenciação do Puca em **just-in-time learning**: aprender no momento em que a necessidade surge.
+
+### 11.1. Capacidades de referência para o produto
+
+| Capacidade | O que significa no Puca |
+|---|---|
+| **Enrollment** | Iniciar e associar a pessoa à jornada adequada a partir de sua entrada, função e data de início. No Puca, considerar também transições internas. |
+| **Personalização** | Adaptar a jornada ao cargo, time, conhecimentos prévios e ritmo. A call inicial orienta essa adaptação, que evolui nas interações seguintes. |
+| **Criação e atualização de conteúdo** | Apoiar especialistas na organização e no compartilhamento do conhecimento com IA, aproveitando documentação, ADRs e codebase. |
+| **Pré-onboarding** | Oferecer materiais de boas-vindas, contatos relevantes, expectativas e preparação para a primeira semana antes do início. |
+| **Acompanhamento do progresso** | Apresentar marcos, etapas, pendências e necessidades de suporte, com visões adequadas para funcionário, buddy, gestor e RH. |
+| **Sessões e conexão com pessoas** | Considerar a criação e organização de encontros ao vivo, presenciais ou híbridos, para integração cultural e contato com o time. |
+| **Just-in-time learning** | Permitir que o funcionário procure o tutor quando surgir uma dúvida e receba orientação contextualizada, sustentada no conhecimento da empresa. |
+
+### 11.2. Principal aposta de diferenciação
+
+Na referência compartilhada, a Sana descreve seu AI Tutor oferecendo respostas em linguagem natural com citações do conhecimento da empresa. O Puca pretende aprofundar essa experiência, especialmente em **onboarding técnico**, com:
+
+- conversa por voz ou texto conectada a uma **lousa visual interativa**;
+- construção progressiva de mapas e explicações sobre arquitetura, fluxos e decisões técnicas;
+- possibilidade de **interromper, explorar uma dúvida e retomar** a explicação;
+- adaptação ao conhecimento identificado na call inicial e nas sessões anteriores;
+- consulta a ADRs, código e documentação para sustentar explicações e permitir aprofundamento;
+- verificação leve de compreensão e atualização dos objetivos de aprendizagem a partir da própria conversa;
+- encaminhamento contextualizado ao especialista quando faltar informação confiável;
+- incorporação de respostas confirmadas à base como entrega opcional, se der tempo, aproveitando o trabalho de João ([§10.2](#102-incorporação-de-respostas-à-base--opcional-no-hackathon)).
+
+> **Exemplo:** durante uma tarefa, a pessoa pergunta o que acontece quando um pagamento falha. Puca usa o contexto do time para explicar o fluxo visualmente, destaca os componentes envolvidos, apresenta a decisão arquitetural relevante e adapta a explicação conforme as dúvidas e respostas da pessoa.
+
+### 11.3. Direção de produto e prioridade de execução
+
+A cobertura equivalente se refere às capacidades mostradas nas imagens e representa um **objetivo de produto**. O escopo efetivamente entregue no hackathon precisa ser priorizado, com destaque para a **tutoria contextual, visual e interativa no momento da necessidade**.
+
+> **Hipótese competitiva:** oferecer uma experiência superior nesse uso específico. As capturas descrevem a oferta da Sana, mas não bastam para concluir que ela não tenha capacidades adicionais semelhantes. Essa diferenciação deverá ser verificada comparando produtos e testando com usuários.
