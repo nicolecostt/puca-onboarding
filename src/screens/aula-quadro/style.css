@@ -56,7 +56,7 @@ body{
 .stage{
   height:calc(100vh - 56px);
   display:grid;grid-template-rows:1fr auto;gap:12px;
-  padding:4px 24px 124px; /* embaixo: espaço da barra de call */
+  padding:4px 24px 176px; /* embaixo: espaço da barra de call e do status acima dela */
 }
 .board-host,.logo-view{min-height:0}
 
@@ -101,7 +101,7 @@ body{
   .callinfo{justify-self:start}
   .profile-switch{grid-column:1 / -1;justify-self:center;margin-top:-4px}
   .topbar{height:auto;padding:10px 16px}
-  .stage{height:auto;min-height:calc(100vh - 92px);padding:4px 16px 124px;grid-template-rows:minmax(360px,60vh) auto}
+  .stage{height:auto;min-height:calc(100vh - 92px);padding:4px 16px 176px;grid-template-rows:minmax(360px,60vh) auto}
   body{overflow:auto}
 }
 @media (prefers-reduced-motion:reduce){

@@ -72,7 +72,8 @@ function edgeGeometry(a: NodeView, b: NodeView): { d: string; mid: { x: number; 
   const ax = a.data.x, ay = a.data.y, bx = b.data.x, by = b.data.y;
   const dx = bx - ax, dy = by - ay;
   let x1, y1, x2, y2, c1x, c1y, c2x, c2y;
-  if (Math.abs(dx) >= Math.abs(dy)) {
+  // Diagonal exata sai por cima/baixo: pela lateral embolaria com as setas de entrada.
+  if (Math.abs(dx) > Math.abs(dy)) {
     const s = Math.sign(dx) || 1;
     x1 = ax + (s * a.w) / 2; y1 = ay;
     x2 = bx - (s * b.w) / 2 - s * 4; y2 = by;
@@ -321,27 +322,54 @@ export function mountBoard(parent: HTMLElement): Board {
     cardEl.classList.remove("is-in");
   }
 
-  /** Cartão ao lado do nó: à direita se couber, senão à esquerda; sempre dentro do quadro. */
+  /**
+   * Cartão perto do nó, no lado que menos cobre os outros nós visíveis
+   * (direita, esquerda, abaixo, acima — nessa ordem de preferência). Nunca cobre o próprio nó.
+   */
   function positionCard(): void {
     if (!cardFor) return;
     const n = nodes.get(cardFor);
     const ctm = root.getScreenCTM();
     if (!n || !ctm) return;
     const host = el.getBoundingClientRect();
-    const toScreen = (x: number, y: number) => {
-      const p = new DOMPoint(x, y).matrixTransform(ctm);
-      return { x: p.x - host.left, y: p.y - host.top };
+    const rectOf = (v: NodeView): Box => {
+      const a = new DOMPoint(v.data.x - v.w / 2, v.data.y - v.h / 2).matrixTransform(ctm);
+      const b = new DOMPoint(v.data.x + v.w / 2, v.data.y + v.h / 2).matrixTransform(ctm);
+      return { x: a.x - host.left, y: a.y - host.top, w: b.x - a.x, h: b.y - a.y };
     };
-    const right = toScreen(n.data.x + n.w / 2, n.data.y);
-    const left = toScreen(n.data.x - n.w / 2, n.data.y);
+    const overlap = (a: Box, b: Box) =>
+      Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+    const clamp = (b: Box): Box => ({
+      ...b,
+      x: Math.min(Math.max(8, b.x), Math.max(8, host.width - b.w - 8)),
+      y: Math.min(Math.max(8, b.y), Math.max(8, host.height - b.h - 8)),
+    });
+
+    const anchor = rectOf(n);
+    const others = [...nodes.values()].filter((v) => v !== n && v.g.dataset.state !== "hidden").map(rectOf);
     const cw = cardEl.offsetWidth || 300;
     const ch = cardEl.offsetHeight || 200;
     const gap = 14;
-    let x = right.x + gap;
-    if (x + cw > host.width - 8) x = left.x - gap - cw;
-    x = Math.min(Math.max(8, x), Math.max(8, host.width - cw - 8));
-    const y = Math.min(Math.max(8, right.y - ch / 2), Math.max(8, host.height - ch - 8));
-    cardEl.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+    const cy = anchor.y + anchor.h / 2 - ch / 2;
+    const cx = anchor.x + anchor.w / 2 - cw / 2;
+    const candidates: Box[] = [
+      { x: anchor.x + anchor.w + gap, y: cy, w: cw, h: ch },
+      { x: anchor.x - gap - cw, y: cy, w: cw, h: ch },
+      { x: cx, y: anchor.y + anchor.h + gap, w: cw, h: ch },
+      { x: cx, y: anchor.y - gap - ch, w: cw, h: ch },
+    ].map(clamp);
+
+    let best = candidates[0];
+    let bestCost = Infinity;
+    candidates.forEach((c, i) => {
+      // cobrir o próprio nó é o pior caso; depois, área coberta dos outros; empate fica com a ordem
+      const cost = overlap(c, anchor) * 100 + others.reduce((s, o) => s + overlap(c, o), 0) + i;
+      if (cost < bestCost) {
+        bestCost = cost;
+        best = c;
+      }
+    });
+    cardEl.style.transform = `translate(${Math.round(best.x)}px, ${Math.round(best.y)}px)`;
   }
 
   cardEl.addEventListener("click", (e) => {

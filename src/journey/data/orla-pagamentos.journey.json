@@ -431,7 +431,11 @@
           "id": "pt-escopo",
           "goal": "Mostrar que a tarefa tem escopo pequeno",
           "line": "Ela mexe só no fraud-score, então você não precisa entender o sistema inteiro para começar. Se travar, a Ana pode te ajudar.",
-          "actions": [{ "type": "highlight", "targets": ["task", "e-task-score", "fraud-score"], "tone": "ok" }]
+          "actions": [
+            { "type": "close_card" },
+            { "type": "focus", "target": null },
+            { "type": "highlight", "targets": ["task", "e-task-score", "fraud-score"], "tone": "ok" }
+          ]
         }
       ]
     },
