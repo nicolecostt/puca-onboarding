@@ -66,9 +66,9 @@ export function mountCallBar(opts: CallBarOptions = {}): CallBar {
         </button>
       </div>
     </div>
-    <button class="call-redial" data-act="start" aria-label="Ligar para o agente" tabindex="-1">
+    <button class="call-redial" data-act="start" aria-label="Ligar para a Puca" tabindex="-1">
       <span class="call-redial__icon">${PHONE_SVG}</span>
-      <span class="call-redial__label">Ligar para o agente</span>
+      <span class="call-redial__label">Ligar para a Puca</span>
     </button>`;
   (opts.parent ?? document.body).appendChild(dock);
 

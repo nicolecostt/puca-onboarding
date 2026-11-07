@@ -1,4 +1,4 @@
-// Aula no quadro: o agente explica "o caminho de uma transação" e o quadro vai se montando
+// Aula no quadro: a Puca explica "o caminho de uma transação" e o quadro vai se montando
 // junto com a fala. A pessoa pode perguntar a qualquer momento (sugestões ou chat),
 // pedir "mais fundo" / "mais simples" e pausar pela barra de call.
 // Por enquanto a fala é simulada (texto dos dados da aula, palavra por palavra).
@@ -60,7 +60,7 @@ function setVoice(v: Voice): void {
   const shown: Voice = state.paused || state.ended ? "paused" : v;
   el.voice.dataset.state = shown;
   el.voiceLabel.textContent =
-    state.ended ? "Aula pausada" : state.paused ? "Lousa pausada" : shown === "talk" ? "Lousa falando" : "Lousa ouvindo";
+    state.ended ? "Aula pausada" : state.paused ? "Puca pausada" : shown === "talk" ? "Puca falando" : "Puca ouvindo";
   el.liveDot.classList.toggle("is-off", state.paused || state.ended);
 }
 

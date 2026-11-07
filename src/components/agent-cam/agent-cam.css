@@ -22,7 +22,7 @@
 .agent-cam__view{position:absolute;inset:-24%;transition:opacity .3s ease, filter .3s ease}
 .agent-cam[data-paused] .agent-cam__view{opacity:.45;filter:saturate(.4)}
 
-/* sem a Iris: círculo neutro no lugar */
+/* sem o visual da Puca: círculo neutro no lugar */
 .agent-cam__placeholder{
   position:absolute;left:50%;top:46%;width:44%;aspect-ratio:1;transform:translate(-50%,-50%);
   border-radius:50%;border:1px dashed #d4d4d4;display:grid;place-items:center;

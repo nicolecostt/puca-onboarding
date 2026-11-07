@@ -1,5 +1,5 @@
 // Visual do agente (a "bolha"). Ainda em definição: hoje existe só um teste local
-// (sandbox/iris-teste.ts, fora do git). Se o arquivo não existir, as telas usam
+// (sandbox/puca-teste.ts, fora do git). Se o arquivo não existir, as telas usam
 // um círculo neutro no lugar.
 
 export type AgentVisualState = "idle" | "think" | "talk";
@@ -21,13 +21,13 @@ export interface AgentVisual {
 export type AgentVisualFactory = (container: HTMLElement) => AgentVisual;
 
 // import.meta.glob não quebra o build quando o arquivo não existe: só volta vazio.
-const testVisual = import.meta.glob<{ mountIris: AgentVisualFactory }>("../../sandbox/iris-teste.ts");
+const testVisual = import.meta.glob<{ mountPuca: AgentVisualFactory }>("../../sandbox/puca-teste.ts");
 
 export async function loadAgentVisual(): Promise<AgentVisualFactory | null> {
-  const load = testVisual["../../sandbox/iris-teste.ts"];
+  const load = testVisual["../../sandbox/puca-teste.ts"];
   if (!load) return null;
   try {
-    return (await load()).mountIris;
+    return (await load()).mountPuca;
   } catch (err) {
     console.warn("Não foi possível carregar o visual de teste do agente:", err);
     return null;

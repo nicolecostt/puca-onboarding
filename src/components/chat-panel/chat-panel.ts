@@ -136,7 +136,7 @@ function timeOf(d: Date): string {
 }
 
 export function mountChatPanel(opts: ChatPanelOptions = {}): ChatPanel {
-  const titleText = opts.title ?? "Journey copilot";
+  const titleText = opts.title ?? "Puca";
   const working = opts.working ?? !opts.messages;
   const panel = document.createElement("section");
   panel.className = "chat-panel" + (working ? " is-working" : "");
@@ -155,7 +155,7 @@ export function mountChatPanel(opts: ChatPanelOptions = {}): ChatPanel {
     <div class="chat-body" aria-live="polite"></div>
     <div class="chat-compose">
       <div class="chat-compose__box">
-        <textarea class="chat-compose__input" rows="1" placeholder="Message copilot · @ mention · /commands" aria-label="Mensagem para o copilot"></textarea>
+        <textarea class="chat-compose__input" rows="1" placeholder="Fale com a Puca · @ menção · /comandos" aria-label="Mensagem para a Puca"></textarea>
         <button class="chat-compose__btn chat-stop" data-act="stop" aria-label="Parar geração" title="Parar"><img src="${stopIcon}" width="12" height="12" alt=""></button>
         <button class="chat-compose__btn chat-send" data-act="send" aria-label="Enviar" title="Enviar" disabled>${SEND_SVG}</button>
       </div>
@@ -178,7 +178,7 @@ export function mountChatPanel(opts: ChatPanelOptions = {}): ChatPanel {
     const list = current.messages;
     body.innerHTML = list.length
       ? list.map(msgHTML).join("")
-      : `<p class="chat-empty">Nova conversa. Pergunte qualquer coisa ao copilot.</p>`;
+      : `<p class="chat-empty">Nova conversa. Pergunte qualquer coisa à Puca.</p>`;
     body.scrollTop = body.scrollHeight;
   }
 

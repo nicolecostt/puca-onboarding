@@ -1,4 +1,4 @@
-// Call inicial: o agente se apresenta e coleta as infos iniciais do usuário, como numa entrevista.
+// Call inicial: a Puca se apresenta e coleta as infos iniciais do usuário, como numa entrevista.
 // Por enquanto a conversa é simulada (roteiro abaixo). A pessoa pode responder
 // "por voz" (resposta de exemplo depois de alguns segundos) ou digitando no chat.
 import "../../styles/base.css";
@@ -34,7 +34,7 @@ const FIELDS: Field[] = [
 
 const QUESTIONS: Record<FieldKey, (a: Answers) => string> = {
   nome: () =>
-    "Oi! Eu sou o agente que vai te acompanhar na sua primeira semana. Antes de começar, quero te conhecer um pouco. Como você prefere ser chamado?",
+    "Oi! Eu sou a Puca, e vou te acompanhar na sua primeira semana. Antes de começar, quero te conhecer um pouco. Como você prefere ser chamado?",
   cargo: (a) => `Prazer, ${a.nome}! Qual vai ser o seu cargo aqui?`,
   time: () => "Legal. Em qual time você vai entrar?",
   gestor: () => "E quem é a pessoa que vai ser sua gestora ou gestor?",
@@ -58,7 +58,7 @@ const LABELS: Record<ShownState, string> = {
   done: "Montando sua semana…",
 };
 const STATUS: Partial<Record<ShownState, string>> = {
-  speaking: "Agente falando…",
+  speaking: "Puca falando…",
   listening: "Ouvindo você…",
   thinking: "Pensando na sua resposta…",
   paused: "Call pausada",
@@ -100,13 +100,13 @@ async function main(): Promise<void> {
   const chat = mountChatPanel({ title: "Transcrição da call", messages: [] });
   const call = mountCallBar({ status: "Conectando…", chat });
 
-  // Visual do agente (teste local). Sem ele, fica o círculo neutro.
+  // Visual da Puca (teste local). Sem ele, fica o círculo neutro.
   let visual: AgentVisual | null = null;
   const factory = await loadAgentVisual();
   if (factory) {
-    el.orb.classList.add("has-iris");
+    el.orb.classList.add("has-visual");
     const holder = document.createElement("div");
-    holder.className = "agent__iris";
+    holder.className = "agent__visual";
     el.orb.appendChild(holder);
     visual = factory(holder);
   }
@@ -142,7 +142,7 @@ async function main(): Promise<void> {
         : shown === "listening"
           ? "Fale normalmente ou responda pelo chat."
           : shown === "ended"
-            ? "Use “Ligar para o agente” para continuar de onde parou."
+            ? "Use “Ligar para a Puca” para continuar de onde parou."
             : "";
   }
 

@@ -11,9 +11,9 @@ import { qs } from "../../lib/dom";
 async function main(): Promise<void> {
   const chat = mountChatPanel();
   mountCallBar({ status: "Clicking “Compare plans”…", chat });
-  const cam = mountAgentCam({ name: "Iris", visual: await loadAgentVisual() });
+  const cam = mountAgentCam({ name: "Puca", visual: await loadAgentVisual() });
 
-  // Simula a Iris conversando: fala por um tempo, faz uma pausa, às vezes pensa
+  // Simula a Puca conversando: fala por um tempo, faz uma pausa, às vezes pensa
   const script: [AgentVisualState, number][] = [
     ["talk", 3200], ["idle", 1600], ["talk", 2400], ["think", 1800], ["talk", 3000], ["idle", 2200],
   ];

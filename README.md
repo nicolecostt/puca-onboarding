@@ -44,7 +44,7 @@ src/
     draggable.ts         arrastar elementos fixos pela tela
     agent-visual.ts      contrato do visual do agente + carregador opcional
     dom.ts               utilitários de DOM
-sandbox/                 testes locais, fora do git (ex.: visual da Iris)
+sandbox/                 testes locais, fora do git (ex.: visual da Puca)
 ```
 
 ## Mudar o visual
@@ -75,7 +75,7 @@ const call = mountCallBar({ status: "Agente falando…", chat });
 document.addEventListener("callbar:pause", (e) => console.log(e.detail.on));
 ```
 
-## Visual do agente
+## Visual da Puca
 
-O visual do agente ainda está em definição. As telas usam um círculo neutro.
-Se existir `sandbox/iris-teste.ts` (local, fora do git), ele é carregado no lugar.
+O visual da Puca (o agente) ainda está em definição. As telas usam um círculo neutro.
+Se existir `sandbox/puca-teste.ts` (local, fora do git), ele é carregado no lugar.

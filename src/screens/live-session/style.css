@@ -1,5 +1,5 @@
 /* Tela de auxílio: sessão ao vivo. O fundo é só um exemplo de "tela qualquer";
-   a barra de call, o chat e a câmera do agente flutuam por cima. */
+   a barra de call, o chat e a câmera da Puca flutuam por cima. */
 body{min-height:100vh;background:var(--color-surface-muted)}
 /* Tela de fundo só para testar a barra por cima */
 .screen{max-width:1240px;margin:20px auto;min-height:calc(100vh - 140px);background:var(--color-surface);border:1px solid var(--color-border);border-radius:16px;
