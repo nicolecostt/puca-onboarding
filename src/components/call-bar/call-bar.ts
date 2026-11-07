@@ -52,14 +52,14 @@ export function mountCallBar(opts: CallBarOptions = {}): CallBar {
           <img src="${handIcon}" width="16" height="16" alt="">
         </button>
         <div class="call-mic">
-          <img class="call-mic__ring" src="${ringIcon}" width="80" height="80" alt="">
+          <img class="call-mic__ring" src="${ringIcon}" width="60" height="56" alt="">
           <button class="call-mic__btn" data-act="mute" aria-pressed="false" aria-label="Silenciar microfone">
-            <img src="${micIcon}" width="22" height="22" alt="">
+            <img src="${micIcon}" width="18" height="18" alt="">
           </button>
           <span class="call-mic__slash" aria-hidden="true"></span>
         </div>
         <button class="call-btn call-btn--chat" data-act="chat" aria-pressed="false" aria-label="Abrir chat">
-          <img src="${chatIcon}" width="44" height="36" alt="">
+          <img src="${chatIcon}" width="40" height="32" alt="">
         </button>
         <button class="call-btn call-btn--end" data-act="end" aria-label="Encerrar sessão">
           <img src="${endIcon}" width="16" height="16" alt="">

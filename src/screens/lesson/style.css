@@ -74,7 +74,7 @@ body {
 .caption {
   position: absolute;
   left: 50%;
-  bottom: 98px;
+  bottom: 72px; /* 12px acima da barra de call */
   transform: translateX(-50%);
   width: min(760px, calc(100% - 32px));
   min-height: 44px;
@@ -118,12 +118,12 @@ body {
   color: var(--color-muted);
 }
 
-/* ---- Ao lado da barra de call (a barra tem ~312px de largura) ---- */
+/* ---- Ao lado da barra de call (a barra tem 270px de largura e 42px de altura) ---- */
 .voice {
   position: fixed;
-  bottom: 36px;
-  right: calc(50% + 168px);
-  height: 36px;
+  bottom: 18px; /* mesma base da barra de call */
+  right: calc(50% + 147px); /* metade da barra (135px) + 12px */
+  height: 42px;
   padding: 0 14px;
   display: flex;
   align-items: center;

@@ -23,9 +23,9 @@
 
 /* Botão que fica na tela depois de encerrar, para ligar de novo */
 .call-redial{
-  all:unset;box-sizing:border-box;cursor:pointer;margin-bottom:9px;
+  all:unset;box-sizing:border-box;cursor:pointer;
   grid-area:1/1; /* repetido aqui porque o all:unset apaga a regra de cima */
-  display:flex;align-items:center;gap:10px;padding:8px 18px 8px 8px;
+  display:flex;align-items:center;gap:10px;padding:4px 16px 4px 4px;
   background:var(--color-surface);border:1px solid var(--color-border);border-radius:999px;
   filter:drop-shadow(0 8px 8px rgba(0,0,0,.05)) drop-shadow(0 4px 4px rgba(0,0,0,.05)) drop-shadow(0 2px 2px rgba(0,0,0,.05));
   font-size:13px;line-height:19.5px;font-weight:500;letter-spacing:-.13px;color:var(--color-ink);white-space:nowrap;
@@ -35,7 +35,7 @@
 .call-redial:focus-visible{outline:2px solid var(--color-ink);outline-offset:3px}
 .call-redial__icon{
   display:flex;align-items:center;justify-content:center;
-  width:40px;height:36px;border-radius:999px;background:var(--color-live);transition:background-color .15s ease;
+  width:40px;height:32px;border-radius:999px;background:var(--color-live);transition:background-color .15s ease;
 }
 
 /* Linha de status acima da barra ("Clicking “Compare plans”…") */
@@ -49,8 +49,9 @@
   content:"";width:6px;height:6px;border-radius:3px;background:var(--color-live);opacity:.44;flex:none;
 }
 
+/* Barra fina (~42px): todos os botões com 32px de altura */
 .call-bar{
-  display:flex;align-items:center;gap:10px;padding:8px 21px;
+  display:flex;align-items:center;gap:8px;padding:4px 14px;
   background:var(--color-surface);border:1px solid var(--color-border);border-radius:999px;
   filter:drop-shadow(0 8px 8px rgba(0,0,0,.05)) drop-shadow(0 4px 4px rgba(0,0,0,.05)) drop-shadow(0 2px 2px rgba(0,0,0,.05));
 }
@@ -58,7 +59,7 @@
 .call-btn{
   all:unset;box-sizing:border-box;cursor:pointer;
   display:flex;align-items:center;justify-content:center;flex:none;
-  height:36px;width:44px;border-radius:999px;
+  height:32px;width:40px;border-radius:999px;
   transition:background-color .15s ease, transform .1s ease;
 }
 .call-btn:hover{background:var(--color-surface-muted)}
@@ -72,12 +73,13 @@
 
 /* Encerrar */
 .call-btn--end{width:40px;background:var(--color-danger-soft)}
+.call-btn--chat img{width:40px;height:32px}
 .call-btn--end:hover{background:#b8231d}
 
-/* Mic (principal) */
-.call-mic{position:relative;width:56px;height:56px;flex:none}
+/* Mic (principal): pílula escura da mesma altura dos outros botões */
+.call-mic{position:relative;width:48px;height:32px;flex:none}
 .call-mic__ring{
-  position:absolute;left:-12px;top:-12px;width:80px;height:80px;pointer-events:none;
+  position:absolute;left:-6px;top:-12px;width:60px;height:56px;pointer-events:none;
   transform-origin:center;opacity:0;
 }
 /* Anel só aparece ao clicar no mic: pulso de liga/desliga */
@@ -89,7 +91,7 @@
 }
 .call-mic__btn{
   all:unset;box-sizing:border-box;cursor:pointer;
-  position:absolute;left:0;top:0;width:56px;height:56px;border-radius:999px;
+  position:absolute;left:0;top:0;width:48px;height:32px;border-radius:999px;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
   background:var(--color-ink);transition:background-color .15s ease, transform .1s ease;
 }
@@ -98,7 +100,7 @@
 .call-mic__btn[aria-pressed="true"]{background:var(--color-muted)}  /* mutado */
 .call-mic__btn[aria-pressed="true"] + .call-mic__slash{opacity:1}
 .call-mic__slash{
-  position:absolute;left:17px;top:27px;width:22px;height:2px;border-radius:2px;
+  position:absolute;left:15px;top:15px;width:18px;height:2px;border-radius:2px;
   background:#fafafa;transform:rotate(-45deg);opacity:0;pointer-events:none;transition:opacity .15s ease;
 }
 @media (prefers-reduced-motion:reduce){
