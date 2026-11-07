@@ -62,5 +62,14 @@ describe("merge-guard", () => {
   });
   it("não barra commit cuja mensagem fala de push", () => {
     expect(guarda('git commit -m "fix push do áudio"', naBranch).codigo).toBe(0);
+    expect(guarda('git commit -m "fix (audio) e push"', naBranch).codigo).toBe(0);
+  });
+  it("merge dentro de $( ) ou crase, mesmo entre aspas, não passa como texto", () => {
+    expect(guarda('gh pr review 58 --comment -b "$(gh pr merge 58)"', naBranch).codigo).toBe(2);
+    expect(guarda('gh pr review 58 --comment -b "`gh pr merge 58`"', naBranch).codigo).toBe(2);
+  });
+  it("flags de prefixo com valor não escondem o comando", () => {
+    expect(guarda("sudo -u bob gh pr merge 58", naBranch).codigo).toBe(2);
+    expect(guarda("exec -a x git push origin main", naBranch).codigo).toBe(2);
   });
 });

@@ -18,7 +18,8 @@ acoes=$(node -e '
   try { c = JSON.parse(process.argv[1]).tool_input?.command || ""; } catch { process.exit(0); }
   const args = (s) => [...s.matchAll(/"((?:\\.|[^"\\])*)"|'\''([^'\'']*)'\''|(\S+)/g)].map((m) => m[1] ?? m[2] ?? m[3]);
   const comValor = new Set(["-b", "--body", "-F", "--body-file", "-t", "--subject", "-A", "--author-email", "--match-head-commit"]);
-  const limpo = c.replace(/\$\(|[()`{}]/g, " ");
+  // $( e crase executam um comando novo mesmo dentro de aspas duplas: viram início de trecho; ( ) { } só somem
+  const limpo = c.replace(/\$\(|`/g, "\n").replace(/[(){}]/g, " ");
   const pareceMerge = (s) => /\bgh\b[^\n]*\bpr\s+(merge|review\b[^\n]*(--approve|\s-a\b))/.test(s);
   // devolve true quando entendeu o trecho como gh pr merge/review (e já imprimiu a ação, se houver)
   const analisa = (trecho) => {
