@@ -11,6 +11,8 @@ export interface Faq {
   intent: FaqIntent;
   text: string;
   actions: BoardAction[];
+  /** Dono sem fonte confiável (owner_confirmed: false): a dúvida vira encaminhamento à buddy. */
+  unconfirmed?: true;
 }
 
 // ponytail: frases por template a partir de node.info. Para soar mais natural, reescrever offline com LLM e revisar.
@@ -26,11 +28,11 @@ export function buildFaqs(journey: Journey, profile: Profile): Faq[] {
       const base = { board, node: n.id, label };
       const focus: BoardAction[] = [{ type: "highlight", targets: [n.id], tone: "focus" }];
       if (i.role) out.push({ ...base, intent: "what", text: `${label}: ${lowerFirst(i.role)}`, actions: focus });
-      const owner =
-        i.owner && i.owner_confirmed !== false
-          ? `Quem cuida do ${label} é ${i.owner}${i.team ? `, do time ${i.team}` : ""}.`
-          : `Não tenho um responsável confirmado para o ${label}. ${askBuddy}`;
-      out.push({ ...base, intent: "owner", text: owner, actions: [{ type: "card", target: n.id }] });
+      const confirmed = !!i.owner && i.owner_confirmed !== false;
+      const owner = confirmed
+        ? `Quem cuida do ${label} é ${i.owner}${i.team ? `, do time ${i.team}` : ""}.`
+        : `Não tenho um responsável confirmado para o ${label}. ${askBuddy}`;
+      out.push({ ...base, intent: "owner", text: owner, actions: [{ type: "card", target: n.id }], ...(confirmed ? {} : { unconfirmed: true as const }) });
       if (i.adr) {
         out.push({ ...base, intent: "why", text: `Isso vem do ${i.adr.id}, ${i.adr.title}. ${i.adr.summary}`, actions: [{ type: "card", target: n.id }] });
       }

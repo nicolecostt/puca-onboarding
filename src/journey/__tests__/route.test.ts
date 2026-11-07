@@ -38,3 +38,15 @@ describe("routeUtterance: FAQ antes da knowledge", () => {
     if (r.kind === "faq") expect(r.faq).toMatchObject({ node: "authorizer", intent: "owner" });
   });
 });
+
+describe("routeUtterance: dono não confirmado vira encaminhamento", () => {
+  it("quem cuida do tail-common cai no FAQ marcado como não confirmado", () => {
+    const r = routeUtterance("Quem cuida do tail-common?", ctx);
+    expect(r).toMatchObject({ kind: "faq", faq: { node: "common", intent: "owner", unconfirmed: true } });
+  });
+
+  it("dono confirmado não fica marcado", () => {
+    const r = routeUtterance("Quem cuida do authorizer?", ctx);
+    expect(r.kind === "faq" && r.faq.unconfirmed).toBeFalsy();
+  });
+});
