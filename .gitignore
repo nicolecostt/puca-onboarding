@@ -1,9 +1,12 @@
 .env
 .DS_Store
 
-# teste: agente azul (não comitar)
-src/screens/onboarding-call/iris-teste.js
-iris_puca_slime_quase_redonda_v2.html
+# testes locais (agente azul etc.): não comitar
+sandbox/
 
 # instruções locais do Claude
 .claude/
+
+# dependências e build
+node_modules/
+dist/
