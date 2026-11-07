@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm ci)",
+      "Bash(npm test)",
+      "Bash(npm run check)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run build)",
+      "Bash(git status)",
+      "Bash(git status -sb)",
+      "Bash(git diff)",
+      "Bash(git diff --stat)",
+      "Bash(git diff origin/main...HEAD)",
+      "Bash(git diff --stat origin/main...HEAD)",
+      "Bash(git log --oneline -10)",
+      "Bash(git log --oneline HEAD..origin/main)",
+      "Bash(git fetch)",
+      "Bash(git fetch origin)",
+      "Bash(git branch --show-current)",
+      "Bash(git pull --ff-only)",
+      "Bash(scripts/sync-check.sh)",
+      "Bash(scripts/sync-check.sh --agora)",
+      "Bash(gh pr list)",
+      "Bash(gh pr view)",
+      "Bash(gh issue list)"
+    ],
+    "deny": [
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git push *--force*)",
+      "Bash(git push * -f*)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean *)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./server/.env)",
+      "Read(./server/.env.local)",
+      "Read(./server/.env.*.local)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/scripts/sync-check.sh --agora", "timeout": 20 }] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/scripts/sync-check.sh", "timeout": 20 }] }
+    ]
+  }
+}
