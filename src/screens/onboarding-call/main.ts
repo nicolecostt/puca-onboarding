@@ -64,13 +64,6 @@ const LABELS: Record<ShownState, string> = {
   ended: "Call encerrada",
   done: "Montando sua semana…",
 };
-const STATUS: Partial<Record<ShownState, string>> = {
-  speaking: "Puca falando…",
-  listening: "Ouvindo você…",
-  thinking: "Pensando na sua resposta…",
-  paused: "Call pausada",
-  done: "Montando sua primeira semana…",
-};
 const VISUAL_STATE: Record<ShownState, AgentVisualState> = {
   idle: "idle",
   speaking: "talk",
@@ -105,7 +98,7 @@ async function main(): Promise<void> {
   let pendingAnswer: ((text: string) => void) | null = null; // resposta da pergunta atual pelo chat
 
   const chat = mountChatPanel({ title: "Transcrição da call", messages: [] });
-  const call = mountCallBar({ status: "Conectando…", chat });
+  mountCallBar({ chat });
 
   // Visual da Puca (teste local). Sem ele, fica o círculo neutro.
   let visual: AgentVisual | null = null;
@@ -140,8 +133,6 @@ async function main(): Promise<void> {
       visual.setWarm(agentState === "thinking"); // continua quente mesmo se pausar no meio
     }
     el.agentState.textContent = LABELS[shown];
-    const status = STATUS[shown];
-    if (status) call.setStatus(status);
     el.live.classList.toggle("is-off", state.ended);
     el.captionHint.textContent =
       shown === "listening" && state.muted
