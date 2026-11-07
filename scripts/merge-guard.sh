@@ -4,7 +4,8 @@
 #     CI vermelho ou rodando, base do sistema fora do padrão depois do merge, ou PR que não deu para verificar;
 #   - `git push` direto para a main (as regras do time: tudo entra por PR).
 # Qualquer outro comando passa direto. É uma trava contra merge acidental por agente, não uma fronteira de segurança:
-# integrar mesmo assim continua sendo decisão de pessoa, pela interface do GitHub.
+# integrar mesmo assim continua sendo decisão de pessoa, pela interface do GitHub. Formas deliberadas de contornar
+# (alias, script próprio, gh api) ficam de fora de propósito: a trava é para acidente, não para quem quer burlar.
 
 cd "$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 entrada=$(cat)
@@ -17,11 +18,15 @@ acoes=$(node -e '
   try { c = JSON.parse(process.argv[1]).tool_input?.command || ""; } catch { process.exit(0); }
   const args = (s) => [...s.matchAll(/"((?:\\.|[^"\\])*)"|'\''([^'\'']*)'\''|(\S+)/g)].map((m) => m[1] ?? m[2] ?? m[3]);
   const comValor = new Set(["-b", "--body", "-F", "--body-file", "-t", "--subject", "-A", "--author-email", "--match-head-commit"]);
-  for (const trecho of c.split(/&&|\|\||;|\||\n/)) {
+  const limpo = c.replace(/\$\(|[()`{}]/g, " ");
+  let achou = false;
+  for (const trecho of limpo.split(/&&|\|\||[;&|\n]/)) {
     const t = args(trecho.trim());
     let i = 0;
-    while (i < t.length && /^[A-Z_][A-Z0-9_]*=/.test(t[i])) i++; // VAR=valor antes do comando
-    if (t[i] === "gh") {
+    // VAR=valor e prefixos que só executam o comando seguinte
+    while (i < t.length && (/^[A-Z_][A-Z0-9_]*=/.test(t[i]) || ["env", "command", "exec", "sudo", "time", "nohup"].includes(t[i]))) i++;
+    const prog = (t[i] || "").split("/").pop();
+    if (prog === "gh") {
       i++;
       let repo = "";
       while (i < t.length && t[i].startsWith("-")) {
@@ -30,6 +35,7 @@ acoes=$(node -e '
         else if (t[i] === "--hostname") i += 2; else i++;
       }
       if (t[i] !== "pr" || !["merge", "review"].includes(t[i + 1])) continue;
+      achou = true; // entendido (inclusive review sem aprovação, que passa)
       const sub = t[i + 1];
       const resto = t.slice(i + 2);
       if (sub === "review" && !resto.some((a) => a === "--approve" || a === "-a")) continue;
@@ -43,15 +49,19 @@ acoes=$(node -e '
         sel = a; break;
       }
       console.log(["pr", sel, repo].join("\t"));
-    } else if (t[i] === "git") {
+    } else if (prog === "git") {
       const p = t.indexOf("push", i);
       if (p < 0) continue;
-      const pos = t.slice(p + 1).filter((a) => !a.startsWith("-"));
-      const refs = pos.slice(1); // o primeiro é o remoto
-      if (refs.some((r) => /^(\+)?(refs\/heads\/)?(main|master)$/.test(r) || /:(refs\/heads\/)?(main|master)$/.test(r))) console.log("push-main");
-      else if (refs.length === 0) console.log("push-atual");
+      achou = true;
+      const opts = t.slice(p + 1).filter((a) => a.startsWith("-"));
+      const refs = t.slice(p + 1).filter((a) => !a.startsWith("-")).slice(1); // o primeiro é o remoto
+      if (opts.some((o) => o === "--all" || o === "--mirror")) console.log("push-todas");
+      else if (refs.some((r) => /^(\+)?(refs\/heads\/)?(main|master)$/.test(r) || /:(refs\/heads\/)?(main|master)$/.test(r))) console.log("push-main");
+      else if (refs.length === 0 || refs.some((r) => /^(\+)?(HEAD|@)$/.test(r))) console.log("push-atual");
     }
   }
+  // tem cara de merge/aprovação mas o parser não entendeu: barra (falha fechada)
+  if (!achou && /\bgh\b[^\n]*\bpr\s+(merge|review\b[^\n]*(--approve|\s-a\b))/.test(c)) console.log("nao-entendi");
 ' "$entrada" 2>/dev/null)
 
 [ -z "$acoes" ] && exit 0
@@ -59,12 +69,16 @@ acoes=$(node -e '
 while IFS=$'\t' read -r tipo sel repo; do
   case $tipo in
     push-main) barra "Push direto na main não: pelas regras do time tudo entra por PR (skill handoff).";;
+    push-todas) barra "git push --all/--mirror pode levar a main junto: faça push só da sua branch.";;
+    nao-entendi) barra "Não entendi esse comando de merge/aprovação para verificar antes. Use a forma simples: gh pr merge <n>.";;
     push-atual)
       [ "$(git branch --show-current)" = main ] && barra "Você está na main: push direto na main não. Crie uma branch e abra um PR (skill handoff).";;
     pr)
       if [ -n "$repo" ]; then
-        meu=$(gh repo view --json nameWithOwner --jq .nameWithOwner 2>/dev/null)
-        [ -n "$meu" ] && [ "${repo#https://github.com/}" != "$meu" ] && continue # outro repositório: não é com este hook
+        canon() { sed -E 's#^(https?://)?(www\.)?github\.com[/:]##; s#^git@github\.com:##; s#\.git/?$##; s#/+$##' | tr '[:upper:]' '[:lower:]'; }
+        meu=$(gh repo view --json nameWithOwner --jq .nameWithOwner 2>/dev/null | canon)
+        alvo=$(canon <<<"$repo")
+        [ -n "$meu" ] && [ "$alvo" != "$meu" ] && continue # outro repositório: não é com este hook
       fi
       if [[ "$sel" =~ ^[0-9]+$ ]]; then n=$sel
       elif [[ "$sel" =~ /pull/([0-9]+) ]]; then n=${BASH_REMATCH[1]}
