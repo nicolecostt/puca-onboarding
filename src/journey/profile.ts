@@ -1,5 +1,5 @@
 // Perfil da pessoa: vem da call de entrevista (sessionStorage), da URL (?perfil=)
-// ou de um dos dois perfis da demo (src/data/profiles.ts, §7 do context.md).
+// ou de um dos dois perfis da demo (src/data/profiles.ts).
 import { normalize } from "./conditions";
 import { company } from "../data/company";
 import { profiles } from "../data/profiles";
