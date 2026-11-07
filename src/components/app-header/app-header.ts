@@ -1,4 +1,5 @@
-// Cabeçalho do app (Figma: topo das telas da aula): logo, empresa, etapas da jornada e a pessoa.
+// Cabeçalho do app (Figma: topo das telas da aula): marca do produto (Lousa), empresa, etapas da jornada e a pessoa.
+// Lousa é o produto; Puca é a agente que fala com a pessoa.
 //   mountAppHeader({ current: "lesson", profile })
 import "../../styles/tokens.css";
 import "./app-header.css";
@@ -28,8 +29,8 @@ export function mountAppHeader(opts: AppHeaderOptions): HTMLElement {
   header.className = "app-header";
   header.innerHTML = `
     <div class="app-header__brand">
-      <span class="app-header__logo" aria-hidden="true">P</span>
-      <span class="app-header__name">Puca</span>
+      <span class="app-header__logo" aria-hidden="true">L</span>
+      <span class="app-header__name">Lousa</span>
       <span class="app-header__company">${esc(company.name)}</span>
     </div>
     <ol class="app-header__steps" aria-label="Sua jornada">${steps}</ol>

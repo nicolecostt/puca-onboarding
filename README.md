@@ -1,6 +1,6 @@
 # puca-onboarding
 
-Front do **Puca**, agente de IA para onboarding e transição entre equipes.
+Front da **Lousa**, produto de onboarding e transição entre equipes. A agente que conversa com a pessoa é a **Puca**.
 Contexto do produto em [`docs/context.md`](docs/context.md).
 
 Vite + TypeScript, sem framework.
