@@ -99,8 +99,10 @@ document.addEventListener("callbar:pause", (e) => console.log(e.detail.on));
 
 ## Visual da Puca
 
-O visual da Puca (a agente) ainda está em definição. As telas usam um círculo neutro.
-Se existir `sandbox/puca-teste.ts` (local, fora do git), ele é carregado no lugar.
+A Puca aparece como uma esfera de pontos com uma faixa em onda, sem rosto (`src/lib/puca-sphere.ts`),
+carregada por `loadAgentVisual()` em todas as telas: call inicial, aula e sessão ao vivo. Ela inclina na direção
+do mouse, os pontos perto do cursor crescem e um clique solta uma ondulação. Os estados `idle`/`think`/`talk`
+mudam a velocidade e a forma da onda. As cores ficam em `tokens.css` (`--puca-sphere-*`). Se o visual não carregar, fica um círculo neutro.
 
 ## Aula no quadro
 
