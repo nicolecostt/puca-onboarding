@@ -8,7 +8,6 @@
   --fg:var(--color-ink);
   --muted:var(--color-muted);
   --faint:var(--color-subtle);
-  --live:var(--color-danger);
   --ok:var(--color-live);
 }
 body{overflow:hidden}
@@ -22,19 +21,11 @@ body{overflow:hidden}
 .brand__mark{width:22px;height:22px;border-radius:7px;background:var(--fg)}
 .brand__name{font-weight:600;font-size:14px;letter-spacing:-.14px}
 .callinfo{
-  display:flex;align-items:center;gap:10px;height:32px;padding:0 12px 0 6px;
+  display:flex;align-items:center;gap:10px;height:32px;padding:0 12px;
   background:var(--surface);border:1px solid var(--line);border-radius:999px;font-size:13px;
 }
-.live{
-  display:flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:999px;
-  background:var(--color-danger-bg);color:var(--live);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
-}
-.live__dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.6s ease-in-out infinite}
-.live.is-off{background:#f0f0f0;color:var(--muted)}
-.live.is-off .live__dot{animation:none}
 .callinfo__label{font-weight:500}
 .callinfo__time{color:var(--muted);font-variant-numeric:tabular-nums}
-@keyframes blink{50%{opacity:.35}}
 
 /* ---------- Palco ---------- */
 .stage{
@@ -107,8 +98,7 @@ body{overflow:hidden}
 }
 @media (prefers-reduced-motion:reduce){
   .agent__orb[data-state="speaking"] .agent__ring,
-  .agent__orb[data-state="speaking"] .agent__core,
-  .live__dot{animation:none}
+  .agent__orb[data-state="speaking"] .agent__core{animation:none}
   .agent__orb[data-state="speaking"] .agent__ring--1{opacity:1}
 }
 

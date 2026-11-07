@@ -88,7 +88,6 @@ async function main(): Promise<void> {
     captionAgent: qs(document, "#caption-agent"),
     captionUser: qs(document, "#caption-user"),
     captionHint: qs(document, "#caption-hint"),
-    live: qs(document, "#live"),
     timer: qs(document, "#timer"),
   };
 
@@ -133,7 +132,6 @@ async function main(): Promise<void> {
       visual.setWarm(agentState === "thinking"); // continua quente mesmo se pausar no meio
     }
     el.agentState.textContent = LABELS[shown];
-    el.live.classList.toggle("is-off", state.ended);
     el.captionHint.textContent =
       shown === "listening" && state.muted
         ? "Seu microfone está mudo. Responda pelo chat."
