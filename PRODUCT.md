@@ -15,6 +15,7 @@
 9. [Direcionamento do produto](#9-direcionamento-do-produto)
 10. [Complementos do alinhamento com Joaquim](#10-complementos-do-alinhamento-com-joaquim)
 11. [Posicionamento: Sana Learn como referência e foco em just-in-time learning](#11-posicionamento-sana-learn-como-referência-e-foco-em-just-in-time-learning)
+12. [Encaixe no Desafio Tako: a Puca como digital worker de onboarding](#12-encaixe-no-desafio-tako-a-puca-como-digital-worker-de-onboarding)
 
 ---
 
@@ -356,3 +357,29 @@ Na referência compartilhada, a Sana descreve seu AI Tutor oferecendo respostas 
 A cobertura equivalente se refere às capacidades mostradas nas imagens e representa um **objetivo de produto**. O escopo efetivamente entregue no hackathon precisa ser priorizado, com destaque para a **tutoria contextual, visual e interativa no momento da necessidade**.
 
 > **Hipótese competitiva:** oferecer uma experiência superior nesse uso específico. As capturas descrevem a oferta da Sana, mas não bastam para concluir que ela não tenha capacidades adicionais semelhantes. Essa diferenciação deverá ser verificada comparando produtos e testando com usuários.
+
+---
+
+## 12. Encaixe no Desafio Tako: a Puca como digital worker de onboarding
+
+O Desafio Tako pede um **digital worker**: um agente com papel definido que *"executa um processo de ponta a ponta, em vez de só responder perguntas"*, opera os sistemas que o time já usa (Slack, entre outros) e *"chama um humano quando sai do roteiro"*. **Admissão e onboarding** é uma das frentes listadas pela Tako.
+
+Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio guia, e não na de digital worker. Para encaixar no desafio, ela precisa **receber um objetivo e conduzir a integração inteira**, agindo nos sistemas do time e envolvendo pessoas só onde elas são necessárias.
+
+### 12.1. O processo que a Puca conduz
+
+| # | O que a Puca faz | O que isso mostra | Onde o humano entra |
+|---|---|---|---|
+| 1 | Na **call inicial**, levanta o que a pessoa já sabe, registra a calibragem e **monta a jornada dela** ([§10.1](#101-call-inicial-e-conhecimento-prévio)). | O agente planeja a partir de um objetivo. | — |
+| 2 | Conduz a **aula** no quadro, seguindo a jornada e respondendo na hora ao que a pessoa diz: perguntas, pulos e interrupções. | O agente executa e se adapta, sem roteiro fixo. | — |
+| 3 | Faz uma **checagem leve de entendimento** e atualiza os objetivos que ainda faltam. | O agente acompanha o resultado do próprio trabalho. | — |
+| 4 | Quando falta fonte confiável, faz o **encaminhamento** ao buddy no Slack, com a dúvida, as fontes já consultadas e o motivo de não ter respondido ([§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano)). | O agente trata a exceção e passa para um humano *"com o contexto pronto para decidir"*. | O buddy responde ou indica o responsável. |
+| 5 | Entrega a **primeira tarefa** ([§4.4](#44-do-aprendizado-à-primeira-tarefa)) e informa o andamento ao buddy e ao gestor ([§5](#5-visibilidade-para-buddy-gestor-e-rh)). | O processo fecha, da entrada à primeira atividade real. | O gestor aprova a tarefa e acompanha os marcos. |
+
+### 12.2. O que precisa aparecer na demo
+
+- **Agir num sistema, não só falar.** O encaminhamento do passo 4 precisa acontecer de fato no Slack simulado da tela `live-session`. O guia aceita integrações simuladas *"desde que o agente realmente opere sobre elas na demo"*.
+- **Rastro.** Cada decisão da Puca (o que respondeu, de qual fonte, quando encaminhou e por quê) fica registrada e pode ser auditada depois.
+- **Custo.** Mostrar quanto custa uma sessão em tempo e tokens, comparado com as horas que o buddy gastaria explicando a mesma coisa.
+
+> **Limites que o desafio impõe:** decisões sobre pessoas ficam com humanos, e a demo usa só dados sintéticos. A calibragem e o andamento descrevem o processo de integração, e não avaliam o desempenho da pessoa (ver o aviso de privacidade em [§5](#5-visibilidade-para-buddy-gestor-e-rh)).
