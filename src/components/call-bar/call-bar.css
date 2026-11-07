@@ -10,6 +10,7 @@
 .call-dock{user-select:none;-webkit-user-select:none;touch-action:none}
 .call-dock.is-placed{bottom:auto;transform:none}
 .call-bar,.call-redial{cursor:grab}
+.call-dock.is-fixed .call-bar,.call-dock.is-fixed .call-redial{cursor:default}
 .call-dock.is-dragging,.call-dock.is-dragging *{cursor:grabbing !important}
 .call-dock.is-dragging .call-bar,.call-dock.is-dragging .call-redial{
   filter:drop-shadow(0 16px 20px rgba(0,0,0,.10)) drop-shadow(0 6px 8px rgba(0,0,0,.06));

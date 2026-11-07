@@ -21,7 +21,7 @@ const buddy = company.people[profile.buddyId];
 mountAppHeader({ current: "lesson", profile });
 const board = mountWhiteboard(qs(document, "#board"), lesson);
 const chat = mountChatPanel({ title: "Transcrição da aula", messages: [] });
-mountCallBar({ chat }); // sem status: a legenda já mostra o que está acontecendo
+mountCallBar({ chat, draggable: false }); // sem status: a legenda já mostra o que está acontecendo
 // a Puca aparece na "câmera" do canto, como numa videochamada
 const cam = mountAgentCam({ name: "Puca", visual: await loadAgentVisual() });
 
