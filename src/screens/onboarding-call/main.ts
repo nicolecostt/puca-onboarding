@@ -1,12 +1,14 @@
 // Call inicial: o agente se apresenta e coleta as infos iniciais do usuário, como numa entrevista.
 // Por enquanto a conversa é simulada (roteiro abaixo). A pessoa pode responder
 // "por voz" (resposta de exemplo depois de alguns segundos) ou digitando no chat.
+import "../../styles/base.css";
 import "./style.css";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
 import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../lib/agent-visual";
 import { emit } from "../../lib/events";
 import { qs } from "../../lib/dom";
+import { activeProfile, company } from "../../data";
 
 // ---- Roteiro ----
 type FieldKey = "nome" | "cargo" | "time" | "gestor" | "ferramentas" | "aprender";
@@ -19,13 +21,15 @@ interface Field {
   sample: string;
 }
 
+// Respostas de exemplo vêm do perfil da demo (?perfil=bruno | ana)
+const profile = activeProfile();
 const FIELDS: Field[] = [
-  { key: "nome", label: "Como prefere ser chamado", sample: "Bruno" },
-  { key: "cargo", label: "Cargo", sample: "Engenheiro de backend" },
-  { key: "time", label: "Time", sample: "TMS — fraud-score" },
-  { key: "gestor", label: "Gestor(a)", sample: "Marcos Vidal" },
-  { key: "ferramentas", label: "Ferramentas que já usa", sample: "GitHub, Slack e Jira" },
-  { key: "aprender", label: "Como prefere aprender", sample: "Fazendo junto com alguém" },
+  { key: "nome", label: "Como prefere ser chamado", sample: profile.nickname },
+  { key: "cargo", label: "Cargo", sample: profile.role },
+  { key: "time", label: "Time", sample: profile.toTeam },
+  { key: "gestor", label: "Gestor(a)", sample: company.people[profile.managerId]?.name ?? "" },
+  { key: "ferramentas", label: "Ferramentas que já usa", sample: profile.tools },
+  { key: "aprender", label: "Como prefere aprender", sample: profile.learningStyle },
 ];
 
 const QUESTIONS: Record<FieldKey, (a: Answers) => string> = {

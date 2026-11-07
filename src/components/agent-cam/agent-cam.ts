@@ -2,6 +2,7 @@
 //   const cam = mountAgentCam({ name: "Iris", visual: await loadAgentVisual() });
 //   cam.setState("talk" | "idle" | "think"); cam.setPaused(true); cam.show(); cam.hide();
 // Sem visual, mostra um círculo neutro.
+import "../../styles/tokens.css";
 import "./agent-cam.css";
 import { esc, qs } from "../../lib/dom";
 import { makeDraggable } from "../../lib/draggable";

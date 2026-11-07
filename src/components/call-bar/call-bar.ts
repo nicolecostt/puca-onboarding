@@ -2,6 +2,7 @@
 //   const call = mountCallBar({ status: "Clicking “Compare plans”…", chat });
 //   call.setStatus("…"); call.end(); call.start();
 // Eventos no document: callbar:pause | control | mute | chat | end | start
+import "../../styles/tokens.css";
 import "./call-bar.css";
 import pauseIcon from "./icons/pause.svg";
 import handIcon from "./icons/hand.svg";

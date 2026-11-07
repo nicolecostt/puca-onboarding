@@ -1,22 +1,17 @@
 /* Tela de call inicial: topo fino, agente no centro (como uma entrevista),
    barra de call flutuando embaixo (componente) e chat à direita (componente). */
+/* atalhos locais para os tokens (src/styles/tokens.css) */
 :root{
-  --bg:#f6f6f6;
-  --surface:#fff;
-  --line:#e5e5e5;
-  --fg:#171717;
-  --muted:#737373;
-  --faint:#a3a3a3;
-  --live:#e40014;
-  --ok:#26911c;
+  --bg:var(--color-bg);
+  --surface:var(--color-surface);
+  --line:var(--color-border);
+  --fg:var(--color-ink);
+  --muted:var(--color-muted);
+  --faint:var(--color-subtle);
+  --live:var(--color-danger);
+  --ok:var(--color-live);
 }
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;background:var(--bg);color:var(--fg);
-  font:14px/1.5 "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing:antialiased;overflow:hidden;
-}
+body{overflow:hidden}
 
 /* ---------- Topo ---------- */
 .topbar{
@@ -32,7 +27,7 @@ body{
 }
 .live{
   display:flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:999px;
-  background:#fdeceb;color:var(--live);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  background:var(--color-danger-bg);color:var(--live);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
 }
 .live__dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.6s ease-in-out infinite}
 .live.is-off{background:#f0f0f0;color:var(--muted)}

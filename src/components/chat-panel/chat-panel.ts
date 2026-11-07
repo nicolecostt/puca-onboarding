@@ -2,6 +2,7 @@
 //   const chat = mountChatPanel();   // começa fechado
 //   chat.open(); chat.close(); chat.toggle(); chat.addMessage({ from: "agent", text });
 // Eventos no document: chatpanel:change { open }, chatpanel:send { text }
+import "../../styles/tokens.css";
 import "./chat-panel.css";
 import threadsIcon from "./icons/threads.svg";
 import newConversationIcon from "./icons/new-conversation.svg";

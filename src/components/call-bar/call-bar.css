@@ -4,7 +4,7 @@
   position:fixed;left:50%;bottom:18px;z-index:1000;
   transform:translateX(-50%);
   display:grid;justify-items:center;align-items:end;
-  font-family:"Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family:var(--font-sans);
 }
 /* Arrastável: depois de mover, a posição vira left/top em px (definidos pelo JS) */
 .call-dock{user-select:none;-webkit-user-select:none;touch-action:none}
@@ -24,33 +24,34 @@
 /* Botão que fica na tela depois de encerrar, para ligar de novo */
 .call-redial{
   all:unset;box-sizing:border-box;cursor:pointer;margin-bottom:9px;
+  grid-area:1/1; /* repetido aqui porque o all:unset apaga a regra de cima */
   display:flex;align-items:center;gap:10px;padding:8px 18px 8px 8px;
-  background:#fff;border:1px solid #e5e5e5;border-radius:999px;
+  background:var(--color-surface);border:1px solid var(--color-border);border-radius:999px;
   filter:drop-shadow(0 8px 8px rgba(0,0,0,.05)) drop-shadow(0 4px 4px rgba(0,0,0,.05)) drop-shadow(0 2px 2px rgba(0,0,0,.05));
-  font-size:13px;line-height:19.5px;font-weight:500;letter-spacing:-.13px;color:#171717;white-space:nowrap;
+  font-size:13px;line-height:19.5px;font-weight:500;letter-spacing:-.13px;color:var(--color-ink);white-space:nowrap;
 }
 .call-redial:hover .call-redial__icon{background:#1f7a17}
 .call-redial:active{transform:scale(.97)}
-.call-redial:focus-visible{outline:2px solid #171717;outline-offset:3px}
+.call-redial:focus-visible{outline:2px solid var(--color-ink);outline-offset:3px}
 .call-redial__icon{
   display:flex;align-items:center;justify-content:center;
-  width:40px;height:36px;border-radius:999px;background:#26911c;transition:background-color .15s ease;
+  width:40px;height:36px;border-radius:999px;background:var(--color-live);transition:background-color .15s ease;
 }
 
 /* Linha de status acima da barra ("Clicking “Compare plans”…") */
 .call-status{
   display:flex;align-items:center;gap:8px;
   padding:12px 0 10px;
-  font-size:12px;line-height:18px;font-style:italic;color:#737373;white-space:nowrap;
+  font-size:12px;line-height:18px;font-style:italic;color:var(--color-muted);white-space:nowrap;
 }
 .call-status:empty{display:none}
 .call-status::before{
-  content:"";width:6px;height:6px;border-radius:3px;background:#26911c;opacity:.44;flex:none;
+  content:"";width:6px;height:6px;border-radius:3px;background:var(--color-live);opacity:.44;flex:none;
 }
 
 .call-bar{
   display:flex;align-items:center;gap:10px;padding:8px 21px;
-  background:#fff;border:1px solid #e5e5e5;border-radius:999px;
+  background:var(--color-surface);border:1px solid var(--color-border);border-radius:999px;
   filter:drop-shadow(0 8px 8px rgba(0,0,0,.05)) drop-shadow(0 4px 4px rgba(0,0,0,.05)) drop-shadow(0 2px 2px rgba(0,0,0,.05));
 }
 
@@ -60,9 +61,9 @@
   height:36px;width:44px;border-radius:999px;
   transition:background-color .15s ease, transform .1s ease;
 }
-.call-btn:hover{background:#f5f5f5}
+.call-btn:hover{background:var(--color-surface-muted)}
 .call-btn:active{transform:scale(.94)}
-.call-btn:focus-visible{outline:2px solid #171717;outline-offset:2px}
+.call-btn:focus-visible{outline:2px solid var(--color-ink);outline-offset:2px}
 .call-btn[aria-pressed="true"]{background:#ededed}
 .call-btn img{display:block}
 
@@ -70,7 +71,7 @@
 .call-btn--chat[aria-pressed="true"],.call-btn--chat[aria-pressed="true"]:hover{background:none}
 
 /* Encerrar */
-.call-btn--end{width:40px;background:#d12d26}
+.call-btn--end{width:40px;background:var(--color-danger-soft)}
 .call-btn--end:hover{background:#b8231d}
 
 /* Mic (principal) */
@@ -90,11 +91,11 @@
   all:unset;box-sizing:border-box;cursor:pointer;
   position:absolute;left:0;top:0;width:56px;height:56px;border-radius:999px;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
-  background:#171717;transition:background-color .15s ease, transform .1s ease;
+  background:var(--color-ink);transition:background-color .15s ease, transform .1s ease;
 }
 .call-mic__btn:active{transform:scale(.95)}
-.call-mic__btn:focus-visible{outline:2px solid #171717;outline-offset:3px}
-.call-mic__btn[aria-pressed="true"]{background:#737373}  /* mutado */
+.call-mic__btn:focus-visible{outline:2px solid var(--color-ink);outline-offset:3px}
+.call-mic__btn[aria-pressed="true"]{background:var(--color-muted)}  /* mutado */
 .call-mic__btn[aria-pressed="true"] + .call-mic__slash{opacity:1}
 .call-mic__slash{
   position:absolute;left:17px;top:27px;width:22px;height:2px;border-radius:2px;

@@ -1,4 +1,5 @@
 // Tela de auxílio (sessão ao vivo): barra de call, chat e câmera do agente por cima de uma tela qualquer.
+import "../../styles/base.css";
 import "./style.css";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
