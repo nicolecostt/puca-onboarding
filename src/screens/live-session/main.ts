@@ -9,6 +9,7 @@ import { mountAgentCursor } from "../../components/agent-cursor/agent-cursor";
 import { loadAgentVisual, type AgentVisualState } from "../../lib/agent-visual";
 import { createOutbox, FORWARDING_KEY, forwardingMessage } from "../../journey/forwarding";
 import { browserStore } from "../../journey/storage";
+import { uid } from "../../journey/uid";
 import { clearComposer, findDm, openDm, postMessage, typeInComposer } from "./slack-dm";
 
 const BUDDY_ACK = "Vi aqui, te respondo já.";
@@ -53,13 +54,13 @@ async function main(): Promise<void> {
   // Encaminhamentos que a aula deixou para a buddy (#28): a Puca abre a DM, digita e envia.
   // "enviando" antes da animação: outra aba do Slack, ou um recarregar, não manda de novo.
   const outbox = createOutbox(browserStore());
-  const tab = crypto.randomUUID();
+  const tab = uid();
   let sending = false;
   async function sendPending(): Promise<void> {
     if (sending) return;
     sending = true;
     try {
-      for (let f = outbox.pending()[0]; f; f = outbox.pending()[0]) {
+      for (let f = outbox.pending(tab)[0]; f; f = outbox.pending(tab)[0]) {
         outbox.claim(f.id, tab);
         // a outra aba pode ter pegado no mesmo instante: espera as duas escreverem e fica quem ganhou
         await new Promise((r) => setTimeout(r, 150));
@@ -80,11 +81,10 @@ async function main(): Promise<void> {
         clearComposer(f.to.name);
         postMessage({ author: "Puca", avatar: "P", tone: "puca", text, time: now() });
         outbox.setStatus(f.id, "enviado");
-        const sent = f;
-        setTimeout(() => {
-          postMessage({ author: sent.to.name, avatar: initials(sent.to.name), tone: "blue", text: BUDDY_ACK, time: now() });
-          outbox.setStatus(sent.id, "confirmado");
-        }, 3000);
+        // a buddy confirma antes da próxima dúvida sair: a conversa fica na ordem
+        await new Promise((r) => setTimeout(r, 3000));
+        postMessage({ author: f.to.name, avatar: initials(f.to.name), tone: "blue", text: BUDDY_ACK, time: now() });
+        outbox.setStatus(f.id, "confirmado");
       }
     } finally {
       sending = false;

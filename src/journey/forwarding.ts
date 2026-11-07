@@ -4,6 +4,7 @@
 import { normalize } from "./conditions";
 import { readJson, writeJson, type KeyValueStore } from "./storage";
 import type { Journey } from "./types";
+import { uid } from "./uid";
 
 export type ForwardingStatus = "pendente" | "enviando" | "enviado" | "confirmado";
 
@@ -26,10 +27,13 @@ export interface Forwarding {
   status: ForwardingStatus;
   /** Aba do Slack que ficou com o envio (duas abas abertas não mandam duas vezes). */
   claimed_by?: string;
+  /** Quando a aba pegou o envio (ISO). Passados 30 s sem enviar, outra aba pode pegar. */
+  claimed_at?: string;
 }
 
 export const FORWARDING_KEY = "puca:encaminhamentos";
 const SAME_QUESTION_MS = 2 * 60_000;
+const STALE_CLAIM_MS = 30_000;
 
 export function createOutbox(store: KeyValueStore, opts: { now?: () => Date } = {}) {
   const now = opts.now ?? (() => new Date());
@@ -47,20 +51,26 @@ export function createOutbox(store: KeyValueStore, opts: { now?: () => Date } = 
       const q = normalize(f.question);
       const same = list.find((x) => normalize(x.question) === q && t - Date.parse(x.at) < SAME_QUESTION_MS);
       if (same) return same;
-      const created: Forwarding = { ...f, id: crypto.randomUUID(), at: new Date(t).toISOString(), status: "pendente" };
+      const created: Forwarding = { ...f, id: uid(), at: new Date(t).toISOString(), status: "pendente" };
       write([...list, created]);
       return created;
     },
     list: read,
-    pending(): Forwarding[] {
-      return read().filter((f) => f.status === "pendente");
+    /** Para enviar: os pendentes e, para outra aba, os presos em "enviando" há mais de 30 s (aba fechada no meio). */
+    pending(tab?: string): Forwarding[] {
+      const t = now().getTime();
+      return read().filter(
+        (f) =>
+          f.status === "pendente" ||
+          (tab !== undefined && f.status === "enviando" && f.claimed_by !== tab && t - Date.parse(f.claimed_at ?? f.at) > STALE_CLAIM_MS),
+      );
     },
     setStatus(id: string, status: ForwardingStatus): void {
       write(read().map((f) => (f.id === id ? { ...f, status } : f)));
     },
     /** A aba pega o envio: tira dos pendentes e marca a dona. Vale a última que escreveu. */
     claim(id: string, tab: string): void {
-      write(read().map((f) => (f.id === id ? { ...f, status: "enviando" as const, claimed_by: tab } : f)));
+      write(read().map((f) => (f.id === id ? { ...f, status: "enviando" as const, claimed_by: tab, claimed_at: now().toISOString() } : f)));
     },
     ownerOf(id: string): string | undefined {
       return read().find((f) => f.id === id)?.claimed_by;
@@ -81,10 +91,17 @@ export function buddyOf(journey: Journey): string {
 /** Texto da mensagem que a Puca manda para a buddy no Slack. */
 export function forwardingMessage(f: Forwarding): string {
   const consulted = f.consulted.length ? f.consulted.join("; ") : "Não achei nenhuma fonte sobre isso.";
+  const summary = f.summary.trim() && normalize(f.summary) !== normalize(f.question) ? [`Resumo: ${f.summary.trim()}`] : [];
   return [
     `Oi, ${f.to.name}! A ${f.pessoa} perguntou na aula: "${f.question}"`,
+    ...summary,
     `O que eu já consultei: ${consulted}`,
     `Por que não respondi: ${f.reason}`,
     "Pode ajudar? Respondo para ela assim que você me disser.",
   ].join("\n");
+}
+
+/** Fala com cara de dúvida (tem "?" ou 3+ palavras). "ok" e "valeu" não viram encaminhamento. */
+export function looksLikeQuestion(text: string): boolean {
+  return text.includes("?") || normalize(text).split(" ").filter(Boolean).length >= 3;
 }

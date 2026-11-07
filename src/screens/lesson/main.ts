@@ -13,7 +13,7 @@ import { whiteboardFromJourney } from "../../components/whiteboard/from-journey"
 import { buildFaqs } from "../../journey/faq";
 import { routeUtterance } from "../../journey/route";
 import { browserStore } from "../../journey/storage";
-import { buddyOf, createOutbox } from "../../journey/forwarding";
+import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
 import { createTrail, sourcesFor } from "../../journey/trail";
 import { createAgentVoice } from "../../voice/agent-voice";
 import { interpolateDeep, resolveProfile } from "../../journey/profile";
@@ -309,7 +309,8 @@ async function main(): Promise<void> {
     // sem servidor e sem fonte confiável: a dúvida fica anotada (§4.5, encaminhamento para uma pessoa)
     const line = "Não achei isso confirmado na documentação, então não quero chutar. Anotei a sua pergunta para a sua buddy responder.";
     trail.update(entry.id, { answer: line });
-    forward(entry.id, { question: text, summary: text, reason: "Estava sem acesso ao agente e não achei isso na aula." });
+    // "ok" ou "valeu" não vão para a buddy
+    if (looksLikeQuestion(text)) forward(entry.id, { question: text, summary: text, reason: "Estava sem acesso ao agente e não achei isso na aula." });
     void speakAside(line);
   }
 

@@ -12,14 +12,17 @@ export function findDm(name: string): HTMLElement | null {
   return [...document.querySelectorAll<HTMLElement>(".sk-dm")].find((li) => label(li).startsWith(name)) ?? null;
 }
 
-/** Abre a conversa direta: título, item marcado na lateral, feed com a introdução da DM e o campo de mensagem. */
+/** Abre a conversa direta: título, item marcado na lateral, feed com a introdução da DM e o campo de mensagem.
+ *  Se a DM já está aberta, não mexe no feed (as mensagens anteriores continuam lá). */
 export function openDm(name: string): void {
+  const feed = $(".sk-feed");
+  if (feed?.dataset.dm === name) return;
   for (const li of document.querySelectorAll(".sk-ch.is-current, .sk-dm.is-current")) li.classList.remove("is-current");
   findDm(name)?.classList.add("is-current");
   const title = $(".sk-chan__name");
   if (title) title.textContent = name;
-  const feed = $(".sk-feed");
   if (feed) {
+    feed.dataset.dm = name;
     const intro = document.createElement("div");
     intro.className = "sk-intro";
     const h2 = document.createElement("h2");
