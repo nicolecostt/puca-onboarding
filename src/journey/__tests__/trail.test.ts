@@ -4,14 +4,14 @@ import { buildFaqs } from "../faq";
 import { DEMO_PROFILES } from "../profile";
 import type { Route } from "../route";
 import { memoryStore, type KeyValueStore } from "../storage";
-import { createTrail, sourcesFor, TRAIL_KEY } from "../trail";
+import { createTrail, sourcesFor, TRAIL_KEY, type TrailEntry } from "../trail";
 import { loadJourney } from "../validate";
 
 const journey = loadJourney(demo);
 const faqs = buildFaqs(journey, DEMO_PROFILES.novo);
 const pagamentos = journey.moments.find((m) => m.id === "pagamentos")!;
-const entry = (utterance: string) =>
-  ({ from: "chat", utterance, route: "ask", answer: "", sources: [], moment: null, step: null }) as const;
+const entry = (utterance: string): Omit<TrailEntry, "id" | "at" | "session"> =>
+  ({ from: "chat", utterance, route: "ask", answer: "", sources: [], moment: null, step: null });
 
 describe("createTrail", () => {
   it("grava as falas em ordem, com id, hora e a mesma sessão", () => {
