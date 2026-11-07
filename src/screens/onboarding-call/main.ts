@@ -135,11 +135,9 @@ async function main(): Promise<void> {
     el.captionHint.textContent =
       shown === "listening" && state.muted
         ? "Seu microfone está mudo. Responda pelo chat."
-        : shown === "listening"
-          ? "Fale normalmente ou responda pelo chat."
-          : shown === "ended"
-            ? "Use “Ligar para a Puca” para continuar de onde parou."
-            : "";
+        : shown === "ended"
+          ? "Use “Ligar para a Puca” para continuar de onde parou."
+          : "";
   }
 
   // Espera que só corre com a call ativa (pausa e encerramento seguram o tempo)
