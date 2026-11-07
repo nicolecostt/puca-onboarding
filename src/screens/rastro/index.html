@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rastro da Puca (demo)</title>
+<script>
+  // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
+  if (location.protocol === "file:") {
+    addEventListener("DOMContentLoaded", function () {
+      document.body.innerHTML =
+        '<div style="max-width:440px;margin:15vh auto;padding:24px;font:15px/1.6 system-ui,sans-serif;color:#171717;background:#fff;border:1px solid #e5e5e5;border-radius:12px">' +
+        "<strong>Esta página precisa do servidor do projeto.</strong><br>" +
+        "No terminal, na pasta do projeto, rode <code>npm run dev</code> e abra " +
+        '<a href="http://localhost:5173/">http://localhost:5173</a>.</div>';
+    });
+  }
+</script>
+</head>
+<body>
+  <main class="rastro">
+    <p class="rastro__demo" role="note">
+      <strong>Tela só para a demo.</strong> Mostra o rastro das decisões da Puca guardado neste navegador. Não faz parte do produto.
+    </p>
+    <header class="rastro__head">
+      <div>
+        <h1>Rastro da Puca</h1>
+        <p class="rastro__sub">Cada fala da pessoa na aula: o caminho que a Puca escolheu, o que respondeu e de qual fonte.</p>
+      </div>
+      <div class="rastro__actions">
+        <button type="button" id="download">Baixar JSON</button>
+        <button type="button" id="clear" class="is-quiet">Limpar</button>
+      </div>
+    </header>
+    <p id="empty" class="rastro__empty" hidden>Nenhuma fala ainda. Abra a <a href="../lesson/">aula</a> e fale com a Puca.</p>
+    <table id="table" class="rastro__table">
+      <thead>
+        <tr><th>Hora</th><th>Fala da pessoa</th><th>Caminho</th><th>Resposta</th><th>Fontes</th><th>Encaminhamento</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </main>
+<script type="module" src="./main.ts"></script>
+</body>
+</html>

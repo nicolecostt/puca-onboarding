@@ -12,6 +12,8 @@ import { mountWhiteboard, type Whiteboard } from "../../components/whiteboard/wh
 import { whiteboardFromJourney } from "../../components/whiteboard/from-journey";
 import { buildFaqs } from "../../journey/faq";
 import { routeUtterance } from "../../journey/route";
+import { browserStore } from "../../journey/storage";
+import { createTrail, sourcesFor } from "../../journey/trail";
 import { createAgentVoice } from "../../voice/agent-voice";
 import { interpolateDeep, resolveProfile } from "../../journey/profile";
 import type { Moment, Profile, Step, Vinculo } from "../../journey/types";
@@ -87,6 +89,8 @@ async function main(): Promise<void> {
   // Voz de verdade (servidor em server/): sem ele, a aula segue só com legenda e chat.
   const voice = await createAgentVoice();
   const faqs = buildFaqs(journey, profile);
+  // Rastro de cada fala (caminho, resposta e fonte): a tela de demo src/screens/rastro/ mostra.
+  const trail = createTrail(browserStore());
   const history: { role: "user" | "assistant"; content: string }[] = [];
   const remember = (role: "user" | "assistant", content: string) => {
     history.push({ role, content });
@@ -216,12 +220,23 @@ async function main(): Promise<void> {
     }
     const waiting = pending?.kind === "reply" ? { kind: "reply" as const, replies: pending.replies ?? [] } : pending?.kind === "select" ? { kind: "select" as const } : null;
     const route = routeUtterance(text, { journey, moment: currentMoment, step: currentStep, waiting, board: currentBoard, faqs });
+    const entry = trail.record({
+      from,
+      utterance: text,
+      route: route.kind,
+      answer: "",
+      sources: sourcesFor(route, journey, currentMoment),
+      moment: currentMoment?.id ?? null,
+      step: currentStep?.id ?? null,
+    });
     switch (route.kind) {
       case "jump":
         if (running && runner?.jumpTo(route.moment.id)) {
           voice.stop();
           interrupt();
-          void speakAside(`Claro, vamos para ${route.moment.title.toLowerCase()}.`);
+          const line = `Claro, vamos para ${route.moment.title.toLowerCase()}.`;
+          trail.update(entry.id, { answer: line });
+          void speakAside(line);
         }
         return;
       case "reply":
@@ -230,25 +245,39 @@ async function main(): Promise<void> {
         return pickNode(route.node, text);
       case "knowledge":
         remember("user", text);
+        trail.update(entry.id, { answer: route.text });
         return speakAside(route.text);
       case "faq":
         remember("user", text);
+        trail.update(entry.id, { answer: route.faq.text });
         for (const a of route.faq.actions) io.apply(a);
         return speakAside(route.faq.text);
     }
     // ask: o agente responde; a ponte sai na hora e o LLM vem atrás.
     remember("user", text);
+    const said: string[] = [];
+    const t0 = performance.now();
     const asked =
       !!currentMoment &&
       !!currentStep &&
       (await voice.ask(
         { text, moment_id: currentMoment.id, step_id: currentStep.id, perfil: profile.vinculo, history: history.slice(0, -1) },
-        { onSpeak: (t, play) => speakAside(t, play), onAction: (a) => io.apply(a), onGoTo: goTo },
+        {
+          onSpeak: (t, play) => {
+            said.push(t);
+            return speakAside(t, play);
+          },
+          onAction: (a) => io.apply(a),
+          onGoTo: goTo,
+        },
       ));
-    if (asked) return;
+    // gravado mesmo se a pessoa interrompeu: fica a resposta parcial
+    if (asked) return trail.update(entry.id, { answer: said.join(" "), ms: Math.round(performance.now() - t0) });
     if (pending?.kind === "reply") return answer(text, "chat");
     // sem servidor e sem fonte confiável: a dúvida fica anotada (§4.5, encaminhamento para uma pessoa)
-    void speakAside("Não achei isso confirmado na documentação, então não quero chutar. Anotei a sua pergunta para a sua buddy responder.");
+    const line = "Não achei isso confirmado na documentação, então não quero chutar. Anotei a sua pergunta para a sua buddy responder.";
+    trail.update(entry.id, { answer: line });
+    void speakAside(line);
   }
 
   document.addEventListener("chatpanel:send", (e) => void handleUtterance(e.detail.text, "chat"));
