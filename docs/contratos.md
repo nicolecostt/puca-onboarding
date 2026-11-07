@@ -12,8 +12,23 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/ask`, `/api/voice/token` | `src/voice/agent-voice.ts`, `screens/lesson` | `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
+| Rastro (decisões da Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo), custo #52, painel #19 | `__tests__/trail.test.ts` |
 | Visual da Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `sandbox/puca-teste.ts` (local) | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
+
+Exemplo válido de `TrailEntry` (uma fala da pessoa e o que a Puca fez com ela):
+
+```json
+{
+  "id": "7f0c…", "at": "2026-11-07T22:10:03.120Z", "session": "a91e…",
+  "from": "chat", "utterance": "Quem cuida do authorizer?", "route": "faq",
+  "answer": "Quem cuida do authorizer é Júlia Paiva, do time Autorização.",
+  "sources": ["ADR-019 · Cálculo de MDR por plano", "fees/mdr.go"],
+  "moment": "pagamentos", "step": "pg-pergunta"
+}
+```
+
+`forwarding_id` aparece quando a fala virou encaminhamento; `ms` é o tempo da resposta do agente (`route: "ask"`).
 
 ## Contratos que vão surgir
 
