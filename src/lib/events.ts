@@ -19,6 +19,9 @@ declare global {
     "chatpanel:change": CustomEvent<{ open: boolean }>;
     "chatpanel:send": CustomEvent<{ text: string }>;
     "onboarding:answer": CustomEvent<{ key: string; value: string; answers: Record<string, string> }>;
+    /** Aula no quadro: entrou num momento / começou um passo da jornada. */
+    "journey:moment": CustomEvent<{ id: string; title: string }>;
+    "journey:step": CustomEvent<{ id: string; moment: string }>;
   }
 }
 

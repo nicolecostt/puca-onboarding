@@ -9,9 +9,10 @@ import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../
 import { emit } from "../../lib/events";
 import { qs } from "../../lib/dom";
 import { activeProfile, company } from "../../data";
+import { profileFromAnswers, saveProfile } from "../../journey/profile";
 
 // ---- Roteiro ----
-type FieldKey = "nome" | "cargo" | "time" | "gestor" | "ferramentas" | "aprender";
+type FieldKey = "nome" | "vinculo" | "cargo" | "time" | "gestor" | "ferramentas" | "aprender";
 type Answers = Partial<Record<FieldKey, string>>;
 
 interface Field {
@@ -25,6 +26,11 @@ interface Field {
 const profile = activeProfile();
 const FIELDS: Field[] = [
   { key: "nome", label: "Como prefere ser chamado", sample: profile.nickname },
+  {
+    key: "vinculo",
+    label: "Primeira vez ou mudando de time",
+    sample: profile.kind === "transfer" ? `Estou mudando de time, vim do ${profile.fromTeam ?? "outro time"}` : "Primeira vez",
+  },
   { key: "cargo", label: "Cargo", sample: profile.role },
   { key: "time", label: "Time", sample: profile.toTeam },
   { key: "gestor", label: "Gestor(a)", sample: company.people[profile.managerId]?.name ?? "" },
@@ -35,7 +41,8 @@ const FIELDS: Field[] = [
 const QUESTIONS: Record<FieldKey, (a: Answers) => string> = {
   nome: () =>
     "Oi! Eu sou a Puca, e vou te acompanhar na sua primeira semana. Antes de começar, quero te conhecer um pouco. Como você prefere ser chamado?",
-  cargo: (a) => `Prazer, ${a.nome}! Qual vai ser o seu cargo aqui?`,
+  vinculo: (a) => `Prazer, ${a.nome}! É a sua primeira vez aqui na empresa ou você está mudando de time?`,
+  cargo: () => "E qual vai ser o seu cargo?",
   time: () => "Legal. Em qual time você vai entrar?",
   gestor: () => "E quem é a pessoa que vai ser sua gestora ou gestor?",
   ferramentas: () => "Quais ferramentas você já usa no dia a dia?",
@@ -238,6 +245,14 @@ async function main(): Promise<void> {
   await say(OUTRO(answers));
   state.done = true;
   setAgent("done");
+
+  // Entrega o perfil para a aula no quadro e mostra o caminho até ela.
+  saveProfile(profileFromAnswers(answers));
+  const next = document.createElement("a");
+  next.className = "caption__next";
+  next.href = "../aula-quadro/";
+  next.textContent = "Começar a aula →";
+  el.captionHint.after(next);
 }
 
 void main();
