@@ -20,7 +20,7 @@
     time: () => "Legal. Em qual time você vai entrar?",
     gestor: () => "E quem é a pessoa que vai ser sua gestora ou gestor?",
     ferramentas: () => "Quais ferramentas você já usa no dia a dia?",
-    aprender: () => "Última pergunta: você aprende melhor lendo, vendo alguém fazer ou fazendo junto?",
+    aprender: () => "E pra fechar: você aprende melhor lendo, vendo alguém fazer ou fazendo junto?",
   };
   const OUTRO = (a) => `Perfeito, ${a.nome}. Já tenho o que preciso. Vou montar sua primeira semana com o time ${a.time} e te mostro em seguida.`;
 
@@ -33,36 +33,13 @@
   const chat = ChatPanel.mount({ title: "Transcrição da call", messages: [] });
   const call = CallBar.mount({ status: "Conectando…", chat });
 
-  // ---- Cartão "Sobre você" ----
-  const CHECK = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>`;
-  $("notes-list").innerHTML = FIELDS.map((f) => `
-    <li class="note" data-key="${f.key}">
-      <span class="note__check">${CHECK}</span>
-      <span class="note__body">
-        <span class="note__label">${f.label}</span>
-        <span class="note__value">—</span>
-      </span>
-    </li>`).join("");
-
-  function noteEl(key) { return document.querySelector(`.note[data-key="${key}"]`); }
-
-  function setActive(key) {
-    document.querySelectorAll(".note").forEach((n) => n.classList.toggle("is-active", n.dataset.key === key));
-    const el = noteEl(key);
-    if (el && !el.classList.contains("is-done")) el.querySelector(".note__value").textContent = "Perguntando…";
-  }
-
-  function fill(key, value) {
+  // Guarda a resposta sem mostrar na tela: a pessoa vive uma entrevista,
+  // não vê o que está sendo coletado. Fica em window.onboardingAnswers e no evento abaixo.
+  function remember(key, value) {
     answers[key] = value;
-    const el = noteEl(key);
-    el.classList.remove("is-active");
-    el.classList.add("is-done", "just-filled");
-    el.querySelector(".note__value").textContent = value;
-    setTimeout(() => el.classList.remove("just-filled"), 600);
-    const n = Object.keys(answers).length;
-    $("notes-count").textContent = `${n} de ${FIELDS.length}`;
-    $("notes-bar").style.width = (n / FIELDS.length) * 100 + "%";
+    document.dispatchEvent(new CustomEvent("onboarding:answer", { detail: { key, value, answers: { ...answers } } }));
   }
+  window.onboardingAnswers = answers;
 
   // ---- Visual do agente ----
   // Se o teste da Iris estiver carregado, ela entra no lugar do círculo neutro.
@@ -75,11 +52,11 @@
     orb.appendChild(holder);
     iris = IrisAgent.mount(holder);
   }
-  const IRIS_STATE = { idle: "idle", speaking: "talk", listening: "idle", paused: "idle", ended: "idle", done: "think" };
+  const IRIS_STATE = { idle: "idle", speaking: "talk", listening: "idle", thinking: "think", paused: "idle", ended: "idle", done: "think" };
 
   // ---- Estados do agente ----
-  const LABELS = { idle: "Conectando…", speaking: "Falando", listening: "Ouvindo você", paused: "Pausado", ended: "Call encerrada", done: "Montando sua semana…" };
-  const STATUS = { speaking: "Agente falando…", listening: "Ouvindo você…", paused: "Call pausada", done: "Montando sua primeira semana…" };
+  const LABELS = { idle: "Conectando…", speaking: "Falando", listening: "Ouvindo você", thinking: "Pensando…", paused: "Pausado", ended: "Call encerrada", done: "Montando sua semana…" };
+  const STATUS = { speaking: "Agente falando…", listening: "Ouvindo você…", thinking: "Pensando na sua resposta…", paused: "Call pausada", done: "Montando sua primeira semana…" };
   let agentState = "idle";
 
   function setAgent(s) {
@@ -91,7 +68,10 @@
   function render() {
     const shown = state.ended ? "ended" : state.paused ? "paused" : agentState;
     $("orb").dataset.state = shown;
-    if (iris) iris.setState(IRIS_STATE[shown]);
+    if (iris) {
+      iris.setState(IRIS_STATE[shown]);
+      iris.setWarm(agentState === "thinking"); // continua quente mesmo se pausar no meio
+    }
     $("agent-state").textContent = LABELS[shown];
     if (STATUS[shown]) call.setStatus(STATUS[shown]);
     $("live").classList.toggle("is-off", state.ended);
@@ -173,14 +153,14 @@
     await wait(900);
     for (let i = 0; i < FIELDS.length; i++) {
       const f = FIELDS[i];
-      $("step").textContent = `Passo ${i + 1} de ${FIELDS.length}`;
-      setActive(f.key);
       await say(QUESTIONS[f.key](answers));
       const answer = await listen(f);
-      fill(f.key, answer);
-      await wait(700);
+      // depois da resposta, ela "pensa" um pouco antes de anotar
+      setAgent("thinking");
+      await wait(1800);
+      remember(f.key, answer);
+      await wait(400);
     }
-    $("step").textContent = "Tudo pronto";
     await say(OUTRO(answers));
     state.done = true;
     setAgent("done");

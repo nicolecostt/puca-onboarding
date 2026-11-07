@@ -23,23 +23,10 @@
       <span class="callinfo__label">Call inicial</span>
       <span class="callinfo__time" id="timer">00:00</span>
     </div>
-    <div class="topbar__right">
-      <span class="step" id="step">Passo 1 de 6</span>
-    </div>
+    <div class="topbar__right" aria-hidden="true"></div>
   </header>
 
   <main class="stage">
-    <!-- O que o agente já anotou -->
-    <aside class="notes" aria-labelledby="notes-title">
-      <div class="notes__head">
-        <h2 id="notes-title">Sobre você</h2>
-        <span class="notes__count" id="notes-count">0 de 6</span>
-      </div>
-      <div class="notes__bar"><span id="notes-bar"></span></div>
-      <ul class="notes__list" id="notes-list"></ul>
-      <p class="notes__foot">O agente usa isso para montar sua primeira semana. Você pode corrigir qualquer coisa depois.</p>
-    </aside>
-
     <!-- Agente no centro (visual ainda em definição) -->
     <section class="agent" aria-live="polite">
       <div class="agent__orb" id="orb" data-state="idle">
