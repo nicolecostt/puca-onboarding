@@ -18,6 +18,45 @@ export interface Profile {
   vinculo: Vinculo;
 }
 
+// ---------- Calibragem (call inicial → jornada e adaptação) ----------
+
+/** Assuntos da calibragem: lista fechada, ligada aos momentos da jornada (CALIBRAGEM_TEMAS em calibragem.ts). */
+export type Tema = "empresa" | "rituais" | "pagamentos" | "mensageria" | "falhas";
+
+/** O que a pessoa já sabe do assunto. Não é nota: só o ponto de partida. */
+export type Nivel = "nao_conhece" | "ja_ouviu" | "usa" | "domina";
+
+/** alta = a pessoa disse com clareza; media = deduzido do que ela contou; baixa = palpite, confirmar na aula. */
+export type Certeza = "alta" | "media" | "baixa";
+
+export interface ItemCalibragem {
+  tema: Tema;
+  nivel: Nivel;
+  certeza: Certeza;
+  /** A frase da pessoa que levou a essa conclusão (vazia quando foi deduzido). */
+  evidencia: string;
+  /** call = respondeu na call · vinculo = deduzido de ser novo ou de transição · aula = atualizado na checagem. */
+  origem: "call" | "vinculo" | "aula";
+}
+
+/** O que a Puca concluiu na call inicial (CONTEXT.md: calibragem). Contrato em docs/contratos.md. */
+export interface Calibragem {
+  versao: 1;
+  perfil: Profile;
+  /** O que a pessoa fazia antes, nas palavras dela. */
+  experiencia?: string;
+  /** O que a pessoa quer conseguir fazer nas primeiras semanas. */
+  objetivos: string[];
+  /** Um item por tema, sempre os cinco. */
+  conhecimentos: ItemCalibragem[];
+  /** Só na transição: time de onde vem, o que aproveita e o que já sabe que vai ser novo. */
+  time_anterior?: string;
+  aproveita?: string;
+  diferencas?: string;
+  /** ISO 8601. */
+  atualizada_em: string;
+}
+
 // ---------- Quadro ----------
 
 export type NodeKind = "frontend" | "service" | "db" | "external" | "queue" | "person" | "team" | "value" | "doc" | "task";
