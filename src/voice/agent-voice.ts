@@ -1,7 +1,7 @@
-// Voz de Puca na tela: fala com áudio do servidor (fila, um por vez), pergunta ao agente (ponte + LLM)
+// Voz do Puca na tela: fala com áudio do servidor (fila, um por vez), pergunta ao agente (ponte + LLM)
 // e microfone (Deepgram) com barge-in. Sem servidor ou sem chaves, cada parte desliga sozinha e a
 // tela segue como antes (legenda e chat).
-import type { BoardAction } from "../journey/types";
+import type { BoardAction, Profile } from "../journey/types";
 import { classifyBargeIn } from "./barge-in";
 import { startMic, type Mic } from "./mic";
 import { apiUrl } from "./api";
@@ -17,11 +17,52 @@ export interface AskRequest {
   history: { role: "user" | "assistant"; content: string }[];
 }
 
+/** Um turno da sessão conduzido pelo LLM (contrato "Turno da sessão" em docs/contratos.md). */
+export interface TurnRequest {
+  kind: "inicio" | "seguir" | "fala" | "silencio";
+  text?: string;
+  moment_id: string;
+  step_id: string;
+  perfil: "novo" | "transicao";
+  /** O perfil que a call inicial gravou (nome, cargo, time, gestor…); sem ele, o servidor usa o da demo. */
+  profile?: Profile;
+  history: { role: "user" | "assistant"; content: string }[];
+  /** A pessoa cortou o Puca: a frase que estava tocando. */
+  interrupted?: { said: string };
+}
+
+/** Um turno da call inicial conduzida pelo LLM (contrato "Call inicial" em docs/contratos.md). */
+export interface CallRequest {
+  kind: "inicio" | "fala" | "silencio";
+  text?: string;
+  history: { role: "user" | "assistant"; content: string }[];
+  interrupted?: { said: string };
+  /** Dados da admissão: o Puca confirma, não pergunta. */
+  admissao: { nome?: string; cargo?: string; time?: string; gestor?: string };
+  /** O que já foi anotado nesta call. */
+  anotado: Record<string, string>;
+  /** Assuntos culturais já contados. */
+  cultura: string[];
+}
+
 export interface AskHandlers {
-  /** Cada frase de Puca, na ordem: a ponte primeiro, depois o LLM. Resolve quando terminou de falar. */
-  onSpeak(text: string, play: () => Promise<void>): Promise<void>;
+  /**
+   * Cada frase do Puca, na ordem: a ponte primeiro, depois o LLM. Chega antes de tocar: a legenda entra no `onStart` de
+   * `play` e segue o `onWord`. Resolve quando terminou de falar.
+   */
+  onSpeak(text: string, play: (opts?: SpeakOptions) => Promise<void>): Promise<void>;
   onAction(action: BoardAction): void;
   onGoTo(target: string): void;
+  /** Turno: o passo acabou (`reply` = resposta sugerida que a pessoa deu). */
+  onNextStep?(reply?: string): void;
+  /** Turno: resultado da checagem do passo atual. */
+  onCheck?(entendeu: boolean): void;
+  /** Call inicial: o que a pessoa contou (chave da call → texto). */
+  onAnswer?(key: string, value: string): void;
+  /** Call inicial: o Puca contou um assunto do onboarding cultural. */
+  onCulture?(topic: string): void;
+  /** Call inicial: acabou. */
+  onDone?(): void;
   /** O agente não achou fonte confiável: a tela encaminha a dúvida à buddy (resumo do agente). */
   onEscalate?(summary: string): void;
   /** Trechos do kit da Kota que a resposta citou (título e URL pública; URL vazia quando a página não tem). */
@@ -42,6 +83,8 @@ export interface AskTimingSummary {
 export interface SpeakOptions {
   /** Cada palavra na hora em que é falada: `index` é a posição dela em `text.split(/\s+/)`. */
   onWord?(index: number, word: WordTiming): void;
+  /** A frase começou a tocar (ou, sem som, a vez dela chegou): a legenda entra aqui, não antes. */
+  onStart?(): void;
 }
 
 /** Como está o microfone: ouvindo, ou por que a conversa segue só pelo chat. */
@@ -52,13 +95,13 @@ export interface ListenHandlers {
   onFinal(text: string): void;
   /** Legenda ao vivo do que a pessoa está dizendo. */
   onCaption?(text: string): void;
-  /** A pessoa falou por cima de Puca: a fala já foi cortada; a tela decide o que fazer com o roteiro. */
+  /** A pessoa falou por cima do Puca: a fala já foi cortada; a tela decide o que fazer com o roteiro. */
   onBargeIn?(): void;
   /** O microfone ligou ("ouvindo") ou não vai ouvir (motivo). */
   onState?(state: MicState): void;
 }
 
-/** O que Puca diz no chat quando o microfone não vai ouvir. */
+/** O que o Puca diz no chat quando o microfone não vai ouvir. */
 export const MIC_AVISO: Record<Exclude<MicState, "ouvindo">, string> = {
   negado: "O microfone está bloqueado. Sigo pelo chat; para falar comigo, libere o microfone e recarregue a página.",
   "sem-microfone": "Não achei um microfone funcionando. Sigo pelo chat.",
@@ -73,6 +116,10 @@ export interface AgentVoice {
   /** Servidor com TTS (voz de verdade) e com STT (microfone). */
   readonly tts: boolean;
   readonly stt: boolean;
+  /** Servidor com LLM: o LLM conduz a sessão (/api/turn). Sem ele, a sessão segue a jornada como roteiro. */
+  readonly llm: boolean;
+  /** A frase do Puca tocando agora ("" se nenhuma). */
+  readonly falando: string;
   /**
    * Precisa de um clique: o browser só libera áudio e microfone depois de um gesto. Desiste em ~1 s e devolve false
    * se o som não foi liberado; aí `speak` não toca nada e a sessão segue com legenda.
@@ -84,6 +131,10 @@ export interface AgentVoice {
   stop(): void;
   /** Pergunta ao agente; corta a fala e a pergunta anteriores. false = servidor indisponível (a tela usa o fallback dela). */
   ask(req: AskRequest, h: AskHandlers): Promise<boolean>;
+  /** Um turno da sessão; corta a fala e o turno anteriores. false = servidor indisponível. */
+  turn(req: TurnRequest, h: AskHandlers): Promise<boolean>;
+  /** Um turno da call inicial (/api/call); corta a fala e o turno anteriores. false = servidor indisponível. */
+  call(req: CallRequest, h: AskHandlers): Promise<boolean>;
   /**
    * Liga o microfone: primeiro o pedido de permissão, depois a conexão com o STT. Não lança: o resultado chega em
    * `onState`. Chamar de novo com o microfone ligado não faz nada.
@@ -104,6 +155,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
     .catch(() => null);
   const tts = !!health?.tts;
   const stt = !!health?.stt;
+  const llm = !!health?.llm;
   const player = new PcmPlayer();
   let chain: Promise<void> = Promise.resolve();
   let generation = 0;
@@ -135,7 +187,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
   }
 
   /** Põe um áudio na fila. onStart roda quando chega a vez dele; onWord, a cada palavra falada. */
-  function enqueue(text: string, audio: () => Promise<Audio>, opts: SpeakOptions & { onStart?: () => void } = {}): Promise<void> {
+  function enqueue(text: string, audio: () => Promise<Audio>, opts: SpeakOptions = {}): Promise<void> {
     const gen = generation;
     const job = chain.then(async () => {
       if (gen !== generation) return;
@@ -185,7 +237,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       onEvent: (ev) => {
         if (ev.type !== "caption" || paused) return;
         const c = ev.caption;
-        // Mic aberto enquanto Puca fala: o eco dela é ignorado; fala nova da pessoa corta.
+        // Mic aberto enquanto o Puca fala: o eco dele é ignorado; fala nova da pessoa corta.
         if (speaking) {
           const d = classifyBargeIn({ transcript: c.text, kind: c.kind, agentText: speaking });
           if (d.decision === "echo" || d.decision === "wait") return;
@@ -226,6 +278,10 @@ export async function createAgentVoice(): Promise<AgentVoice> {
   const voice: AgentVoice = {
     tts,
     stt,
+    llm,
+    get falando() {
+      return speaking;
+    },
     async unlock() {
       // destrava o AudioContext do próprio player, dentro do gesto; sem gesto reconhecido, o resume() não resolve
       const ok = await player.unlock();
@@ -234,7 +290,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
     },
     speak(text, opts = {}) {
       // som bloqueado: nem pede o áudio ao servidor (não gasta TTS); a sessão segue com legenda
-      if (!tts || somBloqueado) return Promise.resolve();
+      if (!tts || somBloqueado) return Promise.resolve(opts.onStart?.());
       return enqueue(text, () => speakAudio(text, !!opts.onWord), opts);
     },
     stop() {
@@ -244,13 +300,45 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       player.stop();
       askAbort?.abort();
     },
-    async ask(req, h) {
+    ask(req, h) {
+      return stream("/api/ask", req, h);
+    },
+    turn(req, h) {
+      return stream("/api/turn", req, h);
+    },
+    call(req, h) {
+      return stream("/api/call", req, h);
+    },
+    async listen(h) {
+      return listen(h);
+    },
+    stopListening() {
+      stopListening();
+    },
+    setMuted(muted) {
+      userMuted = muted;
+      applyMute();
+    },
+    pause() {
+      paused = true;
+      player.pause();
+      applyMute();
+    },
+    resume() {
+      paused = false;
+      player.resume();
+      applyMute();
+    },
+  };
+
+  /** Pergunta ou turno por SSE: frases (com áudio), ações e o resto dos eventos, na ordem. */
+  async function stream(url: string, req: AskRequest | TurnRequest | CallRequest, h: AskHandlers): Promise<boolean> {
       voice.stop(); // nunca duas respostas juntas: a pergunta nova corta a anterior e o que ela ia falar
       const ac = new AbortController();
       askAbort = ac;
       let res: Response;
       try {
-        res = await fetch(apiUrl("/api/ask"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req), signal: ac.signal });
+        res = await fetch(apiUrl(url), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req), signal: ac.signal });
       } catch {
         return false;
       }
@@ -277,16 +365,26 @@ export async function createAgentVoice(): Promise<AgentVoice> {
               const frase = { started: false, actions };
               actions = [];
               last = frase;
-              const start = () => {
-                frase.started = true;
-                frase.actions.forEach((a) => h.onAction(a));
-              };
+              const id: string = ev.id;
               // som bloqueado: a frase sai na hora, só na legenda, sem esperar o player
-              const play = () =>
-                url && !somBloqueado ? enqueue(ev.text, async () => ({ audio_url: url }), { onStart: start }) : Promise.resolve(start());
+              const play = (o: SpeakOptions = {}) => {
+                const start = () => {
+                  frase.started = true;
+                  frase.actions.forEach((a) => h.onAction(a));
+                  o.onStart?.();
+                };
+                return url && !somBloqueado
+                  ? enqueue(ev.text, async () => ({ audio_url: url, words: o.onWord ? wordsOf(id) : undefined }), { onStart: start, onWord: o.onWord })
+                  : Promise.resolve(start());
+              };
               spoken.push(h.onSpeak(ev.text, play));
             } else if (ev.type === "action") actions.push(ev.action);
             else if (ev.type === "go_to") h.onGoTo(ev.target);
+            else if (ev.type === "next_step") h.onNextStep?.(ev.reply);
+            else if (ev.type === "check") h.onCheck?.(ev.entendeu);
+            else if (ev.type === "answer") h.onAnswer?.(ev.key, ev.value);
+            else if (ev.type === "culture") h.onCulture?.(ev.topic);
+            else if (ev.type === "done") h.onDone?.();
             else if (ev.type === "escalate") h.onEscalate?.(ev.summary);
             else if (ev.type === "fontes") h.onFontes?.(ev.fontes);
             else if (ev.type === "timing") h.onTiming?.(ev.timing);
@@ -303,8 +401,9 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       }
       await Promise.all(spoken);
       return true;
-    },
-    async listen(h) {
+  }
+
+  async function listen(h: ListenHandlers): Promise<void> {
       if (!stt || listening) return;
       listening = true;
       // Permissão primeiro: o STT fecha a conexão depois de ~10 s sem áudio, e o pedido do navegador pode demorar.
@@ -325,8 +424,9 @@ export async function createAgentVoice(): Promise<AgentVoice> {
         return h.onState?.("indisponivel");
       }
       if (listening) h.onState?.("ouvindo");
-    },
-    stopListening() {
+  }
+
+  function stopListening(): void {
       listening = false;
       const m = mic;
       const s = session;
@@ -334,22 +434,8 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       session = null; // antes do stop(): o onClose desta sessão não reconecta
       s?.stop();
       m?.stop();
-    },
-    setMuted(muted) {
-      userMuted = muted;
-      applyMute();
-    },
-    pause() {
-      paused = true;
-      player.pause();
-      applyMute();
-    },
-    resume() {
-      paused = false;
-      player.resume();
-      applyMute();
-    },
-  };
+  }
+
   return voice;
 }
 

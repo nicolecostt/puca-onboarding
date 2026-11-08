@@ -1,4 +1,4 @@
-// Formato da jornada de Puca.
+// Formato da jornada do Puca.
 // Vocabulário de jornadas de agentes de demonstração por voz (momentos → passos, com objetivo,
 // fala-guia, vista, conhecimento, decisão e transições), mais uma vista nova: o quadro.
 // Detalhes e exemplos em docs/journey-format.md.
@@ -56,7 +56,7 @@ export interface ResultadoChecagem {
   resposta: string;
 }
 
-/** O que Puca concluiu na call inicial (CONTEXT.md: calibragem). Contrato em docs/contratos.md. */
+/** O que o Puca concluiu na call inicial (CONTEXT.md: calibragem). Contrato em docs/contratos.md. */
 export interface Calibragem {
   versao: 1;
   perfil: Profile;
@@ -87,7 +87,7 @@ export interface MomentoDaPessoa {
   /** Id do momento na jornada. */
   id: string;
   titulo: string;
-  /** O goal do momento: serve para Puca e para o painel do buddy, não é mostrado à pessoa. */
+  /** O goal do momento: serve para o Puca e para o painel do buddy, não é mostrado à pessoa. */
   objetivo: string;
   estado: EstadoMomento;
   /** Por que esse estado, em uma frase curta para a pessoa (vazio quando não há o que dizer). */
@@ -196,7 +196,7 @@ export type BoardAction = (
   | { type: "close_card" }
   | { type: "reset" }
 ) & {
-  /** Trecho da fala do passo: a ação acontece quando Puca chega nele. Sem `at`, acontece antes da fala. */
+  /** Trecho da fala do passo: a ação acontece quando o Puca chega nele. Sem `at`, acontece antes da fala. */
   at?: string;
 };
 

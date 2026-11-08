@@ -107,9 +107,9 @@ function montarMenu(): void {
 async function avisarMicrofoneNegado(win: BrowserWindow): Promise<void> {
   const { response } = await dialog.showMessageBox(win, {
     type: "info",
-    message: "Puca não tem acesso ao microfone",
+    message: "O Puca não tem acesso ao microfone",
     detail:
-      "Você pode seguir a sessão pelo chat. Para falar com Puca, abra Ajustes do Sistema → Privacidade e Segurança → Microfone, ligue o Orbis e abra o app de novo.",
+      "Você pode seguir a sessão pelo chat. Para falar com o Puca, abra Ajustes do Sistema → Privacidade e Segurança → Microfone, ligue o Orbis e abra o app de novo.",
     buttons: ["Seguir pelo chat", "Abrir Ajustes"],
     defaultId: 0,
   });
@@ -132,7 +132,7 @@ function abrirJanela(): BrowserWindow {
 }
 
 app.setName("Orbis");
-app.setAboutPanelOptions({ applicationName: "Orbis", applicationVersion: app.getVersion(), credits: "Puca conduz o seu onboarding por voz." });
+app.setAboutPanelOptions({ applicationName: "Orbis", applicationVersion: app.getVersion(), credits: "O Puca conduz o seu onboarding por voz." });
 
 if (!app.requestSingleInstanceLock()) app.quit();
 

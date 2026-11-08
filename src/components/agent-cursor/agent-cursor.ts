@@ -1,7 +1,7 @@
-// Cursor de Puca: a seta com a etiqueta "Puca" que mexe na tela da pessoa (por enquanto simulado).
+// Cursor do Puca: a seta com a etiqueta "Puca" que mexe na tela da pessoa (por enquanto simulado).
 //   const cursor = mountAgentCursor();
 //   await cursor.moveTo(el);  await cursor.click();  cursor.setPaused(true);  cursor.hide();
-// Não recebe cliques (pointer-events: none): só mostra o que Puca está fazendo.
+// Não recebe cliques (pointer-events: none): só mostra o que o Puca está fazendo.
 import "../../styles/tokens.css";
 import "./agent-cursor.css";
 

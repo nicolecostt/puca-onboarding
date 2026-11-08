@@ -1,4 +1,4 @@
-# Camada de resposta da Puca: desenho
+# Camada de resposta do Puca: desenho
 
 > Rascunho de 2026-11-08 para as issues #25, #26 e #27 e para o modo sempre na tela. É a especificação que os planos
 > desta pasta implementam. Toca o `PRODUCT.md` §4.1, §4.3, §4.5, §5, §11, §12.2 e §13. O modo sempre na tela é
@@ -6,8 +6,8 @@
 
 ## Problema
 
-A Puca precisa transformar uma fala que a cascata local não resolveu, ou um chamado feito enquanto a pessoa usa outro
-app, numa resposta **escolhida pelo modelo**: falar, desenhar no quadro, mostrar a fonte no navegador da Puca, pular
+O Puca precisa transformar uma fala que a cascata local não resolveu, ou um chamado feito enquanto a pessoa usa outro
+app, numa resposta **escolhida pelo modelo**: falar, desenhar no quadro, mostrar a fonte no navegador do Puca, pular
 para um momento, abrir uma sessão sob demanda ou encaminhar. Toda afirmação sobre a Kota e toda ação têm de sair do kit
 da Kota, e nada pode ser inventado: nem fato, nem URL, nem nó, nem responsável.
 
@@ -216,13 +216,13 @@ momentos (B16).
 - **Leitura só no chamado, nunca em sondagem.** Para o clique na pílula não esconder o app de antes, o processo
   principal guarda só o **nome** do último app em foco, por notificação de ativação. Os níveis de leitura:
 
-  | Nível | Permissão | O que a Puca lê |
+  | Nível | Permissão | O que o Puca lê |
   |---|---|---|
-  | 0 | nenhuma nova | o app em foco; o que está aberto no navegador da Puca (sempre, por CDP) |
+  | 0 | nenhuma nova | o app em foco; o que está aberto no navegador do Puca (sempre, por CDP) |
   | 1 | Acessibilidade | título da janela, texto selecionado, URL do navegador em foco |
   | 2 | Gravação de tela | print só da janela em foco, com licença pedida **naquele chamado** |
 
-  Sem permissão, a Puca segue no nível 0.
+  Sem permissão, o Puca segue no nível 0.
 - **Entidades.** `brain.ondeEsta(url)` e o léxico do mapa ligam a tela às entidades (pasta do `kota-bank` → sistema,
   `docs/adr/…` → ADR, URL do Notion → página).
 - **Privacidade, cobrada em código:**
@@ -232,9 +232,9 @@ momentos (B16).
   - apps de senha, de mensagens e de banco ficam de fora;
   - segredos são removidos;
   - a pílula mostra o que foi lido, com um ✕ para descartar;
-  - a Puca não avalia a pessoa.
+  - o Puca não avalia a pessoa.
 - **Decisão nova** (próxima livre em `docs/decisoes/`). Revê a 0004 (só microfone) e a 0008 (ver a tela fora): **ver
-  sim, agir não**. O computer use continua só no navegador da Puca. Registra também o ajudante nativo em Swift.
+  sim, agir não**. O computer use continua só no navegador do Puca. Registra também o ajudante nativo em Swift.
 
 ## Decisão de síntese
 
@@ -289,7 +289,7 @@ Rejeitados:
   dos literais passando? Medir antes de construir (plano 3, tarefa 1).
 - **Falsos positivos do reconhecedor.** "Contas", "Canais" e "Plataforma" são times e palavras comuns. A regra é exigir
   "time X" ou maiúscula no meio da frase, e medir.
-- **Confirmação do encaminhamento (decidido em 2026-11-08):** antes de sair, a Puca pergunta ("Levo para a
+- **Confirmação do encaminhamento (decidido em 2026-11-08):** antes de sair, o Puca pergunta ("Levo para a
   Beatriz?") e só grava com o sim da pessoa.
 - **Assinatura no macOS.** Com assinatura ad hoc, cada versão muda o cdhash e o macOS esquece as permissões. É preciso
   certificado estável no CI (fase 5).

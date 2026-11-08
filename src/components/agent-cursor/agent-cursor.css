@@ -1,4 +1,4 @@
-/* Cursor de Puca: seta + etiqueta com o nome, na cor de Puca. A ponta da seta fica no ponto (0, 0). */
+/* Cursor do Puca: seta + etiqueta com o nome, na cor do Puca. A ponta da seta fica no ponto (0, 0). */
 .agent-cursor {
   position: fixed;
   left: 0;
