@@ -1,5 +1,5 @@
 /* Boas-vindas no visual da landing (DESIGN.md).
-   Recebe a call inicial numa view transition (a call estoura para fora, esta tela sobe). */
+   Apresenta a call inicial na primeira abertura do Orbis. */
 :root {
   --ink: var(--color-text);
   --paper: var(--color-surface);

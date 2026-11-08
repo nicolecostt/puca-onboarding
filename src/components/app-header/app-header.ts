@@ -3,6 +3,7 @@
 //   mountAppHeader({ current: "lesson", profile })
 import "../../styles/tokens.css";
 import "./app-header.css";
+import { screenHref } from "../../lib/navigation";
 import { esc } from "../../lib/dom";
 import { company, journey, teamLine, type JourneyStepId, type Profile } from "../../data";
 import logoUrl from "../../assets/orbis-logo.png";
@@ -32,11 +33,11 @@ export function mountAppHeader(opts: AppHeaderOptions): HTMLElement {
   const header = document.createElement("header");
   header.className = "app-header";
   header.innerHTML = `
-    <div class="app-header__brand">
+    <a class="app-header__brand" href="${esc(screenHref("../inicio/"))}" aria-label="Orbis, início">
       <img class="app-header__logo" src="${logoUrl}" alt="" width="26" height="26">
       <span class="app-header__name">Orbis</span>
       <span class="app-header__company">${esc(company.name)}</span>
-    </div>
+    </a>
     <ol class="app-header__steps" aria-label="Sua jornada">${steps}</ol>
     <div class="app-header__person">
       <span class="app-header__avatar" aria-hidden="true">${esc(opts.profile.initials)}</span>

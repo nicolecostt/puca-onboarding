@@ -8,9 +8,9 @@ RUN npm ci --omit=dev && npm install -g tsx@4.23.15 && npm cache clean --force
 
 COPY tsconfig.json ./
 COPY src ./src
+# src/data importa o mapa da Kota (kit/kota/mapa.ts); o turno do LLM leva o Notion da Kota no prompt (decisão 0012)
+COPY kit ./kit
 COPY server ./server
-# o turno do LLM leva o Notion da Kota no prompt (decisão 0010)
-COPY kit/kota/notion/paginas ./kit/kota/notion/paginas
 
 EXPOSE 8787
 CMD ["tsx", "server/src/server.ts"]

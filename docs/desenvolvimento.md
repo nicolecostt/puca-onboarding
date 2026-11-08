@@ -103,7 +103,7 @@ npm run bench:llm    # latência do LLM por modelo/config → server/bench/resul
 npm run bench:turn   # tempo até o Puca começar a responder, por caminho (--tts mede o áudio também)
 ```
 
-Regra: a sessão nunca fica muda (decisão 0010). Com LLM no servidor, cada turno vai ao `/api/turn` e o LLM conduz,
+Regra: a sessão nunca fica muda (decisão 0012). Com LLM no servidor, cada turno vai ao `/api/turn` e o LLM conduz,
 com a jornada como pauta e o Notion da Kota como fonte. Sem LLM (ou com `?modo=roteiro`, `?auto=1`), cada fala (voz ou chat)
 passa por `src/journey/route.ts`, nesta ordem:
 pulo de assunto → resposta sugerida → dúvida da primeira tarefa (campos da tarefa da pessoa) → nome de um item do quadro →

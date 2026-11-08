@@ -4,6 +4,7 @@
 // momento (rastro, só totais: nunca o texto da fala), encaminhamentos abertos e pedidos de primeira tarefa.
 import "../../styles/base.css";
 import "./style.css";
+import { preserveProfileLinks } from "../../lib/navigation";
 import { esc, qs } from "../../lib/dom";
 import { company } from "../../data";
 import { mountPucaDots } from "../../lib/puca-dots";
@@ -24,6 +25,8 @@ import {
   type Integracao,
   type Pendencia,
 } from "./data";
+
+preserveProfileLinks();
 
 const journey = loadJourney(demoJourney);
 const initials = (nome: string) => nome.split(/\s+/).map((w) => w[0] ?? "").join("").slice(0, 2).toUpperCase();

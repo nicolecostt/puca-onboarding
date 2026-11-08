@@ -1,4 +1,4 @@
-// A jornada como pauta (decisão 0010): o LLM conduz a sessão e avisa quando o passo acabou; daqui sai o próximo
+// A jornada como pauta (decisão 0012): o LLM conduz a sessão e avisa quando o passo acabou; daqui sai o próximo
 // passo, pelas mesmas transições que o motor (runner.ts) usa no roteiro.
 import { evaluate, matchReply } from "./conditions";
 import type { Journey, Profile, ResultadoDaChecagem } from "./types";

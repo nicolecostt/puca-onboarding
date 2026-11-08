@@ -63,7 +63,7 @@ Mac do jurado                                       Nuvem
 
 ## 2. Princípios
 
-1. **A sessão nunca fica muda** (regra do `CLAUDE.md`, decisão 0010). O LLM conduz cada turno pelo `/api/turn`, com a
+1. **A sessão nunca fica muda** (regra do `CLAUDE.md`, decisão 0012). O LLM conduz cada turno pelo `/api/turn`, com a
    jornada como pauta e uma ponte se a primeira frase demorar; sem servidor, sem LLM ou com a trava esgotada, a sessão
    segue a jornada como roteiro pela `src/journey/route.ts`. O conhecimento vem de cópias locais (o Notion da Kota no prompt).
 2. **A sessão nunca trava por causa de infraestrutura.** Supabase fora do ar, Slack lento ou o navegador do Puca

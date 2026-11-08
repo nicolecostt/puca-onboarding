@@ -176,5 +176,6 @@ mountBoard();
 mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
   occluders: "h1, h2, h3, p, dt, dd, .actions, .cmd, .board, .skills, .puca__stage, .orb, .nav, .footer__row > *",
   round: ".puca__stage, .orb",
+  scroll: 0.6,
 });
 void mountSpheres().then(mountSkills);

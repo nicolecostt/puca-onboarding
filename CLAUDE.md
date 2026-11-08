@@ -69,7 +69,7 @@ valem por cima do resto deste arquivo e das skills (decisão 0010). Git seguro, 
 
 ## Regras do projeto
 
-- A sessão nunca fica muda. O LLM conduz cada turno (`/api/turn`, decisão 0010) com a jornada como pauta, e a ponte
+- A sessão nunca fica muda. O LLM conduz cada turno (`/api/turn`, decisão 0012) com a jornada como pauta, e a ponte
   cobre a espera; sem servidor, sem LLM ou com a trava esgotada, a sessão segue a jornada como roteiro pela `src/journey/route.ts`.
 - A sessão (`src/screens/lesson/`) guarda onde a jornada está no app; o servidor dá voz, LLM e as ações nos sistemas da Kota
   (Slack, GitHub), sem guardar estado de sessão: o que precisa durar vai para o Supabase ([`docs/stack.md`](docs/stack.md) §5).

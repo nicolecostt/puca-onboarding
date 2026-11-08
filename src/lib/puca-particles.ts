@@ -9,6 +9,8 @@ export interface PucaParticlesOptions {
   round?: string;
   /** Máximo de partículas na tela (padrão 60). */
   max?: number;
+  /** Quanto as partículas acompanham a rolagem da página: 0 ficam paradas na tela (padrão), 1 andam com o conteúdo. */
+  scroll?: number;
 }
 
 export function mountPucaParticles(canvas: HTMLCanvasElement, opts: PucaParticlesOptions): void {
@@ -64,7 +66,24 @@ export function mountPucaParticles(canvas: HTMLCanvasElement, opts: PucaParticle
       const rad = Math.min(k.r - k.l, k.b - k.t) / 2;
       return (x - cx) ** 2 + (y - cy) ** 2 < rad * rad;
     });
-  addEventListener("scroll", () => (measuredAt = -1), { passive: true });
+  // acompanhar a rolagem: a página subiu N px, as partículas sobem N × scroll (e voltam do outro lado)
+  let lastScroll = scrollY;
+  addEventListener(
+    "scroll",
+    () => {
+      measuredAt = -1;
+      const delta = scrollY - lastScroll;
+      lastScroll = scrollY;
+      if (!opts.scroll || !h) return;
+      for (const d of dots) {
+        d.y -= (delta * opts.scroll) / h;
+        if (d.y < -0.05) d.y += 1.1;
+        else if (d.y > 1.05) d.y -= 1.1;
+      }
+      if (!running) draw(0);
+    },
+    { passive: true },
+  );
   addEventListener("resize", () => (measuredAt = -1));
 
   const draw = (dt: number) => {

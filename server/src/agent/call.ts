@@ -1,4 +1,4 @@
-// Call inicial conduzida pelo LLM (#57, decisão 0010): perguntas norteadoras em vez de roteiro, follow-ups do
+// Call inicial conduzida pelo LLM (#57, decisão 0012): perguntas norteadoras em vez de roteiro, follow-ups do
 // próprio modelo e o onboarding cultural vindo do Notion da Kota. O que a pessoa conta vira anotações (`answer`),
 // que a tela transforma em perfil e calibragem. Contrato "Call inicial" em docs/contratos.md.
 import { randomUUID } from "node:crypto";

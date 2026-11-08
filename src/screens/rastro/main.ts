@@ -2,10 +2,13 @@
 // Não faz parte do produto; serve para mostrar à banca que dá para auditar o que o Puca fez e por quê.
 import "../../styles/base.css";
 import "./style.css";
+import { preserveProfileLinks } from "../../lib/navigation";
 import { createOutbox, FORWARDING_KEY } from "../../journey/forwarding";
 import { browserStore } from "../../journey/storage";
 import { createTrail, TRAIL_KEY, type TrailEntry, type TrailRoute } from "../../journey/trail";
 import { qs } from "../../lib/dom";
+
+preserveProfileLinks();
 
 const ROUTE_LABEL: Record<TrailRoute, string> = {
   jump: "Pulo de assunto",

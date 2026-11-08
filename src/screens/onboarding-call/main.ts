@@ -1,8 +1,9 @@
 // Call inicial: o Puca acolhe, faz o onboarding cultural e conhece a pessoa (a calibragem), numa conversa de voz.
-// O LLM conduz pelo /api/call (#57, decisão 0010): perguntas norteadoras, follow-ups dele e a cultura vinda do
+// O LLM conduz pelo /api/call (#57, decisão 0012): perguntas norteadoras, follow-ups dele e a cultura vinda do
 // Notion da Kota. O que a pessoa conta chega como anotações, que viram o perfil e a calibragem da sessão.
 import "../../styles/base.css";
 import "./style.css";
+import { preserveProfileLinks } from "../../lib/navigation";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
 import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../lib/agent-visual";
@@ -10,20 +11,23 @@ import { emit } from "../../lib/events";
 import { esc, qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
 import { activeProfile, company } from "../../data";
-import { profileFromAnswers, saveProfile } from "../../journey/profile";
+import { loadSavedProfile, profileFromAnswers, saveProfile } from "../../journey/profile";
 import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem";
 import { createAgentVoice, MIC_AVISO, type CallRequest, type SpeakOptions } from "../../voice/agent-voice";
 
-// Dados da admissão: a empresa já sabe, o Puca só confirma (?perfil=bruno | ana escolhe a pessoa da demo).
-const profile = activeProfile();
+const savedProfile = loadSavedProfile();
+if (!savedProfile) qs<HTMLAnchorElement>(document, ".brand").href = "../boas-vindas/";
+preserveProfileLinks();
+
+// Dados da admissão: a empresa já sabe, o Puca só confirma (o vínculo salvo nas boas-vindas escolhe a pessoa da demo).
+const profile = activeProfile(savedProfile?.vinculo === "transicao" ? "bruno" : "ana");
 const admissao = {
   cargo: profile.role,
   time: profile.toTeam,
   gestor: company.people[profile.managerId]?.name ?? "",
 };
 
-/** Boas-vindas, aberta no fim da call; de lá a pessoa vai para o início ou refaz a call. */
-const HOME_URL = `../boas-vindas/${location.search}`; // leva o ?perfil= junto
+
 
 const SEM_PUCA = "O Puca está fora do ar agora. Recarregue a página em alguns minutos para fazer a call.";
 const FALHOU = "Perdi a conexão para pensar agora. Pode repetir?";
@@ -220,15 +224,15 @@ async function main(): Promise<void> {
     void turno("fala", text, interrompida || undefined);
   }
 
-  /** Fim da call: o perfil e a calibragem vão para a sessão no quadro, e a página segue para as boas-vindas. */
+  /** Fim da call: o perfil e a calibragem vão para a sessão no quadro, que abre em seguida. */
   function encerrar(): void {
     state.done = true;
     setAgent("done");
     voice.stopListening();
     const perfil = profileFromAnswers(answers);
-    saveProfile(perfil);
     saveCalibragem(calibragemFromAnswers(perfil, answers));
-    window.setTimeout(leaveToHome, 1400);
+    saveProfile(perfil);
+    window.setTimeout(leaveToSession, 1400);
   }
 
   function ouvir(): void {
@@ -297,11 +301,10 @@ async function main(): Promise<void> {
   });
 }
 
-/** Fim da call: a conversa e os controles somem (style.css, body.is-leaving) e a página
- *  "estoura" para as boas-vindas (view transition, boas-vindas/style.css). */
-function leaveToHome(): void {
+/** Fim da call: a conversa e os controles somem (style.css, body.is-leaving) antes de abrir o quadro. */
+function leaveToSession(): void {
   document.body.classList.add("is-leaving");
-  window.setTimeout(() => location.assign(HOME_URL), 460);
+  window.setTimeout(() => location.replace("../lesson/"), 460);
 }
 
 void main();

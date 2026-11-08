@@ -6,7 +6,7 @@ import { pathToFileURL } from "node:url";
 
 const ORIGEM = "app://orbis";
 const DEV_URL = process.env.ORBIS_DEV_URL?.replace(/\/+$/, "");
-const INICIO = DEV_URL ? `${DEV_URL}/` : `${ORIGEM}/index.html`;
+const INICIO = `${DEV_URL ?? ORIGEM}/src/screens/boas-vindas/`;
 
 // Antes do `ready`: sem isso o app:// não é origem segura, e microfone, localStorage e CORS do Fly não funcionam.
 protocol.registerSchemesAsPrivileged([

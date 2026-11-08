@@ -1,4 +1,4 @@
-// Notion da Kota inteiro, para a parte fixa do prompt do turno (decisão 0010; um dos caminhos da #25).
+// Notion da Kota inteiro, para a parte fixa do prompt do turno (decisão 0012; um dos caminhos da #25).
 // ~85 KB: cabe no Claude e fica no cache de prompt; a busca entra se a qualidade ou a latência pedirem.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 

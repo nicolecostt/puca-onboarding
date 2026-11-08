@@ -2,6 +2,7 @@
 // A tela inteira imita o Slack (tema claro) com os dados da Kota; o conteúdo está no index.html.
 import "../../styles/base.css";
 import "./style.css";
+import { preserveProfileLinks, screenHref } from "../../lib/navigation";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
 import { mountAgentCam } from "../../components/agent-cam/agent-cam";
@@ -14,6 +15,8 @@ import { browserStore } from "../../journey/storage";
 import { uid } from "../../journey/uid";
 import { drenar } from "./fila";
 import { clearComposer, findDm, openDm, postApprovalRequest, postMessage, typeInComposer } from "./slack-dm";
+
+preserveProfileLinks();
 
 const BUDDY_ACK = "Vi aqui, te respondo já.";
 const now = () => new Date().toLocaleTimeString("pt-BR", { hour: "numeric", minute: "2-digit" }).replace(":", "h");
@@ -97,7 +100,7 @@ async function main(): Promise<void> {
     const button = postApprovalRequest({
       text: pedidoMessage(p),
       time: now(),
-      link: `../primeira-tarefa/?id=${encodeURIComponent(p.id)}`,
+      link: screenHref(`../primeira-tarefa/?id=${encodeURIComponent(p.id)}`),
       onApprove: () => {
         const aprovou = pedidos.aprovar(p.id, p.gestor);
         desabilitar(button);

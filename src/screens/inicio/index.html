@@ -1,9 +1,11 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-type="software">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Início · Orbis</title>
+<meta name="page-type" content="software">
+<meta name="site-kind" content="software">
 <meta name="theme-color" content="#ffffff">
 <script>
   // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
@@ -23,29 +25,24 @@
 
   <header class="topbar">
     <div class="wrap topbar__row">
-      <a class="brand" href="../landing/" aria-label="Orbis, início">
+      <a class="brand" href="../inicio/" data-orbis-link aria-label="Orbis, início">
         <img class="brand__mark" src="../../assets/orbis-logo.png" alt="" width="26" height="26">
         <span class="brand__name">Orbis</span>
       </a>
-      <span class="me"><span class="me__name" id="me-name"></span><span class="avatar avatar--sm" id="me-initials" aria-hidden="true"></span></span>
+      <nav class="home-links" aria-label="Áreas do Orbis">
+        <a class="orbis-link" href="../lesson/" data-orbis-link>Rever sessão</a>
+        <a class="orbis-link" href="../rh/" data-orbis-link>Painel do RH</a>
+      </nav>
     </div>
   </header>
 
-  <!-- Progresso -->
-  <nav class="trail" aria-label="Progresso">
-    <div class="wrap trail__row">
-      <span class="trail__label" id="trail-label">Processo</span>
-      <ol class="trail__steps" id="trail"></ol>
-    </div>
-  </nav>
-
-  <main class="wrap page">
-    <!-- Perfil -->
+  <main class="wrap page" hidden>
     <section class="profile" aria-label="Seu perfil">
-      <span class="avatar" id="initials" aria-hidden="true"></span>
       <div class="profile__text">
+        <p class="eyebrow">Sua jornada na Kota</p>
         <h1 class="profile__name" id="name"></h1>
         <p class="profile__role" id="role"></p>
+        <div id="puca-call"></div>
       </div>
       <dl class="profile__meta" id="meta"></dl>
     </section>
@@ -53,13 +50,14 @@
     <div class="grid">
       <!-- Tarefas -->
       <section class="tasks" aria-labelledby="tasks-title">
+        <div class="next-step" id="next-step" hidden></div>
         <h2 id="tasks-title">Suas tarefas</h2>
         <ol class="tasks__list" id="tasks"></ol>
       </section>
 
       <!-- Ferramentas e acessos -->
       <section class="tools" aria-labelledby="tools-title">
-        <h2 id="tools-title">Ferramentas</h2>
+        <h2 id="tools-title">Ferramentas e acessos</h2>
         <div class="notice" id="notice" role="status" aria-live="polite" hidden>
           <span class="notice__orb" id="notice-orb" aria-hidden="true"></span>
           <p class="notice__text" id="notice-text"></p>

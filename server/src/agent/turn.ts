@@ -1,4 +1,4 @@
-// Um turno da sessão conduzido pelo LLM (decisão 0010, contrato "Turno da sessão" em docs/contratos.md).
+// Um turno da sessão conduzido pelo LLM (decisão 0012, contrato "Turno da sessão" em docs/contratos.md).
 // Sem estado: a tela manda onde a sessão está, o histórico e o que aconteceu (começou, seguir, fala, silêncio).
 // A parte fixa do prompt (regras, pauta da jornada, Notion da Kota) e as ferramentas não mudam entre turnos: ficam
 // no cache de prompt. O que muda vai na última mensagem.
@@ -45,7 +45,7 @@ export interface TurnInput {
 /** Sem nada falado depois disso, a ponte toca (só em turno de fala). */
 const BRIDGE_AFTER_MS = 2500;
 
-const RULES = `Você é o Puca e fala de si sempre no masculino ("o Puca", "obrigado", "pronto", "interrompido"), mesmo que algum trecho acima diga "a Puca".
+const RULES = `Você é o Puca e fala de si sempre no masculino ("o Puca", "obrigado", "pronto", "interrompido"), mesmo que algum trecho acima diga "a Puca" ou "Puca" sem artigo.
 Você está numa call de voz, em pt-BR, conduzindo uma sessão de onboarding. Você leva a conversa: sabe para onde a sessão vai e puxa a pessoa de volta com leveza.
 
 Como falar:

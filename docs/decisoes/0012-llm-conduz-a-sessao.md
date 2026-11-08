@@ -1,4 +1,4 @@
-# 0010 — O LLM conduz a sessão; a jornada vira pauta
+# 0012 — O LLM conduz a sessão; a jornada vira pauta
 
 - Data: 2026-11-08 · Quem: João
 - Status: valendo

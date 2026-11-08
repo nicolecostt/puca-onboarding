@@ -10,7 +10,7 @@ export const DEEPGRAM_LISTEN_PARAMS: Record<string, string> = {
   sample_rate: "16000",
   channels: "1",
   interim_results: "true",
-  // 800 ms de pausa fecham a fala: com 300, "então… por que a fila?" virava duas falas (decisão 0010)
+  // 800 ms de pausa fecham a fala: com 300, "então… por que a fila?" virava duas falas (decisão 0012)
   endpointing: "800",
   utterance_end_ms: "1000",
   vad_events: "true",

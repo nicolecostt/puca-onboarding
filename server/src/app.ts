@@ -1,5 +1,5 @@
 // API do agente (sem estado): fala → áudio, pergunta → ponte + LLM por SSE, token do STT e áudio do TTS.
-// A tela guarda onde a sessão está; o LLM conduz cada turno pelo /api/turn (decisão 0010), e o /api/ask fica
+// A tela guarda onde a sessão está; o LLM conduz cada turno pelo /api/turn (decisão 0012), e o /api/ask fica
 // para o roteiro (plano B, sem LLM).
 // Contrato "API do servidor" em docs/contratos.md: token do Supabase, limites por pessoa, travas diárias e CORS.
 import { randomUUID } from "node:crypto";
@@ -13,6 +13,7 @@ import { DEMO_PROFILES } from "../../src/journey/profile";
 import type { Journey, Profile } from "../../src/journey/types";
 import { loadJourney } from "../../src/journey/validate";
 import { ask, type AskEvent } from "./agent/ask";
+import { carregarBrain, type Brain } from "./brain/brain";
 import { notionDaKota } from "./agent/kota";
 import { turn, type TurnEvent, type TurnKind } from "./agent/turn";
 import { CAMPOS_DA_CALL, TEMAS_DE_CULTURA, callTurn, type CallEvent, type CampoDaCall } from "./agent/call";
@@ -90,6 +91,8 @@ export interface BuildAppOptions {
   knowledge?: string;
   /** Para testes: substitui a geração do token do Deepgram. */
   mintSttToken?: typeof mintSttToken;
+  /** Company brain; padrão: carregado do kit da Kota em process.cwd() (sem kit, sobe sem brain). */
+  brain?: Brain;
   /** Encaminhamento no Slack da Kota (#129); null = sem Slack. Padrão: pelo SLACK_BOT_TOKEN do ambiente. */
   encaminhar?: ((p: PedidoDeEncaminhamento) => Promise<ResultadoDoEncaminhamento>) | null;
 }
@@ -101,7 +104,7 @@ export function tryCreateEncaminhador(): ((p: PedidoDeEncaminhamento) => Promise
 export function buildApp(opts: BuildAppOptions = {}) {
   const journey = opts.journey ?? loadDemoJourney();
   const knowledge = opts.knowledge ?? notionDaKota();
-  // há LLM configurado: a tela deixa o LLM conduzir a sessão (decisão 0010)
+  // há LLM configurado: a tela deixa o LLM conduzir a sessão (decisão 0012)
   const llmKey = !!(process.env.ANTHROPIC_API_KEY || process.env.FEATHERLESS_API_KEY);
   const tts = opts.tts === undefined ? tryCreateTts() : opts.tts;
   const verificaToken = opts.verificaToken === undefined ? tryCreateVerificaToken() : opts.verificaToken;
@@ -112,6 +115,15 @@ export function buildApp(opts: BuildAppOptions = {}) {
   const encaminhar = opts.encaminhar === undefined ? tryCreateEncaminhador() : opts.encaminhar;
   // trustProxy: atrás do proxy do Fly, o IP da pessoa vem no X-Forwarded-For
   const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? "info" }, trustProxy: true });
+  let brain = opts.brain;
+  if (!brain) {
+    try {
+      brain = carregarBrain(process.cwd());
+      app.log.info({ trechos: brain.total }, "brain carregado");
+    } catch (err) {
+      app.log.warn({ err }, "brain sem kit da Kota: o /api/ask responde sem trechos");
+    }
+  }
 
   app.register(cors, { origin: opts.corsOrigins ?? env.corsOrigins, methods: ["GET", "POST"], allowedHeaders: ["Authorization", "Content-Type"] });
 
@@ -183,7 +195,7 @@ export function buildApp(opts: BuildAppOptions = {}) {
         reply.raw.on("close", () => { if (!reply.raw.writableFinished) ac.abort(); });
         const emit = sse(reply);
         const timing = await ask(
-          { journey, profile: perfilSeguro(b.profile, b.perfil), momentId: moment.id, stepId: step.id, text, history, tts, model: env.model, timeoutMs: env.llmTimeoutMs, signal: ac.signal },
+          { journey, profile: perfilSeguro(b.profile, b.perfil), momentId: moment.id, stepId: step.id, text, history, tts, model: env.model, timeoutMs: env.llmTimeoutMs, signal: ac.signal, brain },
           emit,
         );
         reply.raw.end();
