@@ -31,7 +31,7 @@
   filter:drop-shadow(0 8px 8px rgba(0,0,0,.05)) drop-shadow(0 4px 4px rgba(0,0,0,.05)) drop-shadow(0 2px 2px rgba(0,0,0,.05));
   font-size:13px;line-height:19.5px;font-weight:500;letter-spacing:-.13px;color:var(--color-ink);white-space:nowrap;
 }
-.call-redial:hover .call-redial__icon{background:#1f7a17}
+.call-redial:hover .call-redial__icon{background:var(--color-text)}
 .call-redial:active{transform:scale(.97)}
 .call-redial:focus-visible{outline:2px solid var(--color-ink);outline-offset:3px}
 .call-redial__icon{
