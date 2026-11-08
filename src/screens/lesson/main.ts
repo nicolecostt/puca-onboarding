@@ -13,6 +13,7 @@ import { whiteboardFromJourney } from "../../components/whiteboard/from-journey"
 import { buildFaqs } from "../../journey/faq";
 import { routeUtterance } from "../../journey/route";
 import { browserStore } from "../../journey/storage";
+import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
 import { createTrail, sourcesFor } from "../../journey/trail";
 import { createAgentVoice } from "../../voice/agent-voice";
 import { interpolateDeep, resolveProfile } from "../../journey/profile";
@@ -81,6 +82,8 @@ async function main(): Promise<void> {
     replies: qs(document, "#replies"),
     hint: qs(document, "#caption-hint"),
     voice: qs(document, "#voice"),
+    forwardToast: qs(document, "#forward-toast"),
+    forwardText: qs(document, "#forward-text"),
   };
   el.lessonName.textContent = journey.title;
 
@@ -99,6 +102,9 @@ async function main(): Promise<void> {
   const faqs = buildFaqs(journey, profile);
   // Rastro de cada fala (caminho, resposta e fonte): a tela de demo src/screens/rastro/ mostra.
   const trail = createTrail(browserStore());
+  // Encaminhamentos à buddy: a tela do Slack (src/screens/live-session/) envia.
+  const outbox = createOutbox(browserStore());
+  const buddy = buddyOf(journey);
   const history: { role: "user" | "assistant"; content: string }[] = [];
   const remember = (role: "user" | "assistant", content: string) => {
     history.push({ role, content });
@@ -209,6 +215,25 @@ async function main(): Promise<void> {
     await play();
   }
 
+  /** Fontes que a Puca tinha à mão: as do quadro na tela e o conhecimento do momento. */
+  function consultedNow(): string[] {
+    const nodes = currentBoard ? (journey.boards[currentBoard]?.nodes ?? []) : [];
+    const docs = nodes.flatMap((n) => [...(n.info?.docs ?? []).map((d) => d.title), ...(n.info?.adr ? [n.info.adr.id] : [])]);
+    const knowledge = currentMoment?.knowledge ? [`Conhecimento da aula: ${currentMoment.title}`] : [];
+    return [...new Set([...docs, ...knowledge])];
+  }
+
+  let toastTimer = 0;
+  /** Encaminha a dúvida à buddy (§4.5): guarda para o Slack, marca no rastro e avisa na aula. */
+  function forward(entryId: string, f: { question: string; summary: string; reason: string }): void {
+    const created = outbox.add({ ...f, to: { name: buddy, role: "buddy" }, pessoa: profile.nome, consulted: consultedNow(), moment: currentMoment?.id ?? null });
+    trail.update(entryId, { forwarding_id: created.id });
+    el.forwardText.textContent = `Encaminhado à ${buddy} no Slack`;
+    el.forwardToast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (el.forwardToast.hidden = true), 8000);
+  }
+
   /** O agente pediu outro ponto da aula: resposta do passo atual que leva lá, ou pulo de momento. */
   function goTo(target: string): void {
     const t = currentStep?.transitions?.find((tr) => ("moment" in tr.to ? `moment:${tr.to.moment}` : `step:${tr.to.step}`) === target);
@@ -262,11 +287,17 @@ async function main(): Promise<void> {
         remember("user", text);
         trail.update(entry.id, { answer: route.text });
         return speakAside(route.text);
-      case "faq":
+      case "faq": {
         remember("user", text);
-        trail.update(entry.id, { answer: route.faq.text });
+        // dono sem fonte confiável: a dúvida vai para a buddy, com contexto
+        const said = route.faq.unconfirmed ? `${route.faq.text} Já encaminhei a sua pergunta no Slack.` : route.faq.text;
+        trail.update(entry.id, { answer: said });
         for (const a of route.faq.actions) io.apply(a);
-        return speakAside(route.faq.text);
+        if (route.faq.unconfirmed) {
+          forward(entry.id, { question: text, summary: text, reason: `Não há responsável confirmado para o ${route.faq.label} nas fontes da ${journey.company}.` });
+        }
+        return speakAside(said);
+      }
     }
     // ask: o agente responde; a ponte sai na hora e o LLM vem atrás.
     remember("user", text);
@@ -284,6 +315,7 @@ async function main(): Promise<void> {
           },
           onAction: (a) => io.apply(a),
           onGoTo: goTo,
+          onEscalate: (summary) => forward(entry.id, { question: text, summary, reason: "Não encontrei fonte confiável para responder." }),
         },
       ));
     // gravado mesmo se a pessoa interrompeu: fica a resposta parcial
@@ -292,6 +324,8 @@ async function main(): Promise<void> {
     // sem servidor e sem fonte confiável: a dúvida fica anotada (§4.5, encaminhamento para uma pessoa)
     const line = "Não achei isso confirmado na documentação, então não quero chutar. Anotei a sua pergunta para a sua buddy responder.";
     trail.update(entry.id, { answer: line });
+    // "ok" ou "valeu" não vão para a buddy
+    if (looksLikeQuestion(text)) forward(entry.id, { question: text, summary: text, reason: "Estava sem acesso ao agente e não achei isso na aula." });
     void speakAside(line);
   }
 

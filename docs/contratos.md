@@ -15,6 +15,7 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
 | Rastro (decisões da Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo), custo #52, painel #19 (só totais e encaminhamentos, nunca `utterance` nem `answer`: §5) | `__tests__/trail.test.ts` |
+| Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` | `screens/lesson` (cria), `screens/live-session` (envia no Slack), rastro (`forwarding_id`) | `__tests__/forwarding.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
 | Visual da Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `src/lib/puca-sphere.ts` | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
 
@@ -35,6 +36,19 @@ Exemplo válido de `TrailEntry` (uma fala da pessoa e o que a Puca fez com ela):
 
 `forwarding_id` aparece quando a fala virou encaminhamento; `ms` é o tempo da resposta do agente (`route: "ask"`).
 
+Exemplo válido de `Forwarding` (status: `pendente` → `enviando` → `enviado` → `confirmado`; `claimed_by` é a aba do Slack que pegou o envio, para duas abas não mandarem duas vezes, e `claimed_at` é quando ela pegou: um envio em `enviando` há mais de 30 s está preso, e outra aba pode pegar):
+
+```json
+{
+  "id": "c2d1…", "at": "2026-11-07T22:14:10.000Z",
+  "to": { "name": "Paula Nunes", "role": "buddy" },
+  "pessoa": "Ana", "question": "Quem cuida do tail-common?", "summary": "Quem cuida do tail-common?",
+  "consulted": ["ADR-012", "README do pos-gateway"],
+  "reason": "Não há responsável confirmado para o tail-common nas fontes da Tail.",
+  "moment": "pagamentos", "status": "pendente"
+}
+```
+
 ## Contratos que vão surgir
 
 Pelas tarefas do hackathon, estes formatos vão ligar partes feitas por pessoas diferentes. Quem chegar primeiro
@@ -45,9 +59,8 @@ escreve o formato aqui (tipo + um exemplo válido) **antes** de implementar; o o
 | Voz ↔ quadro | fala da Puca (interrupção e retomada) em sincronia com as ações no quadro | ações dos passos, eventos `journey:*`, `WordTiming` e `src/voice/barge-in.ts` |
 | Company brain | pergunta → trechos com **fonte** (ADR, código, doc cultural) | `knowledge` dos passos e `info.docs`/`info.adr` dos nós |
 | Progresso e memória | o que a pessoa estudou, dúvidas e onde parou, entre sessões | perfil em `sessionStorage` (`puca:profile`) |
-| Encaminhamento | dúvida sem fonte + contexto → buddy ou responsável | "anotei a sua pergunta para a sua buddy" em `screens/lesson/main.ts` (só a fala, nada é enviado) |
 | Painel buddy/gestor/RH | marcos, pendências e pedidos de suporte | etapas da jornada em `src/data/company.ts` |
-| Computer use | o agente mexendo nas ferramentas | cursor simulado em `components/agent-cursor` |
+| Computer use | o agente mexendo nas ferramentas | cursor em `components/agent-cursor`; primeiro uso real: o envio do encaminhamento no Slack (`screens/live-session/slack-dm.ts`) |
 
 ## Calibragem
 

@@ -715,3 +715,21 @@ body {
   gap: 14px;
   opacity: 0.6;
 }
+
+/* Puca escrevendo e enviando o encaminhamento (slack-dm.ts) */
+.sk-dm.is-current {
+  background: var(--sk-current);
+  color: var(--sk-current-text);
+}
+.sk-av--puca {
+  background: var(--color-puca);
+  color: var(--color-puca-text);
+}
+.sk-composer__input.is-typing {
+  color: inherit;
+  white-space: pre-wrap;
+}
+.sk-dm.is-current em {
+  color: var(--sk-current-text);
+  opacity: 0.7;
+}

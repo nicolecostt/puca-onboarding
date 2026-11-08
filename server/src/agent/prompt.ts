@@ -44,7 +44,7 @@ export function buildMessages(ctx: TurnContext, userText: string, mode: "min" | 
     g.personality_and_tone,
     g.safety_and_escalation,
     "Você está FALANDO em voz alta, em pt-BR. Responda em 1 a 3 frases curtas. A primeira frase tem no máximo 6 palavras.",
-    "Use só os fatos abaixo. Se não estiverem lá, diga que não conseguiu confirmar e indique a buddy.",
+    "Use só os fatos abaixo. Se não estiverem lá, diga que não conseguiu confirmar e chame escalate_to_buddy com um resumo da dúvida.",
     "Use as tools só com os ids listados. Sem markdown, sem listas, sem emojis.",
     "",
     `Pessoa: ${profile.nome}, ${profile.vinculo === "novo" ? "recém-contratada" : "mudando de time"}, time ${profile.time ?? "?"}, gestor ${profile.gestor ?? "?"}.`,
