@@ -30,6 +30,7 @@ export interface AskHandlers {
 /** O que a tela usa do `timing` do /api/ask (docs/contratos.md, "Custo da sessão"). */
 export interface AskTimingSummary {
   total_ms: number;
+  llm_error: "timeout" | "interrupted" | "provider_error" | "refusal" | "empty_response" | null;
   tokens_in: number | null;
   tokens_out: number | null;
   tokens_estimated: boolean;

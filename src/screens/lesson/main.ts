@@ -466,7 +466,7 @@ async function main(): Promise<void> {
           onEscalate: (summary) => forward(entry.id, { question: text, summary, reason: "Não encontrei fonte confiável para responder." }),
           // custo da sessão (#52): só no rastro, para auditar; nada em tela
           onTiming: (t) =>
-            trail.update(entry.id, { llm_ms: t.total_ms, tokens_in: t.tokens_in ?? undefined, tokens_out: t.tokens_out ?? undefined, tokens_estimated: t.tokens_estimated }),
+            trail.update(entry.id, { llm_ms: t.total_ms, llm_error: t.llm_error ?? undefined, tokens_in: t.tokens_in ?? undefined, tokens_out: t.tokens_out ?? undefined, tokens_estimated: t.tokens_estimated }),
         },
       ));
     // gravado mesmo se a pessoa interrompeu: fica a resposta parcial

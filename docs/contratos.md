@@ -218,14 +218,18 @@ Tempo e tokens de cada sessão, para o time auditar a demo (#52, PRODUCT.md §12
 - **`timing` do `/api/ask`** (`AskTiming` em `server/src/agent/ask.ts`), último evento do SSE. Campos novos, aditivos:
   `tokens_in` e `tokens_out` (tokens de entrada e de saída da chamada ao LLM; `null` quando nada foi consumido: o provedor recusou antes de responder, como sem chave, 401 ou 429) e
   `tokens_estimated` (`true` quando o provedor não informou e o servidor estimou, à razão de 4 caracteres por token).
+  `llm_error` é `null` quando não houve falha; senão, uma razão estável: `timeout`, `interrupted`, `provider_error`, `refusal` ou `empty_response`.
+  Falha do LLM e resposta vazia usam uma frase própria e não geram `escalate`; esse evento continua reservado a falta de fonte confiável.
   ```json
   { "type": "timing", "timing": { "first_speak_ms": 2, "llm_first_token_ms": 3185, "llm_first_sentence_ms": 3333,
     "total_ms": 3584, "llm_error": null, "tokens_in": 1912, "tokens_out": 38, "tokens_estimated": false } }
   ```
 - **Log do servidor:** uma linha por `/api/ask`, com `msg: "ask"`, `moment`, `step` e o `timing`, inclusive quando a
   pessoa interrompe e o navegador não recebe o `timing`. Nunca leva o texto da pessoa.
-- **Rastro** (`src/journey/trail.ts`): a entrada de uma fala que foi ao agente ganha `llm_ms` (o `total_ms` do servidor)
-  e `tokens_in`, `tokens_out` e `tokens_estimated`, copiados do `timing`. Sem esses campos, a pergunta não foi medida no
+- **Rastro** (`src/journey/trail.ts`): a entrada de uma fala que foi ao agente ganha `llm_ms` (o `total_ms` do servidor),
+  `tokens_in`, `tokens_out` e `tokens_estimated`, copiados do `timing`, e `llm_error` quando houve falha.
+  `llm_error` é uma razão estável (`timeout`, `interrupted`, `provider_error`, `refusal` ou `empty_response`), sem mensagem
+  bruta do provedor; erros ausentes não geram o campo. Sem `llm_ms` e demais campos de custo, a pergunta não foi medida no
   navegador (a pessoa interrompeu); o log do servidor tem o número.
 - **Sessão** (`TrailSession`, chave `puca:sessoes` no `localStorage`): `{ session, started_at, ended_at }`, com o mesmo
   `session` das entradas. A tela da sessão grava o início quando ela começa e o fim quando a call é encerrada ou a sessão termina;

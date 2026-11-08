@@ -13,6 +13,7 @@ export const BRIDGES: Record<FaqIntent | "generic", string[]> = {
 };
 
 export const FALLBACK_LINE = "Não consegui confirmar isso agora. Vale perguntar pra sua buddy.";
+export const FAILURE_LINE = "Tive um problema para pensar nisso agora. Pode perguntar de novo?";
 
 const used = new Map<string, number>();
 export function pickBridge(intent: FaqIntent | null): string {
@@ -34,5 +35,6 @@ export function allScriptedTexts(journey: Journey, profile: Profile): string[] {
   for (const f of buildFaqs(journey, profile)) texts.add(f.text);
   for (const list of Object.values(BRIDGES)) for (const t of list) texts.add(t);
   texts.add(FALLBACK_LINE);
+  texts.add(FAILURE_LINE);
   return [...texts];
 }
