@@ -1,6 +1,6 @@
 // App para Mac (decisão 0004, docs/stack.md §3): uma janela com o mesmo front, servido de dist/ por app://orbis/.
 // Em desenvolvimento (npm run dev:app), ORBIS_DEV_URL aponta a janela para o Vite.
-import { app, BrowserWindow, net, protocol, session, shell, systemPreferences } from "electron";
+import { app, BrowserWindow, dialog, Menu, net, protocol, session, shell, systemPreferences } from "electron";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -55,7 +55,68 @@ function cuidarDaNavegacao(win: BrowserWindow): void {
   wc.on("did-create-window", (filha) => cuidarDaNavegacao(filha));
 }
 
-function abrirJanela(): void {
+/** Menu do Mac em português. "Visualizar" mantém as ferramentas de desenvolvedor para investigar problema na demo. */
+function montarMenu(): void {
+  Menu.setApplicationMenu(
+    Menu.buildFromTemplate([
+      {
+        label: "Orbis",
+        submenu: [
+          { role: "about", label: "Sobre o Orbis" },
+          { type: "separator" },
+          { role: "hide", label: "Ocultar Orbis" },
+          { role: "hideOthers", label: "Ocultar outros" },
+          { role: "unhide", label: "Mostrar tudo" },
+          { type: "separator" },
+          { role: "quit", label: "Sair do Orbis" },
+        ],
+      },
+      {
+        label: "Editar",
+        submenu: [
+          { role: "undo", label: "Desfazer" },
+          { role: "redo", label: "Refazer" },
+          { type: "separator" },
+          { role: "cut", label: "Recortar" },
+          { role: "copy", label: "Copiar" },
+          { role: "paste", label: "Colar" },
+          { role: "selectAll", label: "Selecionar tudo" },
+        ],
+      },
+      {
+        label: "Visualizar",
+        submenu: [
+          { role: "reload", label: "Recarregar" },
+          { role: "togglefullscreen", label: "Tela cheia" },
+          { type: "separator" },
+          { role: "toggleDevTools", label: "Ferramentas de desenvolvedor" },
+        ],
+      },
+      {
+        label: "Janela",
+        submenu: [
+          { role: "minimize", label: "Minimizar" },
+          { role: "close", label: "Fechar" },
+        ],
+      },
+    ]),
+  );
+}
+
+/** Microfone negado (§3.3): diz o caminho em Ajustes; a sessão segue pelo chat. */
+async function avisarMicrofoneNegado(win: BrowserWindow): Promise<void> {
+  const { response } = await dialog.showMessageBox(win, {
+    type: "info",
+    message: "A Puca não tem acesso ao microfone",
+    detail:
+      "Você pode seguir a sessão pelo chat. Para falar com a Puca, abra Ajustes do Sistema → Privacidade e Segurança → Microfone, ligue o Orbis e abra o app de novo.",
+    buttons: ["Seguir pelo chat", "Abrir Ajustes"],
+    defaultId: 0,
+  });
+  if (response === 1) await shell.openExternal("x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone");
+}
+
+function abrirJanela(): BrowserWindow {
   const win = new BrowserWindow({
     width: 1440,
     height: 900,
@@ -67,7 +128,11 @@ function abrirJanela(): void {
   });
   cuidarDaNavegacao(win);
   void win.loadURL(INICIO);
+  return win;
 }
+
+app.setName("Orbis");
+app.setAboutPanelOptions({ applicationName: "Orbis", applicationVersion: app.getVersion(), credits: "A Puca conduz o seu onboarding por voz." });
 
 if (!app.requestSingleInstanceLock()) app.quit();
 
@@ -93,9 +158,11 @@ app.whenReady().then(async () => {
     const permitidas = ["media", "clipboard-sanitized-write", "fullscreen"];
     responder(permitidas.includes(permissao) && doOrbis(detalhes.requestingUrl));
   });
-  if (process.platform === "darwin") await systemPreferences.askForMediaAccess("microphone").catch(() => false);
+  montarMenu();
+  const microfone = process.platform === "darwin" ? await systemPreferences.askForMediaAccess("microphone").catch(() => false) : true;
 
-  abrirJanela();
+  const win = abrirJanela();
+  if (!microfone) win.webContents.once("did-finish-load", () => void avisarMicrofoneNegado(win));
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) abrirJanela();
   });
