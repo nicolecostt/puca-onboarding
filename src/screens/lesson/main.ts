@@ -498,10 +498,15 @@ async function main(): Promise<void> {
   document.addEventListener("callbar:pause", (e) => {
     paused = !!e.detail.on;
     clock.setPaused(paused);
+    // a voz para na mesma palavra (o quadro, que segue as palavras, para junto) e o microfone fica mudo
+    if (paused) voice.pause();
+    else voice.resume();
     render();
   });
   document.addEventListener("callbar:end", () => {
     ended = true;
+    tomarAVez(); // corta a voz; a fala do passo que estava tocando volta quando a call voltar
+    voice.stopListening(); // e o microfone desliga (para de mandar áudio ao STT)
     trail.endSession();
     clock.setEnded(true);
     cam.hide();
@@ -520,10 +525,12 @@ async function main(): Promise<void> {
     trail.startSession(); // retomar a call reabre a sessão (#52)
     clock.setEnded(false);
     cam.show();
+    ouvir();
+    encerrarVez(); // a fala cortada pelo encerramento volta já, sem esperar
     render();
   });
 
-  /** Liga o microfone. Se não der, a Puca avisa no chat e a conversa segue por ele. */
+  /** Liga o microfone (de novo, ao retomar a call). Se não der, a Puca avisa no chat e a conversa segue por ele. */
   function ouvir(): void {
     void voice.listen({
       onFinal: (t) => void handleUtterance(t, "voz"),

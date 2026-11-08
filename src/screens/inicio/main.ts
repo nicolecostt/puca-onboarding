@@ -201,7 +201,9 @@ async function main(): Promise<void> {
   });
   document.addEventListener("callbar:pause", (e) => {
     cam.setPaused(!!e.detail.on);
-    if (e.detail.on) voice.stop();
+    // a voz para na mesma palavra e volta dali; o microfone fica mudo enquanto isso
+    if (e.detail.on) voice.pause();
+    else voice.resume();
   });
 
   /** Resposta da Puca no início, pelo caminho que a rota escolheu. O que é da sessão (FAQ do quadro, conhecimento,
