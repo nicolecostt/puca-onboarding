@@ -20,7 +20,7 @@ export const HISTORICO: MensagemKota[] = [
   ]),
 
   ...conversa("#people", [
-    ["simone", "O ciclo de desempenho deste semestre abre em março. As regras gerais estão em revisão e o link sai aqui quando a página estiver pronta."],
+    ["simone", "Lembrete: o processo do ciclo de desempenho e os critérios gerais estão na página Ciclo de desempenho, no Kota People do Notion. Trilha de carreira, promoção, bônus e revisão salarial têm página própria lá também."],
     ["simone", "Dúvida sobre férias, benefícios ou carreira: pergunte aqui se servir para todo mundo. Se for um caso seu, fale com seu gestor ou com People em people@kota.example."],
     ["simone", "A pesquisa de clima fica aberta até sexta. É anônima e leva uns 10 minutos."],
   ]),
