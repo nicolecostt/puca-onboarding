@@ -261,12 +261,12 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
       // tom do ponto: anda com a longitude e com a posição na tela (brilho holográfico)
       const h = hue + (lo / (Math.PI * 2)) * HUE_SPREAD + (sx[i] - sy[i]) * 140;
       // metálico: tons médios, e um brilho branco onde a luz (de cima à esquerda) bate
-      let c = mix(BASE, hsl(h, sat, 0.56), heat);
-      c = mix(c, hsl(h + 30, sat, 0.46), dark);
+      let c = mix(BASE, hsl(h, sat, 0.64), heat);
+      c = mix(c, hsl(h + 30, sat, 0.55), dark);
       const shine = Math.pow(Math.max(0, -sx[i] * 0.45 - sy[i] * 0.55 + z * 0.7), 14);
       c = mix(c, WHITE, shine * heat * 0.85);
       // o clique corre pela esfera em arco-íris, com o tom adiantado em relação à faixa
-      c = mix(c, hsl(h + 120 + ring * 90, 0.85, 0.58), Math.min(1, ring * 3));
+      c = mix(c, hsl(h + 120 + ring * 90, 0.85, 0.64), Math.min(1, ring * 3));
 
       const size = Math.max(0.45, (0.5 + depth * 0.85) * (1 + heat * 0.6 + dark * 1.3 + touch * 0.8 + ring * 0.6) * (R / 210));
       const alpha = (0.06 + Math.pow(depth, 1.3) * 0.94) * (0.6 + 0.4 * Math.max(heat, dark, 0.3));
@@ -292,7 +292,7 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
       warm = on;
     },
     getColor() {
-      const c = hsl(hue, 0.75, 0.56);
+      const c = hsl(hue, 0.75, 0.64);
       return { r: Math.round(c.r), g: Math.round(c.g), b: Math.round(c.b) };
     },
   };
