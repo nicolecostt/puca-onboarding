@@ -15,7 +15,7 @@ const MOTIVO_FIXO: Record<EstadoMomento, string> = {
   aprender: "Assunto novo para você.",
   revisar: "Você já conhece: passamos mais rápido.",
   ja_conhece: "Você disse que domina esse assunto.",
-  fora: "Você já é da Tail: a sessão vai direto ao seu time.",
+  fora: "Você já é da empresa: a sessão vai direto ao seu time.",
 };
 
 /** Temas de cada momento, na ordem de CALIBRAGEM_TEMAS. */
@@ -52,7 +52,7 @@ export function montarJornadaDaPessoa(journey: Journey, calibragem: Calibragem):
     const temas = temasDe.get(m.id) ?? [];
     const base = { id: m.id, titulo: m.title, objetivo: m.goal, temas };
     // quem já é da empresa não passa pela parte institucional (o passo bv-oi desvia dela)
-    if (transicao && temas.includes("empresa")) return { ...base, estado: "fora", motivo: MOTIVO_FIXO.fora };
+    if (transicao && temas.includes("empresa")) return { ...base, estado: "fora", motivo: `Você já é da ${journey.company}: a sessão vai direto ao seu time.` };
     // a checagem da sessão vale mais que a call: rever em qualquer tema do momento marca "revisar"
     const checados = temas.map((t) => itemDoTema(calibragem, t)?.checagem).filter((x) => x !== undefined);
     if (checados.includes("rever")) return { ...base, estado: "revisar", motivo: MOTIVO_CHECAGEM.rever, rever: true };

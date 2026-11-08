@@ -152,7 +152,7 @@ export interface BoardNode {
   w?: number;
   /** Visual especial: caixa preta (sem documentação confirmada) ou fila de mensagens com erro. */
   look?: "blackbox" | "dlq";
-  /** Selo embaixo do nó (ex.: "caixa preta · aguardando Carla"). */
+  /** Selo embaixo do nó (ex.: "legado · não sobe"). */
   note?: string;
   info?: NodeInfo;
 }

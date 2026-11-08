@@ -293,7 +293,7 @@
           "x": 1044,
           "y": 510,
           "info": {
-            "role": "O time conversa no #livro-razao, e as dúvidas de outros times chegam no #livro-razao-ajuda.",
+            "role": "O canal do Livro-razão é o #livro-razao, e as dúvidas de quem é de fora chegam no #livro-razao-ajuda.",
             "docs": [
               {
                 "title": "Notion · Comunicação",
@@ -1027,7 +1027,7 @@
           ]
         }
       ],
-      "knowledge": "O time de Livro-razão trabalha em ciclos de duas semanas. A daily é todo dia útil, de manhã, em 15 minutos, e a retro da quinzena é na quinta às 16h. O time conversa no #livro-razao, e as dúvidas de outros times chegam no #livro-razao-ajuda. O plantão é um rodízio semanal que cobre dia e noite, e quem chega acompanha um plantão antes de entrar na escala. O buddy acompanha os três primeiros meses de quem é novo e o primeiro mês de quem muda de time."
+      "knowledge": "O time de Livro-razão trabalha em ciclos de duas semanas. A daily é todo dia útil, de manhã, em 15 minutos, e a retro da quinzena é na quinta às 16h. O canal do Livro-razão é o #livro-razao, e as dúvidas de quem é de fora chegam no #livro-razao-ajuda. O plantão é um rodízio semanal que cobre dia e noite, e quem chega acompanha um plantão antes de entrar na escala. O buddy acompanha os três primeiros meses de quem é novo e o primeiro mês de quem muda de time."
     },
     {
       "id": "pagamentos",

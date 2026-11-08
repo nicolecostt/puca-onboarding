@@ -63,5 +63,7 @@ describe("respostas com o conhecimento do momento", () => {
 
   it("não chuta quando o conhecimento não cobre", () => {
     expect(answerFromKnowledge("qual o horário do almoço?", null, moment("seu-time"))).toBeNull();
+    // política fica no Notion e passa pelo agente; o conhecimento do time não responde por ela
+    expect(answerFromKnowledge("qual a política de home office do time?", null, moment("seu-time"))).toBeNull();
   });
 });

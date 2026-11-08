@@ -48,7 +48,7 @@ src/
     base.css             tokens + reset; importado por toda tela
   data/                  dados de exemplo da demo (depois podem vir de uma API)
     types.ts             formatos: perfil, empresa, jornada, sessão, quadro
-    company.ts           Tail, pessoas e etapas da jornada
+    company.ts           a Kota (lida do mapa do kit), pessoas e etapas da jornada
     profiles.ts          os dois perfis: ?perfil=bruno (transição) | ?perfil=ana (recém-contratada)
     lessons/             sessões do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css

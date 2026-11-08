@@ -244,8 +244,8 @@ async function main(): Promise<void> {
     if (/sessao|aula|quadro|comecar/.test(q)) {
       return "Sua primeira sessão mostra o caminho de uma transação, o que acontece quando falha e quem cuida de cada parte. É só clicar em Começar a sessão.";
     }
-    if (/buddy|paula/.test(q)) return `Sua buddy é ${buddy}. Ela te acompanha nas primeiras semanas.`;
-    if (/gestor|marcos|chefe/.test(q)) return `Seu gestor é ${gestor}, do time ${time}.`;
+    if (/buddy|beatriz/.test(q)) return `Sua buddy é ${buddy}. Ela te acompanha nas primeiras semanas.`;
+    if (/gestor|natalia|natália|chefe/.test(q)) return `Seu gestor é ${gestor}, do time ${time}.`;
     if (/^(oi|ola|bom dia|boa tarde|boa noite)\b|obrigad/.test(q)) return "Estou por aqui. Pode perguntar sobre seus acessos, suas tarefas ou o time.";
     return `Isso eu não tenho confirmado aqui no início. Na sua primeira sessão eu vejo com você; se não estiver lá, pergunta para ${buddy}, sua buddy, no Slack.`;
   }

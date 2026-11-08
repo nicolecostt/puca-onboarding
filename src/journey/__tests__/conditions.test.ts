@@ -44,6 +44,13 @@ describe("matchFaq", () => {
     expect(matchFaq("o que é o task-403?", pagamentos).faq?.node).toBe("task-403");
   });
 
+  it("nó citado pelo nome exato vence nó que só se parece com a palavra (\"ledger-db\" não é \"ledgermonolith\")", () => {
+    const pagamentos = buildFaqs(journey, DEMO_PROFILES.novo).filter((f) => f.board === "pagamentos");
+    expect(matchFaq("o que é o ledger-db?", pagamentos).faq?.node).toBe("ledger-db");
+    expect(matchFaq("o que é o ledgermonolith?", pagamentos).faq?.node).toBe("monolito");
+    expect(matchFaq("me explica o ledgerwriter", pagamentos).faq?.node).toBe("ledgerwriter");
+  });
+
   it("sem intenção cai no 'what' com confiança média; sem nó, nada", () => {
     expect(matchFaq("fraud-score", faqs)).toMatchObject({ faq: faqs[3], score: 0.5 });
     expect(matchFaq("quanto ganha um pleno?", faqs)).toEqual({ faq: null, score: 0 });

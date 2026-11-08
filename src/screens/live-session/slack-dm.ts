@@ -1,4 +1,4 @@
-// Mexe no Slack simulado da Tail como a Puca mexeria no de verdade (computer use, #21): abre a DM,
+// Mexe no Slack simulado da Kota como a Puca mexeria no de verdade (computer use, #21): abre a DM,
 // digita no campo de mensagem e envia. Todo texto entra por textContent: a fala da pessoa nunca vira HTML.
 import type { AgentCursor } from "../../components/agent-cursor/agent-cursor";
 
