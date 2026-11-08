@@ -10,8 +10,6 @@ import closeIcon from "./icons/close.svg";
 import stopIcon from "./icons/stop.svg";
 import chevronIcon from "./icons/chevron.svg";
 import spinnerIcon from "./icons/spinner.svg";
-import toolIcon from "./icons/tool.svg";
-import checkIcon from "./icons/check.svg";
 import shotBg from "./icons/shot-bg.svg";
 import shotTopbar from "./icons/shot-topbar.svg";
 import shotLine1 from "./icons/shot-line1.svg";
@@ -54,16 +52,16 @@ export interface ChatPanel {
   resetPosition(): void;
 }
 
-// Conversa de exemplo do Figma
+// Conversa de exemplo (tela de auxílio): a Puca usando o Slack da pessoa, com os passos que está fazendo
 const DEMO: ChatMessage[] = [
-  { from: "user", text: "Can you check the pricing page on our site and add a moment that walks the user through the plans?" },
-  { from: "agent", text: "Sure — I'll open the pricing page in the browser first so I can see the plans." },
+  { from: "user", text: "Onde fica o README do terminal-config-api?" },
+  { from: "agent", text: "O Lucas mandou o link hoje no #time-terminais. Vou abrir o canal e te mostrar." },
   {
     from: "actions",
     steps: [
-      { name: "Browser navigate", done: true, shot: "Pricing" },
-      { name: "Browser scroll", done: true, shot: "Plans" },
-      { name: "Browser click" },
+      { name: "Abrir o #time-terminais", done: true },
+      { name: "Abrir o link do README", done: true },
+      { name: "Buscar “firmware” no Slack" },
     ],
   },
 ];
@@ -90,14 +88,13 @@ function shotHTML(label: string): string {
     </button>`;
 }
 
+// Um passo do que a Puca está fazendo na tela: marca cheia com visto (feito) ou anel com ponto (fazendo agora)
+const STEP_CHECK = `<svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.3 2.3 4.7-4.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 function stepHTML(s: ActionStep): string {
-  const status = s.done
-    ? `<img src="${checkIcon}" width="12" height="12" alt="Concluído">`
-    : `<img class="chat-spinner" src="${spinnerIcon}" width="12" height="12" alt="Em andamento">`;
   return `
-    <div class="chat-step${s.shot ? " chat-step--shot" : ""}">
-      <div class="chat-step__name"><img src="${toolIcon}" width="12" height="12" alt="">${esc(s.name)}</div>
-      ${status}
+    <div class="chat-step${s.done ? " is-done" : " is-now"}${s.shot ? " chat-step--shot" : ""}">
+      <span class="chat-step__mark">${s.done ? STEP_CHECK : ""}<span class="sr-only">${s.done ? "Concluído" : "Em andamento"}</span></span>
+      <div class="chat-step__name">${esc(s.name)}</div>
       ${s.shot ? shotHTML(s.shot) : ""}
     </div>`;
 }
@@ -109,7 +106,7 @@ function msgHTML(m: ChatMessage): string {
     <div class="chat-msg chat-actions">
       <button class="chat-actions__toggle" aria-expanded="true">
         <img class="chat-actions__chev" src="${chevronIcon}" width="12" height="12" alt="">
-        <span>Working on ${m.steps.length} actions</span>
+        <span>Usando o Slack · ${m.steps.filter((x) => x.done).length} de ${m.steps.length} passos</span>
         <img class="chat-spinner" src="${spinnerIcon}" width="12" height="12" alt="">
       </button>
       <div class="chat-actions__list"><div class="chat-actions__rail">${m.steps.map(stepHTML).join("")}</div></div>
