@@ -2,7 +2,7 @@
 // os momentos numa linha do tempo, marcados pela calibragem (aprender, revisar, já conhece, pulado), com o atual
 // (ou o próximo) em destaque. Não está no Figma;
 // segue o visual dos cartões da sessão. Recolhe para não tampar o quadro.
-//   const panel = mountJourneyPanel({ jornada, final: "primeira-tarefa" });
+//   const panel = mountJourneyPanel({ jornada });
 //   panel.setProgress(["boas-vindas"], "seu-time");
 //   panel.setJornada(montarJornadaDaPessoa(journey, calibragemNova)); // depois de uma checagem
 // Evento no document: journeypanel:pick { id } quando a pessoa clica num momento (a tela faz o pulo).
@@ -15,8 +15,6 @@ import type { EstadoMomento, JornadaDaPessoa, MomentoDaPessoa } from "../../jour
 
 export interface JourneyPanelOptions {
   jornada: JornadaDaPessoa;
-  /** Momento final da jornada (ex.: a primeira tarefa). Hoje a lista de momentos já mostra o caminho todo. */
-  final?: string;
   /** Começa recolhido. Padrão: aberto. */
   collapsed?: boolean;
   parent?: HTMLElement;

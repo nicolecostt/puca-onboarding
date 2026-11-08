@@ -116,7 +116,7 @@ async function main(): Promise<void> {
   // A checagem da sessão atualiza a calibragem e o painel (§4.2 e §12.1: atualiza os objetivos que faltam).
   const calibrada = resolveCalibragem(location.search);
   let calibragem = calibrada.calibragem;
-  const journeyPanel = mountJourneyPanel({ jornada: montarJornadaDaPessoa(journey, calibragem), final: "primeira-tarefa" });
+  const journeyPanel = mountJourneyPanel({ jornada: montarJornadaDaPessoa(journey, calibragem) });
   let visitados: string[] = [];
   let painelRecolhido = false; // recolhe sozinho uma vez, quando o quadro aparece; depois, só a pessoa abre e fecha
   // Voz de verdade (servidor em server/): sem ele, a sessão segue só com legenda e chat.
