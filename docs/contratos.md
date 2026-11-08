@@ -18,6 +18,7 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | Rastro (decisões da Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
 | Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` | `screens/lesson` (cria), `screens/live-session` (envia no Slack), rastro (`forwarding_id`), `screens/rh` (conta os abertos pelo `status`) | `__tests__/forwarding.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
 | Primeira tarefa | `src/journey/primeira-tarefa.ts` (`TarefaDoTime`, `PedidoDeAprovacao`, chave `puca:primeiras-tarefas` no `localStorage`) e os nós `kind: "task"` da jornada — [seção abaixo](#primeira-tarefa) | `screens/lesson` (cria o pedido quando o cartão da tarefa abre), `screens/live-session` (pede a aprovação ao gestor no Slack e grava a aprovação), `screens/primeira-tarefa` (página da tarefa), `screens/rh` (conta pessoas com pedido não aprovado, por `status` e `pessoa`) | `__tests__/primeira-tarefa.test.ts`, `screens/primeira-tarefa/pagina.test.ts` |
+| App para Mac (`window.orbis`) | `desktop/preload.ts` + `src/orbis.d.ts` — [seção abaixo](#app-para-mac) | telas que testam `if (window.orbis)`; a #123 acrescenta `navegador` | `tsc` |
 | Visual da Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
 
@@ -68,6 +69,9 @@ escreve o formato aqui (tipo + um exemplo válido) **antes** de implementar; o o
 O servidor no Fly (`https://orbis-puca.fly.dev`, decisão 0006, `docs/stack.md` §5) e o local (`npm run dev:server`)
 respondem as mesmas rotas. O que muda é o que cada requisição precisa levar:
 
+- **Endereço:** o front monta toda URL do servidor com `apiUrl(caminho)` de `src/voice/api.ts`, que põe na frente o
+  `VITE_API_URL` do build. Vazio (o `npm run dev`): caminho relativo, e o Vite repassa `/api` ao servidor local. No app
+  para Mac: `https://orbis-puca.fly.dev`. Vale também para o `audio_url` que o servidor devolve (`/api/tts/<id>`).
 - **Token:** toda rota, menos `GET /api/health`, exige `Authorization: Bearer <access_token do Supabase>`. O servidor
   confere a assinatura pelo JWKS do projeto, o emissor (`<SUPABASE_URL>/auth/v1`) e a audiência (`authenticated`), e
   usa o `sub` como id da pessoa. Vale para o áudio também: `GET /api/tts/:id` e `/words` levam o mesmo cabeçalho.
@@ -99,6 +103,26 @@ Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6Ii4uLiJ9…
 Content-Type: application/json
 
 {"text":"Quem cuida do balancereader?","moment_id":"pagamentos","step_id":"pg-pergunta","perfil":"novo"}
+```
+
+## App para Mac
+
+O app Electron (decisão 0004, `docs/stack.md` §3, #158) abre o mesmo front por `app://orbis/` e expõe ao front só
+`window.orbis`. No navegador comum (`npm run dev`) ele não existe, e a tela segue com o simulado.
+
+```ts
+interface Orbis {
+  /** Versão do app (a do package.json), ex.: "0.1.0". */
+  versao: string;
+  // a #123 acrescenta `navegador` (docs/stack.md §3.2): mostrar, esconder, executar, cancelar, aoAgirAPessoa
+}
+declare global { interface Window { orbis?: Orbis } }
+```
+
+Exemplo de uso numa tela:
+
+```ts
+if (window.orbis) console.log(`Orbis ${window.orbis.versao}`); // no app
 ```
 
 ## Calibragem

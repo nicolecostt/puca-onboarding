@@ -1,3 +1,4 @@
+import { apiUrl } from "./api";
 import type { SpeechPlayer, WordTiming } from "./types";
 import { AUDIO_RESUME_TIMEOUT_MS, pcm16ToFloat32, resumeWithin } from "./pcm";
 
@@ -90,7 +91,7 @@ export class PcmPlayer implements SpeechPlayer {
     this.controller = controller;
     signal?.addEventListener("abort", () => controller.abort(), { once: true });
 
-    const res = await fetch(audio_url, { signal: controller.signal });
+    const res = await fetch(apiUrl(audio_url), { signal: controller.signal });
     if (!res.ok || !res.body) throw new Error(`audio fetch failed: HTTP ${res.status}`);
     const reader = res.body.getReader();
 

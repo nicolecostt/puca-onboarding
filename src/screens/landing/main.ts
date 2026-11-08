@@ -9,6 +9,8 @@ import { mountPucaParticles } from "../../lib/puca-particles";
 import { mountPucaDots } from "../../lib/puca-dots";
 import demo from "../../journey/data/kota.journey.json";
 import type { BoardNode, Journey } from "../../journey/types";
+import notion from "../../../kit/kota/notion/urls.json";
+import slack from "../../../kit/kota/slack/workspace.json";
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -139,9 +141,40 @@ function mountBoard(): void {
   select("ledgerwriter", false);
 }
 
+// ---- Instalar: links do kit da Kota (vêm dos arquivos do kit) e o botão de copiar o comando ----
+const LINKS: Record<string, string | undefined> = {
+  kota: notion.kota,
+  slack: slack.convite,
+};
+
+function mountInstall(): void {
+  document.querySelectorAll<HTMLAnchorElement>("a[data-link]").forEach((a) => {
+    const url = LINKS[a.dataset.link ?? ""];
+    if (url) a.href = url;
+    else a.removeAttribute("target"); // sem endereço no kit: fica no passo a passo
+  });
+  document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((btn) => {
+    const texto = document.querySelector(btn.dataset.copy ?? "")?.textContent?.trim() ?? "";
+    const rotulo = btn.textContent;
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(texto);
+        btn.textContent = "Copiado";
+      } catch {
+        // sem permissão de área de transferência: seleciona o comando para a pessoa copiar
+        const code = document.querySelector(btn.dataset.copy ?? "");
+        if (code) getSelection()?.selectAllChildren(code);
+        btn.textContent = "Selecionado: Cmd + C";
+      }
+      setTimeout(() => (btn.textContent = rotulo), 2400);
+    });
+  });
+}
+
+mountInstall();
 mountBoard();
 mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
-  occluders: "h1, h2, h3, p, dt, dd, .actions, .board, .skills, .puca__stage, .orb, .nav, .footer__row > *",
+  occluders: "h1, h2, h3, p, dt, dd, .actions, .cmd, .board, .skills, .puca__stage, .orb, .nav, .footer__row > *",
   round: ".puca__stage, .orb",
 });
 void mountSpheres().then(mountSkills);
