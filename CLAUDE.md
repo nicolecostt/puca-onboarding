@@ -54,8 +54,10 @@ Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o
 - A sessão (`src/screens/lesson/`) conduz a jornada no app; o servidor dá voz, LLM e as ações nos sistemas da Kota
   (Slack, GitHub), sem guardar estado de sessão: o que precisa durar vai para o Supabase ([`docs/stack.md`](docs/stack.md) §5).
 - Telas rodam no app para Mac (Electron, decisões 0004 e 0008). A `live-session` é a casa do navegador da Puca, que fica
-  por cima do HTML: barra de call, chat e câmera vão **em volta** da área dele, nunca por cima. Recurso do app só com
-  `window.orbis`; sem ele (`npm run dev` no navegador), a tela segue com o simulado ([`docs/stack.md`](docs/stack.md) §3.2 e §4.2).
+  por cima do HTML: barra de call, chat e câmera vão **em volta** da área dele, nunca por cima (vale para o navegador
+  de verdade; o Slack simulado de hoje continua com os controles por cima e não sai). Recurso do app só com
+  `window.orbis`, depois de o formato estar em `docs/contratos.md`; sem ele (`npm run dev` no navegador), a tela segue
+  com o simulado ([`docs/stack.md`](docs/stack.md) §3.2 e §4.2).
 - Sem fonte confiável, a Puca diz que não confirmou e encaminha para a buddy. Nunca inventar responsável por um sistema.
 - Textos de interface, comentários e docs em português.
 - Framework, banco, serviço externo ou mudança de stack: registre a decisão em `docs/decisoes/` antes de implementar.
