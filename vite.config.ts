@@ -1,10 +1,13 @@
-import { defineConfig } from "vite";
+import { configDefaults, defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
 
 // Cada página HTML vira uma entrada do build.
 const page = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
 export default defineConfig({
+  test: {
+    exclude: [...configDefaults.exclude, "**/.claude/**"],
+  },
   // O agente roda em server/ (npm run dev:server); em dev o Vite repassa /api para ele.
   server: { proxy: { "/api": { target: "http://localhost:8787", changeOrigin: true } } },
   build: {

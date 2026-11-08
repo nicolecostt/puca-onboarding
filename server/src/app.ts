@@ -34,7 +34,7 @@ export function tryCreateTts(): TtsService | null {
 export function tryCreateVerificaToken(): VerificaToken | null {
   // no Fly (EXIGE_TOKEN=1), subir sem Supabase deixaria o servidor aberto: melhor não subir
   if (env.exigeToken && !env.supabaseUrl) throw new Error("EXIGE_TOKEN=1 sem SUPABASE_URL: o servidor ficaria sem login");
-  if (!env.supabaseUrl) return null;
+  if (!env.supabaseUrl || env.tokenDesligado) return null;
   return criaVerificaToken({ supabaseUrl: env.supabaseUrl, jwksUrl: env.supabaseJwksUrl });
 }
 
@@ -110,7 +110,8 @@ export function buildApp(opts: BuildAppOptions = {}) {
   app.register(rateLimit, {
     global: false,
     hook: "preHandler",
-    keyGenerator: (req) => req.pessoa?.id ?? req.ip,
+    // sem token, pelo IP que o proxy do Fly grava (o X-Forwarded-For o cliente consegue forjar)
+    keyGenerator: (req) => req.pessoa?.id ?? String(req.headers["fly-client-ip"] ?? req.ip),
     errorResponseBuilder: (_req, ctx) => ({ statusCode: 429, error: "rate_limited", retry_after_ms: ctx.ttl }),
   });
 

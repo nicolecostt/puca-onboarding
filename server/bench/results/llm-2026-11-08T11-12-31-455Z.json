@@ -1,0 +1,566 @@
+{
+  "at": "2026-11-08T11:12:31.458Z",
+  "n": 3,
+  "summary": [
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-nothink",
+      "ttft_p50": 568,
+      "ttft_p95": 1204,
+      "first_sentence_p50": 753,
+      "first_sentence_p95": 1205,
+      "errors": 0,
+      "expected_tool": "6/6",
+      "runs": 9
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-default",
+      "ttft_p50": 3364,
+      "ttft_p95": 4616,
+      "first_sentence_p50": 4129,
+      "first_sentence_p95": 4296,
+      "errors": 0,
+      "expected_tool": "5/6",
+      "runs": 9
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "full-nothink",
+      "ttft_p50": 536,
+      "ttft_p95": 704,
+      "first_sentence_p50": 734,
+      "first_sentence_p95": 859,
+      "errors": 0,
+      "expected_tool": "5/6",
+      "runs": 9
+    }
+  ],
+  "samples": [
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 790.3677499999999,
+      "firstSentenceMs": 971.0381669999999,
+      "totalMs": 1641.240042,
+      "reasoningChars": 0,
+      "cacheRead": 0,
+      "text": "Não consegui confirmar isso, porque o payments-api não aparece nos fatos que tenho aqui. Vou encaminhar a dúvida para a buddy.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 559.4152090000002,
+      "firstSentenceMs": 752.64525,
+      "totalMs": 1385.9512920000002,
+      "reasoningChars": 0,
+      "cacheRead": 2400,
+      "text": "Essa eu não consigo confirmar: o payments-api não aparece no quadro nem nas fontes que eu tenho. Vou levar a dúvida para a buddy.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 546.7390830000004,
+      "firstSentenceMs": 747.5672920000006,
+      "totalMs": 1326.9615000000003,
+      "reasoningChars": 0,
+      "cacheRead": 2400,
+      "text": "Não consegui confirmar isso: o payments-api não aparece no quadro nem nas fontes que eu tenho. Vou encaminhar a dúvida para a buddy.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 517.4244589999998,
+      "firstSentenceMs": 770.9811250000002,
+      "totalMs": 1072.9897920000003,
+      "reasoningChars": 0,
+      "cacheRead": 2400,
+      "text": "Essa pergunta é sobre a falha na cobrança, então vou te levar para esse ponto da sessão.",
+      "tools": [
+        {
+          "name": "go_to",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 654.0779170000005,
+      "firstSentenceMs": 863.0421670000005,
+      "totalMs": 1118.4889590000002,
+      "reasoningChars": 0,
+      "cacheRead": 2400,
+      "text": "Essa pergunta é sobre a falha na cobrança, então vou levar você para esse ponto da sessão.",
+      "tools": [
+        {
+          "name": "go_to",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 1204.0627079999995,
+      "firstSentenceMs": 1204.5804169999992,
+      "totalMs": 1205.2865829999992,
+      "reasoningChars": 0,
+      "cacheRead": 2400,
+      "text": "Essa pergunta é sobre falha na autorização, e eu tenho fatos só sobre a liquidação. Vou te levar para o trecho de falha, onde isso é explicado com calma.",
+      "tools": [
+        {
+          "name": "go_to",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 547.063791999999,
+      "firstSentenceMs": 694.6692920000005,
+      "totalMs": 1428.511208,
+      "reasoningChars": 0,
+      "cacheRead": 2400,
+      "text": "Essa pergunta é sobre salário, então vai para o RH. Eu não tenho esse dado e não vou chutar um número. Vou encaminhar sua dúvida para a buddy agora.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 568.2377919999999,
+      "firstSentenceMs": 737.772500000001,
+      "totalMs": 1613.010875,
+      "reasoningChars": 0,
+      "cacheRead": 2400,
+      "text": "Essa pergunta é sobre salário, que é com o RH, e eu não tenho essa informação. Vou encaminhar a dúvida para a buddy, que pode te orientar.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 621.3547500000004,
+      "firstSentenceMs": 742.7593749999996,
+      "totalMs": 1368.882375000001,
+      "reasoningChars": 0,
+      "cacheRead": 2400,
+      "text": "Essa pergunta é sobre salário, então vai para o RH. Não consigo responder isso por aqui. Vou registrar a dúvida para a buddy encaminhar.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-default",
+      "scenario": "segue-passo",
+      "ttftMs": 2246.907374999999,
+      "firstSentenceMs": null,
+      "totalMs": 2247.7642079999987,
+      "reasoningChars": 0,
+      "cacheRead": 0,
+      "text": "",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-default",
+      "scenario": "segue-passo",
+      "ttftMs": 1305.6743340000012,
+      "firstSentenceMs": 1346.0827090000002,
+      "totalMs": 2034.8543750000008,
+      "reasoningChars": 0,
+      "cacheRead": 2401,
+      "text": "Não consegui confirmar o que é o payments-api. Vou levar a dúvida para a sua buddy.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-default",
+      "scenario": "segue-passo",
+      "ttftMs": 2450.3121250000004,
+      "firstSentenceMs": null,
+      "totalMs": 2450.7069999999985,
+      "reasoningChars": 0,
+      "cacheRead": 2401,
+      "text": "",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-default",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 4280.1239160000005,
+      "firstSentenceMs": 4296.272083,
+      "totalMs": 4937.184958000002,
+      "reasoningChars": 0,
+      "cacheRead": 2401,
+      "text": "Vou por partes. Se o settlement-worker cair, nada se perde: as vendas ficam esperando na fila e ele continua de onde parou. Sobre a recusa do cartão na hora da cobrança, não consegui confirmar os detalhes, então vou levar a dúvida para a sua buddy.",
+      "tools": [
+        {
+          "name": "go_to",
+          "valid": true
+        },
+        {
+          "name": "highlight",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-default",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 4616.123334,
+      "firstSentenceMs": null,
+      "totalMs": 4741.260167,
+      "reasoningChars": 0,
+      "cacheRead": 2401,
+      "text": "",
+      "tools": [
+        {
+          "name": "go_to",
+          "valid": true
+        },
+        {
+          "name": "highlight",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-default",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 4090.7132500000043,
+      "firstSentenceMs": 4129.137790999997,
+      "totalMs": 5370.123875000001,
+      "reasoningChars": 0,
+      "cacheRead": 2401,
+      "text": "Vou por partes. Se o settlement-worker cair, nada se perde: as vendas ficam esperando na fila transactions.authorized, e ele continua de onde parou. Se a maquininha reenviar a mesma venda, o gateway não cobra duas vezes. Quer ver o caminho da falha com calma?",
+      "tools": [
+        {
+          "name": "highlight",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-default",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 3363.777291999999,
+      "firstSentenceMs": null,
+      "totalMs": 3370.6434169999993,
+      "reasoningChars": 0,
+      "cacheRead": 2401,
+      "text": "",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-default",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 2937.7030000000013,
+      "firstSentenceMs": 2937.8358329999974,
+      "totalMs": 3612.393624999997,
+      "reasoningChars": 0,
+      "cacheRead": 2401,
+      "text": "Essa dúvida é do RH. Salário eu não consigo confirmar por aqui, então já deixei um resumo para a sua buddy encaminhar.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "min-default",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 3712.864999999998,
+      "firstSentenceMs": null,
+      "totalMs": 3713.620707999995,
+      "reasoningChars": 0,
+      "cacheRead": 2401,
+      "text": "",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "full-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 704.0421249999999,
+      "firstSentenceMs": 859.2922079999989,
+      "totalMs": 1448.1786250000005,
+      "reasoningChars": 0,
+      "cacheRead": 0,
+      "text": "Não consegui confirmar isso. O payments-api não aparece no quadro nem nas fontes que eu tenho, então não quero chutar. Vou encaminhar a dúvida para a sua buddy, a Paula Nunes.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "full-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 540.1080420000071,
+      "firstSentenceMs": 733.9256670000032,
+      "totalMs": 1405.2293750000026,
+      "reasoningChars": 0,
+      "cacheRead": 16400,
+      "text": "Não consegui confirmar isso. O payments-api não aparece no quadro nem nas fontes que eu tenho, então não quero chutar. Vou encaminhar a dúvida para a sua buddy, a Paula Nunes.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "full-nothink",
+      "scenario": "segue-passo",
+      "ttftMs": 640.6653339999975,
+      "firstSentenceMs": 829.5921250000029,
+      "totalMs": 1526.146166999999,
+      "reasoningChars": 0,
+      "cacheRead": 16400,
+      "text": "Não consegui confirmar isso: o payments-api não aparece no meu quadro nem nas fontes que tenho. Vou encaminhar a dúvida para a sua buddy, a Paula Nunes.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": null,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "full-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 523.2124579999945,
+      "firstSentenceMs": 727.5069579999981,
+      "totalMs": 1020.8610829999961,
+      "reasoningChars": 0,
+      "cacheRead": 16400,
+      "text": "Essa pergunta cai na parte de falhas, então vou te levar para lá. Assim você vê o caminho de erro com calma.",
+      "tools": [
+        {
+          "name": "go_to",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "full-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 505.24045900000056,
+      "firstSentenceMs": 739.083166999997,
+      "totalMs": 1412.1944999999978,
+      "reasoningChars": 0,
+      "cacheRead": 16400,
+      "text": "Essa pergunta é sobre falha na autorização, e não tenho uma fonte confiável para isso. Vou indicar a buddy.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": false,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "full-nothink",
+      "scenario": "transicao-ambigua",
+      "ttftMs": 536.3048750000016,
+      "firstSentenceMs": 747.7175829999978,
+      "totalMs": 2437.9585000000006,
+      "reasoningChars": 0,
+      "cacheRead": 16400,
+      "text": "Essa pergunta é sobre a falha na autorização, não na liquidação, e o material que tenho cobre só a liquidação. Não consegui confirmar o que acontece quando a cobrança falha na hora. Vou te levar para a parte de falhas, onde explico o que está confirmado, e encaminhar essa dúvida para a sua buddy.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        },
+        {
+          "name": "go_to",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "full-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 531.2306660000031,
+      "firstSentenceMs": 703.5249580000018,
+      "totalMs": 1563.398874999999,
+      "reasoningChars": 0,
+      "cacheRead": 16400,
+      "text": "Essa pergunta é sobre salário, e isso vai para o RH. Não consigo confirmar valores aqui. Vou encaminhar sua dúvida para a buddy, a Paula Nunes, com um resumo.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "full-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 525.1685829999988,
+      "firstSentenceMs": 713.7463750000024,
+      "totalMs": 1148.2613330000022,
+      "reasoningChars": 0,
+      "cacheRead": 16400,
+      "text": "Essa dúvida é sobre salário, e eu não tenho essa informação. Vou encaminhar para o RH com um resumo da sua pergunta.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "config": "full-nothink",
+      "scenario": "fora-do-roteiro",
+      "ttftMs": 613.3681670000005,
+      "firstSentenceMs": 694.9497919999994,
+      "totalMs": 1472.5089999999982,
+      "reasoningChars": 0,
+      "cacheRead": 16400,
+      "text": "Essa pergunta é sobre salário, então vou encaminhar para o RH. A empresa aqui é a Tail, e eu não tenho essa informação.",
+      "tools": [
+        {
+          "name": "escalate_to_buddy",
+          "valid": true
+        }
+      ],
+      "expectedToolHit": true,
+      "error": null
+    }
+  ]
+}

@@ -1,5 +1,7 @@
-// Cliente OpenAI-compatível (Featherless) com streaming. Sem SDK: fetch + SSE.
+// Cliente do LLM com streaming. Modelo `claude-*` vai pelo SDK da Anthropic (llm/anthropic.ts);
+// o resto, pela Featherless (OpenAI-compatível, fetch + SSE).
 // Emite texto, raciocínio (quando o modelo vaza "thinking") e tool calls já montados.
+import { streamAnthropic } from "./llm/anthropic";
 
 export interface ChatMessage {
   role: "system" | "user" | "assistant" | "tool";
@@ -27,7 +29,7 @@ export type LlmEvent =
   | { type: "reasoning"; text: string }
   | { type: "tool_call"; name: string; args: unknown; raw: string }
   /** Tokens que o provedor informou no fim do stream (no máximo um, antes do `done`). */
-  | { type: "usage"; input: number; output: number }
+  | { type: "usage"; input: number; output: number; cacheRead?: number }
   | { type: "done"; finishReason: string | null };
 
 export class LlmError extends Error {
@@ -40,7 +42,11 @@ export class LlmError extends Error {
   }
 }
 
-export async function* streamChat(req: ChatRequest, apiKey = process.env.FEATHERLESS_API_KEY): AsyncGenerator<LlmEvent> {
+export function streamChat(req: ChatRequest, apiKey?: string): AsyncGenerator<LlmEvent> {
+  return req.model.startsWith("claude-") ? streamAnthropic(req) : streamFeatherless(req, apiKey);
+}
+
+async function* streamFeatherless(req: ChatRequest, apiKey = process.env.FEATHERLESS_API_KEY): AsyncGenerator<LlmEvent> {
   const BASE_URL = process.env.FEATHERLESS_BASE_URL ?? "https://api.featherless.ai/v1";
   if (!apiKey) throw new LlmError("FEATHERLESS_API_KEY is not set", "config");
   const body: Record<string, unknown> = {

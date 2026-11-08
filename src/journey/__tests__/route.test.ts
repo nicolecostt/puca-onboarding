@@ -22,6 +22,12 @@ describe("routeUtterance", () => {
   it("resposta sugerida, pulo e pergunta nova", () => {
     expect(routeUtterance("pode seguir", ctx)).toMatchObject({ kind: "reply", reply: "Pode seguir" });
     expect(routeUtterance("quero ver a primeira tarefa", ctx).kind).toBe("jump");
+    expect(routeUtterance("Pule para a primeira tarefa", ctx)).toMatchObject({
+      kind: "jump",
+      moment: { id: "primeira-tarefa" },
+    });
+    expect(routeUtterance("Não pule para a primeira tarefa", ctx).kind).not.toBe("jump");
+    expect(routeUtterance("Manipule para a primeira tarefa", ctx).kind).not.toBe("jump");
     expect(routeUtterance("Quanto ganha um engenheiro pleno aqui?", ctx).kind).toBe("ask");
   });
 
