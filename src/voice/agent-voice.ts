@@ -4,7 +4,6 @@
 import type { BoardAction } from "../journey/types";
 import { classifyBargeIn } from "./barge-in";
 import { startMic, type Mic } from "./mic";
-import { AUDIO_RESUME_TIMEOUT_MS, resumeWithin } from "./pcm";
 import { PcmPlayer } from "./pcm-player";
 import { createSttSession, type SttSession } from "./stt-session";
 import type { WordTiming } from "./types";
@@ -134,10 +133,8 @@ export async function createAgentVoice(): Promise<AgentVoice> {
     tts,
     stt,
     async unlock() {
-      // destrava o AudioContext dentro do gesto; sem gesto reconhecido, o resume() não resolve
-      const ctx = new AudioContext();
-      const ok = await resumeWithin(ctx, AUDIO_RESUME_TIMEOUT_MS);
-      void ctx.close();
+      // destrava o AudioContext do próprio player, dentro do gesto; sem gesto reconhecido, o resume() não resolve
+      const ok = await player.unlock();
       somBloqueado = !ok;
       return ok;
     },
