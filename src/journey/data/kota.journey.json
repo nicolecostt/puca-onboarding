@@ -800,7 +800,8 @@
               "acao": {
                 "tipo": "marcar",
                 "alvo": {
-                  "texto": "Nossa missão"
+                  "texto": "Nossa missão",
+                  "seletor": "h1, h2, h3"
                 }
               },
               "at": "a missão"

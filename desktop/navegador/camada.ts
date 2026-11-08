@@ -65,9 +65,10 @@ window.__puca ??= (() => {
   return {
     achar(alvo) {
       let el = null;
-      if (alvo.seletor) el = [...document.querySelectorAll(alvo.seletor)].find(visivel) ?? null;
+      // com seletor e texto, o texto é procurado só entre os elementos do seletor (ex.: um título da página)
+      if (alvo.seletor && !alvo.texto) el = [...document.querySelectorAll(alvo.seletor)].find(visivel) ?? null;
       if (!el && alvo.texto) {
-        const lista = [...document.querySelectorAll(CLICAVEIS), ...document.querySelectorAll(TEXTOS)];
+        const lista = alvo.seletor ? [...document.querySelectorAll(alvo.seletor)] : [...document.querySelectorAll(CLICAVEIS), ...document.querySelectorAll(TEXTOS)];
         const i = ${escolherAlvo.name}(lista.map((e) => ({ texto: e.textContent || e.getAttribute("aria-label") || "", visivel: visivel(e), clicavel: e.matches(CLICAVEIS) })), alvo.texto);
         el = i >= 0 ? lista[i] : null;
       }
