@@ -61,6 +61,7 @@ describe("TtsService", () => {
     const provider = new FakeProvider([chunk([5, 6, 7], "Olá")]);
     const svc = service(provider);
     await svc.start({ action_id: "a", text: "Olá" });
+    await svc.flush(); // a gravação no cache roda em segundo plano
     const again = await svc.start({ action_id: "b", text: "Olá" });
     expect(again.cached).toBe(true);
     expect(provider.calls).toHaveLength(1);

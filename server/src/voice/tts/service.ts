@@ -1,6 +1,6 @@
 import type { WordTiming } from "../../../../src/voice/types";
 import { charsToWords, type CharTiming } from "../alignment";
-import type { TtsCache } from "./cache";
+import type { TtsCacheStore } from "./cache";
 import { remapWordTimings, toSpokenText, toSpokenWords } from "./spoken-text";
 import type { TtsProvider } from "./types";
 
@@ -28,9 +28,14 @@ interface Job {
   result?: Promise<SpeakResult>;
 }
 
+export interface TravaDoTts {
+  esgotada(): boolean;
+  registra(chars: number): void;
+}
+
 export interface TtsServiceOptions {
   provider: TtsProvider;
-  cache: TtsCache;
+  cache: TtsCacheStore;
   voiceId: string;
   modelId: string;
   /** How long a finished job stays available for GET /api/tts/:action_id. Default 5 minutes. */
@@ -55,6 +60,31 @@ export class TtsService {
 
   cancel(action_id: string): void {
     this.jobs.get(action_id)?.abort.abort();
+  }
+
+  /** Trava diária de caracteres sintetizados (docs/stack.md §5.3); o cache não conta nem é barrado. */
+  private trava: TravaDoTts | null = null;
+
+  limitarCom(trava: TravaDoTts): void {
+    this.trava = trava;
+  }
+
+  /** true se o texto já tem áudio no cache (sai sem custo). */
+  async cached(text: string): Promise<boolean> {
+    const { cache, voiceId, modelId } = this.opts;
+    return !!(await cache.get(cache.key({ text: toSpokenText(text, toSpokenWords(text)), voiceId, modelId })));
+  }
+
+  private readonly pending = new Set<Promise<void>>();
+
+  private track(put: Promise<void>): void {
+    const p = put.catch(() => undefined).finally(() => this.pending.delete(p));
+    this.pending.add(p);
+  }
+
+  /** Espera as gravações no cache que ainda estão em andamento (o precompute usa antes de sair). */
+  async flush(): Promise<void> {
+    while (this.pending.size) await Promise.all([...this.pending]);
   }
 
   cancelAll(): void {
@@ -96,6 +126,7 @@ export class TtsService {
       const chars: CharTiming[] = [];
       let bytes = 0;
       try {
+        if (this.trava?.esgotada()) throw new Error("limite_diario");
         for await (const chunk of provider.synthesize({
           text: spoken,
           previous_text: req.previous_text,
@@ -108,8 +139,10 @@ export class TtsService {
           chars.push(...chunk.chars);
           wake();
         }
+        if (bytes > 0) this.trava?.registra(spoken.length);
         const words = charsToWords(chars);
-        if (!job.abort.signal.aborted && bytes > 0) await cache.put(key, Buffer.concat(job.chunks), words);
+        // guarda em segundo plano: o Storage não atrasa o fim do áudio nem as palavras; falhar só perde o cache
+        if (!job.abort.signal.aborted && bytes > 0) this.track(cache.put(key, Buffer.concat(job.chunks), words));
         return { words: remapWordTimings(spokenWords, words), first_byte_ms: first, audio_bytes: bytes, cached: false };
       } catch (err) {
         job.error = err instanceof Error ? err : new Error(String(err));

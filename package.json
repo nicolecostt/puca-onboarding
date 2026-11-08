@@ -18,7 +18,8 @@
     "check:contexto": "tsx scripts/check-contexto.ts",
     "check:harness": "tsx scripts/check-harness.ts",
     "kota:codeowners": "tsx kit/kota/gerar/codeowners.ts",
-    "check:kota": "tsx kit/kota/checar/cli.ts"
+    "check:kota": "tsx kit/kota/checar/cli.ts",
+    "contas-demo": "tsx server/scripts/contas-demo.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
@@ -30,7 +31,11 @@
     "vitest": "^2.1.9"
   },
   "dependencies": {
+    "@fastify/cors": "^11.4.1",
+    "@fastify/rate-limit": "^11.2.2",
+    "@supabase/supabase-js": "^2.119.0",
     "fastify": "^5.12.8",
+    "jose": "^6.2.15",
     "three": "^0.169.0",
     "ws": "^8.22.1"
   }
