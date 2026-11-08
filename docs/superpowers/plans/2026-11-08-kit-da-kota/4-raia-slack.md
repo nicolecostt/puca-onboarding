@@ -13,7 +13,7 @@
 ## Restrições globais
 
 - API do Slack direto, com app e token de bot. Nunca o MCP do Slack: o conectado hoje é de uma empresa real e **não** pode receber nada do kit.
-- Escopos: `chat:write`, `chat:write.customize`, `channels:manage`, mais `channels:read` e `channels:history` para o script não repetir trabalho. Nada além.
+- Escopos: os do `docs/stack.md` §10.1, e nada além: `chat:write`, `chat:write.customize`, `im:write`, `users:read` e `users:read.email` (a mensagem direta do servidor, #129) e `channels:manage` (este script). Nada de ler mensagens: o script não repete trabalho porque só posta em canal que ele acabou de criar.
 - Token fora do repositório: variável `SLACK_BOT_TOKEN`, o mesmo nome que o servidor usa (`docs/stack.md` §10.1 e tabela de variáveis). No servidor, vai nos `fly secrets` (decisão 0006). O encaminhamento pelo servidor é a #129, não esta raia.
 - Pessoas da Kota não são membros reais: mensagens saem com `username` e `icon_url` da pessoa do mapa.
 - O link de convite vai no guia de uso; quem tiver o link entra no workspace onde o bot age.
@@ -68,9 +68,7 @@ git commit -m "chore(kit): app do slack da kota"
 ```ts
 export interface SlackApi {
   authTest(): Promise<{ teamId: string }>;
-  listarCanais(): Promise<{ id: string; nome: string }[]>;
-  criarCanal(nome: string): Promise<{ id: string }>;
-  temMensagens(canalId: string): Promise<boolean>;
+  criarCanal(nome: string): Promise<{ id: string } | { jaExiste: true }>;   // name_taken vira jaExiste
   postar(m: { canalId: string; texto: string; username: string; iconUrl: string }): Promise<void>;
 }
 export interface MensagemKota { canal: `#${string}`; autor: string; texto: string }   // autor = id de PessoaKota
@@ -80,7 +78,8 @@ export function preencherSlack(api: SlackApi, m: MapaKota, historico: MensagemKo
   Promise<{ canaisCriados: string[]; canaisPulados: string[]; mensagens: number }>;
 ```
 
-- Canais: `#geral`, `#people` (destino do caso pessoal da #125) e `canal` e `canalAjuda` de cada time do mapa. O `canalAjuda` do Livro-razão é o `SLACK_CANAL_AJUDA` do servidor.
+- Canais: `#geral`, `#people` (o canal do RH) e `canal` e `canalAjuda` de cada time do mapa. O encaminhamento da Puca não passa por esses canais: vai por mensagem direta ao próprio jurado, dizendo a quem iria na Kota (`docs/stack.md` §10.1, `PRODUCT.md` §5). Todos os jurados entram no mesmo workspace.
+- Só posta em canal criado na mesma execução. Se a execução cair no meio de um canal, arquive o canal no Slack e rode de novo.
 - Histórico: 5 a 10 mensagens por canal de time, coerentes com o Notion e o repo (aviso de deploy, uma dúvida respondida com link para um ADR, um incidente leve citando o runbook `ledger-db-cheio`). Ninguém marca ninguém com `@`.
 
 - [ ] **Step 1: Testes com uma `SlackApi` falsa em memória; ver falhar**
@@ -91,7 +90,7 @@ it("para sem escrever nada se o token é de outro workspace", async () => {
   expect(falsa.escritas).toEqual([]);
 });
 it("cria só os canais que faltam", ...)
-it("não posta em canal que já tem mensagem", ...)       // canaisPulados contém "#livro-razao"
+it("não posta em canal que já existia", ...)            // criarCanal devolve jaExiste; canaisPulados contém "#livro-razao"
 it("posta com nome e avatar da pessoa do mapa", ...)    // username = nome, iconUrl = avatar
 it("falha antes de postar se um autor não está no mapa", ...)
 it("toda mensagem do HISTORICO tem autor do mapa e canal existente", ...)

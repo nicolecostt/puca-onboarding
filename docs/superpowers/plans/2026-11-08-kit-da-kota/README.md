@@ -78,7 +78,8 @@ Tomadas aqui para destravar as raias. Cada uma pode ser revista sem refazer o re
 
 ## Em aberto (não trava nenhuma raia)
 
-- **#13:** a decisão 0008 e o `docs/stack.md` §10, ainda na branch `docs/13-stack-do-app`, já dizem que o servidor encaminha pelo bot do mesmo app da #118 (`SLACK_BOT_TOKEN`, `SLACK_CANAL_AJUDA`, até 10 mensagens por hora). A raia Slack entrega o app e o token; a ação do servidor fica na #129. Se a 0008 mudar antes do merge, só a S1 muda.
+- **#13 (resolvida):** a decisão 0008 e o `docs/stack.md` §10.1, na `main`, mandam o encaminhamento por mensagem direta ao jurado, pelo bot do mesmo app da #118 (`SLACK_BOT_TOKEN`, escopos do §10.1, até 10 mensagens por hora), nunca num canal. A raia Slack entrega o app e o token; a ação do servidor fica na #129.
+- **`CODEOWNERS` com e-mail no GitHub:** e-mail sem conta com acesso de escrita aparece como "Unknown owner" na tela do arquivo. A E3 confere com `gh api repos/<repo>/codeowners/errors` depois do push e, se aparecer erro, a decisão 4 volta para o Joaquim.
 - **Publicar o Notion na web** é um passo na interface do Notion. Suponho que o MCP não faça isso; a N4 confere.
 - **Prazo do hackathon:** não está no repositório. As ondas não têm data.
 

@@ -164,7 +164,7 @@ Expected: nenhuma regra com erro e nenhuma pulada. Colar na #117.
 Pode começar numa branch `feat/120-kota-no-orbis` logo depois do alicerce. O merge espera a C2 (números das issues) e a N4 (URLs públicas). Seguir a skill `nova-jornada` para a jornada e `contrato` se mudar algum formato.
 
 **Files:**
-- Modify: `src/data/company.ts`, `src/data/profiles.ts`, `src/journey/data/tail.journey.json` (vira `kota.journey.json`), `server/src/app.ts`, `src/screens/landing/index.html`, `docs/demo.md`, `docs/contratos.md`, `docs/journey-format.md`, `README.md`, `.claude/skills/contexto-base/modelos.md`, `.claude/skills/revisar/`, `.claude/skills/nova-jornada/`, `.claude/skills/contrato/`, e os testes em `src/journey/__tests__/` que citam a Tail
+- Modify: `src/data/company.ts`, `src/data/profiles.ts`, `src/journey/data/tail.journey.json` (vira `kota.journey.json`), `server/src/app.ts`, `src/screens/landing/index.html`, `docs/demo.md`, `docs/contratos.md`, `docs/journey-format.md`, `README.md`, `.claude/skills/contexto-base/modelos.md`, `.claude/skills/revisar/`, `.claude/skills/nova-jornada/`, `.claude/skills/contrato/`, os testes em `src/journey/__tests__/` que citam a Tail, e `kit/kota/__tests__/mapa.test.ts` (a lista de nomes da Tail passa a ser um array fixo no próprio teste, senão as 17 pessoas da Kota viram "nome da Tail")
 - Create: `src/data/__tests__/kota.test.ts`, `kit/kota/checar/regras/jornada.ts`
 
 **Interfaces:**
