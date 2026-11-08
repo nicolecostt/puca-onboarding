@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { checarKota } from "../checar/checar";
 import type { ContextoKota } from "../checar/contexto";
 import { regras } from "../checar/regras";
+import { criarRegraKotaPeople } from "../checar/regras/kota-people";
 import { regraNotionUrls } from "../checar/regras/notion-urls";
 import { criarRegrasPaginas } from "../checar/regras/paginas";
 import { mapa } from "../mapa";
@@ -321,4 +322,42 @@ describe("regra notion-urls", () => {
   it("acusa URLs em mais de um domínio", () =>
     expect(checar({ ...todas(), rituais: "https://outra.notion.site/rituais-0123abcd" }))
       .toEqual([expect.stringMatching(/kota\.notion\.site.*outra\.notion\.site/)]));
+});
+
+describe("regra kota-people", () => {
+  const LINHA = "Casos individuais: fale com seu gestor ou com People (people@kota.example).";
+  const comLinha = (titulo: string) => `# ${titulo}\n\nA regra geral.\n\n${LINHA}\n`;
+  const pastaCom = (paginas: Record<string, string>) => {
+    const pasta = pastaTemp();
+    for (const [chave, md] of Object.entries(paginas)) writeFileSync(join(pasta, `${chave}.md`), md);
+    return pasta;
+  };
+  const checar = (pasta: string) => checarKota(ctx, [criarRegraKotaPeople(pasta)]).erros;
+
+  it("aceita bônus, promoção e revisão salarial com a linha de casos individuais", () =>
+    expect(checar(pastaCom({
+      bonus: comLinha("Bônus"), promocao: comLinha("Promoção"), "revisao-salarial": comLinha("Revisão salarial"),
+    }))).toEqual([]));
+
+  it("acusa página de bônus sem a linha de casos individuais", () =>
+    expect(checar(pastaCom({
+      bonus: "# Bônus\n\nA regra geral.\n", promocao: comLinha("Promoção"), "revisao-salarial": comLinha("Revisão salarial"),
+    }))).toEqual([expect.stringMatching(/^\[kota-people\] .*bonus\.md/)]));
+
+  it("acusa a linha com outro texto ou só no meio de uma frase", () => {
+    const erros = checar(pastaCom({
+      bonus: comLinha("Bônus"),
+      promocao: "# Promoção\n\nCasos individuais: fale com seu gestor.\n",
+      "revisao-salarial": `# Revisão salarial\n\nComo a política diz, ${LINHA}\n`,
+    }));
+    expect(erros).toHaveLength(2);
+    expect(erros).toEqual(expect.arrayContaining([
+      expect.stringMatching(/^\[kota-people\] .*promocao\.md/), expect.stringMatching(/^\[kota-people\] .*revisao-salarial\.md/),
+    ]));
+  });
+
+  it("pasta sem as páginas: não lança e deixa a falta para a paginas-escritas", () =>
+    expect(checar(join(pastaTemp(), "paginas"))).toEqual([]));
+
+  it("o check:kota roda a regra kota-people", () => expect(regras.map((r) => r.nome)).toContain("kota-people"));
 });
