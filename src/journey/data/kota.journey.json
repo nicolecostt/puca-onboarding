@@ -787,6 +787,23 @@
               "targets": [
                 "missao"
               ]
+            },
+            {
+              "type": "navegador",
+              "acao": {
+                "tipo": "abrir",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81849a35d3b5f53b6ac8"
+              }
+            },
+            {
+              "type": "navegador",
+              "acao": {
+                "tipo": "marcar",
+                "alvo": {
+                  "texto": "Nossa missão"
+                }
+              },
+              "at": "a missão"
             }
           ]
         },
@@ -1116,6 +1133,23 @@
               ],
               "tone": "focus",
               "at": "pergunta ao balancereader"
+            },
+            {
+              "type": "navegador",
+              "acao": {
+                "tipo": "abrir",
+                "url": "https://github.com/JucaGF/kota-bank"
+              }
+            },
+            {
+              "type": "navegador",
+              "acao": {
+                "tipo": "circular",
+                "alvo": {
+                  "texto": "README.md"
+                }
+              },
+              "at": "ADR 1"
             }
           ],
           "highlight": "pergunta ao balancereader"

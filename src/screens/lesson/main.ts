@@ -668,6 +668,8 @@ async function main(): Promise<void> {
         palco?.executar(a.acao); // vale em qualquer vista, até sem quadro
         return;
       }
+      // passo sem navegador: o palco volta ao quadro, para a pessoa ver o que a ação mexe
+      if (!currentStep?.actions?.some((x) => x.type === "navegador")) palco?.mostrarQuadro();
       if (!board) return;
       switch (a.type) {
         case "reveal": return board.reveal(a.targets);
