@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import demo from "../data/kota.journey.json";
-import { buddyOf, createOutbox, FORWARDING_KEY, forwardingMessage, type Forwarding } from "../forwarding";
+import { buddyOf, createOutbox, destinoDaDuvida, FORWARDING_KEY, forwardingMessage, type Forwarding } from "../forwarding";
 import { memoryStore } from "../storage";
 import { loadJourney } from "../validate";
 
@@ -123,5 +123,23 @@ describe("createOutbox: posse do envio entre abas", () => {
     createOutbox(store).claim(f.id, "aba-2");
     expect(createOutbox(store).ownerOf(f.id)).toBe("aba-2");
     expect(createOutbox(store).pending()).toEqual([]);
+  });
+});
+
+describe("destinoDaDuvida", () => {
+  const quem = { buddy: "Beatriz Cavalcanti", gestor: "Natália Brandão" };
+
+  // Notion da Kota, Bônus: "Casos individuais: fale com seu gestor ou com People"
+  it("caso pessoal vai ao gestor, não à buddy", () => {
+    expect(destinoDaDuvida("qual vai ser o meu bônus?", quem)).toEqual({ name: "Natália Brandão", role: "gestor" });
+    expect(destinoDaDuvida("quando sai a minha promoção?", quem)).toEqual({ name: "Natália Brandão", role: "gestor" });
+  });
+
+  it("dúvida do dia a dia vai à buddy", () => {
+    expect(destinoDaDuvida("quando o ledgermonolith sai do repositório?", quem)).toEqual({ name: "Beatriz Cavalcanti", role: "buddy" });
+  });
+
+  it("sem gestor no perfil, o caso pessoal vai à buddy", () => {
+    expect(destinoDaDuvida("qual vai ser o meu bônus?", { buddy: "Beatriz Cavalcanti" })).toEqual({ name: "Beatriz Cavalcanti", role: "buddy" });
   });
 });

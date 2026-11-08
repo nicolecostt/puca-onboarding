@@ -39,12 +39,12 @@ Exemplo válido de `TrailEntry` (uma fala da pessoa e o que Puca fez com ela):
 
 `forwarding_id` aparece quando a fala virou encaminhamento; `ms` é o tempo da resposta do agente (`route: "ask"`).
 
-Exemplo válido de `Forwarding` (status: `pendente` → `enviando` → `enviado` → `confirmado`; `claimed_by` é a aba do Slack que pegou o envio, para duas abas não mandarem duas vezes, e `claimed_at` é quando ela pegou: um envio em `enviando` há mais de 30 s está preso, e outra aba pode pegar):
+Exemplo válido de `Forwarding` (`to.role` é `buddy`, o destino padrão, ou `gestor`, no caso pessoal como bônus, salário, promoção e férias, que o Notion da Kota manda ao gestor; status: `pendente` → `enviando` → `enviado` → `confirmado`; `claimed_by` é a aba do Slack que pegou o envio, para duas abas não mandarem duas vezes, e `claimed_at` é quando ela pegou: um envio em `enviando` há mais de 30 s está preso, e outra aba pode pegar):
 
 ```json
 {
   "id": "c2d1…", "at": "2026-11-07T22:14:10.000Z",
-  "to": { "name": "Beatriz Cavalcanti", "role": "buddy" },
+  "to": { "name": "Natália Brandão", "role": "gestor" },
   "pessoa": "Ana", "question": "Qual vai ser o meu bônus?", "summary": "Qual vai ser o meu bônus?",
   "consulted": [],
   "reason": "Estava sem acesso ao agente e não achei isso na sessão.",
