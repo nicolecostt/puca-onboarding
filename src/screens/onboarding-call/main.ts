@@ -209,6 +209,8 @@ async function main(): Promise<void> {
         : shown === "ended"
           ? "Use “Ligar para Puca” para continuar de onde parou."
           : "";
+    // o aviso aparece embaixo da conversa: se a fala era longa, rola até ele em vez de deixá-lo atrás da barra de call
+    if (el.captionHint.textContent) requestAnimationFrame(() => el.captionHint.scrollIntoView({ block: "nearest", behavior: "smooth" }));
   }
 
   // Espera que só corre com a call ativa (pausa e encerramento seguram o tempo)
