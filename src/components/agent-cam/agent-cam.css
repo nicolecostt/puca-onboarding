@@ -4,7 +4,7 @@
   --cam-size:176px;
   position:fixed;right:24px;bottom:24px;z-index:998;
   width:var(--cam-size);height:var(--cam-size);overflow:hidden;
-  background:var(--color-surface);border:2px solid var(--cam-accent, var(--color-border));border-radius:16px;
+  background:var(--color-surface);border:1px solid var(--cam-accent, color-mix(in srgb, var(--color-ink) 8%, transparent));border-radius:16px;
   box-shadow:0 16px 32px rgba(0,0,0,.06),0 4px 8px rgba(0,0,0,.05);
   font-family:var(--font-sans);
   transition:opacity .25s ease, transform .25s ease, box-shadow .2s ease;
@@ -18,7 +18,7 @@
 
 /* Borda e bolinha neutras: cinza quando a Puca está quieta ou pausada, mais escuras quando fala ou pensa.
    A cor fica só na esfera. */
-.agent-cam:is([data-state="talk"], [data-state="think"]):not([data-paused]){--cam-accent:var(--color-subtle);--cam-dot:var(--color-ink)}
+.agent-cam:is([data-state="talk"], [data-state="think"]):not([data-paused]){--cam-accent:color-mix(in srgb, var(--color-ink) 18%, transparent);--cam-dot:var(--color-ink)}
 
 .agent-cam__view{position:absolute;inset:4% 4% 14%;transition:opacity .3s ease, filter .3s ease}
 .agent-cam[data-paused] .agent-cam__view{opacity:.45;filter:saturate(.4)}
