@@ -392,7 +392,8 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 ### 12.2. O que precisa aparecer na demo
 
 - **Agir num sistema, não só falar.** A Puca age nos sistemas reais da Kota ([§13](#13-avaliação-pelos-jurados-o-mundo-fictício-da-kota)), e não em telas simuladas. O guia aceitaria conexões simuladas *"desde que o agente realmente opere sobre elas na demo"*; agir no sistema de verdade é a nossa aposta de diferencial.
-  - O **encaminhamento** do passo 4 sai de fato no **Slack da Kota**, no canal de ajuda do time, com a dúvida, as fontes já consultadas e o motivo de não ter respondido.
+  - O **encaminhamento** do passo 4 sai de fato no **Slack da Kota**, numa mensagem direta para a própria pessoa, dizendo a quem iria na Kota, com a dúvida, as fontes já consultadas e o motivo de não ter respondido. Nunca num canal: todos os jurados entram no mesmo Slack, e a dúvida de um não pode aparecer para os outros ([§5](#5-visibilidade-para-buddy-gestor-e-rh)).
+  - O Slack simulado continua para a **aprovação do gestor** (primeira tarefa e acessos) e como reserva quando o Slack real não responde.
   - Dentro do Orbis, a Puca tem um **navegador** onde abre o repositório, o Notion e o Slack da Kota. Ali ela aponta, circula, marca e mostra imagens por cima da página, clica e preenche, e percebe o que a pessoa faz na mesma página: pode mostrar, apontar para a pessoa clicar ou acompanhar a pessoa fazendo.
   - Quando a pessoa fala por cima, a Puca para o que está fazendo no navegador e escuta, como na fala.
 
