@@ -109,6 +109,13 @@ describe("routeUtterance: dúvida da primeira tarefa (#79)", () => {
     expect(routeUtterance("entendi a tarefa", tctx).kind).not.toBe("tarefa");
   });
 
+  it("o que a tarefa não diz, mas a sessão sabe, vem do conhecimento (revisão, I5)", () => {
+    const pt = journey.moments.find((m) => m.id === "primeira-tarefa")!;
+    const pctx: RouteContext = { ...tctx, moment: pt, step: pt.steps.at(-1)!, waiting: null };
+    expect(routeUtterance("quem aprova a tarefa?", pctx).kind).toBe("knowledge");
+    expect(routeUtterance("qual o prazo da tarefa?", pctx)).toMatchObject({ kind: "tarefa", resposta: { kind: "sem_fonte" } });
+  });
+
   it("sem tarefa no contexto, nada muda", () => {
     expect(routeUtterance("o que é a primeira tarefa?", ctx).kind).toBe("faq");
   });

@@ -10,7 +10,7 @@
 //   faq       → pergunta sobre um nó do quadro ("quem cuida do X?")
 //   ask       → nada disso: pergunta ao agente
 import { matchFaq, scoreReply, normalize } from "./conditions";
-import { respostaSobreTarefa, type RespostaSobreTarefa } from "./duvidas-da-tarefa";
+import { respostaSobreTarefa, semPalavraTarefa, type RespostaSobreTarefa } from "./duvidas-da-tarefa";
 import type { Faq } from "./faq";
 import type { TarefaDoTime } from "./primeira-tarefa";
 import { answerFromKnowledge, findJump } from "./intent";
@@ -69,6 +69,15 @@ export function routeUtterance(text: string, ctx: RouteContext): Route {
   // tarefa" é também o rótulo de um nó, e uma pergunta não é toque.
   if (isQuestion(text)) {
     const r = respostaSobreTarefa(text, ctx.tarefa ?? null, ctx.tarefaApresentada ?? false);
+    if (r?.kind === "sem_fonte") {
+      // a tarefa não diz, mas a sessão pode saber ("quem aprova a tarefa?"): o conhecimento casa pelo resto da pergunta,
+      // sem a palavra "tarefa", que sozinha casaria qualquer coisa. Ainda sem o LLM.
+      const rest = semPalavraTarefa(text);
+      const known =
+        answerFromKnowledge(rest, ctx.step, ctx.moment) ??
+        ctx.journey.moments.map((m) => answerFromKnowledge(rest, null, m)).find((a): a is string => !!a);
+      if (known) return { kind: "knowledge", text: known };
+    }
     if (r) return { kind: "tarefa", resposta: r };
   }
 
