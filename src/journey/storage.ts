@@ -32,6 +32,12 @@ export function readJson<T>(store: KeyValueStore, key: string, fallback: T): T {
   }
 }
 
+/** Lista guardada no navegador; só os itens com a forma esperada (dado velho de outra branch ou mexido à mão fica de fora). */
+export function readList<T>(store: KeyValueStore, key: string, isItem: (x: unknown) => x is T): T[] {
+  const v = readJson<unknown>(store, key, []);
+  return Array.isArray(v) ? v.filter(isItem) : [];
+}
+
 export function writeJson(store: KeyValueStore, key: string, value: unknown): void {
   try {
     store.setItem(key, JSON.stringify(value));

@@ -3,7 +3,7 @@
 // respondeu). A sessão cria; a tela do Slack (screens/live-session) envia. Formato em docs/contratos.md.
 import { pendentes, proximaTentativa } from "./claim-queue";
 import { normalize } from "./conditions";
-import { readJson, writeJson, type KeyValueStore } from "./storage";
+import { readList, writeJson, type KeyValueStore } from "./storage";
 import type { Journey } from "./types";
 import { uid } from "./uid";
 
@@ -35,12 +35,17 @@ export interface Forwarding {
 export const FORWARDING_KEY = "puca:encaminhamentos";
 const SAME_QUESTION_MS = 2 * 60_000;
 
+// O que a sessão, o Slack e o rastro leem sem conferir: o resto pode faltar.
+const isForwarding = (x: unknown): x is Forwarding => {
+  const f = x as Forwarding;
+  return typeof f?.id === "string" && typeof f.question === "string" && typeof f.to?.name === "string";
+};
+
 export function createOutbox(store: KeyValueStore, opts: { now?: () => Date } = {}) {
   const now = opts.now ?? (() => new Date());
-  const read = (): Forwarding[] => {
-    const v = readJson<unknown>(store, FORWARDING_KEY, []);
-    return Array.isArray(v) ? (v as Forwarding[]) : [];
-  };
+  // encaminhamento de antes do `consulted` continua valendo, com a lista vazia
+  const read = (): Forwarding[] =>
+    readList(store, FORWARDING_KEY, isForwarding).map((f) => (Array.isArray(f.consulted) ? f : { ...f, consulted: [] }));
   const write = (list: Forwarding[]) => writeJson(store, FORWARDING_KEY, list);
 
   return {
