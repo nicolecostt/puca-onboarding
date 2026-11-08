@@ -755,3 +755,73 @@ body {
   color: var(--sk-current-text);
   opacity: 0.7;
 }
+
+/* ---- A Puca no controle (por cima do Slack, no visual do Orbis) ----
+   Borda fina na cor da Puca em volta da tela e um aviso no topo, como num compartilhamento de tela.
+   Somem quando a call acaba (a câmera some e o body perde .has-agent-cam). */
+.cu-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 990;
+  pointer-events: none;
+  padding: 3px;
+  background: conic-gradient(from var(--holo-turn), var(--puca-holo-stops));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: holo-spin 8s linear infinite;
+  transition: opacity 0.4s ease;
+}
+.cu-pill {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  z-index: 991;
+  margin: 0;
+  height: 30px;
+  padding: 0 14px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transform: translateX(-50%);
+  border-radius: var(--radius-pill);
+  background: var(--color-text);
+  color: var(--color-surface);
+  font: 500 13px/1 var(--font-sans);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.cu-pill__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: conic-gradient(from var(--holo-turn), var(--puca-holo-stops));
+  animation: holo-spin 4s linear infinite;
+}
+body:not(.has-agent-cam) .cu-frame,
+body:not(.has-agent-cam) .cu-pill {
+  opacity: 0;
+}
+body:not(.has-agent-cam) .cu-pill {
+  transform: translate(-50%, -8px);
+}
+/* no espaço livre da barra roxa do Slack, à esquerda da busca (no celular, no centro) */
+@media (min-width: 721px) {
+  .cu-pill {
+    top: 7px;
+    left: 76px;
+    height: 26px;
+    transform: none;
+    font-size: 12px;
+  }
+  body:not(.has-agent-cam) .cu-pill {
+    transform: translateY(-8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cu-frame,
+  .cu-pill__dot {
+    animation: none;
+  }
+}
