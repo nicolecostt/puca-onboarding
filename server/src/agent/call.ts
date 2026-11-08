@@ -202,6 +202,8 @@ export async function callTurn(input: CallInput, emit: (ev: CallEvent) => void):
       } else if (ev.name === "assign_task") {
         const tarefa = lerTarefaDoAgente(ev.args);
         if (tarefa) emit({ type: "tarefa", tarefa });
+        // a tarefa de preparação é o fechamento: sem end_call (o LLM esqueceu), a call acaba igual (revisão do #223)
+        ended = true;
       } else if (ev.name === "end_call" && !ended) {
         ended = true;
       }

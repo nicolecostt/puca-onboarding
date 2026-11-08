@@ -67,4 +67,10 @@ describe("callTurn", () => {
     ]);
     expect(sent[0].content).toContain("assign_task");
   });
+
+  it("a tarefa de preparação fecha a call: sem end_call (o Haiku esqueceu), a call acaba igual", async () => {
+    script = [{ type: "text", text: "Antes da sessão, entre nos canais." }, tool("assign_task", { titulo: "Entrar nos canais", porque: "x", passos: [] })];
+    const evs = await run();
+    expect(evs.filter((e) => e.type === "done")).toEqual([{ type: "done" }]);
+  });
 });

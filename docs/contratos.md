@@ -503,6 +503,11 @@ O Qwen quase não chama ferramentas (decisão 0007): com ele, a tarefa raramente
 - **Evento** `{"type":"tarefa","tarefa":{titulo, porque, passos, onde?}}`: `titulo` até 120 caracteres (sem título, não
   há evento), `porque` até 300, até 5 `passos` de até 200 (vazios saem), `onde` até 200 (vazio sai). Uma tarefa conta
   como resposta do turno: só ela não é `empty_response`.
+- **A tarefa fecha:** na sessão, ela é o fim do momento; turno com `tarefa` e sem `next_step` nem `go_to` ganha um
+  `next_step` do servidor (o LLM às vezes esquece, e a sessão ficaria parada no passo). Na call, ela é o fechamento:
+  o turno com `tarefa` termina com `done`, mesmo sem `end_call`.
+- **Aviso na sessão:** "Nova tarefa: … · Ver tarefas" não tampa um aviso do Slack ainda na tela (pedido de aprovação,
+  encaminhamento): espera ele sumir (`src/screens/lesson/avisos.ts`).
 - **Guardada** (`TarefaAtribuida`): a tarefa + `id`, `at` (ISO 8601), `origem` (`call` ou `sessao`), `momento` (título
   do momento, só na sessão), `sessao` (id do rastro) e `status` (`a-fazer` → `feita`, e volta se a pessoa desmarcar).
   O mesmo título (sem caixa nem acento) não vira duas tarefas. Item malformado no navegador é descartado.

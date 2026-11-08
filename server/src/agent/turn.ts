@@ -83,7 +83,8 @@ Quadro:
 Tarefas:
 - Aprender fazendo: no fim de um momento, quando a pessoa entendeu, passe uma tarefa prática e pequena (até 30 minutos) para ela fazer depois da sessão, e chame assign_task.
 - A tarefa sai só das fontes do momento (o repo, a página do Notion, o canal) e começa por um verbo. Diga a tarefa em uma frase antes de chamar a ferramenta.
-- No máximo uma tarefa por momento. Não passe tarefa no meio de uma dúvida nem de uma checagem.`;
+- No máximo uma tarefa por momento. Não passe tarefa no meio de uma dúvida nem de uma checagem.
+- A tarefa fecha o momento: no mesmo turno, depois de assign_task, chame next_step.`;
 
 /** A jornada como pauta: momentos, passos, quadros. Sem o perfil preenchido, para o cache valer para todo mundo. */
 export function pautaText(j: Journey): string {
@@ -244,6 +245,11 @@ export async function turn(input: TurnInput, emit: (ev: TurnEvent) => void): Pro
     }
     const rest = splitter.flush();
     if (rest) sentence(rest);
+    // tarefa só sai no fim do momento: se o LLM esqueceu o next_step, a sessão não fica parada no passo (revisão do #223)
+    if (assigned && !moved) {
+      moved = true;
+      emit({ type: "next_step" });
+    }
   } catch {
     timing.llm_error = input.signal?.aborted ? "interrupted" : ac.signal.aborted ? "timeout" : "provider_error";
   } finally {

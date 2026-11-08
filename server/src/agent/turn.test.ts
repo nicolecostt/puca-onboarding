@@ -134,4 +134,16 @@ describe("turn: tarefas (assign_task)", () => {
     await run();
     expect(sent[0].content).toContain("assign_task");
   });
+
+  it("tarefa é fim de momento: sem next_step no turno (o Haiku esqueceu), o servidor segue para o próximo passo", async () => {
+    script = [{ type: "text", text: "Faça isso depois." }, tool("assign_task", { titulo: "Ler o README", porque: "x", passos: [] })];
+    const evs = await run({ kind: "fala", text: "entendi" });
+    expect(evs.filter((e) => e.type === "next_step" || e.type === "go_to")).toEqual([{ type: "next_step" }]);
+  });
+
+  it("tarefa com go_to no turno: não soma um next_step", async () => {
+    script = [tool("assign_task", { titulo: "Ler o README", porque: "x", passos: [] }), tool("go_to", { moment: "falha" })];
+    const evs = await run();
+    expect(evs.filter((e) => e.type === "next_step" || e.type === "go_to")).toEqual([{ type: "go_to", target: "moment:falha" }]);
+  });
 });
