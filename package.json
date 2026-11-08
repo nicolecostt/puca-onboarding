@@ -16,7 +16,9 @@
     "start": "tsx server/src/server.ts",
     "check": "npm run typecheck && npm test && npm run check:contexto && npm run check:harness && vite build",
     "check:contexto": "tsx scripts/check-contexto.ts",
-    "check:harness": "tsx scripts/check-harness.ts"
+    "check:harness": "tsx scripts/check-harness.ts",
+    "kota:codeowners": "tsx kit/kota/gerar/codeowners.ts",
+    "check:kota": "tsx kit/kota/checar/cli.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
