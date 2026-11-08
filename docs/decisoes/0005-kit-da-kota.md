@@ -3,9 +3,9 @@
 - Data: 2026-11-08 · Quem: Joaquim
 - Status: valendo
 
-**Contexto:** a issue #12 pede um mundo fictício que seja fonte de Puca e prova para o jurado (`PRODUCT.md` §13). A
+**Contexto:** a issue #12 pede um mundo fictício que seja fonte do Puca e prova para o jurado (`PRODUCT.md` §13). A
 Tail que existe no código foi só para testes e não parece uma empresa de verdade. Escrever um codebase inteiro à mão
-sempre fica com cara de falso, e o jurado precisa conseguir rodar e testar o que Puca explica.
+sempre fica com cara de falso, e o jurado precisa conseguir rodar e testar o que o Puca explica.
 
 **Decisão:**
 
@@ -18,10 +18,10 @@ sempre fica com cara de falso, e o jurado precisa conseguir rodar e testar o que
 - O kit mora onde uma pessoa de verdade procuraria: **repo público `kota-bank` no GitHub** (código, READMEs,
   `CODEOWNERS`, ADRs, runbooks, issues de primeira tarefa) e **Notion público de verdade** (cultura, pessoas, times,
   sistemas, políticas, Kota People, RFCs, onboarding, guia de uso). O Notion também é uma das integrações que mostram
-  que Puca se conecta.
+  que o Puca se conecta.
 - O Notion é preenchido por agente pelo **MCP do Notion**. Times, pessoas, sistemas e responsáveis saem de um arquivo
   só, o **mapa da Kota**, no nosso repo (`kit/kota/`), que também gera o `CODEOWNERS`. Depois de preencher, uma cópia do
-  Notion é baixada para o nosso repo para o check de coerência e para Puca ler sem depender da rede.
+  Notion é baixada para o nosso repo para o check de coerência e para o Puca ler sem depender da rede.
 
 Desenho completo: [`docs/kit-da-kota.md`](../kit-da-kota.md).
 
@@ -32,14 +32,14 @@ Desenho completo: [`docs/kit-da-kota.md`](../kit-da-kota.md).
   numa tarefa própria, com a jornada nova.
 - Mudou um responsável, time ou pessoa? Muda no mapa da Kota, e não direto no Notion ou no `CODEOWNERS`.
 - O `LICENSE` e os cabeçalhos de copyright do Bank of Anthos ficam no `kota-bank`, como a Apache-2.0 exige.
-- Como o servidor de Puca acessa o Notion na hora da demo fica para #13 e #26. → Decidido na 0008: lê a cópia local, sem
+- Como o servidor do Puca acessa o Notion na hora da demo fica para #13 e #26. → Decidido na 0008: lê a cópia local, sem
   token nem MCP na hora da sessão.
 - A jornada continua escrita à mão, mas acontece no kit: toda fonte citada por um nó é um arquivo do `kota-bank` ou uma
   página do Notion da Kota, conferida pelo check de coerência.
 - O repositório é `JucaGF/kota-bank` e o Notion é o Kota Workspace.
 - O Slack da Kota é um workspace gratuito próprio, usado pela **API do Slack com um app e token de bot** (e não pelo MCP)
   para preencher os canais, com mensagens que saem com nome e foto de pessoas da Kota.
-- ⚠️ **Puca agir no Slack real na demo não está decidido aqui.** Se o servidor fizer o encaminhamento pelo Slack, isso
+- ⚠️ **O Puca agir no Slack real na demo não está decidido aqui.** Se o servidor fizer o encaminhamento pelo Slack, isso
   muda a regra "o servidor só dá voz e LLM" (`CLAUDE.md`), a §12.2 do `PRODUCT.md` (encaminhamento no Slack simulado da
   `live-session`) e o contrato de Encaminhamento em `docs/contratos.md`. Essa decisão, e se o Slack real substitui ou
   complementa o simulado, fica para a #13. Se for adiante, o token fica no `server/.env`. → Decidido na 0008: o

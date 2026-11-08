@@ -5,7 +5,7 @@
 > tarefa com o app Electron (#47) que estiver na `main`.
 
 **Objetivo:** o Orbis fica na tela como uma pílula enquanto a pessoa trabalha. Ao ser chamada (⌥Espaço ou clique), a
-Puca entende onde a pessoa está e responde ali mesmo. Se a resposta pede quadro, navegador ou sessão, a janela expande
+O Puca entende onde a pessoa está e responde ali mesmo. Se a resposta pede quadro, navegador ou sessão, a janela expande
 para a sessão própria e, no fim, devolve a pessoa ao que ela fazia.
 
 **Arquitetura:**
@@ -20,9 +20,9 @@ para a sessão própria e, no fim, devolve a pessoa ao que ela fazia.
 
 ## Restrições globais
 
-- **Ver sim, agir não:** o computer use continua só no navegador da Puca.
+- **Ver sim, agir não:** o computer use continua só no navegador do Puca.
 - **Permissões opcionais:** só o microfone é obrigatório. Acessibilidade e Gravação de tela são pedidas na pílula, com
-  explicação, nunca na instalação. Sem elas, a Puca segue no nível 0.
+  explicação, nunca na instalação. Sem elas, o Puca segue no nível 0.
 - **Nada em segundo plano:** nenhuma sondagem nem gravação contínua. O processo principal guarda só o **nome** do
   último app em foco, por notificação de ativação.
 - **Privacidade:**
@@ -31,14 +31,14 @@ para a sessão própria e, no fim, devolve a pessoa ao que ela fazia.
   - apps de senha, de mensagens e de banco ficam de fora;
   - segredos são removidos;
   - a pílula mostra o que foi lido, com um ✕ para descartar.
-- **Sem a Puca avaliar a pessoa:** nenhum tipo de resposta comenta a atividade dela.
+- **Sem o Puca avaliar a pessoa:** nenhum tipo de resposta comenta a atividade dela.
 
 ## Foco da revisão
 
 1. **Clicar na pílula tira o foco do app de antes:** o contexto lido tem de ser o do app anterior, não o do Orbis.
-2. **Permissão negada no meio da demo:** a Puca cai de nível sem erro e diz o que deixou de ver.
+2. **Permissão negada no meio da demo:** o Puca cai de nível sem erro e diz o que deixou de ver.
 3. **Texto com senha ou token selecionado:** é removido antes de sair do processo principal.
-4. **A pessoa chama a Puca dentro do próprio navegador da Puca:** o contexto vem por CDP (URL e seleção), sem pedir
+4. **A pessoa chama o Puca dentro do próprio navegador do Puca:** o contexto vem por CDP (URL e seleção), sem pedir
    permissão nenhuma.
 5. **Chamado sem fala** (clicou e ficou em silêncio): a pílula fecha sem chamar o servidor.
 
@@ -52,7 +52,7 @@ para a sessão própria e, no fim, devolve a pessoa ao que ela fazia.
   - **ajudante nativo em Swift:** compilado no CI do macOS, com assinatura estável.
 - `docs/stack.md` §3.3, §4.9 e §11.
 - **Skill `contexto-base`:** o modo sempre na tela entra no `PRODUCT.md` §11 (aprender na hora da necessidade) e §5
-  (o que a Puca nunca guarda).
+  (o que o Puca nunca guarda).
 - **Skill `nova-regra`:** a regra das telas no `CLAUDE.md` passa a cobrir a pílula.
 - **Contrato "Computer use":** `window.orbis.janela` (`compactar`, `expandir`, `aoChamar`, `voltar`) e
   `window.orbis.tela.contexto(): Promise<ContextoDoComputador | null>`.
@@ -84,7 +84,7 @@ para a sessão própria e, no fim, devolve a pessoa ao que ela fazia.
 
 | Nível | Fonte | Lê |
 |---|---|---|
-| 0 | NSWorkspace; CDP do navegador da Puca | app em foco; URL e seleção do navegador da Puca |
+| 0 | NSWorkspace; CDP do navegador do Puca | app em foco; URL e seleção do navegador do Puca |
 | 1 | Acessibilidade | título da janela, seleção, URL do navegador em foco |
 | 2 | Gravação de tela | print da janela em foco, só com licença dada naquele chamado |
 

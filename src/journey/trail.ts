@@ -1,4 +1,4 @@
-// Rastro das decisões de Puca (PRODUCT.md §12.2): cada fala da pessoa, o caminho que Puca escolheu
+// Rastro das decisões do Puca (PRODUCT.md §12.2): cada fala da pessoa, o caminho que o Puca escolheu
 // (journey/route.ts), o que respondeu e de qual fonte. Fica no navegador; a tela de demo `rastro/`
 // mostra e baixa em JSON. Formato em docs/contratos.md.
 import type { Route } from "./route";
@@ -16,7 +16,7 @@ export interface TrailEntry {
   from: "chat" | "voz";
   utterance: string;
   route: TrailRoute;
-  /** O que Puca disse (no ask, as frases juntas; "" se foi interrompida antes de falar). */
+  /** O que o Puca disse (no ask, as frases juntas; "" se foi interrompido antes de falar). */
   answer: string;
   /** Títulos das fontes usadas; [] quando não houve. */
   sources: string[];
@@ -153,7 +153,7 @@ export function summarizeSessions(entries: TrailEntry[], sessions: TrailSession[
 
 /**
  * Fontes que sustentam a resposta de um caminho (vazio quando a resposta não veio de fonte).
- * Só entra o que diz o que Puca respondeu, para o jurado achar no kit (PRODUCT.md §13.2):
+ * Só entra o que diz o que o Puca respondeu, para o jurado achar no kit (PRODUCT.md §13.2):
  * "o que é" vem das docs do nó, "por que existe" vem do ADR, e "quem cuida" fica sem fonte,
  * porque as docs do nó não dizem quem cuida.
  */
