@@ -39,7 +39,7 @@
 
   /* ---- Estados ----
      Só preto, branco e cinza: o estado se lê pela marca (cheio, vazado, tracejado), não pela cor.
-     A única cor do app é a da Puca (--puca-holo). Vermelho fica só para erro e encerrar. */
+     A única cor do app é a da Puca (--puca-holo-stops). Vermelho fica só para erro e encerrar. */
   --color-success: #171717;
   --color-success-bg: #ffffff;
   --color-success-border: #171717;
@@ -62,22 +62,22 @@
   --color-puca-text: #ffffff;
 
   /* A cor da Puca: o arco-íris metálico da faixa da esfera, para poucos pontos especiais
-     (o foco dela no quadro, a habilidade ativa, partículas). Gire com a animação holo-spin. */
-  --puca-holo: conic-gradient(
-    from var(--holo-turn),
+     (o foco dela no quadro, partículas). Use dentro da regra animada:
+     background: conic-gradient(from var(--holo-turn), var(--puca-holo-stops)); animation: holo-spin ... */
+  --puca-holo-stops:
     hsl(330 75% 64%),
     hsl(25 80% 64%),
     hsl(75 60% 56%),
     hsl(165 65% 52%),
     hsl(215 80% 64%),
     hsl(270 70% 68%),
-    hsl(330 75% 64%)
-  );
+    hsl(330 75% 64%);
 
   /* esfera da Puca (src/lib/puca-sphere.ts): só #rrggbb, o canvas lê estes valores */
   --puca-sphere-dot: #c9c9c9; /* pontos de fundo, cinza claro (a faixa é arco-íris, gerada no canvas) */
 
   --color-highlight: rgba(0, 0, 0, 0.07); /* trecho sendo falado / foco no quadro */
+  --color-highlight-strong: rgba(0, 0, 0, 0.16); /* alvo na checagem: mais forte que o hover */
 
   /* ---- Formas ---- */
   --radius-sm: 6px;

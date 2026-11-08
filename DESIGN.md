@@ -1,5 +1,5 @@
 ---
-name: Lousa
+name: Orbis
 description: A Puca dá aulas no quadro para quem chega no time; preto no branco, e a única cor é a dela.
 colors:
   ink: "#0a0a0a"
@@ -110,7 +110,7 @@ components:
     padding: "3px 10px"
 ---
 
-# Design System: Lousa
+# Design System: Orbis
 
 ## Overview
 
@@ -120,7 +120,7 @@ Um cartaz tipográfico suíço: papel branco, tinta preta, cinzas só para o que
 
 Na landing o mundo é plano e editorial: Creato Display grande alinhada à esquerda numa grade de 12 colunas, listas separadas por fios, nenhum fundo colorido, nenhuma sombra. Nas telas do app (aula, call) o mesmo mundo vale para cor e acabamento, com uma densidade de ferramenta: quadro pontilhado, nós contornados em tinta, e sombras suaves só nos componentes que flutuam sobre o quadro.
 
-O estado nunca depende de cor: lê-se pela marca. Nó cheio é o escolhido pela pessoa, contorno sólido é provado, tracejado é caixa preta ou inferido, e o anel arco-íris é o que a Puca está explicando agora. Vermelho fica reservado para erro e para encerrar a call.
+O estado nunca depende de cor: lê-se pela marca. Nó cheio é o escolhido pela pessoa, contorno sólido é provado, tracejado é caixa preta ou selo inferido, contorno grosso com visto é acerto, contorno duplo cinza é alerta, e o anel arco-íris é o que a Puca está explicando agora. Vermelho fica reservado para erro e para encerrar a call.
 
 **Key Characteristics:**
 - Preto, branco e cinza; a cor é só a da Puca, em poucos pontos.
@@ -138,7 +138,7 @@ Monocromático com uma única voz colorida: a Puca.
 - **Tinta de botão** (ink-button): o preto dos botões escuros, do logo e do cursor da Puca nas telas do app (`--color-ink`).
 
 ### Secondary
-- **Arco-íris da Puca** (`--puca-holo`, gradiente cônico em HSL de 330° a 270° com saturação 60–80% e luminosidade 52–68%, girando com `holo-spin` em 6s): a esfera de pontos (faixa gerada no canvas em `hsl(h, 0.75, 0.64)`), o anel de foco do nó que a Puca está explicando, o anel da orbe pequena e as partículas do fundo (`hsla(h, 75%, 62%, 0.25–0.75)`). Não é um valor sólido: é sempre o gradiente ou o tom girando. Os stops exatos ficam no sidecar.
+- **Arco-íris da Puca** (`--puca-holo-stops`, usado num gradiente cônico em HSL de 330° a 270° com saturação 60–80% e luminosidade 52–68%, girando com `holo-spin` em 6s): a esfera de pontos (faixa gerada no canvas em `hsl(h, 0.75, 0.64)`), o anel de foco do nó que a Puca está explicando, o anel da orbe pequena e as partículas do fundo (`hsla(h, 75%, 62%, 0.25–0.75)`). Não é um valor sólido: é sempre o gradiente ou o tom girando. Os stops exatos ficam em `src/styles/tokens.css`.
 
 ### Tertiary
 - **Vermelho de erro** (danger, danger-soft, danger-text, danger-bg): só erro e o botão de encerrar a call. Nunca decorativo, nunca para estado de jornada.
@@ -155,7 +155,7 @@ Monocromático com uma única voz colorida: a Puca.
 ### Named Rules
 **The Única Cor Rule.** A única cor fora do preto, branco e cinza é o arco-íris da Puca, e ele marca a Puca: a esfera, o foco dela no quadro, as partículas. Nada mais ganha cor de marca, nem botão, nem link, nem fundo.
 
-**The Marca, Não Cor Rule.** Estado se lê pela marca: cheio (escolhido), contorno sólido (provado), tracejado (caixa preta / inferido), anel arco-íris (foco da Puca). Se um estado só se distingue pela cor, está errado.
+**The Marca, Não Cor Rule.** Estado se lê pela marca: cheio (escolhido), contorno sólido (provado), tracejado (caixa preta / selo inferido), contorno grosso com visto (acerto), contorno duplo cinza (alerta), anel arco-íris (foco da Puca). Se um estado só se distingue pela cor, está errado.
 
 **The Vermelho Só Para Parar Rule.** Vermelho é erro e encerrar. Só isso.
 

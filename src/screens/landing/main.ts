@@ -1,10 +1,12 @@
-// Landing da Iris. Aqui ficam as partes que se mexem:
+// Landing do Orbis. Aqui ficam as partes que se mexem:
 // a esfera pequena no exemplo de quadro, a esfera grande com as habilidades trocando,
 // os nós clicáveis do quadro e as partículas coloridas do fechamento.
 import "../../styles/base.css";
 import "./style.css";
 import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../lib/agent-visual";
 import { qs } from "../../lib/dom";
+import demo from "../../journey/data/tail.journey.json";
+import type { BoardNode, Journey } from "../../journey/types";
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -28,6 +30,7 @@ function mountSkills(sphere: AgentVisual | null): void {
   let timer = 0;
   const paused = reduceMotion; // com movimento reduzido, a lista não troca sozinha
   let hovering = false;
+  let pinned = false; // tocou numa habilidade: fica nela (no celular não há hover)
   let visible = false;
 
   const show = (i: number) => {
@@ -43,7 +46,7 @@ function mountSkills(sphere: AgentVisual | null): void {
 
   const restart = () => {
     clearTimeout(timer);
-    const running = !paused && !hovering && visible;
+    const running = !paused && !pinned && !hovering && visible;
     // reinicia o fio do tempo da habilidade ativa
     list.classList.remove("is-running");
     void list.offsetWidth;
@@ -51,7 +54,12 @@ function mountSkills(sphere: AgentVisual | null): void {
     if (running) timer = window.setTimeout(() => show(index + 1), SKILL_MS);
   };
 
-  items.forEach((b, n) => b.addEventListener("click", () => show(n)));
+  items.forEach((b, n) =>
+    b.addEventListener("click", () => {
+      pinned = !(pinned && n === index);
+      show(n);
+    }),
+  );
   list.addEventListener("pointerenter", () => {
     hovering = true;
     restart();
@@ -70,46 +78,46 @@ function mountSkills(sphere: AgentVisual | null): void {
   show(0);
 }
 
-// ---- Nós do exemplo de quadro (dados da jornada da Tail, src/journey/data/tail.journey.json) ----
-interface NodeInfo {
+// ---- Nós do exemplo de quadro: dados lidos da jornada da Tail (o mesmo quadro da aula) ----
+interface NodeCard {
   title: string;
   role: string;
   owner: string;
   tag?: string;
 }
 
-const NODES: Record<string, NodeInfo> = {
-  gateway: {
-    title: "pos-gateway",
-    role: "Recebe as vendas das maquininhas e chama o authorizer.",
-    owner: "Responsável: Diego Ramos · Autorização",
-    tag: "provado · ADR-012",
-  },
-  authorizer: {
-    title: "authorizer",
-    role: "Decide se a venda é aprovada e calcula o MDR.",
-    owner: "Responsável: Júlia Paiva · Autorização",
-    tag: "provado · ADR-019",
-  },
-  topic: {
-    title: "transactions.authorized",
-    role: "Fila onde o gateway publica toda venda aprovada.",
-    owner: "Time: Autorização",
-  },
-  settlement: {
-    title: "settlement-worker",
-    role: "Sem documentação confirmada.",
-    owner: "Responsável: Rafael Lins · Liquidação",
-    tag: "encaminhado à Carla Mendes",
-  },
-};
+const BOARD = (demo as unknown as Journey).boards.pagamentos;
+
+/** Primeira frase do texto (o cartão da landing é curto). */
+const firstSentence = (t: string) => (t.match(/^.*?[.!?](\s|$)/)?.[0] ?? t).trim();
+
+function cardFor(id: string): NodeCard | null {
+  const node: BoardNode | undefined = BOARD.nodes.find((n) => n.id === id);
+  if (!node) return null;
+  const info = node.info ?? {};
+  const owner =
+    info.owner && info.owner_confirmed !== false
+      ? `Responsável: ${info.owner}${info.team ? ` · ${info.team}` : ""}`
+      : info.team
+        ? `Time: ${info.team}`
+        : "Responsável não confirmado";
+  // fonte: o ADR do nó, ou o primeiro documento que é um ADR; caixa preta mostra o que está pendente
+  const adr = info.adr?.id ?? info.docs?.find((d) => d.title.startsWith("ADR"))?.title.split(" ·")[0];
+  const pending = node.look === "blackbox" ? node.note?.split("·").pop()?.trim() : undefined;
+  return {
+    title: node.label,
+    role: firstSentence(info.role ?? ""),
+    owner,
+    tag: pending ?? (adr ? `fonte: ${adr}` : undefined),
+  };
+}
 
 function mountBoard(): void {
   const canvas = qs<HTMLElement>(document, ".board__canvas");
   const field = (name: string) => qs<HTMLElement>(canvas, `[data-card="${name}"]`);
   // marcar = true pinta o nó de preto (escolha da pessoa); no início o cartão só mostra o foco da Puca.
   const select = (id: string, marcar = true) => {
-    const info = NODES[id];
+    const info = cardFor(id);
     if (!info) return;
     canvas.querySelectorAll<HTMLElement>(".node").forEach((n) => {
       const on = marcar && n.dataset.node === id;

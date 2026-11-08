@@ -1,5 +1,5 @@
-/* Landing da Iris: cartaz suíço. Grade de 12 colunas, preto no branco, fios de 1px.
-   A única cor é a da Puca (--puca-holo e a esfera), em poucos pontos. */
+/* Landing do Orbis: cartaz suíço. Grade de 12 colunas, preto no branco, fios de 1px.
+   A única cor é a da Puca (--puca-holo-stops e a esfera), em poucos pontos. */
 @font-face {
   font-family: "Creato Display";
   src: url("../../assets/fonts/CreatoDisplay-Regular.otf") format("opentype");
@@ -372,7 +372,7 @@ main,
   inset: -7px;
   border-radius: calc(var(--radius-lg) + 7px);
   padding: 2.5px;
-  background: var(--puca-holo);
+  background: conic-gradient(from var(--holo-turn), var(--puca-holo-stops));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);

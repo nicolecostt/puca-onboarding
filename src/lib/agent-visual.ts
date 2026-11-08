@@ -11,9 +11,9 @@ export interface RGB {
 
 export interface AgentVisual {
   setState(state: AgentVisualState): void;
-  /** true = "esquenta" (fica vermelha, pensando); false = volta ao normal. */
+  /** true = "esquenta" (pensando: a faixa satura e o arco-íris gira mais rápido); false = volta ao normal. */
   setWarm(on: boolean): void;
-  /** Cor atual do agente, 0–255 (usada na borda da câmera). */
+  /** Cor atual da faixa do agente, 0–255 (hoje nenhuma tela usa; a câmera ficou neutra). */
   getColor(): RGB;
 }
 

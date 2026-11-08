@@ -1,7 +1,7 @@
 // Visual da Puca: esfera de pontos com uma faixa em onda, sem rosto.
-// Carregado por loadAgentVisual() (agent-visual.ts) em todas as telas. Cores em tokens.css (--puca-sphere-*).
+// Carregado por loadAgentVisual() (agent-visual.ts) em todas as telas. Cor dos pontos de fundo em tokens.css (--puca-sphere-dot).
 //
-// Mouse: a esfera inclina na direção do cursor e os pontos perto dele crescem e escurecem.
+// Mouse: a esfera inclina na direção do cursor e os pontos perto dele crescem e ganham a cor da faixa.
 // Clique: solta uma ondulação que corre pela superfície.
 // Faixa: arco-íris metálico (o tom muda ao longo da faixa e gira com o tempo, com brilho onde a luz bate); o fundo fica claro.
 // O clique também solta uma onda em arco-íris.
@@ -154,10 +154,36 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
     return { x: x1 * cy - z2 * syw, y: y2, z: x1 * syw + z2 * cy };
   }
 
+  // só anima quando aparece na tela e a aba está visível; com movimento reduzido, quase parada e em poucos quadros
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let onScreen = true;
+  let running = false;
+  let lastDraw = 0;
   let last = performance.now() / 1000;
+  const wake = () => {
+    if (running || !onScreen || document.hidden) return;
+    running = true;
+    last = performance.now() / 1000;
+    requestAnimationFrame(frame);
+  };
+  new IntersectionObserver(([e]) => {
+    onScreen = e.isIntersecting;
+    wake();
+  }).observe(container);
+  document.addEventListener("visibilitychange", wake);
+
   function frame(): void {
+    if (!onScreen || document.hidden) {
+      running = false;
+      return;
+    }
     const now = performance.now() / 1000;
-    const dt = Math.min(0.05, now - last);
+    if (reduce && now - lastDraw < 0.25) {
+      requestAnimationFrame(frame);
+      return;
+    }
+    lastDraw = now;
+    const dt = Math.min(0.05, now - last) * (reduce ? 0.15 : 1);
     last = now;
 
     // estado anda devagar até o alvo (troca suave)
@@ -282,7 +308,7 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
     for (let j = ripples.length - 1; j >= 0; j--) if (now - ripples[j].born > 2.4) ripples.splice(j, 1);
     requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+  wake();
 
   const api: AgentVisual = {
     setState(s) {
