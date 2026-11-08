@@ -21,7 +21,7 @@ vi.mock("../llm", () => ({
 const { ask } = await import("./ask");
 type AskEvent = Parameters<Parameters<typeof ask>[1]>[0];
 
-const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/tail.journey.json", import.meta.url), "utf8")));
+const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/kota.journey.json", import.meta.url), "utf8")));
 const QUESTION = "Qual a política de home office do time?";
 
 async function run(): Promise<AskEvent[]> {

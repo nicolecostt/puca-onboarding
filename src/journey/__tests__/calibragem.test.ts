@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { CALIBRAGEM_TEMAS, DEMO_CALIBRAGENS, atualizarCalibragem, calibragemFromAnswers, itemDoTema, nivelFromAnswer } from "../calibragem";
 import { TEMAS } from "../validate";
 import { DEMO_PROFILES } from "../profile";
-import demo from "../data/tail.journey.json";
+import demo from "../data/kota.journey.json";
 import type { Tema } from "../types";
 
 describe("nivelFromAnswer", () => {

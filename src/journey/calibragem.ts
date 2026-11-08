@@ -8,7 +8,7 @@ import type { Calibragem, Certeza, ItemCalibragem, Nivel, Profile, ResultadoChec
 
 const STORAGE_KEY = "puca:calibragem";
 
-/** Os temas e os momentos da jornada que cada um controla (ids de tail.journey.json). */
+/** Os temas e os momentos da jornada que cada um controla (ids de kota.journey.json). */
 export const CALIBRAGEM_TEMAS: Record<Tema, { nome: string; momentos: string[] }> = {
   empresa: { nome: "A empresa e a cultura", momentos: ["empresa-e-cultura"] },
   rituais: { nome: "Rituais e pessoas do time", momentos: ["seu-time"] },

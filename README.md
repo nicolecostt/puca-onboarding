@@ -53,7 +53,7 @@ src/
     agent-cursor/        cursor da Puca (seta + "Puca") mexendo na tela, por enquanto simulado
     journey-panel/       painel "Sua jornada" da sessão: objetivo, momentos marcados pela calibragem e próximos passos
   journey/               jornada da sessão em JSON: tipos, validador, motor, perfil, calibragem, jornada da pessoa e intenções (pulo, perguntas)
-    data/                jornadas em JSON (tail.journey.json é a demo)
+    data/                jornadas em JSON (kota.journey.json é a demo)
   lib/                   código compartilhado
     events.ts            eventos tipados (callbar:*, chatpanel:*, onboarding:*)
     draggable.ts         arrastar elementos fixos pela tela
@@ -131,7 +131,7 @@ mudam a velocidade e a forma da onda. A faixa é um arco-íris metálico gerado 
 
 ## Sessão no quadro
 
-A tela `src/screens/lesson/` roda a jornada em JSON (`src/journey/data/tail.journey.json`): a Puca fala, o quadro
+A tela `src/screens/lesson/` roda a jornada em JSON (`src/journey/data/kota.journey.json`): a Puca fala, o quadro
 (`src/components/whiteboard/`) vai se montando e a pessoa responde pelas respostas sugeridas, pelo chat ou tocando no quadro.
 Pelo chat ela também pode pedir para mudar de assunto ou fazer perguntas, que a Puca responde com o conhecimento da sessão.
 A conversa ainda é simulada (sem LLM nem voz); o motor (`src/journey/runner.ts`) não depende da tela.

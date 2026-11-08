@@ -288,4 +288,4 @@ Exemplo válido de `PedidoDeAprovacao`:
 2. **Quebra** (renomear, remover, mudar significado): ajuste todos os usos no mesmo PR, escreva
    `⚠️ quebra contrato` no título ou no começo da descrição do PR e avise o time.
 3. Formato novo da jornada exige: tipo em `types.ts`, regra em `validate.ts`, teste, seção em `journey-format.md`
-   e a demo (`tail.journey.json`) continuando válida.
+   e a demo (`kota.journey.json`) continuando válida.

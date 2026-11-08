@@ -4,7 +4,7 @@ import { DEMO_PROFILES } from "../../../src/journey/profile";
 import { loadJourney } from "../../../src/journey/validate";
 import { ask, type AskEvent } from "./ask";
 
-const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/tail.journey.json", import.meta.url), "utf8")));
+const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/kota.journey.json", import.meta.url), "utf8")));
 
 describe("ask", () => {
   it("LLM fora do ar: a ponte sai na hora e a fala de falha fecha, sem encaminhar", async () => {

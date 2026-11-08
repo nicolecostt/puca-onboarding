@@ -6,7 +6,7 @@ O modelo segue a ideia de jornadas usada em agentes de demonstração por voz:
 uma vista nova, o **quadro**, que o agente monta enquanto explica.
 
 Tipos: [`src/journey/types.ts`](../src/journey/types.ts). Validação: [`src/journey/validate.ts`](../src/journey/validate.ts).
-Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json).
+Jornada de exemplo: [`kota.journey.json`](../src/journey/data/kota.journey.json).
 
 ## Estrutura
 

@@ -19,7 +19,7 @@ import { routeUtterance, type Route } from "../../journey/route";
 import { buildFaqs } from "../../journey/faq";
 import { createTrail } from "../../journey/trail";
 import { tarefaDaPessoa } from "../../journey/primeira-tarefa";
-import demoJourney from "../../journey/data/tail.journey.json";
+import demoJourney from "../../journey/data/kota.journey.json";
 import { createAgentVoice, MIC_AVISO } from "../../voice/agent-voice";
 import { TOOLS, TRAIL, tasksFor, type AccessStatus, type TaskState, type Tool } from "./data";
 

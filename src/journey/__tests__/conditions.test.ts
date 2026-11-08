@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { detectIntent, matchFaq, scoreReply } from "../conditions";
-import demo from "../data/tail.journey.json";
+import demo from "../data/kota.journey.json";
 import { buildFaqs } from "../faq";
 import { DEMO_PROFILES } from "../profile";
 import { loadJourney } from "../validate";
@@ -32,16 +32,16 @@ describe("matchFaq", () => {
     expect(matchFaq("me explica o api gateway", faqs)).toMatchObject({ faq: faqs[4], score: 1 });
   });
 
-  it("vale o nó citado por inteiro, não outro cujo id está dentro do nome (\"config-topic\" não é \"topic\")", () => {
+  it("vale o nó citado por inteiro, não outro cujo id está dentro do nome (\"ledger-db\" não é \"db\")", () => {
     const parecidos = [
-      { node: "topic", label: "transactions.authorized", intent: "what" as const },
-      { node: "config-topic", label: "terminal.config.updated", intent: "what" as const },
+      { node: "db", label: "accounts", intent: "what" as const },
+      { node: "ledger-db", label: "banco do livro-razão", intent: "what" as const },
     ];
-    expect(matchFaq("o que é o config-topic?", parecidos).faq?.node).toBe("config-topic");
-    expect(matchFaq("o que é o topic?", parecidos).faq?.node).toBe("topic");
-    // na jornada de demo
-    const pagamentos = buildFaqs(journey, DEMO_PROFILES.novo).filter((f) => f.board === "pagamentos");
-    expect(matchFaq("o que é o config-topic?", pagamentos).faq?.node).toBe("config-topic");
+    expect(matchFaq("o que é o ledger-db?", parecidos).faq?.node).toBe("ledger-db");
+    expect(matchFaq("o que é o db?", parecidos).faq?.node).toBe("db");
+    // na jornada de demo: a tarefa da transição tem o id da tarefa de quem é novo dentro do dela
+    const pagamentos = buildFaqs(journey, DEMO_PROFILES.transicao).filter((f) => f.board === "pagamentos");
+    expect(matchFaq("o que é o task-403?", pagamentos).faq?.node).toBe("task-403");
   });
 
   it("sem intenção cai no 'what' com confiança média; sem nó, nada", () => {

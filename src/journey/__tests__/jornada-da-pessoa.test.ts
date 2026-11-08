@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import demo from "../data/tail.journey.json";
+import demo from "../data/kota.journey.json";
 import { loadJourney } from "../validate";
 import { DEMO_CALIBRAGENS, atualizarCalibragem } from "../calibragem";
 import { montarJornadaDaPessoa, proximosPassos } from "../jornada-da-pessoa";

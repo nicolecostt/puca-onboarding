@@ -7,7 +7,7 @@ import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../
 import { qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
 import { mountPucaDots } from "../../lib/puca-dots";
-import demo from "../../journey/data/tail.journey.json";
+import demo from "../../journey/data/kota.journey.json";
 import type { BoardNode, Journey } from "../../journey/types";
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
