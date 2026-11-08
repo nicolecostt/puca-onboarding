@@ -143,7 +143,6 @@ function mountBoard(): void {
 
 // ---- Instalar: links do kit da Kota (vêm dos arquivos do kit) e o botão de copiar o comando ----
 const LINKS: Record<string, string | undefined> = {
-  "comece-aqui": notion["comece-aqui"],
   kota: notion.kota,
   slack: slack.convite,
 };
