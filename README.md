@@ -18,6 +18,30 @@ npm run check      # typecheck + testes + base do sistema + harness + build (o q
 
 Trabalhando com agentes de programação (Claude Code, Codex…): regras do time em [`AGENTS.md`](AGENTS.md).
 
+## App para Mac
+
+Instalar (Mac com chip Apple ou Intel; não pede senha, instala em `~/Applications/Orbis.app` e abre):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/nicolecostt/puca-onboarding/main/scripts/instalar.sh | bash
+```
+
+O app não é notarizado pela Apple: ele é assinado com assinatura própria, e o script ([`scripts/instalar.sh`](scripts/instalar.sh))
+confere a soma SHA-256 publicada no Release antes de instalar. Para remover o app e os dados locais, rode o mesmo comando
+com `| bash -s -- --desinstalar`.
+
+Desenvolver (decisão 0004, `docs/stack.md` §3):
+
+```bash
+VITE_API_URL=https://orbis-puca.fly.dev npm run dev   # terminal 1: o front, falando com o servidor do Fly
+npm run dev:app                                       # terminal 2: o app Electron abrindo o Vite
+npm run build:app                                     # Orbis-mac-arm64.zip e Orbis-mac-x64.zip em release/
+```
+
+Em `npm run dev:app`, o macOS pede o microfone em nome do terminal que abriu o app (no VS Code, libere o Visual Studio
+Code em Ajustes → Privacidade e Segurança → Microfone). Release: uma tag `v*` (ex.: `git tag v0.1.0 && git push origin v0.1.0`)
+roda o workflow `Release do app`, que publica os `.zip` e as somas.
+
 ## Estrutura
 
 ```
@@ -59,6 +83,7 @@ src/
     draggable.ts         arrastar elementos fixos pela tela
     agent-visual.ts      contrato do visual do agente + carregador opcional
     dom.ts               utilitários de DOM
+desktop/                 app para Mac (Electron): janela, app://orbis, microfone, ícone e empacotamento (docs/stack.md §3)
 kit/kota/                kit da Kota (docs/kit-da-kota.md): o mapa (pessoas, times, sistemas, ADRs e RFCs), os
                          geradores do CODEOWNERS e dos READMEs de serviço e o check:kota (npm run check:kota -- --repo <checkout do Kota>)
 sandbox/                 testes locais, fora do git (ex.: visual da Puca)
