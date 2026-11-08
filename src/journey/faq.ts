@@ -27,7 +27,7 @@ export function buildFaqs(journey: Journey, profile: Profile): Faq[] {
       const label = n.label.replace(/\n/g, " ");
       const base = { board, node: n.id, label };
       const focus: BoardAction[] = [{ type: "highlight", targets: [n.id], tone: "focus" }];
-      if (i.role) out.push({ ...base, intent: "what", text: `${label}: ${lowerFirst(i.role)}`, actions: focus });
+      if (i.role) out.push({ ...base, intent: "what", text: `${label}? ${upperFirst(i.role)}`, actions: focus });
       const confirmed = !!i.owner && i.owner_confirmed !== false;
       const owner = confirmed
         ? `Quem cuida do ${label} é ${i.owner}${i.team ? `, do time ${i.team}` : ""}.`
@@ -41,4 +41,4 @@ export function buildFaqs(journey: Journey, profile: Profile): Faq[] {
   return out.map((f) => ({ ...f, text: interpolate(f.text, profile), label: interpolate(f.label, profile) }));
 }
 
-const lowerFirst = (s: string) => (s ? s[0].toLowerCase() + s.slice(1) : s);
+const upperFirst = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
