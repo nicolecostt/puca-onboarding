@@ -11,6 +11,7 @@ const ROUTE_LABEL: Record<TrailRoute, string> = {
   jump: "Pulo de assunto",
   reply: "Resposta sugerida",
   select: "Toque no quadro",
+  tarefa: "Primeira tarefa",
   knowledge: "Conhecimento da sessão",
   faq: "Cartão do nó",
   ask: "Agente (LLM)",

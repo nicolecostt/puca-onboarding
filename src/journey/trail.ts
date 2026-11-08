@@ -155,6 +155,7 @@ export function summarizeSessions(entries: TrailEntry[], sessions: TrailSession[
  */
 export function sourcesFor(route: Route, journey: Journey, moment: Moment | null): string[] {
   if (route.kind === "knowledge") return [`Conhecimento da sessão: ${moment?.title ?? journey.title}`];
+  if (route.kind === "tarefa") return route.resposta.kind === "resposta" ? route.resposta.fontes : [];
   if (route.kind !== "faq") return [];
   const info = journey.boards[route.faq.board]?.nodes.find((n) => n.id === route.faq.node)?.info;
   if (route.faq.intent === "why") return info?.adr ? [info.adr.id] : [];

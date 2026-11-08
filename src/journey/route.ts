@@ -3,18 +3,23 @@
 //   jump      → pediu outro assunto            → pula para o início do momento
 //   reply     → bateu numa resposta sugerida   → segue o roteiro (numa checagem, qualquer fala que não seja
 //               pergunta nem pulo é a resposta: o motor decide se entendeu)
+//   tarefa    → pergunta sobre a primeira tarefa → os campos da tarefa da pessoa respondem, ou vira
+//               encaminhamento (#79); vem antes do toque por nome, que confundia "a primeira tarefa" com o nó
 //   select    → disse o nome de um nó          → conta como o toque no quadro
 //   knowledge → o conhecimento da sessão responde
 //   faq       → pergunta sobre um nó do quadro ("quem cuida do X?")
 //   ask       → nada disso: pergunta ao agente
 import { matchFaq, scoreReply, normalize } from "./conditions";
+import { respostaSobreTarefa, type RespostaSobreTarefa } from "./duvidas-da-tarefa";
 import type { Faq } from "./faq";
+import type { TarefaDoTime } from "./primeira-tarefa";
 import { answerFromKnowledge, findJump } from "./intent";
 import type { Journey, Moment, Step } from "./types";
 
 export type Route =
   | { kind: "jump"; moment: Moment }
   | { kind: "reply"; reply: string }
+  | { kind: "tarefa"; resposta: RespostaSobreTarefa }
   | { kind: "select"; node: string }
   | { kind: "knowledge"; text: string }
   | { kind: "faq"; faq: Faq }
@@ -30,6 +35,10 @@ export interface RouteContext {
   /** Nome do quadro na tela (para o FAQ e o toque por nome). */
   board: string | null;
   faqs: Faq[];
+  /** A primeira tarefa da pessoa (tarefaDaPessoa); sem ela, a fala segue o caminho de sempre. */
+  tarefa?: TarefaDoTime | null;
+  /** A tarefa já foi apresentada na sessão; antes disso a Puca não adianta a tarefa. */
+  tarefaApresentada?: boolean;
 }
 
 // ponytail: limiares fixos, ajustados à mão nos cenários do bench; revisar olhando bench:turn.
@@ -55,6 +64,13 @@ export function routeUtterance(text: string, ctx: RouteContext): Route {
   // Checagem: a resposta da pessoa vai inteira ao motor (ele casa com as respostas certas), em vez de cair no
   // conhecimento, que entregaria a resposta. Perguntas continuam indo ao conhecimento e ao agente.
   if (w?.kind === "reply" && w.check && !isQuestion(text)) return { kind: "reply", reply: text.trim() };
+
+  // Pergunta sobre a primeira tarefa: responde pelos campos da tarefa. Antes do toque por nome, porque "a primeira
+  // tarefa" é também o rótulo de um nó, e uma pergunta não é toque.
+  if (isQuestion(text)) {
+    const r = respostaSobreTarefa(text, ctx.tarefa ?? null, ctx.tarefaApresentada ?? false);
+    if (r) return { kind: "tarefa", resposta: r };
+  }
 
   const nodes = ctx.board ? (ctx.journey.boards[ctx.board]?.nodes ?? []) : [];
   if (w?.kind === "select") {
