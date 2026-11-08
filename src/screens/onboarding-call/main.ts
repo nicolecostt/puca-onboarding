@@ -40,7 +40,7 @@ const SEM_PUCA = "O Puca está fora do ar agora. Recarregue a página em alguns 
 const FALHOU = "Perdi a conexão para pensar agora. Pode repetir?";
 
 // ---- Estados ----
-type AgentState = "idle" | "speaking" | "listening" | "thinking" | "done";
+type AgentState = "idle" | "speaking" | "listening" | "thinking" | "done" | "offline";
 type ShownState = AgentState | "paused" | "ended";
 
 const LABELS: Record<ShownState, string> = {
@@ -51,6 +51,7 @@ const LABELS: Record<ShownState, string> = {
   paused: "Pausado",
   ended: "Call encerrada",
   done: "Montando sua semana…",
+  offline: "Fora do ar",
 };
 const VISUAL_STATE: Record<ShownState, AgentVisualState> = {
   idle: "idle",
@@ -60,6 +61,7 @@ const VISUAL_STATE: Record<ShownState, AgentVisualState> = {
   paused: "idle",
   ended: "idle",
   done: "think",
+  offline: "idle",
 };
 
 declare global {
@@ -236,7 +238,7 @@ async function main(): Promise<void> {
     if (!ok) {
       oferecerSessao();
       await falar(kind === "inicio" ? SEM_PUCA : FALHOU);
-      return setAgent(kind === "inicio" ? "idle" : "listening");
+      return setAgent(kind === "inicio" ? "offline" : "listening");
     }
     seguir?.remove();
     seguir = null;
@@ -321,6 +323,7 @@ async function main(): Promise<void> {
     // sem a call, a pessoa não fica presa aqui: segue para a sessão com o perfil de exemplo de quem ela escolheu.
     // A legenda fica com a primeira frase (o aviso inteiro está no chat), para o botão caber acima da barra da call.
     el.captionAgent.textContent = "O Puca está fora do ar agora.";
+    setAgent("offline");
     oferecerSessao();
     return;
   }

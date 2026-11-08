@@ -56,6 +56,15 @@ describe("recuperação da conversa", () => {
     expect(h.onTiming).toHaveBeenCalledWith({ llm_error });
   });
 
+  it("fala de falha do servidor não toca: a tela decide o que dizer", async () => {
+    const reserva = event({ type: "speak", text: "Tive um problema.", audio_url: null, source: "fallback" });
+    servidor(() => new Response(reserva + event({ type: "timing", timing: { llm_error: "timeout" } })));
+    const voice = await createAgentVoice();
+    const h = handlers();
+    await expect(voice.call(req, h)).resolves.toBe(false);
+    expect(h.onSpeak).not.toHaveBeenCalled();
+  });
+
   it("fala válida sem timing continua compatível", async () => {
     servidor(() => new Response(fala));
     const voice = await createAgentVoice();

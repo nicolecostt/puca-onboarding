@@ -394,8 +394,11 @@ export async function createAgentVoice(): Promise<AgentVoice> {
                 if (!block.startsWith("data: ")) continue;
                 const ev = JSON.parse(block.slice(6));
                 if (!ev || typeof ev.type !== "string") throw new Error("Resposta SSE inválida");
-                if (["speak", "action", "go_to", "next_step", "check", "answer", "culture", "done", "escalate"].includes(ev.type)) received = true;
-                if (ev.type === "speak") {
+                if (ev.source !== "fallback" && ["speak", "action", "go_to", "next_step", "check", "answer", "culture", "done", "escalate"].includes(ev.type)) received = true;
+                if (ev.type === "speak" && ev.source === "fallback") {
+                  // a fala de falha do servidor não toca: quem decide o que dizer na falha é a tela (o `llm_error` vem no `timing`)
+                  failed = true;
+                } else if (ev.type === "speak") {
                   if (typeof ev.text !== "string" || !ev.text.trim()) throw new Error("Fala SSE inválida");
                   const url: string | null = ev.audio_url;
                   const frase = { started: false, actions };
