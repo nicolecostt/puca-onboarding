@@ -32,7 +32,8 @@ Desenho completo: [`docs/kit-da-kota.md`](../kit-da-kota.md).
   numa tarefa própria, com a jornada nova.
 - Mudou um responsável, time ou pessoa? Muda no mapa da Kota, e não direto no Notion ou no `CODEOWNERS`.
 - O `LICENSE` e os cabeçalhos de copyright do Bank of Anthos ficam no `kota-bank`, como a Apache-2.0 exige.
-- Como o servidor da Puca acessa o Notion na hora da demo fica para #13 e #26.
+- Como o servidor da Puca acessa o Notion na hora da demo fica para #13 e #26. → Decidido na 0008: lê a cópia local, sem
+  token nem MCP na hora da sessão.
 - A jornada continua escrita à mão, mas acontece no kit: toda fonte citada por um nó é um arquivo do `kota-bank` ou uma
   página do Notion da Kota, conferida pelo check de coerência.
 - O repositório é `JucaGF/kota-bank` e o Notion é o Kota Workspace.
@@ -41,4 +42,5 @@ Desenho completo: [`docs/kit-da-kota.md`](../kit-da-kota.md).
 - ⚠️ **A Puca agir no Slack real na demo não está decidido aqui.** Se o servidor fizer o encaminhamento pelo Slack, isso
   muda a regra "o servidor só dá voz e LLM" (`CLAUDE.md`), a §12.2 do `PRODUCT.md` (encaminhamento no Slack simulado da
   `live-session`) e o contrato de Encaminhamento em `docs/contratos.md`. Essa decisão, e se o Slack real substitui ou
-  complementa o simulado, fica para a #13. Se for adiante, o token fica no `server/.env`.
+  complementa o simulado, fica para a #13. Se for adiante, o token fica no `server/.env`. → Decidido na 0008: o
+  servidor envia o encaminhamento como mensagem direta ao jurado, e o simulado fica (plano B e aprovação do gestor).
