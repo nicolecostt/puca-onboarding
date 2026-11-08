@@ -306,27 +306,6 @@ body {
   scroll-margin-bottom: 120px; /* ao rolar até ele, fica acima da barra de call */
 }
 
-/* ---- Fim da call: a conversa e os controles saem, e a página estoura para a tela inicial ---- */
-.caption,
-.agent__meta,
-.callinfo,
-.call-dock .call-live {
-  transition: opacity 0.35s var(--ease-out), filter 0.35s var(--ease-out), transform 0.35s var(--ease-out);
-}
-
-body.is-leaving .caption,
-body.is-leaving .agent__meta,
-body.is-leaving .callinfo {
-  opacity: 0;
-  filter: blur(8px);
-  transform: translateY(8px);
-}
-
-body.is-leaving .call-dock .call-live {
-  opacity: 0;
-  transform: translateY(28px);
-}
-
 @media (prefers-reduced-motion: no-preference) {
   @view-transition {
     navigation: auto;
