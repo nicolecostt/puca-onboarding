@@ -13,14 +13,16 @@ mudando esse mesmo código em TypeScript. Não há tempo para conta de desenvolv
 - O Orbis é um **app desktop em Electron** em volta do front atual. Vite + TypeScript sem framework continua; o front
   roda igual no Electron (é o mesmo Chromium do desenvolvimento).
 - O MVP é **só para macOS** (Apple Silicon e Intel).
-- O computer use acontece num **navegador da Puca dentro do app** (uma janela do Electron com GitHub, Notion e Slack na
-  versão web), controlado pelo protocolo de depuração do Chromium (`webContents.debugger`): navegar, clicar e passar o
-  mouse com eventos de mouse reais, preencher campos, teclar e tirar print. Como a janela é do app, a posição de cada
-  elemento é conhecida e o cursor da Puca é desenhado por cima dele. Apps nativos (Slack desktop, por exemplo) ficam
+- O computer use acontece num **navegador da Puca dentro do app** (uma área da janela do Orbis, um `WebContentsView`,
+  com GitHub, Notion e Slack na versão web), controlado pelo protocolo de depuração do Chromium (`webContents.debugger`):
+  navegar, clicar e passar o mouse com eventos de mouse reais, preencher campos e teclar. Como o navegador é do app, a
+  posição de cada elemento é conhecida e o cursor da Puca é desenhado por cima dele. Ver a tela por print fica fora do
+  MVP (0008). Apps nativos (Slack desktop, por exemplo) ficam
   fora do MVP. O desenho das ações está na decisão 0008 e na #123.
 - **Instalação pelo terminal**, sem App Store e sem conta da Apple: `curl -fsSL <endereço>/instalar | bash` baixa o
   `.zip` dos Releases do GitHub (o repositório é público), coloca o `Orbis.app` em `~/Applications` e abre. Arquivo
   baixado com `curl` não recebe a quarentena do macOS, e o build assina o app com assinatura própria (`codesign --sign -`).
+  O script confere o SHA-256 publicado no Release antes de instalar, e o guia de uso diz que o app não é notarizado.
 - O servidor (voz e LLM) fica na nuvem. **As chaves de API nunca vão dentro do app.**
 
 **Medições** (2026-11-08, Mac M4, macOS 26.6, Electron 33.2.1, sessão `?perfil=ana&auto=1` em primeiro plano, 30 s, sem voz):
