@@ -365,6 +365,9 @@ primary_region = "iad"
 
 - **Região:** começar em `iad` (perto da Anthropic e da ElevenLabs) e medir `gru` (São Paulo) com `npm run bench:turn`
   rodado do Brasil. Fica a de menor p95 até o primeiro áudio. Trocar é `fly regions set`.
+  **Medido em 2026-11-08 (#49), de São Paulo, ficou `iad`:** primeiro áudio p50 de 460 ms contra 600–930 ms em `gru`
+  (o Storage do Supabase e a ElevenLabs estão nos EUA); ponte e primeira frase do LLM parecidas nas duas
+  (`server/bench/results/turn-2026-11-08T10-2*`).
 - **`server/Dockerfile`:** `node:22-slim`, `npm ci --omit=dev` mais `tsx`, `CMD ["npx", "tsx", "server/src/server.ts"]`.
   O índice do kit (§9) é gerado no build da imagem.
 - **Chaves:** `fly secrets set ANTHROPIC_API_KEY=… ELEVENLABS_API_KEY=… …` (lista na §13.3). Nunca no repo.
@@ -745,7 +748,7 @@ de uso (#119), teste de instalação em outro Mac seguindo só o guia.
 |---|---|
 | Anthropic (Claude) | ok |
 | Supabase | ok |
-| ElevenLabs (plano pago) | ok |
+| ElevenLabs (plano pago) | Starter, 40 mil caracteres por mês, renova dia 7 (#151); a trava `LIMITE_DIARIO_TTS` do `fly.toml` segue essa cota |
 | Deepgram (papel Member) | ok segundo Joaquim; a chave não estava no `server/.env` desta máquina na hora do bench |
 | Slack da Kota (workspace e app) | #118 |
 | Notion da Kota | ok (Kota Workspace) |

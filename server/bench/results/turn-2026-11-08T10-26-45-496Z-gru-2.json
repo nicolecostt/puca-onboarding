@@ -1,0 +1,119 @@
+{
+  "at": "2026-11-08T10:26:45.501Z",
+  "url": "https://orbis-puca.fly.dev",
+  "summary": {
+    "turns": 13,
+    "local": 9,
+    "ask": 4,
+    "first_response_p50": 0.2,
+    "first_response_p95": 260,
+    "first_audio_byte_p50": 595,
+    "llm_first_sentence_p50": 2865
+  },
+  "rows": [
+    {
+      "text": "O que é ser dono do problema?",
+      "route": "reply",
+      "first_response_ms": 0.17,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: O que é ser dono do problema?)"
+    },
+    {
+      "text": "pode seguir",
+      "route": "reply",
+      "first_response_ms": 0.03,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: Pode seguir)"
+    },
+    {
+      "text": "Qual a diferença entre gestor e buddy?",
+      "route": "reply",
+      "first_response_ms": 0.01,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: Qual a diferença entre gestor e buddy?)"
+    },
+    {
+      "text": "beleza, ficou claro",
+      "route": "reply",
+      "first_response_ms": 0.05,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: Ficou claro)"
+    },
+    {
+      "text": "E se a liquidação falhar?",
+      "route": "reply",
+      "first_response_ms": 0.01,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: E se a liquidação falhar?)"
+    },
+    {
+      "text": "Quem cuida do authorizer?",
+      "route": "faq",
+      "first_response_ms": 0.22,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "Quem cuida do authorizer é Júlia Paiva, do time Autorização."
+    },
+    {
+      "text": "me explica o settlement-worker",
+      "route": "faq",
+      "first_response_ms": 0.2,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "settlement-worker: junta as vendas aprovadas e manda para a liquidação."
+    },
+    {
+      "text": "quero ver a primeira tarefa",
+      "route": "jump",
+      "first_response_ms": 0.06,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(pula: Primeira tarefa)"
+    },
+    {
+      "text": "e se der ruim na hora de cobrar o cartão, o que rola?",
+      "route": "ask",
+      "first_response_ms": 260,
+      "first_audio_byte_ms": 595,
+      "llm_first_sentence_ms": 2865,
+      "said": "[bridge] Boa pergunta. Só um instante. [llm] Quer entender a falha? [llm] Vamos lá. (go_to moment:falha)"
+    },
+    {
+      "text": "Quanto ganha um engenheiro pleno aqui?",
+      "route": "ask",
+      "first_response_ms": 57,
+      "first_audio_byte_ms": 556,
+      "llm_first_sentence_ms": 2768,
+      "said": "[bridge] Deixa eu ver isso pra você. [llm] Isso é informação do RH. [llm] Posso resumir a sua dúvida para eles?"
+    },
+    {
+      "text": "a gente usa kafka ou rabbit nessa fila?",
+      "route": "ask",
+      "first_response_ms": 48,
+      "first_audio_byte_ms": 863,
+      "llm_first_sentence_ms": 2982,
+      "said": "[bridge] Hum, deixa eu pensar um segundo. [llm] Não consegui confirmar a ferramenta usada na fila. [llm] Vou encaminhar para a sua buddy."
+    },
+    {
+      "text": "isso já aconteceu em produção alguma vez?",
+      "route": "ask",
+      "first_response_ms": 46,
+      "first_audio_byte_ms": 426,
+      "llm_first_sentence_ms": 2818,
+      "said": "[bridge] Boa pergunta. Só um instante. [llm] Não consegui confirmar se isso já aconteceu em produção. [llm] Vou encaminhar a dúvida para a sua buddy."
+    },
+    {
+      "text": "terminar por hoje",
+      "route": "reply",
+      "first_response_ms": 0.28,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: Terminar por hoje)"
+    }
+  ]
+}
