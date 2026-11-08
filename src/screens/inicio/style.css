@@ -122,6 +122,21 @@ body {
   border: 1.5px dashed var(--color-subtle);
 }
 
+/* ---- Ligar para Puca: com a call desligada, o botão fica na página, embaixo do nome, e não flutua por cima
+   das ferramentas (cobria o campo de e-mail). Ligada, a câmera de Puca flutua como em toda tela. ---- */
+#puca-call .call-dock.is-ended {
+  position: static;
+  transform: none;
+  justify-items: start;
+  margin-top: 14px;
+}
+#puca-call .call-dock.is-ended .call-live {
+  display: none;
+}
+#puca-call .call-dock.is-ended .call-redial {
+  justify-self: start; /* preso à câmera ele centraliza; aqui alinha com o nome */
+}
+
 /* ---- Página ---- */
 .page {
   padding-top: clamp(32px, 4vw, 56px);
