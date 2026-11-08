@@ -9,7 +9,7 @@ o que não estiver no código, numa issue, num PR ou nestes docs, os outros agen
   O glossário inteiro está no fim deste arquivo.
 - Visão de produto (cenários, funcionalidades, prioridades do hackathon): [`PRODUCT.md`](PRODUCT.md).
 - Formato da jornada: [`docs/journey-format.md`](docs/journey-format.md).
-- Como rodar e a estrutura de pastas: [`README.md`](README.md).
+- Como rodar e a estrutura de pastas: [`docs/desenvolvimento.md`](docs/desenvolvimento.md); o produto em poucas linhas: [`README.md`](README.md).
 - Contratos entre partes do sistema: [`docs/contratos.md`](docs/contratos.md).
 - Decisões técnicas: [`docs/decisoes/`](docs/decisoes/). Stack e guia de implementação: [`docs/stack.md`](docs/stack.md).
 - Roteiro e testes da demo: [`docs/demo.md`](docs/demo.md).
