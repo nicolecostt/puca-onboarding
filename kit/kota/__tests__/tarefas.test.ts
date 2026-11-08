@@ -1,4 +1,6 @@
-import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { mapa } from "../mapa";
@@ -44,6 +46,31 @@ describe("corpoIssue", () => {
     expect(corpo).toContain(`scripts/testar.sh ${tarefa.servico}`);
     expect(corpo).toContain("solucao/7");
     expect(corpo).toContain(gestor.nome);
+  });
+
+  it("os comandos git de como começar funcionam num clone novo do kota-bank", () => {
+    const raiz = mkdtempSync(join(tmpdir(), "kota-clone-"));
+    const origem = join(raiz, "kota-bank");
+    const clone = join(raiz, "clone");
+    const g = (cwd: string, ...args: string[]) =>
+      execFileSync("git", ["-c", "user.name=Kota", "-c", "user.email=kit@kota.example", ...args], { cwd, stdio: "pipe" });
+    mkdirSync(origem);
+    g(origem, "init", "-q", "-b", "main");
+    writeFileSync(join(origem, "f"), "main\n");
+    g(origem, "add", "f");
+    g(origem, "commit", "-q", "-m", "main");
+    for (const branch of ["tarefa/7", "solucao/7"]) {
+      g(origem, "switch", "-q", "-c", branch);
+      writeFileSync(join(origem, "f"), `${branch}\n`);
+      g(origem, "commit", "-q", "-am", branch);
+    }
+    g(origem, "switch", "-q", "main");
+    g(raiz, "clone", "-q", origem, clone);
+
+    const comoComecar = corpoIssue(tarefa, 7, mapa, urls).split("## Como começar")[1];
+    const comandos = [...comoComecar.matchAll(/`(git [^`]+)`/g)].map((m) => m[1]);
+    expect(comandos.some((c) => c.includes("solucao/7"))).toBe(true);
+    for (const c of comandos) expect(() => g(clone, ...c.split(" ").slice(1)), c).not.toThrow();
   });
 
   it("diz quem abriu a issue, já que no GitHub ela sai pela conta de quem publica", () => {

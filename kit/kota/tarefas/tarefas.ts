@@ -141,7 +141,8 @@ export function corpoIssue(t: TarefaKota, n: number, m: MapaKota, urls: Record<s
     `1. Combine com ${gestor.nome}, ${gestor.cargo.toLowerCase()} do time ${doTime.nome}: o gestor aprova a primeira tarefa antes de você começar.`,
     `2. \`git switch tarefa/${n}\``,
     `3. \`scripts/testar.sh ${t.servico}\`: o teste \`${t.testeQueFalha}\` falha. A tarefa é fazê-lo passar sem quebrar os outros.`,
-    `4. Quando terminar, compare o seu caminho com a branch \`solucao/${n}\` (\`git diff solucao/${n}\`).`,
+    `4. Quando terminar, compare o seu caminho com a solução (\`git diff origin/solucao/${n}\`). ` +
+      `Para só ver o teste passar, rode \`git switch solucao/${n}\` e o teste de novo.`,
     "",
   ].join("\n");
 }
