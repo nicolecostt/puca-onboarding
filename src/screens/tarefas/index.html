@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suas tarefas · Orbis</title>
+<script>
+  // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
+  if (location.protocol === "file:") {
+    addEventListener("DOMContentLoaded", function () {
+      document.body.innerHTML =
+        '<div style="max-width:440px;margin:15vh auto;padding:24px;font:15px/1.6 system-ui,sans-serif;color:#171717;background:#fff;border:1px solid #e5e5e5;border-radius:12px">' +
+        "<strong>Esta página precisa do servidor do projeto.</strong><br>" +
+        "No terminal, na pasta do projeto, rode <code>npm run dev</code> e abra " +
+        '<a href="http://localhost:5173/">http://localhost:5173</a>.</div>';
+    });
+  }
+</script>
+</head>
+<body>
+  <header class="tf-top">
+    <button type="button" id="menu" class="tf-top__menu" aria-label="Abrir menu" aria-expanded="false" aria-controls="side">
+      <span></span><span></span><span></span>
+    </button>
+    <strong class="tf-top__brand">Orbis</strong>
+  </header>
+
+  <div id="scrim" class="tf-scrim" hidden></div>
+  <nav id="side" class="tf-side" aria-label="Menu" hidden>
+    <ul>
+      <li><a href="../inicio/" data-orbis-link>Início</a></li>
+      <li><a href="../lesson/" data-orbis-link>Sessão com o Puca</a></li>
+      <li><a href="../tarefas/" data-orbis-link aria-current="page">Tarefas</a></li>
+      <li><a href="../primeira-tarefa/" data-orbis-link>Primeira tarefa</a></li>
+      <li><a href="../rastro/" data-orbis-link>Rastro (demo)</a></li>
+    </ul>
+  </nav>
+
+  <main class="tf">
+    <h1>Suas tarefas</h1>
+    <p class="tf__sub">O que o Puca pediu para você fazer depois da call e de cada sessão. Aprender fazendo: marque quando terminar.</p>
+
+    <a id="primeira" class="tf-first" href="../primeira-tarefa/" data-orbis-link hidden>
+      <span class="tf-first__label">Primeira tarefa do time</span>
+      <strong id="primeira-titulo"></strong>
+      <span id="primeira-status" class="tf-first__status"></span>
+    </a>
+
+    <p id="empty" class="tf__empty" hidden>As tarefas aparecem aqui quando o Puca passar uma na call ou na sessão.</p>
+
+    <section id="sec-afazer" class="tf-sec" hidden>
+      <h2>A fazer <span id="n-afazer" class="tf-sec__n"></span></h2>
+      <ol id="afazer" class="tf-list"></ol>
+    </section>
+    <section id="sec-feitas" class="tf-sec" hidden>
+      <h2>Feitas <span id="n-feitas" class="tf-sec__n"></span></h2>
+      <ol id="feitas" class="tf-list"></ol>
+    </section>
+  </main>
+<script type="module" src="./main.ts"></script>
+</body>
+</html>

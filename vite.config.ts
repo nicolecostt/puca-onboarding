@@ -21,6 +21,7 @@ export default defineConfig({
         lesson: page("./src/screens/lesson/index.html"),
         rastro: page("./src/screens/rastro/index.html"),
         primeiraTarefa: page("./src/screens/primeira-tarefa/index.html"),
+        tarefas: page("./src/screens/tarefas/index.html"),
         landing: page("./src/screens/landing/index.html"),
         boasVindas: page("./src/screens/boas-vindas/index.html"),
         inicio: page("./src/screens/inicio/index.html"),

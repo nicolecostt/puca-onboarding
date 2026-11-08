@@ -21,6 +21,7 @@ import { buddyOf, createOutbox, destinatario, looksLikeQuestion, motivoDoEncamin
 import type { DestinoDoEncaminhamento } from "../../journey/encaminhamento-slack";
 import { createPedidos, PEDIDOS_KEY, tarefaDaPessoa, tarefaDoPasso } from "../../journey/primeira-tarefa";
 import { createTrail, sourcesFor } from "../../journey/trail";
+import { createTarefas, type TarefaDoAgente } from "../../journey/tarefas";
 import { createAgentVoice, MIC_AVISO, type SpeakOptions, type TurnRequest } from "../../voice/agent-voice";
 import { interpolate, interpolateDeep, resolveProfile } from "../../journey/profile";
 import { atualizarCalibragem, resolveCalibragem, saveCalibragem } from "../../journey/calibragem";
@@ -40,6 +41,7 @@ import { esc, qs } from "../../lib/dom";
 import { profiles, type Profile as DemoProfile } from "../../data";
 import { montarPalcoNavegador } from "./palco-navegador";
 import { acoesQueAindaValem } from "./cortes";
+import { createAvisos, type Aviso } from "./avisos";
 
 type AgentState = "speaking" | "listening" | "choosing" | "thinking" | "done";
 
@@ -356,16 +358,20 @@ async function main(): Promise<void> {
     return [...new Set([...docs, ...knowledge])];
   }
 
-  let toastTimer = 0;
-  /** Aviso no canto da sessão, com um link para a outra tela (Slack ou página da tarefa). */
-  function showToast(text: string, link: { href: string; target: string; label: string }): void {
-    el.forwardText.textContent = text;
-    el.forwardLink.href = link.href;
-    el.forwardLink.target = link.target;
-    el.forwardLink.textContent = link.label;
-    el.forwardToast.hidden = false;
-    clearTimeout(toastTimer);
-    toastTimer = window.setTimeout(() => (el.forwardToast.hidden = true), 8000);
+  /** Aviso no canto da sessão, com um link para a outra tela (Slack, página da tarefa ou tarefas). */
+  const avisos = createAvisos(
+    (a) => {
+      el.forwardToast.hidden = !a;
+      if (!a) return;
+      el.forwardText.textContent = a.text;
+      el.forwardLink.href = a.link.href;
+      el.forwardLink.target = a.link.target;
+      el.forwardLink.textContent = a.link.label;
+    },
+    { ms: 8000, setTimeout: (fn, ms) => window.setTimeout(fn, ms), clearTimeout: (id) => window.clearTimeout(id) },
+  );
+  function showToast(text: string, link: { href: string; target: string; label: string }, tipo: Aviso["tipo"] = "slack"): void {
+    avisos.avisar({ tipo, text, link });
   }
   const SLACK = { href: screenHref("../live-session/"), target: "puca-slack", label: "Abrir Slack" };
 
@@ -383,6 +389,13 @@ async function main(): Promise<void> {
       trail.update(entryId, { forwarding_link: link });
       showToast("Mandei a dúvida no seu Slack da Kota", { href: link, target: "_blank", label: "Abrir no Slack" });
     });
+  }
+
+  const tarefas = createTarefas(browserStore());
+  /** Puca passou uma tarefa (assign_task): guarda para a tela de tarefas e avisa na sessão. */
+  function receberTarefa(t: TarefaDoAgente, momento: string): void {
+    const created = tarefas.add(t, { origem: "sessao", momento, sessao: trail.session });
+    showToast(`Nova tarefa: ${created.titulo}`, { href: screenHref("../tarefas/"), target: "puca-tarefas", label: "Ver tarefas" }, "tarefa");
   }
 
   /** O passo abriu o cartão de uma tarefa do catálogo: pede a aprovação do gestor (o Slack envia). */
@@ -665,6 +678,7 @@ async function main(): Promise<void> {
           if (s.check) io.onCheck?.({ tema: s.check.tema, passo: s.id, entendeu, tentativas: 1, resposta: text ?? "" });
         },
         onEscalate: (summary, destino) => entryId && forward(entryId, { question: text ?? "", summary, destino, reason: motivoDoEncaminhamento(destino) }),
+        onTarefa: (t) => receberTarefa(t, m.title),
         onTiming: (t) =>
           entryId && trail.update(entryId, { llm_ms: t.total_ms, tokens_in: t.tokens_in ?? undefined, tokens_out: t.tokens_out ?? undefined, tokens_estimated: t.tokens_estimated }),
       },

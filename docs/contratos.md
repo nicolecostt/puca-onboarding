@@ -19,6 +19,7 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | Company brain | `server/src/brain/brain.ts` (`Trecho`, `Brain`). O brain mínimo lê as páginas do Notion e o mapa do kit da Kota, busca em memória, e a resposta do `/api/ask` cita `[fN]`, que vira o evento `fontes` (título e URL) | `server/src/agent/ask.ts`, rastro (`sources` da entrada `ask`, em `screens/lesson`) | `server/src/brain/brain.test.ts`, `server/src/agent/ask.fontes.test.ts` |
 | Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` (`{ summary, destino? }`, também no `TurnEvent` de `server/src/agent/turn.ts`: o destino vem da tool `escalate_to_buddy`; sem ele, da fala de Puca ("People", "gestor"); caso pessoal sem nada vai a `"rh"`; sem destino no evento, a buddy. `Forwarding.to.role` segue o destino, #125) | `screens/lesson` (cria e pede o envio no Slack da Kota pelo servidor, `src/journey/slack-real.ts`), `screens/live-session` (envia no Slack simulado o que ficou pendente), rastro (`forwarding_id`, `forwarding_link`), `screens/rh` (conta os abertos pelo `status`); envio real: [seção abaixo](#encaminhamento-no-slack-da-kota) | `__tests__/forwarding.test.ts`, `__tests__/slack-real.test.ts`, `server/src/slack/encaminhar.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
 | Primeira tarefa | `src/journey/primeira-tarefa.ts` (`TarefaDoTime`, `PedidoDeAprovacao`, chave `puca:primeiras-tarefas` no `localStorage`) e os nós `kind: "task"` da jornada — [seção abaixo](#primeira-tarefa) | `screens/lesson` (cria o pedido quando o cartão da tarefa abre), `screens/live-session` (pede a aprovação ao gestor no Slack e grava a aprovação), `screens/primeira-tarefa` (página da tarefa), `screens/rh` (conta pessoas com pedido não aprovado, por `status` e `pessoa`) | `__tests__/primeira-tarefa.test.ts`, `screens/primeira-tarefa/pagina.test.ts` |
+| Tarefas do agente | `src/journey/tarefas.ts` (`TarefaDoAgente`, `lerTarefaDoAgente`, `TarefaAtribuida`, chave `puca:tarefas` no `localStorage`), ferramenta `assign_task` em `server/src/agent/tarefa-tool.ts` e evento `tarefa` no `TurnEvent` e no `CallEvent` — [seção abaixo](#tarefas-do-agente) | `screens/lesson` e `screens/onboarding-call` (gravam), `screens/tarefas` (lista e marca como feita) | `__tests__/tarefas.test.ts`, `server/src/agent/turn.test.ts`, `call.test.ts`, `tarefa-tool.test.ts`, `screens/tarefas/lista.test.ts`, `src/voice/agent-voice.test.ts` |
 | App para Mac (`window.orbis`) | `desktop/preload.ts` + `src/orbis.d.ts` — [seção abaixo](#app-para-mac) | telas que testam `if (window.orbis)` | `tsc` |
 | Computer use (`window.orbis.navegador`) | `src/lib/orbis.ts` (`AcaoDaPuca`, `ResultadoDaFila`, `OrbisNavegador`) + ação `navegador` da jornada em `src/journey/types.ts` — [seção abaixo](#computer-use) | `desktop/navegador/` (executa), `screens/lesson` (palco do navegador), quem escreve jornadas | `__tests__/validate.test.ts`, `desktop/navegador/*.test.ts`, `tsc` |
 | Visual de Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
@@ -323,6 +324,7 @@ segue a jornada como roteiro, pela `route.ts`.
     `src/journey/pauta.ts`) e pede outro turno `seguir`.
   - `go_to` com `target` = `moment:<id>`: pulo para o início do momento; a tela pede um turno `seguir` lá.
   - `check` com `entendeu`: resultado da checagem do passo atual (vira `onCheck`, como no motor).
+  - `tarefa`: Puca passou uma tarefa (ver [Tarefas do agente](#tarefas-do-agente)).
   Turno que termina sem `next_step` nem `go_to` espera a pessoa.
 - **Quadro:** ao entrar num passo, a tela aplica as `actions` dele (o quadro nunca fica pela metade); o LLM só
   destaca, abre cartão ou revela além disso.
@@ -363,6 +365,7 @@ são perguntas norteadoras (em `server/src/agent/call.ts`), e o LLM faz os follo
   - `culture` com `topic` (`missao`, `valores`, `jeito_de_trabalhar` ou `rituais_do_time`, `combinados_do_time`,
     `pessoas_de_referencia`).
   - `done`: a call acabou; a tela grava o perfil e a calibragem (`puca:profile`, `puca:calibragem`) e vai para as boas-vindas.
+  - `tarefa`: a tarefa de preparação do fim da call (ver [Tarefas do agente](#tarefas-do-agente)).
 
 Exemplo válido:
 
@@ -507,6 +510,38 @@ Exemplo válido de `PedidoDeAprovacao`:
   "moment": "primeira-tarefa", "sessao": "a91e…", "status": "aprovada",
   "aprovada_por": "Natália Brandão", "aprovada_em": "2026-11-08T14:31:12.000Z"
 }
+```
+
+## Tarefas do agente
+
+Aprender fazendo: na call inicial e no fim de cada momento da sessão, Puca passa uma tarefa pequena e prática e chama a
+ferramenta `assign_task` (fixa, a mesma nos dois, em `server/src/agent/tarefa-tool.ts`). O servidor limpa os argumentos
+com `lerTarefaDoAgente` e emite o evento `tarefa`; a tela grava em `puca:tarefas` e a tela `screens/tarefas` lista.
+O Qwen quase não chama ferramentas (decisão 0007): com ele, a tarefa raramente sai. No Fly (Claude Haiku), sai.
+
+- **Ferramenta** `assign_task`: `titulo` (começa por verbo), `porque`, `passos` (lista) obrigatórios; `onde` opcional.
+- **Evento** `{"type":"tarefa","tarefa":{titulo, porque, passos, onde?}}`: `titulo` até 120 caracteres (sem título, não
+  há evento), `porque` até 300, até 5 `passos` de até 200 (vazios saem), `onde` até 200 (vazio sai). Uma tarefa conta
+  como resposta do turno: só ela não é `empty_response`.
+- **A tarefa fecha:** na sessão, ela é o fim do momento; turno com `tarefa` e sem `next_step` nem `go_to` ganha um
+  `next_step` do servidor (o LLM às vezes esquece, e a sessão ficaria parada no passo). Na call, ela é o fechamento:
+  o turno com `tarefa` termina com `done`, mesmo sem `end_call`.
+- **Aviso na sessão:** "Nova tarefa: … · Ver tarefas" não tampa um aviso do Slack ainda na tela (pedido de aprovação,
+  encaminhamento): espera ele sumir (`src/screens/lesson/avisos.ts`).
+- **Guardada** (`TarefaAtribuida`): a tarefa + `id`, `at` (ISO 8601), `origem` (`call` ou `sessao`), `momento` (título
+  do momento, só na sessão), `sessao` (id do rastro) e `status` (`a-fazer` → `feita`, e volta se a pessoa desmarcar).
+  O mesmo título (sem caixa nem acento) não vira duas tarefas. Item malformado no navegador é descartado.
+
+Exemplo válido (evento e o que fica guardado):
+
+```text
+data: {"type":"tarefa","tarefa":{"titulo":"Rodar o ledgerwriter na sua máquina","porque":"É o serviço que grava cada transferência.","passos":["Clone o repo ledgerwriter","Rode npm test"],"onde":"README do ledgerwriter"}}
+```
+
+```json
+{"id":"5f0c…","at":"2026-11-08T14:00:00.000Z","titulo":"Rodar o ledgerwriter na sua máquina",
+ "porque":"É o serviço que grava cada transferência.","passos":["Clone o repo ledgerwriter","Rode npm test"],
+ "onde":"README do ledgerwriter","origem":"sessao","momento":"Como uma transferência acontece","sessao":"b2…","status":"a-fazer"}
 ```
 
 ## Ao mudar um contrato
