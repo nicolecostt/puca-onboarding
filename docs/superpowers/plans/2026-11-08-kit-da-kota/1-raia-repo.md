@@ -115,7 +115,7 @@ Colar a saída dos Steps 5 a 7 no PR e na #112.
 
 Valores fixados:
 
-- **Remover (uma vez só, com `git rm` no Step 6, nunca dentro do script):** `iac/`, `extras/`, `src/components/`, `kubernetes-manifests/`, `docs/`, `.github/`, `Makefile`, `skaffold*.yaml`, e em qualquer pasta `k8s/`, `skaffold.yaml`, `cloudbuild.yaml`. Depois do merge do R2, `docs/` e `.github/` passam a ter arquivos da Kota (ADRs, CI, `CODEOWNERS`).
+- **Remover (uma vez só, com `git rm` no Step 6, nunca dentro do script):** `iac/`, `extras/`, `src/components/`, `kubernetes-manifests/`, `docs/` menos `docs/adr/` e `docs/runbooks/` (são da Kota e podem chegar à oficina antes do Step 6), `.github/`, `Makefile`, `skaffold*.yaml`, e em qualquer pasta `k8s/`, `skaffold.yaml`, `cloudbuild.yaml`. Depois do merge do R2, `.github/` passa a ter arquivos da Kota (CI, `CODEOWNERS`).
 - **Renomear pastas Java:** `.../java/anthos/samples/bankofanthos/` → `.../java/br/com/kota/` (main e test).
 - **Substituir, nesta ordem, em arquivos de texto:** `anthos.samples.bankofanthos` → `br.com.kota`; `CymbalBank` → `Kota`; `Bank of Anthos` → `Kota`; `BankOfAnthos` → `Kota`; `bank-of-anthos` → `kota-bank`; `bankofanthos` → `kota`; `CYMBAL` → `KOTA`; `Cymbal` → `Kota`; `cymbal` → `kota`. Renomear `cymbal.svg` → `kota.svg` e `cymbal.css` → `kota.css`.
 - **Nunca tocar:** `LICENSE`, linhas com `Copyright` e `Google LLC`, arquivos binários.
@@ -162,7 +162,7 @@ git commit -m "feat(kit): troca e detector da marca de origem no código da kota
 Run:
 ```bash
 git -C ../kota-bank-oficina switch -c feat/marca-kota
-(cd ../kota-bank-oficina && git rm -rq iac extras src/components kubernetes-manifests docs .github Makefile skaffold*.yaml \
+(cd ../kota-bank-oficina && git rm -rq iac extras src/components kubernetes-manifests $(git ls-files docs | grep -vE '^docs/(adr|runbooks)/') .github Makefile skaffold*.yaml \
   $(git ls-files '*/k8s/*' '*/skaffold.yaml' '*/cloudbuild.yaml'))
 npm run kota:marca -- ../kota-bank-oficina
 ```
