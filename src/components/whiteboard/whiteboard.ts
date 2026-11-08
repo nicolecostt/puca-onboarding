@@ -161,7 +161,7 @@ export function mountWhiteboard(parent: HTMLElement, lesson: WhiteboardSpec, opt
     const pad = 32;
     return { x: x0 - pad, y: y0 - pad, w: x1 - x0 + pad * 2, h: y1 - y0 + pad * 2 };
   }
-  // ---- câmera (tela infinita): a pessoa move e dá zoom; a Puca centra o que está explicando ----
+  // ---- câmera (tela infinita): a pessoa move e dá zoom; o Puca centra o que está explicando ----
   let cam: Camera = { x: 0, y: 0, escala: 1 };
   // a pessoa mexeu na câmera: o quadro para de se reajustar sozinho até ela pedir "Ajustar" (ou o quadro trocar)
   let mexeu = false;
@@ -228,18 +228,20 @@ export function mountWhiteboard(parent: HTMLElement, lesson: WhiteboardSpec, opt
     }
     return Number.isFinite(x0) ? { x: x0, y: y0, w: x1 - x0, h: y1 - y0 } : null;
   }
-  /** O que a Puca está explicando ficou fora da tela (a pessoa moveu o quadro): centra nele. */
+  /** O que o Puca está explicando ficou fora da tela (a pessoa moveu o quadro): centra nele. */
   function seguir(ids: string[]): void {
     const c = temArea() ? caixaDe(ids) : null;
     if (!c || visivel(cam, c, viewport())) return;
     aplicar(centrarEm(cam, c, viewport()), true);
   }
   function zoomNoCentro(fator: number): void {
+    if (!temArea()) return; // quadro escondido (encerramento, aba do navegador): ⌘+ e ⌘0 não mexem nele
     mexeu = true;
     const v = viewport();
     aplicar(zoomNoPonto(cam, { x: v.w / 2, y: v.h / 2 }, fator), true);
   }
   function zoomCem(): void {
+    if (!temArea()) return;
     zoomNoCentro(1 / cam.escala);
   }
   function enquadrar(): void {
@@ -419,8 +421,14 @@ export function mountWhiteboard(parent: HTMLElement, lesson: WhiteboardSpec, opt
     espaco = false;
     superficie.classList.remove("wb-espaco");
   };
+  // trocar de janela (⌘Tab) com o espaço apertado não entrega o keyup: sem isto, todo clique viraria arraste
+  const onBlur = () => {
+    espaco = false;
+    superficie.classList.remove("wb-espaco");
+  };
   document.addEventListener("keydown", onKey);
   document.addEventListener("keyup", onKeyUp);
+  window.addEventListener("blur", onBlur);
 
   // ---- pulso percorrendo as setas ----
   const svgEl = root.querySelector<SVGSVGElement>(".wb__edges")!;
@@ -535,6 +543,7 @@ export function mountWhiteboard(parent: HTMLElement, lesson: WhiteboardSpec, opt
       resize.disconnect();
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("blur", onBlur);
       superficie.removeEventListener("wheel", onWheel);
       superficie.removeEventListener("pointerdown", onPointerDown);
       superficie.removeEventListener("click", onClickCaptura, true);

@@ -160,7 +160,7 @@ O quadro é uma tela infinita, como no Excalidraw (`src/components/whiteboard/ca
 movem; `⌘`/`ctrl` + roda ou pinça dão zoom no cursor; arrastar o fundo, espaço + arrastar ou o botão do meio também
 movem. Os controles no canto do quadro (−, zoom, +, Ajustar) e os atalhos `Shift 1` (ver tudo) e `⌘ 0` (100%) fazem o
 resto. Clicar num nó continua abrindo o cartão e valendo como toque na checagem; o clique que encerra um arraste não
-conta. Se a pessoa afastar o quadro e Puca falar de algo fora da tela, o quadro centra no que ela está mostrando.
+conta. Se a pessoa afastar o quadro e o Puca falar de algo fora da tela, o quadro centra no que ele está mostrando.
 
 - O perfil vem da call inicial: no fim dela, as boas-vindas levam ao início, e "Começar a sessão" abre a sessão.
 - `?perfil=ana` (recém-contratada: passa pela parte institucional) ou `?perfil=bruno` (mudando de time: vai direto ao time).
