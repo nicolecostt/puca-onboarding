@@ -123,7 +123,7 @@ nada disso vale e tudo continua como acima.
 
 ```bash
 fly secrets import -a orbis-puca < <(grep -E '^[A-Z_]+=.' server/.env)   # chaves só por fly secrets, nunca no repo
-fly deploy           # gera a imagem, pré-gera o áudio da jornada no Supabase Storage (release_command) e sobe
+fly deploy           # à mão; a main já sobe sozinha (deploy-servidor.yml). Gera a imagem, pré-gera o áudio da jornada (release_command) e sobe
 fly logs             # logs (só ids, rotas e tempos)
 npm run bench:turn -- --url https://orbis-puca.fly.dev --token <access_token>   # mede o servidor no ar
 npm run contas-demo  # cria ou atualiza as contas fixas da apresentação no Supabase (senha em SENHA_DEMO)
