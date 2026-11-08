@@ -42,6 +42,8 @@ const CAM_STATE: Record<AgentState, AgentVisualState> = {
   done: "idle",
 };
 const VINCULO_LABEL: Record<Vinculo, string> = { novo: "Começando na empresa", transicao: "Mudando de time" };
+const SOM_BLOQUEADO =
+  "O navegador não liberou o som. Sigo com legenda e chat; para ouvir a voz, recarregue a página e clique de novo em Começar.";
 
 /** Pessoa mostrada no cabeçalho: o perfil da demo, ou o que a entrevista coletou. */
 function headerPerson(p: Profile, fromInterview: boolean): DemoProfile {
@@ -150,6 +152,9 @@ async function main(): Promise<void> {
   let pending: { kind: "reply" | "select"; resolve: (v: string) => void; reject: (e: Error) => void; replies?: string[] } | null = null;
   let runner: Runner | null = null;
   let running = false;
+  // A sessão está começando (antes de o runner rodar): um pulo pedido agora fica guardado e vale quando ela começar.
+  let iniciando = false;
+  let puloPendente: Moment | null = null;
   let currentMoment: Moment | null = null;
 
   // ---- Estado visível ----
@@ -313,10 +318,16 @@ async function main(): Promise<void> {
   /** Pulo pedido pela pessoa (chat, voz ou clique no painel "Sua jornada"): vai ao início do momento. */
   /** Pula para o início do momento; devolve o que a Puca disse (null se o pulo não aconteceu). */
   function pularPara(m: Moment): string | null {
-    if (!running || !runner?.jumpTo(m.id)) return null;
+    if (ended) return null;
+    const line = `Claro, vamos para ${m.title.toLowerCase()}.`;
+    if (!runner || iniciando) {
+      // a sessão ainda não rodou: guarda o pulo; o start() aplica e fala quando ela começar
+      puloPendente = m;
+      return line;
+    }
+    if (!running || !runner.jumpTo(m.id)) return null;
     voice.stop();
     interrupt();
-    const line = `Claro, vamos para ${m.title.toLowerCase()}.`;
     void speakAside(line);
     return line;
   }
@@ -632,6 +643,7 @@ async function main(): Promise<void> {
 
   // ---- Rodar / recomeçar ----
   async function start(): Promise<void> {
+    iniciando = true;
     clock.cancel(); // derruba esperas da execução anterior
     pending?.reject(new Cancelled());
     pending = null;
@@ -648,7 +660,13 @@ async function main(): Promise<void> {
       runner = createRunner(journey, profile, io);
       trail.startSession();
       running = true;
-      await runner.run();
+      iniciando = false;
+      const run = runner.run();
+      // pulo pedido antes de a sessão rodar (#65): vale uma vez, agora que o runner existe
+      const pulo = puloPendente;
+      puloPendente = null;
+      if (pulo) pularPara(pulo);
+      await run;
       running = false;
       trail.endSession();
       journeyPanel.setProgress(visitados, null);
@@ -670,7 +688,8 @@ async function main(): Promise<void> {
   showGate("Começar sessão com voz", async () => {
     document.body.classList.remove("is-call-off");
     window.setTimeout(() => cam.sync(), 300);
-    await voice.unlock();
+    // sem gesto reconhecido, o navegador pode segurar o áudio: a sessão começa assim mesmo, com legenda
+    if (!(await voice.unlock())) chat.addMessage({ from: "agent", text: SOM_BLOQUEADO });
     void voice.listen((t) => void handleUtterance(t, "voz"), (t) => (el.captionUser.textContent = t)).catch((e) => console.warn("microfone:", e));
     void start();
   });
