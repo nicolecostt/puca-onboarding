@@ -32,9 +32,9 @@ describe("histórico das conversas", () => {
     sessao.anotar("assistant", "Vamos abrir o quadro.");
     sessao.salvar(ana, store);
     const [primeira] = listarConversas(ana, store);
-    expect(salvarResumo(ana, primeira, ["O Puca abriu o quadro."], store)).toBe(true);
+    expect(salvarResumo(ana, primeira, ["Puca abriu o quadro."], store)).toBe(true);
     sessao.salvar(ana, store);
-    expect(listarConversas(ana, store)[0].topicos).toEqual(["O Puca abriu o quadro."]);
+    expect(listarConversas(ana, store)[0].topicos).toEqual(["Puca abriu o quadro."]);
     sessao.anotar("user", "Onde vejo minha primeira tarefa?");
     sessao.salvar(ana, store);
     const atual = listarConversas(ana, store);

@@ -244,8 +244,13 @@ describe("POST /api/conversas/resumo", () => {
     },
   });
 
-  it("resume as falas com Haiku e aplica a trava diária", async () => {
-    const app = criarApp('{"topicos":["A pessoa perguntou pela primeira tarefa."]}');
+  const resumo = '{"topicos":["A pessoa perguntou pela primeira tarefa."]}';
+
+  it.each([
+    ["JSON puro", resumo],
+    ["JSON entre cercas", `\n\`\`\`json\n${resumo}\n\`\`\`\n`],
+  ])("aceita %s na saída do Haiku e aplica a trava diária", async (_formato, texto) => {
+    const app = criarApp(texto);
     try {
       const ok = await app.inject({ method: "POST", url, payload });
       expect(ok.statusCode).toBe(200);

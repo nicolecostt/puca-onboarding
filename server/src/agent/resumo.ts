@@ -24,7 +24,9 @@ export async function resumirConversa(
     if (evento.type === "done") completo = evento.finishReason === "end_turn";
   }
   if (!completo) throw new Error("resumo incompleto");
-  const saida = JSON.parse(texto) as { topicos?: unknown } | null;
+  const json = texto.trim();
+  const cerca = /^```(?:json)?[^\S\r\n]*\r?\n([\s\S]*?)\r?\n```$/i.exec(json);
+  const saida = JSON.parse(cerca?.[1] ?? json) as { topicos?: unknown } | null;
   if (!topicosValidos(saida?.topicos)) throw new Error("resumo inválido");
   return saida.topicos;
 }
