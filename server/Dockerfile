@@ -11,7 +11,6 @@ COPY src ./src
 # src/data importa o mapa da Kota (kit/kota/mapa.ts)
 COPY kit ./kit
 COPY server ./server
-COPY kit ./kit
 
 EXPOSE 8787
 CMD ["tsx", "server/src/server.ts"]
