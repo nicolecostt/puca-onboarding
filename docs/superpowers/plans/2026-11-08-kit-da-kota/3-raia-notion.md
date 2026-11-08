@@ -90,9 +90,9 @@ git commit -m "feat(kit): árvore e databases do notion da kota geradas do mapa"
 - Produces: `kit/kota/notion/urls.json`, `Record<ChaveNotion, string>` com URLs públicas. A raia eng. lê `rfc-1..3`; a C4 e a C5 leem o resto.
 - `COMO-PREENCHER.md` fixa: procurar a página pela chave (título) sob o pai antes de criar; se existe, atualizar; criar na ordem da `ARVORE`; databases com as colunas da N1; depois de cada criação, gravar a URL pública (`https://<dominio>.notion.site/<id sem hífens>`) em `urls.json`; conteúdo sobe com `resolverLinks` aplicado; nunca editar a database à mão.
 
-- [ ] **Step 1: Escolher o domínio público do workspace**
+- [ ] **Step 1: Saber o domínio público do workspace**
 
-Na interface do Notion: Settings → Public pages → domínio (ex.: `kota`). Anotar em `COMO-PREENCHER.md`.
+O Notion gera um domínio para o workspace (hoje `lean-ptarmigan-dd2`), que dá para trocar em Settings → Sites. O endpoint público `https://www.notion.so/api/v3/getPublicPageData` devolve o domínio atual em `publicDomainName`, sem login. Anotar em `COMO-PREENCHER.md`.
 
 - [ ] **Step 2: Escrever `COMO-PREENCHER.md`**
 
@@ -107,7 +107,7 @@ Expected: regra `notion-urls` sem erro (todas as chaves com URL `notion.site`).
 
 - [ ] **Step 5: Rodar o procedimento de novo**
 
-Expected: nenhuma página nova no Notion (a busca do `notion-search` pela raiz devolve o mesmo número de páginas antes e depois).
+Expected: nenhuma página nova no Notion. A contagem é pela estrutura (filhos da raiz e das páginas que agrupam, mais as linhas de cada database), igual antes e depois. O `notion-search` não serve para contar: devolve no máximo 50 resultados, e a árvore tem 65 objetos.
 
 - [ ] **Step 6: Commit e PR; avisar a raia eng. que `rfc-1..3` têm URL**
 

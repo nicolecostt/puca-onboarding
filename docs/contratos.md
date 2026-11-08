@@ -12,7 +12,7 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | Voz ↔ quadro | `BoardAction.at` em `src/journey/types.ts` + `RunnerIO.say(text, cues)` + `GET /api/tts/:id/words` — [seção abaixo](#voz--quadro) | `runner.ts`, `screens/lesson` (`io.say`), `src/voice/agent-voice.ts`, quem escreve jornadas | `validate.test.ts`, `runner.test.ts`, `server/src/voice/tts/service.test.ts` |
 | Jornada da pessoa | `src/journey/types.ts` (`JornadaDaPessoa`) + `src/journey/jornada-da-pessoa.ts` (`montarJornadaDaPessoa`, `proximosPassos`) — [seção abaixo](#jornada-da-pessoa) | sessão, painel "Sua jornada" (#17) → progresso (#18), painel do buddy (#19), checagem (#24) | `__tests__/jornada-da-pessoa.test.ts` |
 | Rota da fala | `src/journey/route.ts` (`Route`: jump → reply → tarefa → select → knowledge → faq → ask; numa checagem, `waiting.check`: o que não é pergunta nem pulo é `reply`; `tarefa`: pergunta que cita a primeira tarefa, respondida pelos campos dela em `src/journey/duvidas-da-tarefa.ts`, com `RouteContext.tarefa`/`tarefaApresentada` opcionais) | `screens/lesson`, voz e chat | `__tests__/route.test.ts` |
-| API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask`, `/api/voice/token` | `src/voice/agent-voice.ts`, `screens/lesson` | `server/src/**/*.test.ts` |
+| API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask`, `/api/voice/token`; token do Supabase, limites e CORS — [seção abaixo](#api-do-servidor) | `src/voice/agent-voice.ts`, `src/voice/pcm-player.ts`, `screens/lesson`, `server/bench/turn-latency.ts` | `server/src/app.test.ts`, `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
 | Rastro (decisões da Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
@@ -62,6 +62,43 @@ escreve o formato aqui (tipo + um exemplo válido) **antes** de implementar; o o
 | Progresso e memória | o que a pessoa estudou, dúvidas e onde parou, entre sessões | perfil em `sessionStorage` (`puca:profile`) |
 | Painel buddy/gestor/RH | marcos, pendências e pedidos de suporte | etapas da jornada em `src/data/company.ts` |
 | Computer use | o agente mexendo nas ferramentas | cursor em `components/agent-cursor`; primeiro uso real: o envio do encaminhamento no Slack (`screens/live-session/slack-dm.ts`) |
+
+## API do servidor
+
+O servidor no Fly (`https://orbis-puca.fly.dev`, decisão 0006, `docs/stack.md` §5) e o local (`npm run dev:server`)
+respondem as mesmas rotas. O que muda é o que cada requisição precisa levar:
+
+- **Token:** toda rota, menos `GET /api/health`, exige `Authorization: Bearer <access_token do Supabase>`. O servidor
+  confere a assinatura pelo JWKS do projeto, o emissor (`<SUPABASE_URL>/auth/v1`) e a audiência (`authenticated`), e
+  usa o `sub` como id da pessoa. Vale para o áudio também: `GET /api/tts/:id` e `/words` levam o mesmo cabeçalho.
+  Sem `SUPABASE_URL` no ambiente (dev local), nenhuma rota exige token. No Fly, `EXIGE_TOKEN=1` impede o servidor de
+  subir sem Supabase.
+- **Limite por pessoa** (pelo id do token; sem token, pelo IP), por minuto: `POST /api/ask` 30, `POST /api/speak`
+  120, `POST /api/voice/token` 20.
+- **Travas diárias globais** (meia-noite de São Paulo; reiniciar o servidor zera), por `LIMITE_DIARIO_*`, sem valor =
+  sem trava: `LLM` conta chamadas ao `/api/ask`; `TTS` conta caracteres sintetizados de verdade (áudio que já está no
+  cache não conta nem é barrado); `STT` conta tokens do `/api/voice/token`. Com a do TTS ou a do STT esgotada, o
+  `/api/health` responde `tts: false` ou `stt: false`.
+- **CORS:** só `app://orbis` (o app) e `http://localhost:5173` (o Vite), com `Authorization` e `Content-Type`.
+
+Erros que o app trata como "sem servidor" (`ask()` de `src/voice/agent-voice.ts` devolve `false` e a sessão segue como
+sem servidor, em `src/screens/lesson/main.ts`; o `/api/speak` fica só na legenda; o microfone dá lugar ao chat):
+
+| Status | Corpo | Quando |
+|---|---|---|
+| 401 | `{"error":"unauthorized"}` | sem token, token inválido, vencido ou de outro projeto |
+| 429 | `{"statusCode":429,"error":"rate_limited","retry_after_ms":41000}` | passou do limite por minuto da pessoa |
+| 503 | `{"error":"limite_diario"}` | passou da trava diária do provedor da rota |
+
+Exemplo válido (o app manda o token da sessão do Supabase; quem cria a sessão e guarda o token é a #18):
+
+```http
+POST /api/ask HTTP/1.1
+Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6Ii4uLiJ9…
+Content-Type: application/json
+
+{"text":"Quem cuida do authorizer?","moment_id":"pagamentos","step_id":"pg-pergunta","perfil":"novo"}
+```
 
 ## Calibragem
 

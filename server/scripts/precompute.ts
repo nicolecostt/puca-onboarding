@@ -44,5 +44,6 @@ await Promise.all(
     }
   }),
 );
+await tts.flush(); // espera as gravações no cache (no Fly, o Storage) antes de sair
 tts.cancelAll();
 console.log(`${texts.length} textos: ${made} gerados, ${cached} já estavam no cache, ${failed} falharam.`);
