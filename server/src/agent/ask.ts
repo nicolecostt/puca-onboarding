@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import { detectIntent } from "../../../src/journey/conditions";
 import { looksLikeQuestion } from "../../../src/journey/forwarding";
 import type { BoardAction, Journey, Profile } from "../../../src/journey/types";
+import type { Brain } from "../brain/brain";
 import type { TtsService } from "../voice/tts/service";
 import { streamChat, type ChatMessage } from "../llm";
 import { FAILURE_LINE, pickBridge } from "./bridges";
@@ -21,6 +22,8 @@ export type AskEvent =
   | { type: "go_to"; target: string }
   /** Sem fonte confiável: a tela encaminha a dúvida à buddy (no máximo um por pedido, antes do timing). */
   | { type: "escalate"; summary: string }
+  /** Trechos do kit citados na resposta ([fN]), sem repetir; antes do timing. */
+  | { type: "fontes"; fontes: { titulo: string; url: string }[] }
   | { type: "timing"; timing: AskTiming };
 
 export interface AskTiming {
@@ -54,7 +57,12 @@ export interface AskInput {
   timeoutMs: number;
   /** Abortado quando a pessoa interrompe (o cliente fecha a conexão). */
   signal?: AbortSignal;
+  /** Company brain: trechos do kit da Kota para a fala (server/src/brain). */
+  brain?: Brain;
 }
+
+// Marca de citação do LLM ("... pelo CI [f1]."): sai do texto falado, com o espaço antes.
+const CITACAO = /\s*\[f(\d+)\]/g;
 
 // O LLM às vezes admite que não confirmou sem chamar escalate_to_buddy: vale como encaminhamento.
 const NO_SOURCE = /não (consegui|consigo) confirmar|não (achei|tenho) (isso )?confirmad/i;
@@ -72,7 +80,9 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
 
   say(pickBridge(detectIntent(input.text)), "bridge");
 
-  const ctx = { journey: input.journey, profile: input.profile, momentId: input.momentId, stepId: input.stepId, history: input.history };
+  const trechos = input.brain?.buscar(input.text, 5) ?? [];
+  const ctx = { journey: input.journey, profile: input.profile, momentId: input.momentId, stepId: input.stepId, history: input.history, trechos };
+  const citados = new Set<number>();
   const ids = new Set(visibleNodes(ctx).map((n) => n.id));
   const ac = new AbortController();
   const timer = setTimeout(() => ac.abort(), input.timeoutMs);
@@ -84,7 +94,9 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   let saidNoSource = false;
   let refused = false;
   const escalate = (summary: string) => { escalationSummary ??= summary; };
-  const sentence = (s: string) => {
+  const sentence = (raw: string) => {
+    const s = raw.replace(CITACAO, (_m, n: string) => { citados.add(Number(n)); return ""; }).trim();
+    if (!s) return;
     timing.llm_first_sentence_ms ??= ms();
     spoke = true;
     say(s, "llm");
@@ -152,6 +164,10 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
     if (escalationSummary) emit({ type: "escalate", summary: escalationSummary });
     else if (saidNoSource) emit({ type: "escalate", summary: input.text });
   }
+  const fontes = [...citados].sort((a, b) => a - b).map((n) => trechos[n - 1]).filter(Boolean)
+    .map((t) => ({ titulo: t.titulo, url: t.url }))
+    .filter((f, i, all) => all.findIndex((g) => g.titulo === f.titulo && g.url === f.url) === i);
+  if (fontes.length) emit({ type: "fontes", fontes });
   timing.total_ms = ms();
   emit({ type: "timing", timing });
   return timing;
