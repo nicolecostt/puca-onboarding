@@ -1,23 +1,23 @@
-// Boas-vindas: abre no fim da call inicial. Cumprimenta pelo perfil salvo na call e dá duas saídas:
-// ir para o início do Orbis ou refazer a call inicial (as duas levam o ?perfil= junto).
+// Entrada do Orbis: a call inicial começa nas boas-vindas.
 import "../../styles/base.css";
 import "./style.css";
+import { activeProfile } from "../../data";
+import { sessionCompleted } from "../../journey/session-progress";
+import { loadSavedProfile } from "../../journey/profile";
+import { preserveProfileLinks } from "../../lib/navigation";
 import { qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
-import { resolveProfile } from "../../journey/profile";
 
-const { profile } = resolveProfile(location.search);
-qs(document, "#title").textContent = `Oi, ${profile.nome}.`;
-qs(document, "#lead").textContent = profile.time
-  ? `Sua primeira semana com o time ${profile.time} está pronta.`
-  : "Sua primeira semana está pronta.";
-qs(document, "#who").textContent = profile.nome;
-for (const id of ["#go-inicio", "#go-call"]) {
-  const a = qs<HTMLAnchorElement>(document, id);
-  a.href = a.getAttribute("href") + location.search;
+const savedProfile = loadSavedProfile();
+if (savedProfile) {
+  location.replace(sessionCompleted(savedProfile) ? "../inicio/" : "../lesson/");
+} else {
+  preserveProfileLinks();
+  const profile = activeProfile("ana");
+  qs(document, "#title").textContent = `Oi, ${profile.nickname}.`;
+  qs(document, "#who").textContent = profile.name;
+  mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
+    occluders: ".topbar__row > *, .home__title, .home__lead, .home__actions > *",
+    max: 40,
+  });
 }
-
-mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
-  occluders: ".topbar__row > *, .home__title, .home__lead, .home__actions > *",
-  max: 40,
-});

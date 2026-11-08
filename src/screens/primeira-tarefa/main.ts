@@ -2,10 +2,13 @@
 // aprovação do gestor. Lê o pedido do localStorage (?id=, ou o mais recente) e muda sozinha quando o gestor aprova no Slack.
 import "../../styles/base.css";
 import "./style.css";
+import { preserveProfileLinks } from "../../lib/navigation";
 import { PEDIDOS_KEY } from "../../journey/primeira-tarefa";
 import { browserStore, readJson } from "../../journey/storage";
 import { qs } from "../../lib/dom";
 import { pedidoDaPagina, statusDaPagina } from "./pagina";
+
+preserveProfileLinks();
 
 const store = browserStore();
 const id = new URLSearchParams(location.search).get("id");
@@ -21,6 +24,7 @@ function render(): void {
   const p = pedidoDaPagina(readJson<unknown>(store, PEDIDOS_KEY, []), id);
   doc.hidden = !p;
   empty.hidden = !!p;
+  qs(document, "#task-slack").hidden = !p || p.status === "aprovada";
   if (!p) return;
   const t = p.tarefa;
   document.title = `${t.titulo} · Kota`;

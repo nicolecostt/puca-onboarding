@@ -12,6 +12,11 @@ export function memoryStore(): KeyValueStore {
   return { getItem: (k) => data.get(k) ?? null, setItem: (k, v) => void data.set(k, v) };
 }
 
+/** No Mac, o perfil e o progresso local sobrevivem a fechar e reabrir o app. */
+export function onboardingStore(): Storage {
+  return typeof window !== "undefined" && window.orbis ? localStorage : sessionStorage;
+}
+
 /** localStorage, ou memória se o navegador bloquear o acesso. */
 export function browserStore(): KeyValueStore {
   try {

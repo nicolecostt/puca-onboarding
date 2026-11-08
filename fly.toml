@@ -19,8 +19,9 @@ primary_region = "iad"
   ELEVENLABS_MODEL_ID = "eleven_flash_v2_5"
   # travas diárias globais (docs/stack.md §5.3): passou, a rota cai no comportamento sem servidor
   LIMITE_DIARIO_LLM = "1500"
-  # ElevenLabs Starter: 40 mil caracteres por mês; ~10 mil vão na pré-geração, o resto dura uma semana a 4 mil por dia
-  LIMITE_DIARIO_TTS = "4000"
+  # alta de propósito para os testes da submissão: quem segura é a cota da ElevenLabs (Starter, 40 mil por mês);
+  # depois da avaliação, voltar para algo como 4000
+  LIMITE_DIARIO_TTS = "1000000"
   LIMITE_DIARIO_STT = "400"
 
 [http_service]

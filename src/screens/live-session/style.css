@@ -76,6 +76,14 @@ body {
 }
 
 /* ---------- Topo ---------- */
+.sk-top__orbis {
+  color: var(--sk-on-dark-strong);
+  white-space: nowrap;
+}
+.sk-top__orbis:focus-visible {
+  outline-color: currentColor;
+}
+
 .sk-top {
   grid-area: top;
   display: grid;
