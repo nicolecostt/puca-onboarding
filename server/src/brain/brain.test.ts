@@ -1,10 +1,11 @@
 // Brain mínimo com os arquivos reais do kit da Kota.
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { carregarBrain, criarBrain, trechosDoKit, type Trecho } from "./brain";
 import { mapa } from "../../../kit/kota/mapa";
 
-const raiz = new URL("../../../", import.meta.url).pathname;
+const raiz = fileURLToPath(new URL("../../../", import.meta.url)); // fileURLToPath: pasta com espaço no nome
 const urls = JSON.parse(readFileSync(new URL("../../../kit/kota/notion/urls.json", import.meta.url), "utf8")) as Record<string, string>;
 const trechos = trechosDoKit({ paginasDir: `${raiz}kit/kota/notion/paginas`, urls, mapa });
 const brain = carregarBrain(raiz);
