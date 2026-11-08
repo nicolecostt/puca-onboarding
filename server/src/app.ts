@@ -5,7 +5,8 @@
 import { falaValida } from "../../src/journey/conversas";
 import { resumirConversa } from "./agent/resumo";
 import { randomUUID } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import { lerPedidoDeEncaminhamento, type PedidoDeEncaminhamento, type ResultadoDoEncaminhamento } from "../../src/journey/encaminhamento-slack";
@@ -121,8 +122,10 @@ export function buildApp(opts: BuildAppOptions = {}) {
   let brain = opts.brain;
   if (!brain) {
     try {
-      brain = carregarBrain(process.cwd());
-      app.log.info({ trechos: brain.total }, "brain carregado");
+      const vizinho = join(process.cwd(), "..", "kota-bank");
+      const kotaBank = env.kotaBankDir || (existsSync(vizinho) ? vizinho : undefined);
+      brain = carregarBrain(process.cwd(), kotaBank);
+      app.log.info({ trechos: brain.total, kotaBank: kotaBank ?? null }, "brain carregado");
     } catch (err) {
       app.log.warn({ err }, "brain sem kit da Kota: o /api/ask responde sem trechos");
     }
@@ -259,7 +262,7 @@ export function buildApp(opts: BuildAppOptions = {}) {
       const emit = sse(reply);
       const timing = await callTurn(
         {
-          knowledge, kind, text, history, anotado, tts, model: env.model,
+          knowledge, brain, kind, text, history, anotado, tts, model: env.model,
           cultura: (b.cultura ?? []).filter((t): t is string => typeof t === "string" && TEMAS_DE_CULTURA.includes(t)), timeoutMs: Math.max(env.llmTimeoutMs, 15000), signal: ac.signal,
           interrupted: curto(b.interrupted?.said),
           admissao: { nome: curto(ad.nome), cargo: curto(ad.cargo), time: curto(ad.time), gestor: curto(ad.gestor) },

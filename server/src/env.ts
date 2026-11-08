@@ -39,6 +39,8 @@ export const env = {
   },
   /** Token do bot do app da Kota (#118): o encaminhamento no Slack real (#129). Vazio = a rota responde sem_slack. */
   slackBotToken: process.env.SLACK_BOT_TOKEN ?? "",
+  /** Clone do kota-bank para o brain ler código e ADRs (#228). Vazio = `../kota-bank` se existir; sem ele, só Notion e mapa. */
+  kotaBankDir: process.env.KOTA_BANK_DIR ?? "",
   /** Origens aceitas pelo CORS: o app (Electron) e o Vite em dev. */
   corsOrigins: (process.env.CORS_ORIGINS ?? "app://orbis,http://localhost:5173").split(",").map((o) => o.trim()).filter(Boolean),
 };

@@ -1,6 +1,7 @@
 // Company brain mínimo: as páginas do Notion e o mapa da Kota em trechos, com busca de texto em memória.
 // Sem banco nem embedding: BM25 simples, síncrono, em poucos ms. Quem usa: server/src/agent/ask.ts.
-import { readdirSync, readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { mapa as mapaKota } from "../../../kit/kota/mapa";
 import { ARVORE, linhasDatabase } from "../../../kit/kota/notion/arvore";
@@ -130,9 +131,80 @@ export function criarBrain(trechos: Trecho[]): Brain {
   };
 }
 
-/** Lê <raiz>/kit/kota/notion/paginas, urls.json e o mapa. */
-export function carregarBrain(raiz: string): Brain {
+const LINHAS_POR_TRECHO = 40;
+const EXT_CODIGO = /\.(java|py)$/;
+/** Teste e gerado não explicam o sistema para quem chega; `extras/` e `iac/` falam de outra empresa. */
+const FORA_DO_CODIGO = /(^|\/)(test|tests|__tests__|extras|iac|node_modules|target|build)(\/|$)|(_test|Test|Tests)\.(java|py)$|^test_/;
+
+function arquivos(dir: string, rel = ""): string[] {
+  return readdirSync(join(dir, rel), { withFileTypes: true }).flatMap((e) => {
+    const r = rel ? `${rel}/${e.name}` : e.name;
+    return e.isDirectory() ? arquivos(dir, r) : [r];
+  });
+}
+
+/** Commit atual do clone, para o link do GitHub não andar quando o repo mudar. Sem git, a `main`. */
+function commitDe(dir: string): string {
+  try {
+    return execFileSync("git", ["-C", dir, "rev-parse", "HEAD"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim() || "main";
+  } catch {
+    return "main";
+  }
+}
+
+/**
+ * ADRs (`docs/adr/*.md`, por seção) e código (`src/**\/*.{java,py}`, em blocos de 40 linhas) de um clone do kota-bank.
+ * Link do GitHub preso ao commit: `?plain=1` no Markdown e `#Lx-Ly` no código.
+ */
+export function trechosDoKotaBank(dir: string, repo: string = mapaKota.repo): Trecho[] {
+  const base = `https://github.com/${repo}/blob/${commitDe(dir)}`;
+  const out: Trecho[] = [];
+  const adrDir = join(dir, "docs", "adr");
+  if (existsSync(adrDir)) {
+    for (const arquivo of readdirSync(adrDir).filter((f) => f.endsWith(".md")).sort()) {
+      const md = readFileSync(join(adrDir, arquivo), "utf8");
+      const titulo = /^#\s+(.+)$/m.exec(md)?.[1].trim() ?? arquivo.slice(0, -3);
+      const usados = new Set<string>();
+      for (const s of secoes(md)) {
+        let id = slug(s.titulo) || "secao";
+        for (let i = 2; usados.has(id); i++) id = `${slug(s.titulo)}-${i}`;
+        usados.add(id);
+        out.push({
+          id: `adr:${arquivo.slice(0, -3)}#${id}`,
+          titulo: `ADR · ${titulo} · ${s.titulo}`,
+          url: `${base}/docs/adr/${arquivo}?plain=1`,
+          texto: s.texto,
+        });
+      }
+    }
+  }
+  const src = join(dir, "src");
+  if (existsSync(src)) {
+    for (const rel of arquivos(src).filter((f) => EXT_CODIGO.test(f) && !FORA_DO_CODIGO.test(f)).sort()) {
+      const caminho = `src/${rel}`;
+      const linhas = readFileSync(join(src, rel), "utf8").split("\n");
+      for (let i = 0; i < linhas.length; i += LINHAS_POR_TRECHO) {
+        const texto = linhas.slice(i, i + LINHAS_POR_TRECHO).join("\n").trim();
+        if (!texto) continue;
+        const fim = Math.min(i + LINHAS_POR_TRECHO, linhas.length);
+        out.push({
+          id: `codigo:${caminho}#L${i + 1}`,
+          titulo: `Código · ${caminho} (linhas ${i + 1}-${fim})`,
+          url: `${base}/${caminho}#L${i + 1}-L${fim}`,
+          // o caminho entra no texto: "balancereader", "ledgerwriter" acham o arquivo
+          texto: `${caminho.replace(/[/._-]/g, " ")}\n${texto}`,
+        });
+      }
+    }
+  }
+  return out;
+}
+
+/** Lê <raiz>/kit/kota/notion/paginas, urls.json e o mapa; com `kotaBankDir`, também os ADRs e o código do kota-bank. */
+export function carregarBrain(raiz: string, kotaBankDir?: string): Brain {
   const notion = join(raiz, "kit", "kota", "notion");
   const urls = JSON.parse(readFileSync(join(notion, "urls.json"), "utf8")) as Record<string, string>;
-  return criarBrain(trechosDoKit({ paginasDir: join(notion, "paginas"), urls, mapa: mapaKota }));
+  const trechos = trechosDoKit({ paginasDir: join(notion, "paginas"), urls, mapa: mapaKota });
+  if (kotaBankDir) trechos.push(...trechosDoKotaBank(kotaBankDir));
+  return criarBrain(trechos);
 }
