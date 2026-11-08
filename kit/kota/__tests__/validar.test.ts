@@ -6,7 +6,7 @@ function pessoa(id: string, nome: string, area: AreaId): PessoaKota {
   return {
     id,
     nome,
-    cargo: "Engenharia",
+    cargo: "Engenheiro de software pleno",
     area,
     email: `${id}@kota.example`,
     slack: nome,
@@ -182,6 +182,21 @@ describe("validarMapa", () => {
     expect(erros(com((m) => { m.perfis.novo.pessoa = "clara-dias"; }))).toMatch(/perfil novo: "clara-dias" é de contas, precisa ser de livro-razao/);
     expect(erros(com((m) => { m.perfis.transicao.pessoa = "fabio-lima"; }))).toMatch(/perfil transicao: "fabio-lima" é de livro-razao, precisa ser de contas/);
     expect(erros(com((m) => { m.perfis.novo.pessoa = "ninguem"; }))).toMatch(/perfil novo: pessoa "ninguem" não existe/);
+  });
+
+  it("acusa cargo de engenharia sem o nível da trilha de carreira", () => {
+    for (const cargo of ["Engenheira de software backend", "Engenheiro de software", "Desenvolvedor pleno"])
+      expect(erros(com((m) => { m.pessoas[0].cargo = cargo; }))).toContain(`pessoa ana-souza: cargo "${cargo}" fora da trilha de carreira`);
+  });
+
+  it("aceita os cargos da trilha de carreira e deixa People e segurança fora dela", () => {
+    const cargos = ["Gestora de engenharia", "Gestor de engenharia", "Tech lead", "Engenheira de software júnior",
+      "Engenheiro de software sênior", "Engenheira de plataforma pleno"];
+    expect(validarMapa(com((m) => {
+      cargos.forEach((cargo, i) => { m.pessoas[i].cargo = cargo; });
+      m.pessoas[12].cargo = "People partner";
+      m.pessoas[13].cargo = "Analista de segurança da informação";
+    }))).toEqual([]);
   });
 
   it("acusa nome proibido", () =>

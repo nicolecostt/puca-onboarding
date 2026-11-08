@@ -23,7 +23,7 @@ export const mapa: MapaKota = {
     pessoa("thiago", "Thiago Nakamura", "Tech lead", "livro-razao"),
     pessoa("beatriz", "Beatriz Cavalcanti", "Engenheira de software sênior", "livro-razao"),
     pessoa("gustavo", "Gustavo Schmitt", "Engenheiro de software pleno", "livro-razao"),
-    pessoa("ana", "Ana Lacerda", "Engenheira de software backend", "livro-razao"),
+    pessoa("ana", "Ana Lacerda", "Engenheira de software pleno", "livro-razao"),
 
     pessoa("priscila", "Priscila Antunes", "Gestora de engenharia", "canais"),
     pessoa("larissa", "Larissa Fagundes", "Tech lead", "canais"),
