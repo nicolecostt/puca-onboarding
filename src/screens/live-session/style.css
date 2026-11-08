@@ -774,22 +774,30 @@ body {
 }
 .cu-pill {
   position: fixed;
-  top: 10px;
+  top: 46px; /* logo abaixo da barra roxa do Slack, no centro */
   left: 50%;
   z-index: 991;
   margin: 0;
-  height: 30px;
-  padding: 0 14px;
+  height: 34px;
+  padding: 0 14px 0 8px;
   display: flex;
   align-items: center;
+  gap: 8px;
   transform: translateX(-50%);
+  border: 1px solid var(--color-text);
   border-radius: var(--radius-pill);
-  background: var(--color-text);
-  color: var(--color-surface);
+  background: var(--color-surface);
+  color: var(--color-text);
   font: 500 13px/1 var(--font-sans);
   white-space: nowrap;
   pointer-events: none;
   transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.cu-pill__dots {
+  position: relative;
+  flex: none;
+  width: 22px;
+  height: 22px;
 }
 body:not(.has-agent-cam) .cu-frame,
 body:not(.has-agent-cam) .cu-pill {
@@ -797,19 +805,6 @@ body:not(.has-agent-cam) .cu-pill {
 }
 body:not(.has-agent-cam) .cu-pill {
   transform: translate(-50%, -8px);
-}
-/* no espaço livre da barra roxa do Slack, à esquerda da busca (no celular, no centro) */
-@media (min-width: 721px) {
-  .cu-pill {
-    top: 7px;
-    left: 76px;
-    height: 26px;
-    transform: none;
-    font-size: 12px;
-  }
-  body:not(.has-agent-cam) .cu-pill {
-    transform: translateY(-8px);
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .cu-frame {

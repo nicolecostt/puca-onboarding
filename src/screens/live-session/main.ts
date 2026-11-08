@@ -7,6 +7,7 @@ import { mountCallBar } from "../../components/call-bar/call-bar";
 import { mountAgentCam } from "../../components/agent-cam/agent-cam";
 import { mountAgentCursor } from "../../components/agent-cursor/agent-cursor";
 import { loadAgentVisual, type AgentVisualState } from "../../lib/agent-visual";
+import { mountPucaDots } from "../../lib/puca-dots";
 import { createOutbox, FORWARDING_KEY, forwardingMessage } from "../../journey/forwarding";
 import { createPedidos, pedidoMessage, PEDIDOS_KEY, type PedidoDeAprovacao } from "../../journey/primeira-tarefa";
 import { browserStore } from "../../journey/storage";
@@ -29,6 +30,7 @@ async function main(): Promise<void> {
   const cam = mountAgentCam({ name: "Puca", visual: await loadAgentVisual() });
   mountCallBar({ chat, attachTo: cam }); // barra presa embaixo da câmera; sem status por cima do Slack
   const cursor = mountAgentCursor();
+  mountPucaDots(document.querySelector<HTMLElement>("#cu-dots")!); // as bolinhas da Puca no aviso do topo
 
   // Simula a Puca conversando: fala por um tempo, faz uma pausa, às vezes pensa
   const script: [AgentVisualState, number][] = [
