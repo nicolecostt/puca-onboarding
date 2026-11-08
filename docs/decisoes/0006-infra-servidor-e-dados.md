@@ -4,7 +4,7 @@
 - Status: valendo
 
 **Contexto:** o app roda no Mac do jurado (0004) e não pode levar chave de API. O servidor precisa ficar na nuvem. Ele
-cria o áudio de Puca na memória (`/api/speak`) e o entrega numa segunda requisição (`/api/tts/:id`), faz streaming
+cria o áudio do Puca na memória (`/api/speak`) e o entrega numa segunda requisição (`/api/tts/:id`), faz streaming
 por SSE e mantém WebSocket com a ElevenLabs: serverless quebra isso. Os dados da pessoa (perfil, calibragem,
 progresso, rastro, encaminhamentos, primeira tarefa) vivem hoje só no `localStorage`/`sessionStorage` de uma máquina,
 e cada jurado precisa dos seus.
@@ -18,7 +18,7 @@ e cada jurado precisa dos seus.
     para a apresentação. O servidor confere o token do Supabase em toda rota, menos `/api/health`.
   - **Postgres:** uma tabela por dado da pessoa, com RLS por `auth.uid()`. O app grava local primeiro e sincroniza
     por uma fila; a sessão nunca espera o Supabase.
-  - **Storage:** o cache de áudio de Puca sai do disco do servidor.
+  - **Storage:** o cache de áudio do Puca sai do disco do servidor.
 - O **front vai dentro do app**; não há front hospedado (Vercel fica de fora).
 - O servidor passa a ter **limite de uso por pessoa** e uma trava diária de chamadas ao LLM.
 

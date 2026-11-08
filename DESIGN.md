@@ -1,6 +1,6 @@
 ---
 name: Orbis
-description: Puca conduz sessões no quadro para quem chega no time; preto no branco, e a única cor é a dela.
+description: O Puca conduz sessões no quadro para quem chega no time; preto no branco, e a única cor é a dela.
 colors:
   ink: "#0a0a0a"
   ink-button: "#171717"
@@ -116,14 +116,14 @@ components:
 
 **Creative North Star: "O cartaz e a única cor"**
 
-Um cartaz tipográfico suíço: papel branco, tinta preta, cinzas só para o que é secundário ou inativo, fios de 1px marcando a grade, e um único objeto colorido: Puca. Tudo o que não é Puca é monocromático; o arco-íris metálico dela (a faixa da esfera de pontos, o anel `--puca-holo`, as partículas) aparece em poucos pontos, e é justamente essa raridade que faz o olho achar Puca na tela.
+Um cartaz tipográfico suíço: papel branco, tinta preta, cinzas só para o que é secundário ou inativo, fios de 1px marcando a grade, e um único objeto colorido: o Puca. Tudo o que não é o Puca é monocromático; o arco-íris metálico dela (a faixa da esfera de pontos, o anel `--puca-holo`, as partículas) aparece em poucos pontos, e é justamente essa raridade que faz o olho achar o Puca na tela.
 
 Na landing o mundo é plano e editorial: Creato Display grande alinhada à esquerda numa grade de 12 colunas, listas separadas por fios, nenhum fundo colorido, nenhuma sombra. Nas telas do app (sessão, call) o mesmo mundo vale para cor e acabamento, com uma densidade de ferramenta: quadro pontilhado, nós contornados em tinta, e sombras suaves só nos componentes que flutuam sobre o quadro.
 
-O estado nunca depende de cor: lê-se pela marca. Nó cheio é o escolhido pela pessoa, contorno sólido é provado, tracejado é caixa preta ou selo inferido, contorno grosso com visto é acerto, contorno duplo cinza é alerta, e o anel arco-íris é o que Puca está explicando agora. Vermelho fica reservado para erro e para encerrar a call.
+O estado nunca depende de cor: lê-se pela marca. Nó cheio é o escolhido pela pessoa, contorno sólido é provado, tracejado é caixa preta ou selo inferido, contorno grosso com visto é acerto, contorno duplo cinza é alerta, e o anel arco-íris é o que o Puca está explicando agora. Vermelho fica reservado para erro e para encerrar a call.
 
 **Key Characteristics:**
-- Preto, branco e cinza; a cor é só a de Puca, em poucos pontos.
+- Preto, branco e cinza; a cor é só a do Puca, em poucos pontos.
 - Estado pela marca (cheio, vazado, tracejado), nunca pela cor.
 - Grade de 12 colunas com fios de 1px; tipo display grande alinhado à esquerda.
 - Títulos em Creato Display (self-hosted), corpo em Inter, nomes de sistema em JetBrains Mono.
@@ -131,14 +131,14 @@ O estado nunca depende de cor: lê-se pela marca. Nó cheio é o escolhido pela 
 
 ## Colors
 
-Monocromático com uma única voz colorida: Puca.
+Monocromático com uma única voz colorida: o Puca.
 
 ### Primary
 - **Tinta** (ink): texto, títulos, botões, contorno e preenchimento dos nós, fios fortes (topo das listas e colunas). Na landing é a tinta de tudo.
-- **Tinta de botão** (ink-button): o preto dos botões escuros, do logo e do cursor de Puca nas telas do app (`--color-ink`).
+- **Tinta de botão** (ink-button): o preto dos botões escuros, do logo e do cursor do Puca nas telas do app (`--color-ink`).
 
 ### Secondary
-- **Arco-íris de Puca** (`--puca-holo-stops`, usado num gradiente cônico em HSL de 330° a 270° com saturação 60–80% e luminosidade 52–68%, girando com `holo-spin` em 6s): a esfera de pontos (faixa gerada no canvas em `hsl(h, 0.75, 0.64)`), o anel de foco do nó que Puca está explicando, o anel da orbe pequena e as partículas do fundo (`hsla(h, 75%, 62%, 0.25–0.75)`). Não é um valor sólido: é sempre o gradiente ou o tom girando. Os stops exatos ficam em `src/styles/tokens.css`.
+- **Arco-íris do Puca** (`--puca-holo-stops`, usado num gradiente cônico em HSL de 330° a 270° com saturação 60–80% e luminosidade 52–68%, girando com `holo-spin` em 6s): a esfera de pontos (faixa gerada no canvas em `hsl(h, 0.75, 0.64)`), o anel de foco do nó que o Puca está explicando, o anel da orbe pequena e as partículas do fundo (`hsla(h, 75%, 62%, 0.25–0.75)`). Não é um valor sólido: é sempre o gradiente ou o tom girando. Os stops exatos ficam em `src/styles/tokens.css`.
 
 ### Tertiary
 - **Vermelho de erro** (danger, danger-soft, danger-text, danger-bg): só erro e o botão de encerrar a call. Nunca decorativo, nunca para estado de jornada.
@@ -153,9 +153,9 @@ Monocromático com uma única voz colorida: Puca.
 - **Ponto da esfera** (puca-sphere-dot): os pontos de fundo da esfera, só `#rrggbb` porque o canvas lê o valor.
 
 ### Named Rules
-**The Única Cor Rule.** A única cor fora do preto, branco e cinza é o arco-íris de Puca, e ele marca Puca: a esfera, o foco dela no quadro, as partículas. Nada mais ganha cor de marca, nem botão, nem link, nem fundo.
+**The Única Cor Rule.** A única cor fora do preto, branco e cinza é o arco-íris do Puca, e ele marca o Puca: a esfera, o foco dela no quadro, as partículas. Nada mais ganha cor de marca, nem botão, nem link, nem fundo.
 
-**The Marca, Não Cor Rule.** Estado se lê pela marca: cheio (escolhido), contorno sólido (provado), tracejado (caixa preta / selo inferido), contorno grosso com visto (acerto), contorno duplo cinza (alerta), anel arco-íris (foco de Puca). Se um estado só se distingue pela cor, está errado.
+**The Marca, Não Cor Rule.** Estado se lê pela marca: cheio (escolhido), contorno sólido (provado), tracejado (caixa preta / selo inferido), contorno grosso com visto (acerto), contorno duplo cinza (alerta), anel arco-íris (foco do Puca). Se um estado só se distingue pela cor, está errado.
 
 **The Vermelho Só Para Parar Rule.** Vermelho é erro e encerrar. Só isso.
 
@@ -185,7 +185,7 @@ Movimento: entrada de 18px com fade em 0.9s `cubic-bezier(0.16, 1, 0.3, 1)`; bot
 
 ## Elevation & Depth
 
-A landing é plana: profundidade vem de fio, contorno e tom, nunca de sombra. A única camada sobreposta é a navegação fixa, papel a 92% com blur de 8px e fio embaixo, e o canvas de partículas atrás de todo o conteúdo. No app, componentes que flutuam sobre o quadro (câmera de Puca, chips, painéis) usam sombras empilhadas suaves e neutras; os nós do quadro usam a sombra "desenhada" leve.
+A landing é plana: profundidade vem de fio, contorno e tom, nunca de sombra. A única camada sobreposta é a navegação fixa, papel a 92% com blur de 8px e fio embaixo, e o canvas de partículas atrás de todo o conteúdo. No app, componentes que flutuam sobre o quadro (câmera do Puca, chips, painéis) usam sombras empilhadas suaves e neutras; os nós do quadro usam a sombra "desenhada" leve.
 
 ### Shadow Vocabulary
 - **Chip** (`box-shadow: 0 1px 1px rgba(0,0,0,0.06), 0 2px 2px rgba(0,0,0,0.06)`): chips e pílulas do app.
@@ -198,7 +198,7 @@ A landing é plana: profundidade vem de fio, contorno e tom, nunca de sombra. A 
 
 ## Shapes
 
-Cantos gentis e consistentes: 6px (marca, skip link), 10px (cartão do nó), 12px (nós), 16px (moldura do quadro, câmera), 22px (nós em pílula: fila e DLQ), pílula total para botões e etiquetas, círculo para a esfera e a orbe. Bordas são a linguagem principal: 1px em fio cinza para divisão, 1px em tinta para molduras e topo de listas, 1.5px em tinta nos nós e ligações (`vector-effect: non-scaling-stroke`), tracejado para caixa preta. O anel de Puca fica 7px fora do nó, com 2.5–3px de espessura e raio acompanhando o do nó (+7px).
+Cantos gentis e consistentes: 6px (marca, skip link), 10px (cartão do nó), 12px (nós), 16px (moldura do quadro, câmera), 22px (nós em pílula: fila e DLQ), pílula total para botões e etiquetas, círculo para a esfera e a orbe. Bordas são a linguagem principal: 1px em fio cinza para divisão, 1px em tinta para molduras e topo de listas, 1.5px em tinta nos nós e ligações (`vector-effect: non-scaling-stroke`), tracejado para caixa preta. O anel do Puca fica 7px fora do nó, com 2.5–3px de espessura e raio acompanhando o do nó (+7px).
 
 ## Components
 
@@ -219,25 +219,25 @@ Lista ordenada entre fios de 1px. Cada item é um botão: nome em Title; inativo
 - **Padrão:** papel, contorno de 1.5px em tinta, raio 12px, rótulo pequeno em Inter 11px cinza acima do nome em mono 14px.
 - **Escolhido pela pessoa:** cheio em tinta, texto papel.
 - **Caixa preta:** contorno tracejado, texto cinza.
-- **Foco de Puca:** o anel arco-íris girando 7px fora do nó.
+- **Foco do Puca:** o anel arco-íris girando 7px fora do nó.
 - **Cartão do nó:** papel, fio de 1px em tinta, raio 10px, nome em mono 500, responsável em cinza, etiqueta em pílula com contorno de tinta (ex.: provado / inferido).
 - **Quadro:** moldura de 1px em tinta, raio 16px, barra superior e legenda separadas por fio, fundo pontilhado (1px a cada 18px).
 
-### Esfera de Puca (Signature)
-Esfera de pontos cinza-claros com uma faixa em onda em arco-íris metálico, gerada no canvas; muda de estado (fala, pensa) e reage ao cursor. Em tamanho grande na seção de Puca (4 colunas), e como orbe de 52px com anel `--puca-holo` ao lado da fala no quadro. As partículas do fundo são os pontos da esfera soltos: até 140 pontos de 1.2–3.8px subindo devagar num canvas fixo atrás da página, com o tom girando.
+### Esfera do Puca (Signature)
+Esfera de pontos cinza-claros com uma faixa em onda em arco-íris metálico, gerada no canvas; muda de estado (fala, pensa) e reage ao cursor. Em tamanho grande na seção do Puca (4 colunas), e como orbe de 52px com anel `--puca-holo` ao lado da fala no quadro. As partículas do fundo são os pontos da esfera soltos: até 140 pontos de 1.2–3.8px subindo devagar num canvas fixo atrás da página, com o tom girando.
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** usar só as variáveis de `src/styles/tokens.css`; nada de hex solto.
-- **Do** marcar estado por cheio, contorno sólido, tracejado e anel de Puca.
-- **Do** reservar o arco-íris para Puca: esfera, foco no quadro, orbe, partículas.
+- **Do** marcar estado por cheio, contorno sólido, tracejado e anel do Puca.
+- **Do** reservar o arco-íris para o Puca: esfera, foco no quadro, orbe, partículas.
 - **Do** separar conteúdo com fios de 1px (#e5e5e5) e marcar o topo de listas e colunas com fio em tinta.
 - **Do** alinhar títulos Creato Display à esquerda na grade de 12 colunas, com tracking negativo.
 - **Do** desligar entrada, anel girando e transições com `prefers-reduced-motion`.
 
 ### Don't:
-- **Don't** dar cor de marca a botão, link, fundo, ícone ou estado de jornada; a cor é de Puca.
+- **Don't** dar cor de marca a botão, link, fundo, ícone ou estado de jornada; a cor é do Puca.
 - **Don't** usar verde, amarelo ou azul para sucesso, aviso ou info: os tokens de estado são preto e cinza de propósito.
 - **Don't** usar vermelho fora de erro e do botão de encerrar.
 - **Don't** colocar sombra em superfícies da landing.

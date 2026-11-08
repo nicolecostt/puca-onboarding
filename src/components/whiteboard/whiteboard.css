@@ -190,7 +190,7 @@
   color: var(--color-danger-text);
 }
 
-/* foco: anel com a cor de Puca (o que ela está explicando agora) */
+/* foco: anel com a cor do Puca (o que ele está explicando agora) */
 .wb-node.is-focus::after {
   content: "";
   position: absolute;
@@ -389,7 +389,7 @@
   }
 }
 
-/* ---- Destaque (Puca chamando atenção): quem tem tom fica forte, o resto apaga ---- */
+/* ---- Destaque (O Puca chamando atenção): quem tem tom fica forte, o resto apaga ---- */
 .wb--highlight .wb-node.is-shown:not([class*="tone-"]),
 .wb--highlight .wb-edge.is-shown:not([class*="tone-"]),
 .wb--highlight .wb-label.is-shown:not([class*="tone-"]),
