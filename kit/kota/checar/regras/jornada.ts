@@ -1,19 +1,19 @@
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
+import { TAREFAS, type TarefaKota } from "../../tarefas/tarefas";
+import type { MapaKota } from "../../tipos";
 import { existe } from "../caminhos";
 import type { ContextoKota, Regra } from "../contexto";
 
-/** O que a regra lê de uma primeira tarefa do catálogo (TarefaKota, da C2). */
-export interface TarefaDaJornada {
-  titulo: string;
-  perfis: ("novo" | "transicao")[];
-}
+/** O que a regra lê de uma primeira tarefa do catálogo: o cartão do nó tem de bater com a issue. */
+export type TarefaDaJornada = Pick<TarefaKota, "titulo" | "perfis" | "sistemas" | "quemAjuda">;
 
 interface NoLido {
   id: string;
   kind: string;
   info?: {
     role?: string;
+    bullets?: string[];
     owner?: string;
     vinculo?: string;
     docs?: { title: string; url?: string }[];
@@ -22,12 +22,6 @@ interface NoLido {
 }
 
 const BLOB = "https://github.com/JucaGF/kota-bank/blob/main/";
-
-// Provisório até a C2 publicar TAREFAS (kit/kota/tarefas/tarefas.ts): os títulos das candidatas do plano.
-export const TAREFAS_DO_PLANO: TarefaDaJornada[] = [
-  { titulo: "Limite de valor por transferência no ledgerwriter", perfis: ["novo"] },
-  { titulo: "Extrato de outra conta responde 403 no transactionhistory", perfis: ["transicao"] },
-];
 
 export function regraJornada(tarefas: TarefaDaJornada[]): Regra {
   return {
@@ -49,7 +43,7 @@ function checarNo(n: NoLido, ctx: ContextoKota, tarefas: TarefaDaJornada[]): str
   return [
     ...(i.docs ?? []).flatMap((d) => checarDoc(d, ctx)),
     ...(i.adr ? checarAdr(i.adr, ctx) : []),
-    ...(n.kind === "task" ? checarTarefa(i.role ?? "", i.vinculo, tarefas) : []),
+    ...(n.kind === "task" ? checarTarefa(i.role ?? "", i.vinculo, i.bullets ?? [], tarefas, ctx.mapa) : []),
     ...[i.owner, i.adr?.owner].flatMap((nome) => checarResponsavel(nome, ctx)),
   ];
 }
@@ -72,11 +66,22 @@ function checarAdr(a: { id: string; title: string }, ctx: ContextoKota): string[
   return a.title === doMapa.titulo ? [] : [`${a.id} com título "${a.title}", no mapa "${doMapa.titulo}"`];
 }
 
-function checarTarefa(titulo: string, vinculo: string | undefined, tarefas: TarefaDaJornada[]): string[] {
+function checarTarefa(titulo: string, vinculo: string | undefined, bullets: string[], tarefas: TarefaDaJornada[], m: MapaKota): string[] {
   const t = tarefas.find((x) => x.titulo === titulo);
   if (!t) return [`tarefa "${titulo}" fora do catálogo de primeira tarefa`];
   if (vinculo && !t.perfis.includes(vinculo as TarefaDaJornada["perfis"][number])) return [`tarefa "${titulo}" não é do vínculo ${vinculo}`];
-  return [];
+  // a página da tarefa e o pedido ao gestor saem destes bullets (src/journey/primeira-tarefa.ts)
+  const campo = (prefixo: string) => bullets.find((b) => b.startsWith(prefixo)) ?? "";
+  const sistemas = campo("Sistemas:");
+  const quemAjuda = campo("Quem ajuda:");
+  const daIssue = t.quemAjuda.map((id) => m.pessoas.find((p) => p.id === id)?.nome ?? id);
+  return [
+    ...t.sistemas.filter((s) => !sistemas.includes(s)).map((s) => `tarefa "${titulo}" sem o sistema ${s} em "Sistemas:"`),
+    ...daIssue.filter((nome) => !quemAjuda.includes(nome)).map((nome) => `tarefa "${titulo}" sem ${nome} em "Quem ajuda:", como na issue`),
+    ...m.pessoas
+      .filter((p) => !daIssue.includes(p.nome) && quemAjuda.includes(p.nome))
+      .map((p) => `tarefa "${titulo}" com ${p.nome} em "Quem ajuda:", que a issue não cita`),
+  ];
 }
 
 function checarResponsavel(nome: string | undefined, ctx: ContextoKota): string[] {
@@ -84,4 +89,4 @@ function checarResponsavel(nome: string | undefined, ctx: ContextoKota): string[
   return ctx.mapa.pessoas.some((p) => p.nome === nome) ? [] : [`responsável "${nome}" não é uma pessoa da Kota`];
 }
 
-export const regraJornadaDaKota = regraJornada(TAREFAS_DO_PLANO);
+export const regraJornadaDaKota = regraJornada(TAREFAS);

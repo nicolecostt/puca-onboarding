@@ -142,3 +142,39 @@ describe("routeUtterance: dúvida da primeira tarefa (#79)", () => {
     expect(routeUtterance("o que é a primeira tarefa?", ctx).kind).toBe("faq");
   });
 });
+
+describe("routeUtterance: perguntas sobre a Kota que o caminho local responde", () => {
+  function em(momento: string, passo: string, vinculo: "novo" | "transicao" = "novo"): RouteContext {
+    const m = journey.moments.find((x) => x.id === momento)!;
+    const s = m.steps.find((x) => x.id === passo)!;
+    const board = m.view && "board" in m.view ? (m.view.board ?? null) : null;
+    return { journey, moment: m, step: s, waiting: null, board, faqs: buildFaqs(journey, DEMO_PROFILES[vinculo]) };
+  }
+  const texto = (r: ReturnType<typeof routeUtterance>) => (r.kind === "faq" ? r.faq.text : r.kind === "knowledge" ? r.text : "");
+
+  it("o ADR citado pelo número responde com o resumo dele, nunca com a frase de outro ADR", () => {
+    const pg = em("pagamentos", "pg-ledgerwriter");
+    expect(routeUtterance("o que diz o ADR 1?", pg)).toMatchObject({ kind: "faq" });
+    expect(texto(routeUtterance("o que diz o ADR 1?", pg))).toContain("ADR-0001");
+    expect(texto(routeUtterance("o que diz o ADR 2?", pg))).toContain("ADR-0002");
+    // fora do quadro do nó: a resposta vem, sem mexer num quadro que não está na tela
+    const doTime = routeUtterance("o que diz o ADR 1?", em("seu-time", "st-time"));
+    expect(doTime).toMatchObject({ kind: "faq", faq: { actions: [] } });
+    expect(texto(doTime)).toContain("ADR-0001");
+    // ADR sem nó no quadro: não responde com a frase de outro ADR
+    for (const fala of ["o que diz o ADR 7?", "o que diz o ADR 5?"]) {
+      const t = texto(routeUtterance(fala, pg));
+      expect(t.match(/ADR[ -]0*(\d)/g)?.every((x) => x.endsWith(fala.match(/\d/)![0])) ?? true, `${fala} => ${t}`).toBe(true);
+    }
+  });
+
+  it("quem é a gestora e a buddy responde com o nome da pessoa", () => {
+    for (const vinculo of ["novo", "transicao"] as const) {
+      const time = em("seu-time", "st-time", vinculo);
+      for (const fala of ["quem é a minha gestora?", "quem é o meu gestor?", "quem é a gestora do time?"]) {
+        expect(texto(routeUtterance(fala, time)), fala).toContain("Natália Brandão");
+      }
+      expect(texto(routeUtterance("quem é a minha buddy?", time))).toContain("Beatriz Cavalcanti");
+    }
+  });
+});
