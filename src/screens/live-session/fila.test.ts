@@ -41,7 +41,7 @@ function montar() {
 }
 
 describe("drenar (fila do Slack)", () => {
-  it("encaminhamento criado enquanto a Puca digita o pedido também sai", async () => {
+  it("encaminhamento criado enquanto Puca digita o pedido também sai", async () => {
     const t = montar();
     t.pedidos.add({ pessoa: "Bruno", gestor: "Marcos Vidal", tarefa: tarefaDoNo(taskDlq)!, moment: "primeira-tarefa" });
     await drenar({
@@ -52,7 +52,7 @@ describe("drenar (fila do Slack)", () => {
       },
       pedir: async (p) => {
         t.feitos.push(`pediu: ${p.tarefa.no}`);
-        // a pessoa pergunta algo sem fonte enquanto a Puca ainda digita o pedido
+        // a pessoa pergunta algo sem fonte enquanto Puca ainda digita o pedido
         t.outbox.add(duvida("Quem cuida do tail-common?"));
         t.pedidos.setStatus(p.id, "aguardando");
       },

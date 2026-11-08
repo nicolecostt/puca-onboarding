@@ -1,6 +1,6 @@
 /* Início do Orbis no visual da landing (DESIGN.md): papel branco, tinta preta, fios de 1px,
    títulos em Creato Display. Estado pela marca (cheio, anel, tracejado, vazado), nunca pela cor.
-   A cor da Puca só na esfera do aviso, na câmera e nas partículas. */
+   A cor de Puca só na esfera do aviso, na câmera e nas partículas. */
 :root {
   --ink: var(--color-text);
   --paper: var(--color-surface);
@@ -73,7 +73,7 @@ body {
 }
 
 .brand__mark {
-  /* logo: as bolinhas da Puca (src/assets/orbis-logo.png) */
+  /* logo: as bolinhas de Puca (src/assets/orbis-logo.png) */
   display: block;
   flex: none;
   width: 26px;
@@ -212,7 +212,7 @@ body {
 /* ---- Página ---- */
 .page {
   padding-top: 32px;
-  padding-bottom: 160px; /* espaço do botão da Puca */
+  padding-bottom: 160px; /* espaço do botão de Puca */
 }
 
 h2 {
@@ -351,7 +351,7 @@ h2 {
   transform: scale(0.98);
 }
 
-/* ---- Aviso da Puca ---- */
+/* ---- Aviso de Puca ---- */
 .notice {
   display: flex;
   align-items: center;

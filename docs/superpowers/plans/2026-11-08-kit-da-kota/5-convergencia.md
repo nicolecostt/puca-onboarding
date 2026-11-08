@@ -24,7 +24,7 @@
 1. **Arquivo da oficina que nenhum passo do histórico cobre** sumiria do repo público. Esperado: o script para antes do primeiro commit e lista os arquivos. Teste em C1.
 2. **Branch `tarefa/<n>` que falha pelo motivo errado** (erro de compilação em vez do teste esperado). Esperado: a publicação confere que a saída cita `testeQueFalha` e que o resto passa. Teste em C2.
 3. **Nó da jornada que cita um ADR com título antigo** depois de uma mudança no mapa. Esperado: a regra `jornada` acusa. Teste em C4.
-4. **Página do Notion editada direto na interface** e diferente da fonte que a Puca lê. Esperado: C3 lista a diferença. Teste em C3.
+4. **Página do Notion editada direto na interface** e diferente da fonte que Puca lê. Esperado: C3 lista a diferença. Teste em C3.
 5. **Jurado sem o Slack ou sem o Orbis instalado** tentando seguir o guia. Esperado: o guia diz o que fazer em cada caso, e o teste na máquina limpa passa por ele. Conferido em C5.
 
 ---

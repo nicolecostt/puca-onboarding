@@ -72,7 +72,7 @@ export interface BoardNode {
   caption?: string;
   /** Texto do selo embaixo do nó (ex.: "caixa preta · aguardando Carla"). */
   note?: string;
-  /** Detalhes ao clicar no nó (ou quando a Puca abre o cartão). */
+  /** Detalhes ao clicar no nó (ou quando Puca abre o cartão). */
   details?: NodeDetails;
 }
 

@@ -25,7 +25,7 @@ Você pede os acessos ao seu gestor, que aprova cada um. Se no fim do segundo di
 - [ ] Homologação. Toda a engenharia tem acesso, sempre com dados de teste.
 - [ ] Docker na sua máquina. É o único requisito para subir o banco e rodar os testes.
 - [ ] Convites dos rituais do seu time, que o gestor manda. Quais são e para que servem está em [Rituais](notion:rituais).
-- [ ] Orbis, onde a Puca conduz a sua call inicial e as suas sessões.
+- [ ] Orbis, onde Puca conduz a sua call inicial e as suas sessões.
 
 O acesso a produção não entra nesta lista. Ninguém precisa dele na primeira semana, e as regras estão em [Segurança e acesso a produção](notion:seguranca-e-acesso).
 
@@ -35,7 +35,7 @@ O acesso a produção não entra nesta lista. Ninguém precisa dele na primeira 
 
 - Conversa de boas-vindas com o gestor. Ele conta o que o time faz, o que vem nas primeiras semanas e quem é o seu buddy.
 - Conversa com o buddy. Combinem um horário fixo para as dúvidas dos primeiros dias.
-- Call inicial com a Puca, no Orbis. Ela conta como a Kota funciona, pergunta o que você já sabe e monta as suas sessões sobre o time.
+- Call inicial com Puca, no Orbis. Ela conta como a Kota funciona, pergunta o que você já sabe e monta as suas sessões sobre o time.
 - Os acessos da lista acima.
 - [Quem somos](notion:quem-somos) e [Jeito de trabalhar](notion:jeito-de-trabalhar), com calma.
 
@@ -50,7 +50,7 @@ O acesso a produção não entra nesta lista. Ninguém precisa dele na primeira 
 
 ### Quarto e quinto dias
 
-- Pegue a primeira tarefa. É uma das [issues com o label `primeira-tarefa`](https://github.com/JucaGF/kota-bank/issues?q=label%3Aprimeira-tarefa), pequena e com um teste que falha até a tarefa ficar pronta. A Puca escolhe uma do catálogo do time conforme o que você já sabe, e o gestor aprova antes de você começar.
+- Pegue a primeira tarefa. É uma das [issues com o label `primeira-tarefa`](https://github.com/JucaGF/kota-bank/issues?q=label%3Aprimeira-tarefa), pequena e com um teste que falha até a tarefa ficar pronta. Puca escolhe uma do catálogo do time conforme o que você já sabe, e o gestor aprova antes de você começar.
 - Abra o PR quando o teste passar. Não precisa terminar na primeira semana.
 - No fim da semana, uma conversa curta com o gestor sobre o que ficou confuso, o acesso que ainda falta e o que vem na semana seguinte. A conversa é sobre a sua chegada.
 

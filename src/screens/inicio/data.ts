@@ -12,7 +12,7 @@ export interface Tool {
   status: AccessStatus;
 }
 
-/** Ferramentas do time Terminais. A que está "missing" a Puca percebe ao abrir o início e pede ao gestor. */
+/** Ferramentas do time Terminais. A que está "missing" Puca percebe ao abrir o início e pede ao gestor. */
 export const TOOLS: Tool[] = [
   { id: "github", name: "GitHub", use: "Código do terminal-config-api", status: "ok" },
   { id: "slack", name: "Slack", use: "Canal #time-terminais", status: "ok" },
@@ -33,7 +33,7 @@ export interface Task {
 /** Tarefas do início. A primeira tarefa é a do vínculo da pessoa; sem tarefa no catálogo, a linha não aparece. */
 export function tasksFor(tarefa: TarefaDoTime | null, nome: string | undefined): Task[] {
   return [
-    { title: "Call inicial com a Puca", detail: "A Puca já sabe o que você conhece e o que quer aprender.", state: "done" },
+    { title: "Call inicial com Puca", detail: "Puca já sabe o que você conhece e o que quer aprender.", state: "done" },
     {
       title: "Sua primeira sessão",
       detail: "O caminho de uma transação, quando falha e quem cuida de cada parte.",
