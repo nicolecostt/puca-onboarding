@@ -6,6 +6,7 @@ import { randomUUID } from "node:crypto";
 import type { DestinoDoEncaminhamento } from "../../../src/journey/encaminhamento-slack";
 import { looksLikeQuestion } from "../../../src/journey/forwarding";
 import { interpolate } from "../../../src/journey/profile";
+import { lerTarefaDoAgente, type TarefaDoAgente } from "../../../src/journey/tarefas";
 import type { BoardAction, Journey, Moment, Profile, Step } from "../../../src/journey/types";
 import type { TtsService } from "../voice/tts/service";
 import { streamChat, type ChatMessage, type ToolSpec } from "../llm";
@@ -13,6 +14,7 @@ import { destinoPelaFala, estimateTokens, isCasoPessoal, type AskTiming } from "
 import { FAILURE_LINE, pickBridge } from "./bridges";
 import { visibleNodes } from "./prompt";
 import { SentenceSplitter } from "./sentences";
+import { ASSIGN_TASK } from "./tarefa-tool";
 
 export type TurnKind = "inicio" | "seguir" | "fala" | "silencio";
 
@@ -24,6 +26,8 @@ export type TurnEvent =
   | { type: "go_to"; target: string }
   | { type: "check"; entendeu: boolean }
   | { type: "escalate"; summary: string; destino?: DestinoDoEncaminhamento }
+  /** Puca passou uma tarefa (assign_task): a tela grava e mostra em screens/tarefas. */
+  | { type: "tarefa"; tarefa: TarefaDoAgente }
   | { type: "timing"; timing: AskTiming };
 
 export interface TurnInput {
@@ -78,7 +82,13 @@ Fontes:
 - Caso pessoal da pessoa (o meu bônus, o meu salário, as minhas férias, a minha avaliação): diga a regra geral, diga que vai encaminhar para People ou para o gestor e chame escalate_to_buddy com destino "rh" (People) ou "gestor".
 
 Quadro:
-- Use highlight, reveal e open_card só com ids do quadro na tela, enquanto fala do nó.`;
+- Use highlight, reveal e open_card só com ids do quadro na tela, enquanto fala do nó.
+
+Tarefas:
+- Aprender fazendo: no fim de um momento, quando a pessoa entendeu, passe uma tarefa prática e pequena (até 30 minutos) para ela fazer depois da sessão, e chame assign_task.
+- A tarefa sai só das fontes do momento (o repo, a página do Notion, o canal) e começa por um verbo. Diga a tarefa em uma frase antes de chamar a ferramenta.
+- No máximo uma tarefa por momento. Não passe tarefa no meio de uma dúvida nem de uma checagem.
+- A tarefa fecha o momento: no mesmo turno, depois de assign_task, chame next_step.`;
 
 /** A jornada como pauta: momentos, passos, quadros. Sem o perfil preenchido, para o cache valer para todo mundo. */
 export function pautaText(j: Journey): string {
@@ -179,6 +189,7 @@ export function buildTurnTools(j: Journey): ToolSpec[] {
       { summary: { type: "string" }, destino: { type: "string", enum: ["buddy", "gestor", "rh"], description: "Quem recebe na empresa. Sem destino, a buddy." } },
       ["summary"],
     ),
+    ASSIGN_TASK,
   ];
 }
 
@@ -202,6 +213,7 @@ export async function turn(input: TurnInput, emit: (ev: TurnEvent) => void): Pro
   const splitter = new SentenceSplitter();
   let moved = false;
   let spoke = false;
+  let assigned = false;
   let escalation: string | null = null;
   let escalationDestino: DestinoDoEncaminhamento | undefined;
   let falado = "";
@@ -249,6 +261,12 @@ export async function turn(input: TurnInput, emit: (ev: TurnEvent) => void): Pro
           escalation = a.summary?.trim() || input.text || "";
           escalationDestino = (["buddy", "gestor", "rh"] as const).find((d) => d === (a as { destino?: unknown }).destino);
         }
+      } else if (ev.name === "assign_task") {
+        const tarefa = lerTarefaDoAgente(ev.args);
+        if (tarefa) {
+          assigned = true;
+          emit({ type: "tarefa", tarefa });
+        }
       } else if (!moved && ev.name === "next_step") {
         moved = true;
         emit(a.reply ? { type: "next_step", reply: a.reply } : { type: "next_step" });
@@ -259,6 +277,11 @@ export async function turn(input: TurnInput, emit: (ev: TurnEvent) => void): Pro
     }
     const rest = splitter.flush();
     if (rest) sentence(rest);
+    // tarefa só sai no fim do momento: se o LLM esqueceu o next_step, a sessão não fica parada no passo (revisão do #223)
+    if (assigned && !moved) {
+      moved = true;
+      emit({ type: "next_step" });
+    }
   } catch {
     timing.llm_error = input.signal?.aborted ? "interrupted" : ac.signal.aborted ? "timeout" : "provider_error";
   } finally {
@@ -274,7 +297,7 @@ export async function turn(input: TurnInput, emit: (ev: TurnEvent) => void): Pro
     timing.tokens_out = estimateTokens(outChars);
   }
   if (refused) timing.llm_error = "refusal";
-  if (!spoke && !moved && !escalation && !timing.llm_error) timing.llm_error = "empty_response";
+  if (!spoke && !moved && !escalation && !assigned && !timing.llm_error) timing.llm_error = "empty_response";
   if (timing.llm_error && timing.llm_error !== "interrupted") say(FAILURE_LINE, "fallback");
   else if ((escalation || isCasoPessoal(input.text ?? "")) && !input.signal?.aborted && input.kind === "fala" && looksLikeQuestion(input.text ?? "")) {
     // caso pessoal encaminha mesmo sem a tool (o LLM às vezes só explica a regra), como no /api/ask (#189).

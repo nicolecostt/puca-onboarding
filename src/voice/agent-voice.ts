@@ -2,6 +2,7 @@
 // e microfone (Deepgram) com barge-in. Sem servidor ou sem chaves, cada parte desliga sozinha e a
 // tela segue como antes (legenda e chat).
 import type { DestinoDoEncaminhamento } from "../journey/encaminhamento-slack";
+import type { TarefaDoAgente } from "../journey/tarefas";
 import type { BoardAction, Profile } from "../journey/types";
 import { classifyBargeIn } from "./barge-in";
 import { startMic, type Mic } from "./mic";
@@ -69,6 +70,8 @@ export interface AskHandlers {
   onEscalate?(summary: string, destino?: DestinoDoEncaminhamento): void;
   /** Trechos do kit da Kota que a resposta citou (título e URL pública; URL vazia quando a página não tem). */
   onFontes?(fontes: { titulo: string; url: string }[]): void;
+  /** Call e turno: Puca passou uma tarefa (assign_task). */
+  onTarefa?(tarefa: TarefaDoAgente): void;
   /** Tempo e tokens do pedido (último evento; não chega se a pessoa interrompeu). Custo da sessão, #52. */
   onTiming?(timing: AskTimingSummary): void;
 }
@@ -394,7 +397,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
                 if (!block.startsWith("data: ")) continue;
                 const ev = JSON.parse(block.slice(6));
                 if (!ev || typeof ev.type !== "string") throw new Error("Resposta SSE inválida");
-                if (ev.source !== "fallback" && ["speak", "action", "go_to", "next_step", "check", "answer", "culture", "done", "escalate"].includes(ev.type)) received = true;
+                if (ev.source !== "fallback" && ["speak", "action", "go_to", "next_step", "check", "answer", "culture", "done", "escalate", "tarefa"].includes(ev.type)) received = true;
                 if (ev.type === "speak" && ev.source === "fallback") {
                   // a fala de falha do servidor não toca: quem decide o que dizer na falha é a tela (o `llm_error` vem no `timing`)
                   failed = true;
@@ -427,6 +430,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
                 else if (ev.type === "done") h.onDone?.();
                 else if (ev.type === "escalate") h.onEscalate?.(ev.summary, ev.destino);
                 else if (ev.type === "fontes") h.onFontes?.(ev.fontes);
+                else if (ev.type === "tarefa") h.onTarefa?.(ev.tarefa);
                 else if (ev.type === "timing") {
                   if (!ev.timing || typeof ev.timing !== "object") throw new Error("Tempo SSE inválido");
                   failed ||= !!ev.timing.llm_error;

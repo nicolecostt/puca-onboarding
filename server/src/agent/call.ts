@@ -6,8 +6,10 @@ import type { TtsService } from "../voice/tts/service";
 import { streamChat, type ChatMessage, type ToolSpec } from "../llm";
 import { estimateTokens, type AskTiming } from "./ask";
 import { FAILURE_LINE, pickBridge } from "./bridges";
+import { lerTarefaDoAgente, type TarefaDoAgente } from "../../../src/journey/tarefas";
 import { vinculoFromAnswer } from "../../../src/journey/profile";
 import { SentenceSplitter } from "./sentences";
+import { ASSIGN_TASK } from "./tarefa-tool";
 import type { Brain } from "../brain/brain";
 
 const MAX_TRECHO = 600;
@@ -31,6 +33,8 @@ export type CallEvent =
   | { type: "answer"; key: CampoDaCall; value: string }
   /** Puca contou um assunto do onboarding cultural. */
   | { type: "culture"; topic: string }
+  /** Puca passou uma tarefa de preparação (assign_task): a tela grava e mostra em screens/tarefas. */
+  | { type: "tarefa"; tarefa: TarefaDoAgente }
   /** A call acabou: a tela grava o perfil e a calibragem e segue para as boas-vindas. */
   | { type: "done" }
   | { type: "timing"; timing: AskTiming };
@@ -82,7 +86,7 @@ Perguntas norteadoras (a pauta da call, não um roteiro: diga com as suas palavr
 6. O que ela já sabe de banco digital (transferência, saldo, extrato; vai na chave pagamentos), de mensageria (Kafka, filas) e de falhas (retry, fila de erro).
 7. O que ela quer conseguir nas primeiras semanas.
 8. Como ela aprende melhor: lendo, vendo alguém fazer ou fazendo junto.
-9. Feche: agradeça, diga em uma frase o que você vai preparar e chame end_call.
+9. Feche: agradeça, diga em uma frase o que você vai preparar, passe uma tarefa de preparação para antes da primeira sessão (ex.: entrar nos canais do time, ler uma página do Notion que ela citou) dizendo-a em uma frase e chamando assign_task, e chame end_call.
 
 Follow-ups:
 - Resposta vaga ou curta: faça um follow-up curto antes de seguir ("o que você fazia nessa agência?").
@@ -100,19 +104,25 @@ Anotações:
 - O cultural está no "Ainda falta": intercale um assunto cultural a cada uma ou duas perguntas, e chame culture_told no turno em que contou.
 - Só chame end_call depois de cobrir a pauta (ou se a pessoa pedir para encerrar).`;
 
-export function callContext(input: CallInput): string {
-  const a = input.admissao;
-  const anotado = Object.entries(input.anotado).filter(([, v]) => v);
+/** O que ainda falta na pauta da call: campos sem anotação e assuntos culturais não contados. */
+export function faltaNaCall(anotado: CallInput["anotado"], cultura: string[]): string[] {
   // o time anterior e o que aproveita só valem para quem está mudando de time
   const daTransicao = new Set(["time_anterior", "aproveita", "diferencas"]);
   // a mesma leitura do cliente (vinculoFromAnswer): "transição" ou "mudando de time" também são transição (revisão do #221)
-  const transicao = !!input.anotado.vinculo && vinculoFromAnswer(input.anotado.vinculo) === "transicao";
-  const faltam: string[] = CAMPOS_DA_CALL.filter((k) => !input.anotado[k] && (transicao || !daTransicao.has(k)));
+  const transicao = !!anotado.vinculo && vinculoFromAnswer(anotado.vinculo) === "transicao";
+  const faltam: string[] = CAMPOS_DA_CALL.filter((k) => !anotado[k] && (transicao || !daTransicao.has(k)));
   // a cultura só entra depois de saber o vínculo (novo ouve a empresa; transição ouve o time)
-  if (input.anotado.vinculo) {
-    const temas = CULTURA[transicao ? "transicao" : "novo"].filter((t) => !input.cultura.includes(t));
+  if (anotado.vinculo) {
+    const temas = CULTURA[transicao ? "transicao" : "novo"].filter((t) => !cultura.includes(t));
     faltam.push(...temas.map((t) => `cultura:${t} (conte em um trecho curto e chame culture_told)`));
   }
+  return faltam;
+}
+
+export function callContext(input: CallInput): string {
+  const a = input.admissao;
+  const anotado = Object.entries(input.anotado).filter(([, v]) => v);
+  const faltam = faltaNaCall(input.anotado, input.cultura);
   return [
     `Admissão (confirme, não pergunte): ${a.nome ? `nome ${a.nome}, ` : ""}cargo ${a.cargo ?? "?"}, time ${a.time ?? "?"}, gestor ${a.gestor ?? "?"}.`,
     `Já anotado: ${anotado.length ? anotado.map(([k, v]) => `${k}=${v}`).join("; ") : "nada"}.`,
@@ -159,6 +169,7 @@ export const CALL_TOOLS: ToolSpec[] = [
       parameters: { type: "object", properties: { topic: { type: "string", enum: TEMAS_DE_CULTURA } }, required: ["topic"] },
     },
   },
+  ASSIGN_TASK,
   { type: "function", function: { name: "end_call", description: "Encerra a call depois de cobrir a pauta.", parameters: { type: "object", properties: {}, required: [] } } },
 ];
 
@@ -179,6 +190,10 @@ export async function callTurn(input: CallInput, emit: (ev: CallEvent) => void):
   const splitter = new SentenceSplitter();
   let spoke = false;
   let ended = false;
+  // o que este turno anotou e contou, para saber se a pauta fechou quando vier uma tarefa
+  const anotadoAgora: CallInput["anotado"] = { ...input.anotado };
+  const culturaAgora = [...input.cultura];
+  let tarefaPassada = false;
   let usage: { input: number; output: number } | null = null;
   let sentChars: number | null = null;
   let outChars = 0;
@@ -206,15 +221,24 @@ export async function callTurn(input: CallInput, emit: (ev: CallEvent) => void):
       if (ev.name === "answer" && CAMPOS_DA_CALL.includes(a.key as CampoDaCall) && a.value?.trim()) {
         // o vínculo sai já no valor do contrato ("novo" ou "transicao"), para tela e servidor lerem igual
         const value = a.key === "vinculo" ? vinculoFromAnswer(a.value) : a.value.trim().slice(0, 300);
+        anotadoAgora[a.key as CampoDaCall] = value;
         emit({ type: "answer", key: a.key as CampoDaCall, value });
       } else if (ev.name === "culture_told" && TEMAS_DE_CULTURA.includes((ev.args as { topic?: string }).topic ?? "")) {
+        culturaAgora.push((ev.args as { topic: string }).topic);
         emit({ type: "culture", topic: (ev.args as { topic: string }).topic });
+      } else if (ev.name === "assign_task") {
+        const tarefa = lerTarefaDoAgente(ev.args);
+        if (tarefa) emit({ type: "tarefa", tarefa });
+        tarefaPassada = true;
       } else if (ev.name === "end_call" && !ended) {
         ended = true;
       }
     }
     const rest = splitter.flush();
     if (rest) sentence(rest);
+    // a tarefa de preparação é o fechamento: sem end_call (o LLM esqueceu), a call acaba igual (revisão do #223).
+    // Só fecha com a pauta coberta; uma tarefa cedo fica gravada e a call segue.
+    if (tarefaPassada && faltaNaCall(anotadoAgora, culturaAgora).length === 0) ended = true;
   } catch {
     timing.llm_error = input.signal?.aborted ? "interrupted" : ac.signal.aborted ? "timeout" : "provider_error";
   } finally {

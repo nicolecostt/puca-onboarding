@@ -68,3 +68,25 @@ describe("createAgentVoice com o áudio bloqueado", () => {
     await expect(asked).resolves.toBe(true);
   });
 });
+
+describe("createAgentVoice: tarefa do agente", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("o evento tarefa chega no onTarefa", async () => {
+    const tarefa = { titulo: "Rodar o ledgerwriter", porque: "Grava cada transferência.", passos: ["Clone o repo"] };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        if (url === "/api/health") return new Response(JSON.stringify({ tts: false, stt: false }));
+        return new Response(`data: ${JSON.stringify({ type: "tarefa", tarefa })}\n\ndata: {"type":"next_step"}\n\n`);
+      }),
+    );
+    const voice = await createAgentVoice();
+    const recebidas: unknown[] = [];
+    await voice.turn(
+      { kind: "seguir", moment_id: "m", step_id: "s", perfil: "novo", history: [] } as unknown as Parameters<typeof voice.turn>[0],
+      { onSpeak: async () => {}, onAction: () => {}, onGoTo: () => {}, onTarefa: (t) => void recebidas.push(t) },
+    );
+    expect(recebidas).toEqual([tarefa]);
+  });
+});
