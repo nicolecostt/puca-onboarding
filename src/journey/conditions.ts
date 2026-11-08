@@ -102,14 +102,20 @@ export function matchFaq<T extends { node: string; label: string; intent: FaqInt
   const said = ` ${normalize(text)} `;
   const words = keywords(text);
   const intent = detectIntent(text);
-  const mentions = (f: T) => {
+  // Tamanho do trecho da fala que cita o nó (0 = não cita). Vale o nó citado pelo trecho mais longo:
+  // "config-topic" cita o nó config-topic, e não o nó "topic", cujo id está dentro do nome.
+  const mention = (f: T): number => {
     const label = normalize(f.label);
-    if (said.includes(` ${label} `) || said.includes(` ${normalize(f.node)} `)) return true;
+    const node = normalize(f.node);
+    const exact = Math.max(said.includes(` ${label} `) ? label.length : 0, said.includes(` ${node} `) ? node.length : 0);
+    if (exact) return exact;
     const lk = keywords(f.label);
-    return lk.length > 0 && lk.every((k) => words.some((w) => sameWord(w, k)));
+    return lk.length > 0 && lk.every((k) => words.some((w) => sameWord(w, k))) ? label.length : 0;
   };
-  const hit = faqs.filter(mentions);
-  if (!hit.length) return { faq: null, score: 0 };
+  const sizes = faqs.map(mention);
+  const longest = Math.max(0, ...sizes);
+  if (!longest) return { faq: null, score: 0 };
+  const hit = faqs.filter((_, i) => sizes[i] === longest);
   const exact = intent && hit.find((f) => f.intent === intent);
   if (exact) return { faq: exact, score: 1 };
   return { faq: hit.find((f) => f.intent === "what") ?? null, score: intent ? 0.3 : 0.5 };
