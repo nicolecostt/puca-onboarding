@@ -30,6 +30,43 @@ body.has-agent-cam:not(.is-call-off) .lesson__board {
   background: none;
 }
 
+/* ---- Navegador da Puca (só no app para Mac) ----
+   A área tem a mesma posição do quadro; o app põe a página por cima dela, então nada da sessão entra aqui. */
+.lesson__navegador {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+/* Abas Quadro/Navegador: na faixa do título, à direita, acima da área do navegador */
+.palco-abas {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+.palco-abas[hidden] {
+  display: none;
+}
+.palco-abas button {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-muted);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+.palco-abas button[aria-pressed="true"] {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
 /* ---- Abertura e encerramento (vista "logo") ---- */
 .opening {
   position: absolute;

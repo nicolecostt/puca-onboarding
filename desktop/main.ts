@@ -3,6 +3,7 @@
 import { app, BrowserWindow, dialog, Menu, net, protocol, session, shell, systemPreferences } from "electron";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { ligarNavegador } from "./navegador";
 
 const ORIGEM = "app://orbis";
 const DEV_URL = process.env.ORBIS_DEV_URL?.replace(/\/+$/, "");
@@ -162,6 +163,7 @@ app.whenReady().then(async () => {
   const microfone = process.platform === "darwin" ? await systemPreferences.askForMediaAccess("microphone").catch(() => false) : true;
 
   const win = abrirJanela();
+  ligarNavegador(win);
   if (!microfone) win.webContents.once("did-finish-load", () => void avisarMicrofoneNegado(win));
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) abrirJanela();
