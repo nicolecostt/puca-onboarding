@@ -6,7 +6,6 @@ import "./style.css";
 import { activeProfile } from "../../data";
 import { mountEscolhaPerfil } from "../../components/escolha-perfil/escolha-perfil";
 import { ID_DO_VINCULO } from "../../journey/escolha";
-import { sessionCompleted } from "../../journey/session-progress";
 import { loadSavedProfile } from "../../journey/profile";
 import { preserveProfileLinks } from "../../lib/navigation";
 import { qs } from "../../lib/dom";
@@ -14,7 +13,7 @@ import { mountPucaParticles } from "../../lib/puca-particles";
 
 const savedProfile = loadSavedProfile();
 if (savedProfile) {
-  location.replace(sessionCompleted(savedProfile) ? "../inicio/" : "../lesson/");
+  location.replace("../inicio/"); // depois da call, o Início vem primeiro e leva à sessão
 } else if (new URLSearchParams(location.search).get("perfil")) {
   // perfil já escolhido no endereço (link de apresentação): cumprimenta e vai direto para a call
   preserveProfileLinks();
