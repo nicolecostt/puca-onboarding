@@ -23,14 +23,21 @@ const QUEM: Record<PedidoDeEncaminhamento["destino"], (para: string) => string> 
 /** Texto vindo do app: o Slack lê `<...>` como menção, <!channel> ou link disfarçado; escapado, vira texto. */
 const semComando = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-/** Texto da mensagem: a quem iria na Kota, a dúvida, o que foi consultado e o motivo. Sem o nome digitado. */
+/** Quantas fontes a mensagem lista; o resto vira "e mais N". */
+const MAX_FONTES = 3;
+
+/**
+ * Texto da mensagem: a quem iria na Kota, a dúvida, o que foi consultado e o motivo. Quem lê é o próprio jurado, então
+ * o resumo do agente (escrito para a buddy, em terceira pessoa, com o nome e o gênero da pessoa) não entra.
+ */
 export function mensagemDoEncaminhamento(p: PedidoDeEncaminhamento): string {
-  const fontes = p.fontes_consultadas.length ? p.fontes_consultadas.map(semComando).join("; ") : "não achei nenhuma fonte sobre isso.";
+  const lista = p.fontes_consultadas.slice(0, MAX_FONTES).map(semComando).join("; ");
+  const resto = p.fontes_consultadas.length - MAX_FONTES;
+  const fontes = !p.fontes_consultadas.length ? "não achei nenhuma fonte sobre isso." : resto > 0 ? `${lista} e mais ${resto}` : lista;
   return [
     "Oi! Aqui é o Puca, do Orbis.",
     `Você me fez uma pergunta que eu não consegui responder com segurança. Na Kota, ela iria para ${QUEM[p.destino](semComando(p.para))}.`,
     `*Pergunta:* "${semComando(p.pergunta)}"`,
-    ...(p.resumo && p.resumo !== p.pergunta ? [`*Resumo:* ${semComando(p.resumo)}`] : []),
     `*O que eu já consultei:* ${fontes}`,
     `*Por que não respondi:* ${semComando(p.motivo)}`,
   ].join("\n");

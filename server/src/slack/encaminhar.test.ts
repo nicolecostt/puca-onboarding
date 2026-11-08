@@ -117,6 +117,20 @@ describe("mensagemDoEncaminhamento", () => {
     expect(mensagemDoEncaminhamento(pedido({ para: "Lucas Prado" }))).not.toMatch(/\b(a|o) (Lucas|Paula)\b/);
   });
 
+  it("o resumo do agente (escrito para a buddy, em terceira pessoa) não vai: nada do nome nem do gênero da pessoa", () => {
+    const msg = mensagemDoEncaminhamento(pedido({ pergunta: "qual vai ser o meu bônus?", resumo: "A Ana, recém-contratada, perguntou qual será o bônus dela." }));
+    expect(msg).not.toContain("Ana");
+    expect(msg).not.toMatch(/\bdela\b/);
+    expect(msg).not.toContain("Resumo");
+  });
+
+  it("no máximo 3 fontes, com quantas ficaram de fora", () => {
+    const fontes = Array.from({ length: 18 }, (_, i) => `README ${i + 1}`);
+    const msg = mensagemDoEncaminhamento(pedido({ fontes_consultadas: fontes }));
+    expect(msg).toContain("README 1; README 2; README 3 e mais 15");
+    expect(msg).not.toContain("README 4");
+  });
+
   it("sem fontes, diz que não achou nenhuma", () => {
     expect(mensagemDoEncaminhamento(pedido({ fontes_consultadas: [] }))).toContain("não achei nenhuma fonte");
   });

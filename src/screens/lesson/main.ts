@@ -16,7 +16,8 @@ import { buildFaqs } from "../../journey/faq";
 import { routeUtterance } from "../../journey/route";
 import { enviarNoSlackReal, lerEmailDoSlack } from "../../journey/slack-real";
 import { browserStore } from "../../journey/storage";
-import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
+import { buddyOf, createOutbox, destinatario, looksLikeQuestion, motivoDoEncaminhamento } from "../../journey/forwarding";
+import type { DestinoDoEncaminhamento } from "../../journey/encaminhamento-slack";
 import { createPedidos, PEDIDOS_KEY, tarefaDaPessoa, tarefaDoPasso } from "../../journey/primeira-tarefa";
 import { createTrail, sourcesFor } from "../../journey/trail";
 import { createAgentVoice, MIC_AVISO, type SpeakOptions, type TurnRequest } from "../../voice/agent-voice";
@@ -38,6 +39,8 @@ import { completeSession, sessionCompleted } from "../../journey/session-progres
 import { emit } from "../../lib/events";
 import { esc, qs } from "../../lib/dom";
 import { profiles, type Profile as DemoProfile } from "../../data";
+import { montarPalcoNavegador } from "./palco-navegador";
+import { acoesQueAindaValem } from "./cortes";
 
 type AgentState = "speaking" | "listening" | "choosing" | "thinking" | "done";
 
@@ -136,6 +139,9 @@ async function main(): Promise<void> {
     forwardLink: qs<HTMLAnchorElement>(document, "#forward-link"),
   };
   el.lessonName.textContent = journey.title;
+  // navegador do Puca (só no app para Mac); sem window.orbis, palco é null e a sessão segue igual
+  const navegadorHost = qs(document, "#navegador-host");
+  const palco = montarPalcoNavegador(navegadorHost, qs(document, "#palco-abas"), el.boardHost, window.orbis?.navegador);
   mountPucaDots(qs(document, "#caption-orb")); // o Puca na legenda: as bolinhas dele se mexendo
 
   const clock = createClock();
@@ -302,6 +308,7 @@ async function main(): Promise<void> {
 
   function tomarAVez(): void {
     voice.stop();
+    palco?.cancelar();
     if (!falando || vez) return;
     let resolve = () => {};
     const promise = new Promise<void>((r) => (resolve = r));
@@ -368,11 +375,13 @@ async function main(): Promise<void> {
   const SLACK = { href: screenHref("../live-session/"), target: "puca-slack", label: "Abrir Slack" };
 
   /** Encaminha a dúvida à buddy (§4.5): guarda para o Slack, marca no rastro e avisa na sessão. */
-  function forward(entryId: string, f: { question: string; summary: string; reason: string; consulted?: string[] }): void {
-    const consulted = [...new Set([...(f.consulted ?? []), ...consultedNow()])];
-    const created = outbox.add({ ...f, to: { name: buddy, role: "buddy" }, pessoa: profile.nome, consulted, moment: currentMoment?.id ?? null });
+  function forward(entryId: string, f: { question: string; summary: string; reason: string; consulted?: string[]; destino?: DestinoDoEncaminhamento }): void {
+    const { destino, ...dados } = f;
+    const consulted = [...new Set([...(dados.consulted ?? []), ...consultedNow()])];
+    const to = destinatario(destino, { buddy, gestor: profile.gestor });
+    const created = outbox.add({ ...dados, to, pessoa: profile.nome, consulted, moment: currentMoment?.id ?? null });
     trail.update(entryId, { forwarding_id: created.id });
-    showToast(`Encaminhado à ${buddy} no Slack`, SLACK);
+    showToast(`Encaminhado para ${created.to.name} no Slack`, SLACK);
     // com o e-mail do Slack da Kota, o servidor manda de verdade; senão, o Slack simulado envia (#129)
     void enviarNoSlackReal(created, { outbox, email: lerEmailDoSlack(browserStore()) }).then((link) => {
       if (!link) return;
@@ -556,7 +565,14 @@ async function main(): Promise<void> {
           },
           onAction: (a) => io.apply(a),
           onGoTo: goTo,
-          onEscalate: (summary) => forward(entry.id, { question: text, summary, reason: "Não encontrei fonte confiável para responder.", consulted: fontesCitadas }),
+          onEscalate: (summary, destino) =>
+            forward(entry.id, {
+              question: text,
+              summary,
+              destino,
+              consulted: fontesCitadas,
+              reason: motivoDoEncaminhamento(destino),
+            }),
           // fontes do kit que a resposta citou: ficam no rastro para conferir
           onFontes: (fontes) => {
             fontesCitadas = fontes.map((f) => f.titulo);
@@ -652,7 +668,7 @@ async function main(): Promise<void> {
           checagemDoPasso = entendeu ? "entendeu" : "rever";
           if (s.check) io.onCheck?.({ tema: s.check.tema, passo: s.id, entendeu, tentativas: 1, resposta: text ?? "" });
         },
-        onEscalate: (summary) => entryId && forward(entryId, { question: text ?? "", summary, reason: "Não encontrei fonte confiável para responder." }),
+        onEscalate: (summary, destino) => entryId && forward(entryId, { question: text ?? "", summary, destino, reason: motivoDoEncaminhamento(destino) }),
         onTiming: (t) =>
           entryId && trail.update(entryId, { llm_ms: t.total_ms, tokens_in: t.tokens_in ?? undefined, tokens_out: t.tokens_out ?? undefined, tokens_estimated: t.tokens_estimated }),
       },
@@ -788,6 +804,7 @@ async function main(): Promise<void> {
 
   // ---- Vistas ----
   function showLogo(): void {
+    palco?.mostrarQuadro(); // a vista mudou: o navegador sai
     el.boardHost.hidden = true;
     el.logoView.hidden = false;
     el.logoCompany.textContent = journey.company;
@@ -796,11 +813,17 @@ async function main(): Promise<void> {
   }
 
   function showBoard(name: string, fresh: boolean): void {
+    // a vista mudou (quadro novo ou saída da abertura): o navegador volta ao quadro; senão ele segue na vista
+    const muda = fresh || name !== currentBoard || !el.logoView.hidden;
+    if (muda) palco?.mostrarQuadro();
     el.logoView.hidden = true;
-    el.boardHost.hidden = false;
+    if (muda || navegadorHost.hidden) el.boardHost.hidden = false;
     if (fresh || name !== currentBoard) {
       board?.destroy();
-      board = mountWhiteboard(el.boardHost, whiteboardFromJourney(interpolateDeep(journey.boards[name], profile)));
+      // a página inteira é a tela infinita: roda, arraste e pontilhado valem fora da faixa do quadro também
+      board = mountWhiteboard(el.boardHost, whiteboardFromJourney(interpolateDeep(journey.boards[name], profile)), {
+        superficie: el.boardHost.closest<HTMLElement>(".lesson") ?? undefined,
+      });
       board.onSelect(onBoardSelect);
       currentBoard = name;
     }
@@ -865,9 +888,12 @@ async function main(): Promise<void> {
       falando = false;
       finished = true;
       // fala cortada ou áudio que falhou: o quadro chega ao estado final do passo. Num pulo, a legenda
-      // já é a resposta do pulo; com a pessoa tomando a vez, a legenda para onde o Puca parou: só as ações que faltavam.
-      if (cut() || vez) while (next < cues.length) io.apply(cues[next++].action);
-      else advance(text.length);
+      // já é a resposta do pulo; com a pessoa tomando a vez, a legenda para onde o Puca parou: só as ações que faltavam,
+      // e as do navegador não (a pessoa falou por cima, o Puca para de mexer na página).
+      if (cut() || vez) {
+        for (const a of acoesQueAindaValem(cues, next)) io.apply(a);
+        next = cues.length;
+      } else advance(text.length);
     }
     if (cut()) throw new Cancelled();
     if (vez) return; // cortada pela pessoa: say() repete depois de responder
@@ -886,6 +912,12 @@ async function main(): Promise<void> {
       }
     },
     apply(a) {
+      if (a.type === "navegador") {
+        palco?.executar(a.acao); // vale em qualquer vista, até sem quadro
+        return;
+      }
+      // passo sem navegador: o palco volta ao quadro, para a pessoa ver o que a ação mexe
+      if (!currentStep?.actions?.some((x) => x.type === "navegador")) palco?.mostrarQuadro();
       if (!board) return;
       switch (a.type) {
         case "reveal": return board.reveal(a.targets);

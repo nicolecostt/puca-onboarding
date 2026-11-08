@@ -3,6 +3,7 @@
 // respondeu). A sessão cria; a tela do Slack (screens/live-session) envia. Formato em docs/contratos.md.
 import { pendentes, proximaTentativa } from "./claim-queue";
 import { normalize } from "./conditions";
+import type { DestinoDoEncaminhamento } from "./encaminhamento-slack";
 import { readList, writeJson, type KeyValueStore } from "./storage";
 import type { Journey } from "./types";
 import { uid } from "./uid";
@@ -13,8 +14,8 @@ export interface Forwarding {
   id: string;
   /** ISO 8601. */
   at: string;
-  /** A buddy é o destino padrão (CONTEXT.md). */
-  to: { name: string; role: "buddy" };
+  /** A buddy é o destino padrão (CONTEXT.md); o caso pessoal vai ao gestor ou a People ("rh", #125). */
+  to: { name: string; role: DestinoDoEncaminhamento };
   pessoa: string;
   /** A fala da pessoa. */
   question: string;
@@ -92,6 +93,20 @@ export function createOutbox(store: KeyValueStore, opts: { now?: () => Date } = 
 }
 
 export type Outbox = ReturnType<typeof createOutbox>;
+
+/** Quem recebe o encaminhamento: o destino que o agente escolheu (sem destino, a buddy). */
+export function destinatario(destino: DestinoDoEncaminhamento | undefined, nomes: { buddy: string; gestor?: string }): Forwarding["to"] {
+  if (destino === "gestor") return { name: nomes.gestor?.trim() || "Gestão do time", role: "gestor" };
+  if (destino === "rh") return { name: "People", role: "rh" };
+  return { name: nomes.buddy, role: "buddy" };
+}
+
+/** Por que o Puca não respondeu, pelo destino: verdade nos dois casos, sem afirmar que é caso pessoal. */
+export function motivoDoEncaminhamento(destino: DestinoDoEncaminhamento | undefined): string {
+  if (destino === "rh") return "Quem responde isso é People, não as fontes que eu tenho.";
+  if (destino === "gestor") return "Quem responde isso é a gestão do seu time, não as fontes que eu tenho.";
+  return "Não encontrei fonte confiável para responder.";
+}
 
 /** Nome da buddy: o rótulo do nó "buddy" da jornada. */
 export function buddyOf(journey: Journey): string {

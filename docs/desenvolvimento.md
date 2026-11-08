@@ -31,7 +31,9 @@ npm run build:app     # Orbis-mac-arm64.zip e Orbis-mac-x64.zip em release/
 
 Em `npm run dev:app`, o macOS pede o microfone em nome do terminal que abriu o app (no VS Code, libere o Visual Studio
 Code em Ajustes → Privacidade e Segurança → Microfone). Versão nova do app: com a `main` atualizada, `npm run publicar-app -- 0.1.2` gera os
-`.zip`, assina, cria a tag `v0.1.2` e sobe o Release; quem já tem o app roda o comando de instalar de novo. Testar o instalador sem Release: sirva `release/`
+`.zip`, assina, cria a tag `v0.1.2` e sobe o Release; quem já tem o app roda o comando de instalar de novo.
+Sem Mac à mão: no GitHub, Actions → **Publicar o app** → **Run workflow** (branch `main`). Ele roda o `npm run check`
+num Mac do GitHub e, se passar, publica a versão `0.2.<n>`. Nada sai sozinho a cada merge. Testar o instalador sem Release: sirva `release/`
 (`python3 -m http.server 8000`) e rode `ORBIS_BASE_URL=http://localhost:8000 bash scripts/instalar.sh`.
 
 ## Estrutura
@@ -156,6 +158,12 @@ A tela `src/screens/lesson/` roda a jornada em JSON (`src/journey/data/kota.jour
 (`src/components/whiteboard/`) vai se montando e a pessoa responde pelas respostas sugeridas, pelo chat ou tocando no quadro.
 Pelo chat ela também pode pedir para mudar de assunto ou fazer perguntas, que o Puca responde com o conhecimento da sessão.
 A conversa ainda é simulada (sem LLM nem voz); o motor (`src/journey/runner.ts`) não depende da tela.
+
+O quadro é uma tela infinita, como no Excalidraw (`src/components/whiteboard/camera.ts`): roda ou dois dedos no trackpad
+movem; `⌘`/`ctrl` + roda ou pinça dão zoom no cursor; arrastar o fundo, espaço + arrastar ou o botão do meio também
+movem. Os controles no canto do quadro (−, zoom, +, Ajustar) e os atalhos `Shift 1` (ver tudo) e `⌘ 0` (100%) fazem o
+resto. Clicar num nó continua abrindo o cartão e valendo como toque na checagem; o clique que encerra um arraste não
+conta. Se a pessoa afastar o quadro e o Puca falar de algo fora da tela, o quadro centra no que ele está mostrando.
 
 - O perfil vem da escolha nas boas-vindas (dois cartões, que mandam `?perfil=` para a call) e da call inicial, que o
   salva (`onboardingStore()`: `localStorage` no app para Mac, `sessionStorage` no navegador); no fim da call, o app abre

@@ -157,8 +157,8 @@ function renderHome(): void {
     if (!missing.length) return;
     for (const t of missing) t.status = "pending";
     const names = missing.map((t) => t.name).join(" e ");
-    lastNotice = `Você ainda não tem acesso ao ${names}. Quem libera é ${gestor}; te aviso aqui quando chegar.`;
-    qs(document, "#notice-text").innerHTML = `Você ainda não tem acesso ao <b>${esc(names)}</b>. Quem libera é ${esc(gestor)}; te aviso aqui quando chegar.`;
+    lastNotice = `Ainda falta: ${names}. Quem libera é ${gestor}; te aviso aqui quando chegar.`;
+    qs(document, "#notice-text").innerHTML = `Ainda falta: <b>${esc(names)}</b>. Quem libera é ${esc(gestor)}; te aviso aqui quando chegar.`;
     qs(document, "#notice").hidden = false;
     renderTools();
   }
@@ -285,7 +285,7 @@ function renderHome(): void {
       const tool = tools.find((t) => q.includes(normalize(t.name)) || q.includes(t.id));
       if (tool) {
         if (tool.status === "ok") return `Você já tem acesso ao ${tool.name}. Ele serve para: ${tool.use.toLowerCase()}.`;
-        return `O acesso ao ${tool.name} ainda não chegou. Quem libera é ${gestor}; te aviso aqui quando chegar.`;
+        return `Ainda falta: ${tool.name}. Quem libera é ${gestor}; te aviso aqui quando chegar.`;
       }
       if (/acess/.test(q)) {
         const waiting = tools.filter((t) => t.status !== "ok").map((t) => t.name);

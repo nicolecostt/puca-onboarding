@@ -51,7 +51,8 @@ export function buildMessages(ctx: TurnContext, userText: string, mode: "min" | 
     g.personality_and_tone,
     g.safety_and_escalation,
     "Você está FALANDO em voz alta, em pt-BR. Responda em 1 a 3 frases curtas. A primeira frase tem no máximo 6 palavras.",
-    "Afirmação sobre a Kota só com um trecho ou fato abaixo; quando usar um trecho, cite o id dele entre colchetes no fim da frase (ex.: \"... pelo CI [f1].\"). Conhecimento geral pode, dito como geral. Sem trecho para uma pergunta sobre a Kota, diga que não conseguiu confirmar e chame escalate_to_buddy com um resumo da dúvida. Caso pessoal da pessoa (o meu bônus, o meu salário, as minhas férias, a minha avaliação ou promoção): diga a regra geral citando [fN] e chame escalate_to_buddy com um resumo, porque o caso dela só a buddy ou o gestor resolve.",
+    "Afirmação sobre a Kota só com um trecho ou fato abaixo; quando usar um trecho, cite o id dele entre colchetes no fim da frase (ex.: \"... pelo CI [f1].\"). Conhecimento geral (um conceito que não é da Kota) pode, mas a frase começa com \"De forma geral,\", e só a parte que é da Kota leva [fN]. Ex. \"o que é um JWT?\": \"De forma geral, JWT é um token assinado que prova quem fez o login. Na Kota, quem assina é o userservice [f1].\" (a segunda frase só se houver trecho).",
+    "Chame escalate_to_buddy só em dois casos: (1) não há trecho para responder a pergunta sobre a Kota (diga que não conseguiu confirmar e passe um resumo da dúvida); (2) caso pessoal da pessoa (o meu bônus, o meu salário, as minhas férias, a minha avaliação ou promoção): diga a regra geral citando [fN], diga que vai encaminhar para People ou para o gestor e passe um resumo com destino \"rh\" (People) ou \"gestor\": o caso da pessoa só eles resolvem. Se você respondeu com trecho e não é caso pessoal, NÃO encaminhe, nem para dar mais detalhes. No resumo, escreva os assuntos por extenso, sem [fN].",
     "Use as tools só com os ids listados. Sem markdown, sem listas, sem emojis.",
     "",
     `Pessoa: ${profile.nome}, ${profile.vinculo === "novo" ? "recém-contratada" : "mudando de time"}, time ${profile.time ?? "?"}, gestor ${profile.gestor ?? "?"}.`,
@@ -80,8 +81,15 @@ export function buildTools(ctx: TurnContext): ToolSpec[] {
       type: "function",
       function: {
         name: "escalate_to_buddy",
-        description: "Encaminha a dúvida para a buddy quando não há fonte confiável.",
-        parameters: { type: "object", properties: { summary: { type: "string" } }, required: ["summary"] },
+        description: "Encaminha a dúvida quando não há fonte confiável (à buddy) ou é caso pessoal da pessoa (ao gestor ou a People, rh). Não use se já respondeu com trecho.",
+        parameters: {
+          type: "object",
+          properties: {
+            summary: { type: "string" },
+            destino: { type: "string", enum: ["buddy", "gestor", "rh"], description: "Quem recebe na empresa. Sem destino, a buddy." },
+          },
+          required: ["summary"],
+        },
       },
     },
   ];

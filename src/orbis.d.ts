@@ -2,6 +2,8 @@
 interface Orbis {
   /** Versão do app (a do package.json), ex.: "0.1.0". */
   versao: string;
+  /** Navegador do Puca (contrato "Computer use", src/lib/orbis.ts). */
+  navegador?: import("./lib/orbis").OrbisNavegador;
 }
 
 interface Window {

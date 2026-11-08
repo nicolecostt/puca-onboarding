@@ -150,8 +150,9 @@ window.orbis = {
   `codesign --force --deep --sign - Orbis.app`. Sem isso o Mac com Apple Silicon recusa abrir. Sem conta da Apple,
   sem notarização.
 - **Releases:** `npm run publicar-app -- <versão>` (`scripts/publicar-app.sh`), rodado num Mac a partir da `main`:
-  gera e assina os dois `.zip` com os `.sha256`, cria a tag `v<versão>` e sobe o Release. O workflow por tag saiu:
-  o GitHub deixou de aceitar o runner `macos-14`.
+  gera e assina os dois `.zip` com os `.sha256`, cria a tag `v<versão>` e sobe o Release. Sem Mac à mão, o workflow
+  `.github/workflows/publicar-app.yml` (runner `macos-latest`; o `macos-14` não é mais aceito), disparado à mão em
+  Actions → Run workflow, roda o `npm run check` e, se passar, o mesmo script com a versão `0.2.<n>`. Não roda a cada merge.
 - **`scripts/instalar.sh`** (o guia de uso só pede este comando):
 
 ```bash

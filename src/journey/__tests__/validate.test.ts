@@ -18,6 +18,20 @@ describe("validateJourney", () => {
     expect(errorsOf(demo)).toEqual([]);
   });
 
+  it("aceita ação navegador num momento sem quadro", () => {
+    const j = clone(demo);
+    const m = j.moments.find((x) => x.view?.mode === "logo") ?? j.moments[0];
+    m.view = { mode: "logo" };
+    m.steps[0].actions = [{ type: "navegador", acao: { tipo: "abrir", url: "https://github.com/JucaGF/kota-bank" } }];
+    expect(errorsOf(j)).toEqual([]);
+  });
+
+  it("recusa ação navegador com tipo desconhecido", () => {
+    const j = clone(demo);
+    j.moments[3].steps[0].actions = [{ type: "navegador", acao: { tipo: "digitar" } } as never];
+    expect(errorsOf(j).join("\n")).toMatch(/navegador/);
+  });
+
   it("recusa ação que cita nó inexistente", () => {
     const j = clone(demo);
     j.moments[3].steps[0].actions = [{ type: "reveal", targets: ["nao-existe"] }];

@@ -6,10 +6,13 @@ import { carregarContexto, type ContextoKota } from "../checar/contexto";
 import { regras } from "../checar/regras";
 import { regraJornada, type TarefaDaJornada } from "../checar/regras/jornada";
 import { mapa } from "../mapa";
+import { TAREFAS as CATALOGO } from "../tarefas/tarefas";
 import { caminhoAdr } from "../tipos";
 
 const URLS = { "rfc-1": "https://kota.notion.site/rfc-1", "quem-somos": "https://kota.notion.site/quem-somos" };
-const TAREFAS: TarefaDaJornada[] = [{ titulo: "Limite de valor por transferência", perfis: ["novo"] }];
+const TAREFAS: TarefaDaJornada[] = [
+  { titulo: "Limite de valor por transferência", perfis: ["novo"], sistemas: ["ledgerwriter", "ledger-db"], quemAjuda: ["beatriz", "thiago"] },
+];
 const blob = (caminho: string) => `https://github.com/JucaGF/kota-bank/blob/main/${caminho}`;
 const adr1 = mapa.adrs.find((a) => a.n === 1)!;
 
@@ -41,7 +44,15 @@ const noBom = {
     adr: { id: "ADR-0001", title: adr1.titulo, summary: "…", owner: "Thiago Nakamura" },
   },
 };
-const tarefa = { id: "task", kind: "task", info: { role: "Limite de valor por transferência", vinculo: "novo" } };
+const tarefa = {
+  id: "task",
+  kind: "task",
+  info: {
+    role: "Limite de valor por transferência",
+    vinculo: "novo",
+    bullets: ["Sistemas: ledgerwriter e ledger-db", "Quem ajuda: Beatriz Cavalcanti e Thiago Nakamura"],
+  },
+};
 
 describe("regra jornada", () => {
   it("aceita nó que cita o ADR 1 e a RFC 1, com tarefa do catálogo (portão 1)", () => {
@@ -53,7 +64,7 @@ describe("regra jornada", () => {
       { id: "a", kind: "service", info: { docs: [{ title: "README" }] } },
       { id: "b", kind: "service", info: { adr: { id: "ADR-0001", title: "Título antigo", summary: "" } } },
       { id: "c", kind: "task", info: { role: "Tarefa inventada", vinculo: "novo" } },
-      { id: "d", kind: "task", info: { role: "Limite de valor por transferência", vinculo: "transicao" } },
+      { ...tarefa, id: "d", info: { ...tarefa.info, vinculo: "transicao" } },
     ]));
     expect(erros).toEqual([
       "teste.journey.json: nó a: doc \"README\" sem url",
@@ -61,6 +72,28 @@ describe("regra jornada", () => {
       "teste.journey.json: nó c: tarefa \"Tarefa inventada\" fora do catálogo de primeira tarefa",
       "teste.journey.json: nó d: tarefa \"Limite de valor por transferência\" não é do vínculo transicao",
     ]);
+  });
+
+  it("acusa tarefa cujos sistemas e quem ajuda não são os da issue do catálogo", () => {
+    const erros = checar(jornada([
+      { ...tarefa, info: { ...tarefa.info, bullets: ["Sistemas: só o ledgerwriter", "Quem ajuda: Beatriz Cavalcanti e Gustavo Schmitt"] } },
+    ]));
+    expect(erros).toEqual([
+      "teste.journey.json: nó task: tarefa \"Limite de valor por transferência\" sem o sistema ledger-db em \"Sistemas:\"",
+      "teste.journey.json: nó task: tarefa \"Limite de valor por transferência\" sem Thiago Nakamura em \"Quem ajuda:\", como na issue",
+      "teste.journey.json: nó task: tarefa \"Limite de valor por transferência\" com Gustavo Schmitt em \"Quem ajuda:\", que a issue não cita",
+    ]);
+  });
+
+  it("o check:kota confere a tarefa contra o catálogo publicado", () => {
+    const daKota = regras.find((r) => r.nome === "jornada")!;
+    const nome = (id: string) => mapa.pessoas.find((p) => p.id === id)!.nome;
+    const nos = CATALOGO.map((t) => ({
+      id: t.chave,
+      kind: "task",
+      info: { role: t.titulo, vinculo: t.perfis[0], bullets: [`Sistemas: ${t.sistemas.join(", ")}`, `Quem ajuda: ${t.quemAjuda.map(nome).join(" e ")}`] },
+    }));
+    expect(daKota.checar({ mapa, notionUrls: URLS, jornadas: [jornada(nos)] })).toEqual([]);
   });
 
   it("acusa url fora do kit e arquivo do repo que não existe", () => {

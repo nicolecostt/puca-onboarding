@@ -3,12 +3,13 @@
 // A parte fixa do prompt (regras, pauta da jornada, Notion da Kota) e as ferramentas não mudam entre turnos: ficam
 // no cache de prompt. O que muda vai na última mensagem.
 import { randomUUID } from "node:crypto";
+import type { DestinoDoEncaminhamento } from "../../../src/journey/encaminhamento-slack";
 import { looksLikeQuestion } from "../../../src/journey/forwarding";
 import { interpolate } from "../../../src/journey/profile";
 import type { BoardAction, Journey, Moment, Profile, Step } from "../../../src/journey/types";
 import type { TtsService } from "../voice/tts/service";
 import { streamChat, type ChatMessage, type ToolSpec } from "../llm";
-import { estimateTokens, type AskTiming } from "./ask";
+import { destinoPelaFala, estimateTokens, isCasoPessoal, type AskTiming } from "./ask";
 import { FAILURE_LINE, pickBridge } from "./bridges";
 import { visibleNodes } from "./prompt";
 import { SentenceSplitter } from "./sentences";
@@ -22,7 +23,7 @@ export type TurnEvent =
   | { type: "next_step"; reply?: string }
   | { type: "go_to"; target: string }
   | { type: "check"; entendeu: boolean }
-  | { type: "escalate"; summary: string }
+  | { type: "escalate"; summary: string; destino?: DestinoDoEncaminhamento }
   | { type: "timing"; timing: AskTiming };
 
 export interface TurnInput {
@@ -69,6 +70,7 @@ A pauta:
 Fontes:
 - Use só a pauta, os nós do quadro e o Notion da Kota abaixo. O Notion inteiro já está aqui: você já leu tudo, não existe busca. Procure a resposta nele antes de dizer que não sabe. Quando a resposta vem do Notion, diga de qual página ("pela página de Home office…").
 - Se não estiver em nenhuma fonte, diga que não conseguiu confirmar e chame escalate_to_buddy com um resumo da dúvida. Nunca invente.
+- Caso pessoal da pessoa (o meu bônus, o meu salário, as minhas férias, a minha avaliação): diga a regra geral, diga que vai encaminhar para People ou para o gestor e chame escalate_to_buddy com destino "rh" (People) ou "gestor".
 
 Quadro:
 - Use highlight, reveal e open_card só com ids do quadro na tela, enquanto fala do nó.`;
@@ -142,7 +144,12 @@ export function buildTurnTools(j: Journey): ToolSpec[] {
     fn("highlight", "Destaca nós do quadro enquanto fala deles.", { targets: nodes }, ["targets"]),
     fn("reveal", "Mostra nós do quadro que ainda não apareceram.", { targets: nodes }, ["targets"]),
     fn("open_card", "Abre o cartão de um nó (função, dono, docs, ADR).", { target: { type: "string", enum: nodeIds } }, ["target"]),
-    fn("escalate_to_buddy", "Encaminha a dúvida para a buddy quando não há fonte confiável.", { summary: { type: "string" } }, ["summary"]),
+    fn(
+      "escalate_to_buddy",
+      "Encaminha a dúvida quando não há fonte confiável: à buddy, ou, no caso pessoal (salário, bônus, contrato), ao gestor ou a People (rh).",
+      { summary: { type: "string" }, destino: { type: "string", enum: ["buddy", "gestor", "rh"], description: "Quem recebe na empresa. Sem destino, a buddy." } },
+      ["summary"],
+    ),
   ];
 }
 
@@ -167,6 +174,8 @@ export async function turn(input: TurnInput, emit: (ev: TurnEvent) => void): Pro
   let moved = false;
   let spoke = false;
   let escalation: string | null = null;
+  let escalationDestino: DestinoDoEncaminhamento | undefined;
+  let falado = "";
   let refused = false;
   let usage: { input: number; output: number } | null = null;
   let sentChars: number | null = null;
@@ -175,6 +184,7 @@ export async function turn(input: TurnInput, emit: (ev: TurnEvent) => void): Pro
     timing.llm_first_sentence_ms ??= ms();
     spoke = true;
     say(s, "llm");
+    falado += ` ${s}`;
   };
   try {
     const messages = buildTurnMessages(input, moment, step);
@@ -202,7 +212,10 @@ export async function turn(input: TurnInput, emit: (ev: TurnEvent) => void): Pro
       } else if (ev.name === "record_check" && typeof a.entendeu === "boolean") {
         emit({ type: "check", entendeu: a.entendeu });
       } else if (ev.name === "escalate_to_buddy") {
-        escalation ??= a.summary?.trim() || input.text || "";
+        if (escalation === null) {
+          escalation = a.summary?.trim() || input.text || "";
+          escalationDestino = (["buddy", "gestor", "rh"] as const).find((d) => d === (a as { destino?: unknown }).destino);
+        }
       } else if (!moved && ev.name === "next_step") {
         moved = true;
         emit(a.reply ? { type: "next_step", reply: a.reply } : { type: "next_step" });
@@ -230,7 +243,12 @@ export async function turn(input: TurnInput, emit: (ev: TurnEvent) => void): Pro
   if (refused) timing.llm_error = "refusal";
   if (!spoke && !moved && !escalation && !timing.llm_error) timing.llm_error = "empty_response";
   if (timing.llm_error && timing.llm_error !== "interrupted") say(FAILURE_LINE, "fallback");
-  else if (escalation && !input.signal?.aborted && input.kind === "fala" && looksLikeQuestion(input.text ?? "")) emit({ type: "escalate", summary: escalation });
+  else if ((escalation || isCasoPessoal(input.text ?? "")) && !input.signal?.aborted && input.kind === "fala" && looksLikeQuestion(input.text ?? "")) {
+    // caso pessoal encaminha mesmo sem a tool (o LLM às vezes só explica a regra), como no /api/ask (#189).
+    // Sem destino na tool, vale a fala do Puca; caso pessoal sem nada vai a People (PRODUCT.md §13.2)
+    const destino = escalationDestino ?? destinoPelaFala(falado) ?? (isCasoPessoal(input.text ?? "") ? "rh" : undefined);
+    emit({ type: "escalate", summary: escalation ?? input.text ?? "", ...(destino ? { destino } : {}) });
+  }
   timing.total_ms = ms();
   emit({ type: "timing", timing });
   return timing;

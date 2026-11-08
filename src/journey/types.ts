@@ -2,6 +2,7 @@
 // Vocabulário de jornadas de agentes de demonstração por voz (momentos → passos, com objetivo,
 // fala-guia, vista, conhecimento, decisão e transições), mais uma vista nova: o quadro.
 // Detalhes e exemplos em docs/journey-format.md.
+import type { AcaoDaPuca } from "../lib/orbis";
 
 // ---------- Perfil da pessoa ----------
 
@@ -195,6 +196,8 @@ export type BoardAction = (
   | { type: "card"; target: string }
   | { type: "close_card" }
   | { type: "reset" }
+  /** Ação no navegador do Puca (contrato "Computer use", src/lib/orbis.ts); sem o app, é ignorada. */
+  | { type: "navegador"; acao: AcaoDaPuca }
 ) & {
   /** Trecho da fala do passo: a ação acontece quando o Puca chega nele. Sem `at`, acontece antes da fala. */
   at?: string;
