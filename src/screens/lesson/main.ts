@@ -801,7 +801,10 @@ async function main(): Promise<void> {
     if (muda || navegadorHost.hidden) el.boardHost.hidden = false;
     if (fresh || name !== currentBoard) {
       board?.destroy();
-      board = mountWhiteboard(el.boardHost, whiteboardFromJourney(interpolateDeep(journey.boards[name], profile)));
+      // a página inteira é a tela infinita: roda, arraste e pontilhado valem fora da faixa do quadro também
+      board = mountWhiteboard(el.boardHost, whiteboardFromJourney(interpolateDeep(journey.boards[name], profile)), {
+        superficie: el.boardHost.closest<HTMLElement>(".lesson") ?? undefined,
+      });
       board.onSelect(onBoardSelect);
       currentBoard = name;
     }

@@ -26,8 +26,8 @@ body.has-agent-cam:not(.is-call-off) .lesson__board {
   right: 300px;
 }
 .lesson__board .wb {
-  overflow: visible; /* cartões dos nós podem passar da faixa do quadro */
-  background: none;
+  overflow: visible; /* cartões dos nós podem passar da faixa do quadro (o desenho é cortado em .wb__vista) */
+  background: none; /* o pontilhado é da página e anda com o quadro (tela infinita, superficie = .lesson) */
 }
 
 /* ---- Navegador do Puca (só no app para Mac) ----
