@@ -13,8 +13,8 @@ import { matchFaq, scoreReply, normalize } from "./conditions";
 import { respostaSobreTarefa, semPalavraTarefa, type RespostaSobreTarefa } from "./duvidas-da-tarefa";
 import type { Faq } from "./faq";
 import { tarefaDoPasso, type TarefaDoTime } from "./primeira-tarefa";
-import { answerFromKnowledge, findJump } from "./intent";
-import type { Journey, Moment, Step } from "./types";
+import { adrCitado, answerFromKnowledge, findJump } from "./intent";
+import type { BoardNode, Journey, Moment, Step } from "./types";
 
 export type Route =
   | { kind: "jump"; moment: Moment }
@@ -95,6 +95,15 @@ export function routeUtterance(text: string, ctx: RouteContext): Route {
     if (hit) return { kind: "select", node: hit.id };
   }
 
+  // ADR citado pelo número e pessoa citada pelo papel: o nó responde, do quadro que for. A busca por palavra na
+  // knowledge casava só "adr" ou "gestor" e respondia a frase de outro ADR ou a da aprovação da tarefa.
+  const adr = adrCitado(text);
+  const doAdr = adr ? faqDe(ctx, (f, n) => f.intent === "why" && n.info?.adr?.id === adr) : null;
+  if (doAdr) return { kind: "faq", faq: doAdr };
+  const papel = /^quem\b/.test(normalize(text)) ? PAPEIS.find(([, re]) => re.test(normalize(text)))?.[0] : undefined;
+  const daPessoa = papel ? faqDe(ctx, (f) => f.intent === "what" && f.node === papel) : null;
+  if (daPessoa) return { kind: "faq", faq: daPessoa };
+
   // FAQ com nó + intenção ("quem cuida do balancereader?") é mais preciso que a busca por palavra na knowledge,
   // que aceita uma palavra só em comum e respondia outra coisa sobre o mesmo nó.
   const faq = matchFaq(text, ctx.faqs.filter((f) => f.board === ctx.board));
@@ -108,4 +117,22 @@ export function routeUtterance(text: string, ctx: RouteContext): Route {
   if (faq.faq && faq.score >= FAQ_MIN) return { kind: "faq", faq: faq.faq };
 
   return { kind: "ask" };
+}
+
+/** Papéis da pessoa no quadro do time: o id do nó e como a fala cita o papel. */
+const PAPEIS: [string, RegExp][] = [
+  ["gestor", /\bgestora?\b/],
+  ["buddy", /\bbuddy\b/],
+  ["tech-lead", /\btech ?lead\b/],
+];
+
+/** O FAQ que casa, preferindo o do quadro na tela; de outro quadro, vem sem ações, que mexeriam num quadro que não está lá. */
+function faqDe(ctx: RouteContext, casa: (f: Faq, no: BoardNode) => boolean): Faq | null {
+  const todos = ctx.faqs.filter((f) => {
+    const no = ctx.journey.boards[f.board]?.nodes.find((n) => n.id === f.node);
+    return !!no && casa(f, no);
+  });
+  const f = todos.find((x) => x.board === ctx.board) ?? todos[0];
+  if (!f) return null;
+  return f.board === ctx.board ? f : { ...f, actions: [] };
 }

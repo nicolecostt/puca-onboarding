@@ -40,11 +40,13 @@ export function findJump(text: string, journey: Journey, currentMomentId?: strin
 export function answerFromKnowledge(question: string, step?: Step | null, moment?: Moment | null): string | null {
   const words = keywords(question);
   if (!words.length) return null;
+  // "o que diz o ADR 1?" tem "adr" em comum com qualquer frase que cita um ADR: só vale a que cita o mesmo
+  const adr = adrCitado(question);
   const sentences = [step?.knowledge, moment?.knowledge]
     .filter((k): k is string => !!k)
     .flatMap((k) => k.split(/(?<=[.!?])\s+/))
     .map((t) => t.trim())
-    .filter(Boolean);
+    .filter((t) => t && (!adr || adrsCitados(t).includes(adr)));
   let best: string | null = null;
   let bestScore = 0;
   for (const sentence of sentences) {
@@ -56,4 +58,11 @@ export function answerFromKnowledge(question: string, step?: Step | null, moment
   }
   // duas palavras em comum, ou metade das palavras de uma pergunta curta
   return bestScore >= 2 || (bestScore >= 1 && bestScore / words.length >= 0.5) ? best : null;
+}
+
+const adrsCitados = (text: string): string[] => [...normalize(text).matchAll(/\badr 0*(\d+)\b/g)].map((m) => `ADR-${m[1].padStart(4, "0")}`);
+
+/** O ADR que a fala cita pelo número ("ADR 1", "adr-0001"), como o id do ADR na jornada; null se não cita. */
+export function adrCitado(text: string): string | null {
+  return adrsCitados(text)[0] ?? null;
 }
