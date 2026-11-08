@@ -16,7 +16,7 @@
 10. [Complementos do alinhamento com Joaquim](#10-complementos-do-alinhamento-com-joaquim)
 11. [Posicionamento: Sana Learn como referência e foco em just-in-time learning](#11-posicionamento-sana-learn-como-referência-e-foco-em-just-in-time-learning)
 12. [Encaixe no Desafio Tako: a Puca como digital worker de onboarding](#12-encaixe-no-desafio-tako-a-puca-como-digital-worker-de-onboarding)
-13. [Avaliação pelos jurados: o mundo fictício da Tail](#13-avaliação-pelos-jurados-o-mundo-fictício-da-tail)
+13. [Avaliação pelos jurados: o mundo fictício da Kota](#13-avaliação-pelos-jurados-o-mundo-fictício-da-kota)
 14. [Modelo de negócio: quem compra e como cobramos](#14-modelo-de-negócio-quem-compra-e-como-cobramos)
 
 ---
@@ -315,9 +315,9 @@ A call inicial é o momento de identificar **o que a pessoa já conhece**, suas 
 - **De onde vem:** só da documentação oficial da empresa, com as mesmas regras de fonte da [§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano). O que não está documentado a Puca não inventa.
 - **Na transição entre times:** só as particularidades culturais do novo time, sem repetir a apresentação institucional ([Cenário B](#cenário-b--funcionário-em-transição-interna)).
 
-> **Exemplo:** “Antes de seguir, uma coisa sobre como a Tail trabalha: aqui quem encontra um problema é dono dele até alguém assumir. Você vai ver isso no seu primeiro ticket. E no seu time anterior, como funcionava?”
+> **Exemplo:** “Antes de seguir, uma coisa sobre como a Kota trabalha: aqui quem encontra um problema é dono dele até alguém assumir. Você vai ver isso na sua primeira tarefa. E no seu time anterior, como funcionava?”
 
-> **No hackathon:** a tela da call inicial (`src/screens/onboarding-call`) hoje só faz perguntas; a cultura aparece na sessão, no momento “empresa e cultura” da jornada da Tail. Trazer o onboarding cultural para a call está em #57.
+> **No hackathon:** a tela da call inicial (`src/screens/onboarding-call`) hoje só faz perguntas; a cultura aparece na sessão, no momento “empresa e cultura” da jornada de demo. Trazer o onboarding cultural para a call está em #57.
 
 ### 10.2. Incorporação de respostas à base — opcional no hackathon
 
@@ -401,53 +401,60 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 
 ---
 
-## 13. Avaliação pelos jurados: o mundo fictício da Tail
+## 13. Avaliação pelos jurados: o mundo fictício da Kota
 
-> Alinhamento com Joaquim em 2026-11-07.
+> Alinhamento com Joaquim em 2026-11-07 e 2026-11-08.
 
 Não temos como prever **como** cada jurado vai testar a Puca, e o desafio pede só dados sintéticos ([§12.2](#122-o-que-precisa-aparecer-na-demo)). Então, em vez de roteirizar o teste, controlamos o
-**mundo** em que ele cai: a Tail, uma empresa fictícia completa, que a Puca conhece e que o jurado também recebe.
+**mundo** em que ele cai: a **Kota**, um banco digital fictício completo, que a Puca conhece e que o jurado também recebe.
+O desenho do kit está em [`docs/kit-da-kota.md`](docs/kit-da-kota.md), e as escolhas técnicas, em [`docs/decisoes/0005-kit-da-kota.md`](docs/decisoes/0005-kit-da-kota.md).
 
 ### 13.1. O jurado vive a pessoa
 
 O jurado não assiste a uma demo: ele **é a pessoa** sendo integrada e **escolhe o perfil** com que entra:
 
-- **Novo**: acabou de entrar na Tail (como a Ana).
-- **Transição**: já está na Tail e muda de time (como o Bruno).
+- **Novo**: acabou de entrar na Kota.
+- **Transição**: já está na Kota e muda de time.
 
-A escolha muda a jornada, como em [§7](#7-demonstração-dos-dois-perfis).
+Nos dois perfis a pessoa entra no time de Livro-razão; quem está em transição vem do time de Contas. A escolha muda a jornada, como em [§7](#7-demonstração-dos-dois-perfis).
 
-### 13.2. O kit da Tail: fonte e prova ao mesmo tempo
+### 13.2. O kit da Kota: fonte e prova ao mesmo tempo
 
-O mundo fictício é um conjunto de materiais falsos, mas realistas o bastante para simular o primeiro dia numa empresa de verdade:
+O mundo fictício precisa ser realista o bastante para simular o primeiro dia numa empresa de verdade, e precisa **rodar**:
 
-- **Repositórios** falsos: código, README e ADRs;
-- **Documentação** falsa: Notion, políticas, organograma, rituais, responsáveis por sistema;
-- o que mais a Puca precisar citar como **fonte**.
+- **Código de verdade**: o da Kota vem de um projeto aberto real, renomeado e sem a marca original, num repositório público. O jurado sobe o banco, abre o site e roda os testes.
+- **Engenharia no repositório**: README de cada serviço, responsáveis por pasta, ADRs ancorados no código, runbooks e issues de primeira tarefa ([§4.4](#44-do-aprendizado-à-primeira-tarefa)).
+- **A empresa num Notion de verdade**: missão e valores, pessoas e times, sistemas e responsáveis, jeito de trabalhar, RFCs, políticas (inclusive desempenho, carreira e bônus), onboarding por perfil e o guia de uso. O Notion também é uma das integrações que mostram que a Puca se conecta a sistemas reais.
 
 O kit tem dois papéis:
 
 1. **Fonte**: é de onde a Puca tira o que explica.
 2. **Prova**: o jurado recebe o mesmo kit e pode conferir que a Puca não inventou.
 
-Por isso o mundo precisa ser **coerente**: se a Puca diz "o serviço de pagamentos é do time X, por causa do ADR-003",
-o jurado tem que achar isso no repo. Afirmação sem fonte no kit cai no **encaminhamento** ([§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano)).
+Por isso o mundo precisa ser **coerente**: se a Puca diz "o saldo é do time de Livro-razão e fica em cache por causa de um ADR",
+o jurado tem que achar o responsável e o ADR no repositório. Afirmação sem fonte no kit cai no **encaminhamento** ([§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano)).
+
+Como a Kota tem os documentos que uma empresa real tem, o encaminhamento aparece de dois jeitos: o **caso pessoal** ("qual vai ser o meu bônus?"), em que a Puca explica a regra geral com a fonte e leva o caso ao RH ou ao gestor, e o que **nenhum documento cobre**.
+
+> ⚠️ **A Puca explica a política de desempenho da Kota, mas nunca avalia a pessoa** ([§12.2](#122-o-que-precisa-aparecer-na-demo)).
 
 ### 13.3. Guia de uso
 
-O kit vai junto com um **guia de uso** para o jurado: quem ele é na história, como escolher o perfil, onde estão os
-materiais e o que vale tentar (inclusive perguntas fora do roteiro e dúvidas sem resposta na base).
+O kit vai junto com um **guia de uso** para o jurado, que é a página de entrada do Notion da Kota: quem ele é na história, como escolher o perfil, onde estão os
+materiais, como subir o banco e o que vale tentar (inclusive perguntas fora do roteiro e casos pessoais que viram encaminhamento).
+Os links do repositório e do Notion também ficam na landing (#48).
 
-### 13.4. O que já existe é referência, não contrato
+### 13.4. A Tail sai inteira
 
 A Tail de hoje (`src/data/company.ts`, `src/data/profiles.ts`) e a jornada de demo (`src/journey/data/tail.journey.json`)
-são **referência**. O mundo fictício pode redesenhar a Tail, as pessoas e a jornada do jeito que funcionar melhor.
+foram só para testes. A Kota começa do zero, com pessoas, times e jornada novas; trocar no código é uma tarefa própria.
 
-### 13.5. Em aberto
+### 13.5. A jornada acontece no kit
 
-- A jornada continua escrita à mão ou passa a ser derivada do kit (repos e docs)?
-- Como o kit chega ao jurado (repos públicos no GitHub, Notion público, arquivo junto do app)?
-- O que o jurado precisa conseguir fazer com o kit para acreditar que a Puca é de verdade, e não um roteiro?
+> Alinhamento com Joaquim em 2026-11-08.
+
+A jornada continua **escrita à mão**, mas se passa inteira na Kota: toda fonte que a Puca cita num nó é um arquivo do
+repositório ou uma página do Notion da Kota, que o jurado consegue abrir.
 
 ---
 
