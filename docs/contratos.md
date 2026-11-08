@@ -17,6 +17,7 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
 | Rastro (decisões da Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19 (só totais e encaminhamentos, nunca `utterance` nem `answer`: §5) | `__tests__/trail.test.ts` |
 | Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` | `screens/lesson` (cria), `screens/live-session` (envia no Slack), rastro (`forwarding_id`) | `__tests__/forwarding.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
+| Primeira tarefa | `src/journey/primeira-tarefa.ts` (`TarefaDoTime`, `PedidoDeAprovacao`, chave `puca:primeiras-tarefas` no `localStorage`) e os nós `kind: "task"` da jornada — [seção abaixo](#primeira-tarefa) | `screens/lesson` (cria o pedido quando o cartão da tarefa abre), `screens/live-session` (pede a aprovação ao gestor no Slack e grava a aprovação), `screens/primeira-tarefa` (página da tarefa) | `__tests__/primeira-tarefa.test.ts`, `screens/primeira-tarefa/pagina.test.ts` |
 | Visual da Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
 
@@ -201,6 +202,40 @@ Tempo e tokens de cada sessão, para o time auditar a demo (#52, PRODUCT.md §12
     "duration_ms": 870000, "utterances": 6, "llm_calls": 2, "llm_calls_unmeasured": 1, "llm_ms": 3561,
     "tokens_in": 1676, "tokens_out": 18, "tokens_estimated": false }
   ```
+
+## Primeira tarefa
+
+A primeira tarefa (PRODUCT.md §4.4 e §12.1, passo 5) sai do catálogo que o time aprovou: os nós `kind: "task"` da jornada.
+O momento `primeira-tarefa` escolhe uma pelo vínculo e abre o cartão dela. Cada nó `task` tem `info.role` (o título) e
+exatamente estes `bullets`, nesta forma, que viram a `TarefaDoTime` (`tarefaDoNo`):
+
+`Problema: …` · `Por que importa: …` · `Sistemas: …` · `Onde ler: …` · `Quem ajuda: …`
+
+Quando o cartão de um nó `task` abre, a sessão cria um **pedido de aprovação** para o gestor. A tela do Slack pega o pedido,
+a Puca escreve na DM do gestor, e o gestor aprova com um clique. A página da tarefa e a sessão escutam o evento `storage`.
+
+- Status: `pendente` (a sessão criou) → `enviando` (uma aba do Slack pegou; `claimed_by`/`claimed_at`, com a mesma regra de 30 s
+  do encaminhamento) → `aguardando` (mensagem enviada na DM do gestor) → `aprovada` (o gestor clicou; `aprovada_por` e `aprovada_em`).
+- A sessão só escreve `pendente`; o Slack escreve o resto.
+- A mesma pessoa e a mesma tarefa geram um pedido só: recomeçar a sessão devolve o pedido que já existe, mesmo aprovado.
+
+Exemplo válido de `PedidoDeAprovacao`:
+
+```json
+{
+  "id": "5b7e…", "at": "2026-11-08T14:30:00.000Z",
+  "pessoa": "Bruno", "gestor": "Marcos Vidal",
+  "tarefa": {
+    "no": "task-dlq", "titulo": "Fazer a publicação de configuração tentar de novo e, se continuar falhando, ir para uma DLQ.",
+    "problema": "se o config-topic fica fora do ar, a configuração publicada se perde sem aviso",
+    "porque": "a maquininha fica com a configuração antiga e ninguém sabe",
+    "sistemas": "terminal-config-api e config-topic", "onde_ler": "README do terminal-config-api",
+    "quem_ajuda": "Lucas Melo e Paula Nunes"
+  },
+  "moment": "primeira-tarefa", "status": "aprovada",
+  "aprovada_por": "Marcos Vidal", "aprovada_em": "2026-11-08T14:31:12.000Z"
+}
+```
 
 ## Ao mudar um contrato
 
