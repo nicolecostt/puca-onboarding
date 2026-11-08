@@ -104,7 +104,7 @@ async function main(): Promise<void> {
   const journey = loadJourney(demo);
   const auto = new URLSearchParams(location.search).get("auto") === "1";
   const resolved = resolveProfile(location.search);
-  // ninguém escolheu com quem entra na Kota (sessão aberta direto, sem a escolha nem a call): pede antes de Puca falar
+  // ninguém escolheu com quem entra na Kota (sessão aberta direto, sem a escolha nem a call): pede antes de o Puca falar
   if (resolved.source === "demo") return pedirEscolha();
   const profile = resolved.profile;
 

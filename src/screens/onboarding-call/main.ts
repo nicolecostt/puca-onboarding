@@ -12,7 +12,7 @@ import { esc, qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
 import { activeProfile, company } from "../../data";
 import { loadSavedProfile, profileFromAnswers, resolveProfile, saveProfile } from "../../journey/profile";
-import { ID_DO_VINCULO } from "../../journey/escolha";
+import { ID_DO_VINCULO, escolherPerfil } from "../../journey/escolha";
 import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem";
 import { createAgentVoice, MIC_AVISO, type CallRequest, type SpeakOptions } from "../../voice/agent-voice";
 
@@ -291,7 +291,19 @@ async function main(): Promise<void> {
   render();
   if (!voice.llm) {
     chat.addMessage({ from: "agent", text: SEM_PUCA });
-    el.captionAgent.textContent = SEM_PUCA;
+    // sem a call, a pessoa não fica presa aqui: segue para a sessão com o perfil de exemplo de quem ela escolheu.
+    // A legenda fica com a primeira frase (o aviso inteiro está no chat), para o botão caber acima da barra da call.
+    el.captionAgent.textContent = "O Puca está fora do ar agora.";
+    const seguir = document.createElement("button");
+    seguir.type = "button";
+    seguir.className = "call-seguir";
+    seguir.textContent = "Ir para a sessão";
+    el.captionAgent.before(seguir); // logo acima do aviso: embaixo dele fica a barra da call
+    seguir.addEventListener("click", () => {
+      seguir.remove();
+      escolherPerfil(vinculoEscolhido ?? (profile.kind === "transfer" ? "transicao" : "novo"));
+      leaveToSession();
+    });
     return;
   }
   // O navegador só libera som e microfone depois de um clique.
