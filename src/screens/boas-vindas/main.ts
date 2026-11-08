@@ -10,6 +10,7 @@ import { loadSavedProfile } from "../../journey/profile";
 import { preserveProfileLinks } from "../../lib/navigation";
 import { qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
+import { montarEmailDoSlack } from "./email-slack";
 
 const savedProfile = loadSavedProfile();
 if (savedProfile) {
@@ -20,7 +21,8 @@ if (savedProfile) {
   const profile = activeProfile("ana");
   qs(document, "#title").textContent = `Oi, ${profile.nickname}.`;
   qs(document, "#who").textContent = profile.name;
-  particulas(".topbar__row > *, .home__title, .home__lead, .home__actions > *");
+  montarEmailDoSlack(qs(document, ".home"));
+  particulas(".topbar__row > *, .home__title, .home__lead, .home__actions > *, .slack-email");
 } else {
   const home = qs(document, ".home");
   home.classList.add("home--escolha");
@@ -28,7 +30,8 @@ if (savedProfile) {
   mountEscolhaPerfil(home, {
     aoEscolher: (vinculo) => location.assign(`../onboarding-call/?perfil=${ID_DO_VINCULO[vinculo]}`),
   });
-  particulas(".topbar__row > *, .escolha__titulo, .escolha__texto, .escolha__cartao");
+  montarEmailDoSlack(home);
+  particulas(".topbar__row > *, .escolha__titulo, .escolha__texto, .escolha__cartao, .slack-email");
 }
 
 function particulas(occluders: string): void {
