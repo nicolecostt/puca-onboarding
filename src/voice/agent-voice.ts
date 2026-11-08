@@ -114,6 +114,27 @@ export const MIC_AVISO: Record<Exclude<MicState, "ouvindo">, string> = {
 /** Quantas vezes a conexão com o STT tenta voltar sozinha antes de desistir ("caiu"). */
 const RECONEXOES = 3;
 
+// O servidor espera pelo menos 15 s pelo LLM; o transporte tem margem para entregar a resposta de falha.
+export const HEALTH_TIMEOUT_MS = 5000;
+export const REQUEST_TIMEOUT_MS = 30000;
+
+/** Limita também a leitura do corpo, e não só a chegada dos cabeçalhos. */
+async function requestWithin<T>(ms: number, run: (signal: AbortSignal) => Promise<T>, ac = new AbortController()): Promise<T> {
+  const timer = setTimeout(() => ac.abort(new DOMException("Servidor não respondeu a tempo", "TimeoutError")), ms);
+  let aborted = () => {};
+  const interruption = new Promise<never>((_resolve, reject) => {
+    aborted = () => reject(ac.signal.reason);
+    ac.signal.addEventListener("abort", aborted, { once: true });
+    if (ac.signal.aborted) aborted();
+  });
+  try {
+    return await Promise.race([run(ac.signal), interruption]);
+  } finally {
+    clearTimeout(timer);
+    ac.signal.removeEventListener("abort", aborted);
+  }
+}
+
 export interface AgentVoice {
   /** Servidor com TTS (voz de verdade) e com STT (microfone). */
   readonly tts: boolean;
@@ -152,9 +173,10 @@ export interface AgentVoice {
 }
 
 export async function createAgentVoice(): Promise<AgentVoice> {
-  const health = await fetch(apiUrl("/api/health"))
-    .then((r) => (r.ok ? r.json() : null))
-    .catch(() => null);
+  const health = await requestWithin(HEALTH_TIMEOUT_MS, async (signal) => {
+    const r = await fetch(apiUrl("/api/health"), { signal });
+    return r.ok ? r.json() : null;
+  }).catch(() => null);
   const tts = !!health?.tts;
   const stt = !!health?.stt;
   const llm = !!health?.llm;
@@ -198,6 +220,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       let off = () => {};
       try {
         const a = await audio();
+        if (gen !== generation) return; // a síntese terminou depois de a pessoa cortar a fala
         if (opts.onWord) {
           const onWord = opts.onWord;
           let words: WordTiming[] = [];
@@ -222,10 +245,12 @@ export async function createAgentVoice(): Promise<AgentVoice> {
   }
 
   async function speakAudio(text: string, withWords: boolean): Promise<Audio> {
-    const r = await fetch(apiUrl("/api/speak"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
-    if (!r.ok) throw new Error(`speak HTTP ${r.status}`);
-    const { id, audio_url } = (await r.json()) as { id: string; audio_url: string };
-    return { audio_url, words: withWords ? wordsOf(id) : undefined };
+    return requestWithin(REQUEST_TIMEOUT_MS, async (signal) => {
+      const r = await fetch(apiUrl("/api/speak"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }), signal });
+      if (!r.ok) throw new Error(`speak HTTP ${r.status}`);
+      const { id, audio_url } = (await r.json()) as { id: string; audio_url: string };
+      return { audio_url, words: withWords ? wordsOf(id) : undefined };
+    });
   }
 
   /** Abre a conexão com o STT (token novo a cada vez). Só fica valendo se o microfone ainda está ligado. */
@@ -338,71 +363,96 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       voice.stop(); // nunca duas respostas juntas: a pergunta nova corta a anterior e o que ela ia falar
       const ac = new AbortController();
       askAbort = ac;
-      let res: Response;
-      try {
-        res = await fetch(apiUrl(url), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req), signal: ac.signal });
-      } catch {
-        return false;
-      }
-      if (!res.ok || !res.body) return false;
-      const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
       let buf = "";
       const spoken: Promise<void>[] = [];
+      let received = false;
+      let failed = false;
       // ações do agente esperam a frase seguinte começar a tocar (contrato Voz ↔ quadro)
       let actions: BoardAction[] = [];
       let last: { started: boolean; actions: BoardAction[] } | null = null;
       try {
-        for (;;) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buf += value;
-          let i: number;
-          while ((i = buf.indexOf("\n\n")) >= 0) {
-            const block = buf.slice(0, i);
-            buf = buf.slice(i + 2);
-            if (!block.startsWith("data: ")) continue;
-            const ev = JSON.parse(block.slice(6));
-            if (ev.type === "speak") {
-              const url: string | null = ev.audio_url;
-              const frase = { started: false, actions };
-              actions = [];
-              last = frase;
-              const id: string = ev.id;
-              // som bloqueado: a frase sai na hora, só na legenda, sem esperar o player
-              const play = (o: SpeakOptions = {}) => {
-                const start = () => {
-                  frase.started = true;
-                  frase.actions.forEach((a) => h.onAction(a));
-                  o.onStart?.();
-                };
-                return url && !somBloqueado
-                  ? enqueue(ev.text, async () => ({ audio_url: url, words: o.onWord ? wordsOf(id) : undefined }), { onStart: start, onWord: o.onWord })
-                  : Promise.resolve(start());
-              };
-              spoken.push(h.onSpeak(ev.text, play));
-            } else if (ev.type === "action") actions.push(ev.action);
-            else if (ev.type === "go_to") h.onGoTo(ev.target);
-            else if (ev.type === "next_step") h.onNextStep?.(ev.reply);
-            else if (ev.type === "check") h.onCheck?.(ev.entendeu);
-            else if (ev.type === "answer") h.onAnswer?.(ev.key, ev.value);
-            else if (ev.type === "culture") h.onCulture?.(ev.topic);
-            else if (ev.type === "done") h.onDone?.();
-            else if (ev.type === "escalate") h.onEscalate?.(ev.summary, ev.destino);
-            else if (ev.type === "fontes") h.onFontes?.(ev.fontes);
-            else if (ev.type === "timing") h.onTiming?.(ev.timing);
+        await requestWithin(REQUEST_TIMEOUT_MS, async (signal) => {
+          const res = await fetch(apiUrl(url), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req), signal });
+          if (signal.aborted) throw signal.reason;
+          if (!res.ok || !res.body) throw new Error(`conversa HTTP ${res.status}`);
+          const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+          const cancel = () => { void reader.cancel().catch(() => undefined); };
+          signal.addEventListener("abort", cancel, { once: true });
+          try {
+            for (;;) {
+              const { done, value } = await reader.read();
+              if (ac.signal.aborted) throw ac.signal.reason;
+              if (done) {
+                if (buf.trim()) throw new Error("Resposta SSE incompleta");
+                break;
+              }
+              buf += value;
+              let i: number;
+              while ((i = buf.indexOf("\n\n")) >= 0) {
+                const block = buf.slice(0, i);
+                buf = buf.slice(i + 2);
+                if (!block.startsWith("data: ")) continue;
+                const ev = JSON.parse(block.slice(6));
+                if (!ev || typeof ev.type !== "string") throw new Error("Resposta SSE inválida");
+                if (["speak", "action", "go_to", "next_step", "check", "answer", "culture", "done", "escalate"].includes(ev.type)) received = true;
+                if (ev.type === "speak") {
+                  if (typeof ev.text !== "string" || !ev.text.trim()) throw new Error("Fala SSE inválida");
+                  const url: string | null = ev.audio_url;
+                  const frase = { started: false, actions };
+                  actions = [];
+                  last = frase;
+                  const id: string = ev.id;
+                  // som bloqueado: a frase sai na hora, só na legenda, sem esperar o player
+                  const play = (o: SpeakOptions = {}) => {
+                    if (ac.signal.aborted) return Promise.resolve();
+                    const start = () => {
+                      frase.started = true;
+                      frase.actions.forEach((a) => h.onAction(a));
+                      o.onStart?.();
+                    };
+                    return url && !somBloqueado
+                      ? enqueue(ev.text, async () => ({ audio_url: url, words: o.onWord ? wordsOf(id) : undefined }), { onStart: start, onWord: o.onWord })
+                      : Promise.resolve(start());
+                  };
+                  spoken.push(h.onSpeak(ev.text, play));
+                } else if (ev.type === "action") actions.push(ev.action);
+                else if (ev.type === "go_to") h.onGoTo(ev.target);
+                else if (ev.type === "next_step") h.onNextStep?.(ev.reply);
+                else if (ev.type === "check") h.onCheck?.(ev.entendeu);
+                else if (ev.type === "answer") h.onAnswer?.(ev.key, ev.value);
+                else if (ev.type === "culture") h.onCulture?.(ev.topic);
+                else if (ev.type === "done") h.onDone?.();
+                else if (ev.type === "escalate") h.onEscalate?.(ev.summary, ev.destino);
+                else if (ev.type === "fontes") h.onFontes?.(ev.fontes);
+                else if (ev.type === "timing") {
+                  if (!ev.timing || typeof ev.timing !== "object") throw new Error("Tempo SSE inválido");
+                  failed ||= !!ev.timing.llm_error;
+                  h.onTiming?.(ev.timing);
+                }
+              }
+            }
+          } finally {
+            signal.removeEventListener("abort", cancel);
+            void reader.cancel().catch(() => undefined);
           }
-        }
+        }, ac);
       } catch {
-        /* interrompida */
+        // Interromper de propósito encerra o turno anterior; rede, protocolo e timeout precisam de recuperação.
+        failed = !ac.signal.aborted || ac.signal.reason?.name === "TimeoutError";
+        if (ac.signal.reason?.name === "TimeoutError" && askAbort === ac) voice.stop();
       }
       // ações depois da última frase: com ela, se ainda não começou a tocar (mantém a ordem); senão, já
       const tail = last as { started: boolean; actions: BoardAction[] } | null;
-      if (!ac.signal.aborted) {
+      if (!ac.signal.aborted && !failed) {
         if (tail && !tail.started) tail.actions.push(...actions);
         else actions.forEach((a) => h.onAction(a));
       }
-      await Promise.all(spoken);
-      return true;
+      try {
+        await Promise.all(spoken);
+      } catch {
+        failed = true;
+      }
+      return !failed && (received || ac.signal.aborted);
   }
 
   async function listen(h: ListenHandlers): Promise<void> {

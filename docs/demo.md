@@ -30,7 +30,7 @@ Estado em 2026-11-07: **existe** (funciona, ainda que simulado), **parcial** ou 
 
 | # | Passo | Estado | Onde ver / o que precisa acontecer |
 |---|---|---|---|
-| 1 | Call inicial (onboarding cultural, cargo, time, conhecimentos, objetivos) | existe, simulada; falta o onboarding cultural (#57) | `/src/screens/onboarding-call/?perfil=ana` e `?perfil=bruno`. Na primeira abertura do app, as boas-vindas pedem a escolha: dois cartões, Ana (entrando na Kota) e Bruno (mudando de time); a escolha abre a call dessa pessoa, que não pergunta de novo o vínculo. Sessão aberta sem perfil mostra a mesma escolha. No fim da call, o app abre a sessão no quadro. Depois de concluir a sessão, “Ir para o Início” abre as tarefas e os acessos. O perfil e a calibragem coletados na call seguem para a sessão |
+| 1 | Call inicial (onboarding cultural, cargo, time, conhecimentos, objetivos) | existe, simulada; falta o onboarding cultural (#57) | `/src/screens/onboarding-call/?perfil=ana` e `?perfil=bruno`. Na primeira abertura do app, as boas-vindas pedem a escolha: dois cartões, Ana (entrando na Kota) e Bruno (mudando de time); a escolha abre a call dessa pessoa, que não pergunta de novo o vínculo. Sessão aberta sem perfil mostra a mesma escolha. No fim da call, o app abre a sessão no quadro. Depois de concluir a sessão, “Ir para o Início” abre as tarefas e os acessos. O perfil e a calibragem coletados na call seguem para a sessão. Se o servidor ou o LLM falhar, “Ir para a sessão” permite continuar, conservando o que já foi coletado (#207) |
 | 2 | Jornada com objetivos e próximos passos | existe | na sessão, o painel "Sua jornada" (canto de cima à esquerda): barra de progresso, objetivo da pessoa e os momentos numa linha do tempo, marcados pela calibragem (aprender, revisar, já conhece, pulado), com o atual ("agora") ou o próximo ("a seguir"; depois do fim, "para rever") em destaque; clicar num momento pula para ele. Com `?perfil=bruno`, "A Kota" aparece como pulado e "Quando falha" é revisão |
 | 3 | Sessão no quadro, com voz | existe | `/src/screens/lesson/?perfil=ana&auto=1` (institucional) e `?perfil=bruno&auto=1` (direto ao time); voz de verdade com `dev:server` e chaves. O quadro é tela infinita: arrastar o fundo ou rolar move, `⌘` + rolar dá zoom, "Ajustar" volta a ver tudo |
 | 4 | Verificação de compreensão | existe | na sessão, "Checagem rápida" (tocar no quadro, os dois perfis) e a pergunta "se o balancereader estiver fora do ar, o que acontece com uma transferência?" em "Quando falha" (responder por botão, chat ou voz). Quem precisa rever passa por um reforço no quadro; o painel "Sua jornada" muda o momento para "já conhece" ou "revisar" na hora |
@@ -54,6 +54,28 @@ Do plano do time. Cada um vale quando o passo correspondente existir.
 - Instalação e uso em outro computador, seguindo só as instruções públicas.
 - Rastro: depois da sessão, abrir `/src/screens/rastro/` (**tela só para a demo**). Cada fala aparece com o caminho, a resposta e a fonte, e "Baixar JSON" gera o arquivo para auditar.
 - Custo da sessão (#52, só para auditar, não aparece na demo): no JSON baixado, `sessions` traz a duração, as falas, as perguntas ao agente e os tokens de cada sessão; no log do servidor (`npm run dev:server`), cada pergunta ao agente vira uma linha `"msg":"ask"` com o `timing`, inclusive as interrompidas.
+
+## Verificação de integração — 08/11/2026 (#207)
+
+Ensaio local sobre a `main` até `00f675f`, com as correções da #207. Não substitui testar o app instalado e os
+serviços reais antes de apresentar.
+
+| Verificação | Resultado observado |
+|---|---|
+| `npm run check` | 752 testes em 79 arquivos; tipos, base, harness e build passaram |
+| `npm run build:desktop` | Passou; execução do app instalado não verificada |
+| Páginas da demo | As nove telas responderam HTTP 200 |
+| Call pelo Fly | Bruno passou da call para a sessão com nome e objetivo coletados pelo chat |
+| Sessões com `?auto=1`, no build local | Ana terminou 9/9 momentos; Bruno, 8/8; chegaram ao Início |
+| Primeira tarefa e aprovação | Tarefas distintas por perfil; aprovação no Slack simulado refletida na página da tarefa e no Início |
+| Pulo e encaminhamento | “Vamos para quando falha” mudou o momento; dúvida sobre bônus foi encaminhada à Beatriz e apareceu confirmada no rastro, pelo Slack simulado |
+| Recuperação da call | Servidor de teste anunciou LLM disponível e falhou após coletar respostas; “Ir para a sessão” abriu o quadro preservando “Ana Teste” |
+| Progresso | Início da Ana manteve tarefa aprovada após recarregar; reabrir o app instalado não verificado |
+| Console | Sem erros nas sessões de Ana/Bruno e no Slack simulado durante o ensaio do build |
+
+Ainda não verificados neste ensaio: microfone real, sincronização audível de voz/quadro, envio ao Slack real,
+navegador do Puca no Electron e instalação em outro computador. O servidor local apresentou falhas intermitentes
+do LLM; o health disponível, sozinho, não comprova que o provedor responderá.
 
 ## Ordem da apresentação
 
