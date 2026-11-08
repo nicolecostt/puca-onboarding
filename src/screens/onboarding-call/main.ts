@@ -21,10 +21,10 @@ if (!savedProfile) qs<HTMLAnchorElement>(document, ".brand").href = "../boas-vin
 preserveProfileLinks();
 
 // Quem entra (novo na Kota ou mudando de time) Puca descobre na conversa e anota como `vinculo`. Só o link de
-// apresentação (?perfil=ana|bruno) ou um perfil já salvo trazem o vínculo de antes, e aí ele já vai anotado
-// (server/src/agent/call.ts: "Não pergunte o que já está anotado").
+// apresentação (?perfil=ana|bruno) traz o vínculo de antes, e aí ele já vai anotado (server/src/agent/call.ts: "Não
+// pergunte o que já está anotado"). Perfil salvo de outra vez não conta: refazer a call pergunta de novo.
 const conhecido = resolveProfile(location.search);
-const vinculoConhecido = conhecido.source === "demo" ? null : conhecido.profile.vinculo;
+const vinculoConhecido = conhecido.source === "url" ? conhecido.profile.vinculo : null;
 
 const SEM_PUCA = "Puca está fora do ar agora. Recarregue a página em alguns minutos para fazer a call.";
 const FALHOU = "Perdi a conexão para pensar agora. Pode repetir?";
