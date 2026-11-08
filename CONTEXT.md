@@ -134,12 +134,12 @@ Registro de uma decisão técnica do time e do porquê dela.
 
 ## Avaliação
 
-**Tail**:
-A empresa fictícia onde se passam a demo e o teste dos jurados.
-_Avoid_: empresa de exemplo, empresa mock
+**Kota**:
+O banco digital fictício onde se passam a demo e o teste dos jurados.
+_Avoid_: Tail (nome antigo), empresa de exemplo, empresa mock
 
-**Kit da Tail**:
-Os materiais falsos, mas realistas, da Tail (repos, código, ADRs, Notion, políticas, organograma). É a fonte da Puca e a prova que o jurado confere.
+**Kit da Kota**:
+Os materiais falsos, mas realistas, da Kota (repositório com código que roda, ADRs, Notion com cultura, pessoas, políticas e responsáveis). É a fonte da Puca e a prova que o jurado confere.
 _Avoid_: mock, dados fake, dataset
 
 **Guia de uso**:
