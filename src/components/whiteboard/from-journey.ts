@@ -45,45 +45,58 @@ interface Box {
   h: number;
 }
 
-/** Seta calculada: sai pela lateral (ou por baixo/cima) e chega na outra caixa, com ponta aberta. */
+/** Seta calculada: sai da borda da caixa na direção da outra e chega na borda dela, com uma curva leve
+ *  (como traço à mão) e ponta aberta apontando para onde a linha chega. */
 function autoEdge(a: Box, b: Box): { path: string; head: string; mid: { x: number; y: number }; steep: boolean } {
   const ac = { x: a.x + a.w / 2, y: a.y + a.h / 2 };
   const bc = { x: b.x + b.w / 2, y: b.y + b.h / 2 };
   const dx = bc.x - ac.x;
   const dy = bc.y - ac.y;
-  let x1, y1, x2, y2, c1x, c1y, c2x, c2y;
-  if (Math.abs(dx) > Math.abs(dy)) {
-    const s = Math.sign(dx) || 1;
-    x1 = ac.x + (s * a.w) / 2 + s * 3;
-    y1 = ac.y;
-    x2 = bc.x - (s * b.w) / 2 - s * 4;
-    y2 = bc.y;
-    const k = (x2 - x1) / 2;
-    [c1x, c1y, c2x, c2y] = [x1 + k, y1, x2 - k, y2];
-  } else {
-    const s = Math.sign(dy) || 1;
-    x1 = ac.x;
-    y1 = ac.y + (s * a.h) / 2 + s * 3;
-    x2 = bc.x;
-    y2 = bc.y - (s * b.h) / 2 - s * 4;
-    const k = (y2 - y1) / 2;
-    [c1x, c1y, c2x, c2y] = [x1, y1 + k, x2, y2 - k];
-  }
+  const dist = Math.hypot(dx, dy) || 1;
+  const ux = dx / dist;
+  const uy = dy / dist;
+  // Ponto na borda da caixa, na direção da linha, puxado para o meio do lado (longe das quinas
+  // arredondadas) e com um respiro para fora. `dir` é +1 saindo da caixa, -1 chegando nela.
+  const anchor = (box: Box, c: { x: number; y: number }, dir: number, gap: number) => {
+    const vx = ux * dir;
+    const vy = uy * dir;
+    const tx = vx ? box.w / 2 / Math.abs(vx) : Infinity;
+    const ty = vy ? box.h / 2 / Math.abs(vy) : Infinity;
+    if (tx < ty) {
+      // sai pela lateral
+      const y = c.y + vy * tx * 0.4;
+      return { x: c.x + Math.sign(vx) * (box.w / 2 + gap), y };
+    }
+    // sai por cima ou por baixo
+    const x = c.x + vx * ty * 0.4;
+    return { x, y: c.y + Math.sign(vy) * (box.h / 2 + gap) };
+  };
+  const { x: x1, y: y1 } = anchor(a, ac, 1, 6);
+  const { x: x2, y: y2 } = anchor(b, bc, -1, 9);
+  // curva leve para o mesmo lado (sentido horário), proporcional ao tamanho da seta
+  const len = Math.hypot(x2 - x1, y2 - y1);
+  const bend = Math.min(26, len * 0.09);
+  const qx = (x1 + x2) / 2 - uy * bend;
+  const qy = (y1 + y2) / 2 + ux * bend;
+  // quadrática escrita como cúbica (o resto do quadro espera "C")
+  const c1x = x1 + ((qx - x1) * 2) / 3;
+  const c1y = y1 + ((qy - y1) * 2) / 3;
+  const c2x = x2 + ((qx - x2) * 2) / 3;
+  const c2y = y2 + ((qy - y2) * 2) / 3;
   // ponta: chevron aberto na direção em que a curva chega
-  let ux = x2 - c2x;
-  let uy = y2 - c2y;
-  const len = Math.hypot(ux, uy) || 1;
-  ux /= len;
-  uy /= len;
-  const p = (along: number, side: number) => `${(x2 - ux * along - uy * side).toFixed(1)} ${(y2 - uy * along + ux * side).toFixed(1)}`;
-  const mid = { x: (x1 + 3 * c1x + 3 * c2x + x2) / 8, y: (y1 + 3 * c1y + 3 * c2y + y2) / 8 };
-  const steep = Math.abs(x2 + c2x - c1x - x1) < Math.abs(y2 + c2y - c1y - y1);
+  let tx = x2 - qx;
+  let ty = y2 - qy;
+  const tl = Math.hypot(tx, ty) || 1;
+  tx /= tl;
+  ty /= tl;
+  const p = (along: number, side: number) => `${(x2 - tx * along - ty * side).toFixed(1)} ${(y2 - ty * along + tx * side).toFixed(1)}`;
+  const mid = { x: 0.25 * x1 + 0.5 * qx + 0.25 * x2, y: 0.25 * y1 + 0.5 * qy + 0.25 * y2 };
   const f = (v: number) => v.toFixed(1);
   return {
     path: `M${f(x1)} ${f(y1)} C${f(c1x)} ${f(c1y)} ${f(c2x)} ${f(c2y)} ${f(x2)} ${f(y2)}`,
-    head: `M${p(10, 6)} L${f(x2)} ${f(y2)} L${p(10, -6)}`,
+    head: `M${p(9, 5.5)} L${f(x2)} ${f(y2)} L${p(9, -5.5)}`,
     mid,
-    steep,
+    steep: Math.abs(dx) < Math.abs(dy),
   };
 }
 

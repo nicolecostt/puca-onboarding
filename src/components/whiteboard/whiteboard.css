@@ -5,7 +5,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--color-board);
+  background-color: var(--color-surface);
   background-image: radial-gradient(var(--color-board-dot) 1px, transparent 1.2px);
   background-size: 22px 22px;
 }
@@ -276,60 +276,108 @@
   color: var(--color-muted);
 }
 
-/* ---- Detalhes do nó ---- */
+/* ---- Detalhes do nó (cartão do nó), no visual da landing: plano, fio de tinta, sem sombra ---- */
 .wb-pop {
   position: absolute;
   z-index: 5;
-  width: 280px;
-  padding: 12px 14px;
+  width: 300px;
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-float);
+  border: 1px solid var(--color-text);
+  border-radius: var(--radius-xl);
   font-family: var(--font-sans);
+  color: var(--color-text);
+  animation: wb-pop-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .wb-pop[hidden] {
   display: none;
 }
-.wb-pop p {
+.wb-pop p,
+.wb-pop dl,
+.wb-pop dd {
   margin: 0;
 }
+.wb-pop__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 .wb-pop__title {
-  font: 400 17px/1.3 var(--font-hand);
-  color: var(--color-sketch);
-  margin-bottom: 4px !important;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
 }
-.wb-pop__what {
-  font-size: var(--text-md);
-  line-height: 1.5;
-  color: var(--color-text);
-}
-.wb-pop__row {
-  margin-top: 8px !important;
-  display: grid;
-  grid-template-columns: 52px 1fr;
-  gap: 8px;
-  font-size: var(--text-sm);
-  line-height: 1.45;
-}
-.wb-pop__row span {
+.wb-pop__caption {
+  font-size: 12px;
   color: var(--color-muted);
 }
-
+.wb-pop__what {
+  font-size: 14px;
+  line-height: 1.5;
+}
+/* dados: rótulo à esquerda, valor à direita, separados por fio */
+.wb-pop__rows {
+  border-top: 1px solid var(--color-border);
+}
+.wb-pop__row {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.wb-pop__row dt {
+  color: var(--color-muted);
+}
 .wb-pop__warn {
-  margin-top: 8px !important;
-  padding: 6px 8px;
+  padding: 8px 10px;
   border: 1px dashed var(--color-subtle);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface-muted);
-  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  line-height: 1.45;
   color: var(--color-muted);
 }
 .wb-pop__list {
-  margin: 8px 0 0;
-  padding-left: 16px;
-  font-size: var(--text-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
   line-height: 1.45;
+}
+.wb-pop__list li {
+  position: relative;
+  padding-left: 16px;
+}
+/* traço curto no lugar da bolinha */
+.wb-pop__list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 8px;
+  height: 1px;
+  background: var(--color-text);
+}
+@keyframes wb-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wb-pop {
+    animation: none;
+  }
 }
 
 /* ---- Destaque (a Puca chamando atenção): quem tem tom fica forte, o resto apaga ---- */
@@ -404,4 +452,60 @@
   .wb-edge__head {
     transition: none;
   }
+}
+
+/* ---- Só preto e branco (DESIGN.md): nada de fundo ou traço cinza no quadro.
+   O estado vem do traço: tracejado = inferido ou caixa preta; cheio = provado. ---- */
+.wb-node,
+.wb-node:hover,
+.wb-node.is-open {
+  box-shadow: none;
+}
+.wb-node:hover {
+  box-shadow: 0 0 0 3px var(--color-surface), 0 0 0 4px var(--color-sketch);
+}
+.wb-node.is-open {
+  box-shadow: 0 0 0 3px var(--color-surface), 0 0 0 5px var(--color-sketch);
+}
+/* fila: a forma de pílula já diz que é fila; fundo branco como os outros */
+.wb-node--topic {
+  background: var(--color-surface);
+  border-color: var(--color-sketch);
+}
+.wb-node--topic .wb-node__label {
+  color: var(--color-sketch);
+}
+/* caixa preta: branca, tracejada em preto */
+.wb-node--blackbox {
+  background: var(--color-surface);
+  border: 2px dashed var(--color-sketch);
+}
+.wb-node--blackbox .wb-node__label {
+  color: var(--color-sketch);
+}
+.wb-node__lock {
+  background: var(--color-sketch);
+  border-color: var(--color-surface);
+}
+.wb-node__note {
+  background: var(--color-surface);
+  border-color: var(--color-sketch);
+  color: var(--color-text);
+}
+/* seta inferida: tracejada em preto */
+.wb-edge--inferred path {
+  stroke: var(--color-sketch);
+}
+/* selos: brancos com texto preto; provado com fio cheio, inferido tracejado */
+.wb-badge--proven,
+.wb-badge--inferred {
+  background: var(--color-surface);
+  border: 1px solid var(--color-sketch);
+  color: var(--color-text);
+}
+.wb-badge--inferred {
+  border-style: dashed;
+}
+.wb-label--mono {
+  color: var(--color-muted);
 }
