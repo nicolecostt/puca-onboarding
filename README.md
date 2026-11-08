@@ -13,7 +13,7 @@ npm run dev        # servidor local; abre a lista de telas
 npm run typecheck  # checa os tipos
 npm test           # testes (validador e motor da jornada)
 npm run build      # build de produção em dist/
-npm run check      # typecheck + testes + build (o que o CI roda em cada PR)
+npm run check      # typecheck + testes + base do sistema + harness + build (o que o CI roda em cada PR)
 ```
 
 Trabalhando com agentes de programação (Claude Code, Codex…): regras do time em [`AGENTS.md`](AGENTS.md).
@@ -44,7 +44,8 @@ src/
     chat-panel/          chat flutuante (Figma: "Chat (floating window)")
     agent-cam/           "câmera" do agente no canto da tela
     agent-cursor/        cursor da Puca (seta + "Puca") mexendo na tela, por enquanto simulado
-  journey/               jornada da aula em JSON: tipos, validador, motor, perfil, calibragem e intenções (pulo, perguntas)
+    journey-panel/       painel "Sua jornada" da aula: objetivo, momentos marcados pela calibragem e próximos passos
+  journey/               jornada da aula em JSON: tipos, validador, motor, perfil, calibragem, jornada da pessoa e intenções (pulo, perguntas)
     data/                jornadas em JSON (tail.journey.json é a demo)
   lib/                   código compartilhado
     events.ts            eventos tipados (callbar:*, chatpanel:*, onboarding:*)

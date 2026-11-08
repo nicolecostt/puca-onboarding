@@ -6,10 +6,11 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | Contrato | Onde está definido | Quem depende | Testado por |
 |---|---|---|---|
 | Jornada da aula (JSON) | `src/journey/types.ts` + [`journey-format.md`](journey-format.md) | `runner.ts`, `whiteboard/from-journey.ts`, `screens/lesson`, quem escreve jornadas | `validate.ts` + `__tests__/validate.test.ts` |
-| Eventos entre componentes | `src/lib/events.ts` (`DocumentEventMap`) | telas e componentes que escutam `callbar:*`, `chatpanel:*`, `onboarding:*`, `journey:*`, `agentcam:*` | `tsc` |
+| Eventos entre componentes | `src/lib/events.ts` (`DocumentEventMap`) | telas e componentes que escutam `callbar:*`, `chatpanel:*`, `onboarding:*`, `journey:*`, `journeypanel:*`, `agentcam:*` | `tsc` |
 | Perfil da pessoa | `src/journey/profile.ts` e `src/data/types.ts` | call inicial (grava `sessionStorage` `puca:profile`) → aula → `POST /api/ask` | `__tests__/validate.test.ts` |
 | Calibragem | `src/journey/types.ts` (`Calibragem`) + `src/journey/calibragem.ts` (temas, regras, `sessionStorage` `puca:calibragem`) — [seção abaixo](#calibragem) | call inicial escreve (#16) → jornada (#17) e adaptação das explicações (#23) leem | `__tests__/calibragem.test.ts` |
 | Voz ↔ quadro | `BoardAction.at` em `src/journey/types.ts` + `RunnerIO.say(text, cues)` + `GET /api/tts/:id/words` — [seção abaixo](#voz--quadro) | `runner.ts`, `screens/lesson` (`io.say`), `src/voice/agent-voice.ts`, quem escreve jornadas | `validate.test.ts`, `runner.test.ts`, `server/src/voice/tts/service.test.ts` |
+| Jornada da pessoa | `src/journey/types.ts` (`JornadaDaPessoa`) + `src/journey/jornada-da-pessoa.ts` (`montarJornadaDaPessoa`, `proximosPassos`) — [seção abaixo](#jornada-da-pessoa) | aula, painel "Sua jornada" (#17) → progresso (#18), painel do buddy (#19), checagem (#24) | `__tests__/jornada-da-pessoa.test.ts` |
 | Rota da fala | `src/journey/route.ts` (`Route`: jump → reply → select → knowledge → faq → ask) | `screens/lesson`, voz e chat | `__tests__/route.test.ts` |
 | API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask`, `/api/voice/token` | `src/voice/agent-voice.ts`, `screens/lesson` | `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
@@ -89,6 +90,42 @@ Cada ação do quadro acontece na palavra em que a Puca fala dela (PRODUCT.md §
   eles não chegam, seguem a estimativa da legenda.
 - **Ações do agente** (`action` no SSE do `/api/ask`): saem quando a frase seguinte começa a tocar, ou no fim da resposta
   se não vier frase depois.
+
+## Jornada da pessoa
+
+A jornada como a pessoa vê, montada a partir da calibragem: os objetivos dela e cada momento marcado.
+Quem lê chama `montarJornadaDaPessoa(journey, calibragem)`, uma função pura que não grava nada. O progresso
+(feito, agora, a seguir) é estado da tela; salvar o progresso é a #18.
+
+- **Nenhum momento sai da jornada.** O estado só marca; o runner segue o mesmo JSON.
+- **Estado** (`EstadoMomento`), nesta ordem de checagem:
+  - `fora`: vínculo `transicao` e momento do tema `empresa` (é o desvio que o passo `bv-oi` já faz).
+  - `ja_conhece`: nível `domina` com certeza `alta`.
+  - `revisar`: nível `usa`, ou `domina` com certeza menor.
+  - `aprender`: `nao_conhece` ou `ja_ouviu`, e todo momento sem tema (boas-vindas, quem cuida, checagem…).
+- Momento com mais de um tema (`pagamentos` cobre pagamentos e mensageria): vale o **menor** nível, para não
+  marcar como revisão o que a pessoa ainda não sabe.
+- **Motivo**: a frase da pessoa na call (`evidencia` do tema que decidiu) quando existe; senão, uma frase fixa por estado.
+- `proximosPassos(jornada, visitados, atual)`: os momentos que faltam, sem os `fora`, na ordem.
+
+Exemplo (Bruno, transição; saída de `montarJornadaDaPessoa(journey, DEMO_CALIBRAGENS.transicao)`, momentos cortados):
+
+```json
+{
+  "versao": 1,
+  "objetivos": ["Entender o caminho da transação e fazer minha primeira mudança no terminal-config sozinho"],
+  "momentos": [
+    { "id": "boas-vindas", "titulo": "Boas-vindas", "objetivo": "Cumprimentar e explicar o roteiro da aula conforme o momento da pessoa",
+      "estado": "aprender", "motivo": "", "temas": [] },
+    { "id": "empresa-e-cultura", "titulo": "A Tail", "objetivo": "Apresentar missão, valores e áreas da empresa",
+      "estado": "fora", "motivo": "Você já é da Tail: a aula vai direto ao seu time.", "temas": ["empresa"] },
+    { "id": "pagamentos", "titulo": "O caminho de uma transação", "objetivo": "Mostrar o caminho de uma transação da maquininha até a liquidação",
+      "estado": "aprender", "motivo": "Você disse: “Um pouco, pelo lado da fraude, mas adquirência eu não conheço”", "temas": ["pagamentos", "mensageria"] },
+    { "id": "falha", "titulo": "Quando falha", "objetivo": "Explicar o caminho de erro e o que ainda não está confirmado",
+      "estado": "revisar", "motivo": "Você disse: “Já, a gente tinha retry e DLQ nos consumidores”", "temas": ["falhas"] }
+  ]
+}
+```
 
 ## Ao mudar um contrato
 

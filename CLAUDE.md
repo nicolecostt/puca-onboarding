@@ -24,6 +24,9 @@ o que não estiver no código, numa issue, num PR ou nestes docs, os outros agen
 - **Todo texto usa os termos do glossário**: código, interface, commits, issues, PRs e docs.
 - **Adicionar ou mudar algo nos dois só pela skill `/contexto-base`**: ela diz onde cada coisa vai, segue o modelo,
   valida (`npm run check:contexto`) e leva a mudança para as issues e os docs afetados.
+- **Regra nova para os agentes só pela skill `/nova-regra`** ("a partir de agora…", "sempre que…", skill, hook,
+  permissão, CI): ela escolhe o lugar mais leve que resolve, evita regra duplicada ou contraditória, valida
+  (`npm run check:harness`) e registra a decisão. Preferência só sua vai em `CLAUDE.local.md`.
 
 ## Comandos
 
@@ -32,8 +35,9 @@ npm run dev          # telas (Vite)
 npm run dev:server   # API em :8787 (o Vite repassa /api)
 npm run typecheck
 npm test             # valida a jornada de demo e o motor
-npm run check        # typecheck + testes + base do sistema + build (o que o CI roda em cada PR)
+npm run check        # typecheck + testes + base do sistema + harness + build (o que o CI roda em cada PR)
 npm run check:contexto  # só a base: sumário e âncoras do PRODUCT.md, formato do CONTEXT.md
+npm run check:harness   # só o harness: skills na tabela abaixo, revisor, scripts dos hooks executáveis
 ```
 
 Antes de dizer que terminou: `npm run check` (ou, no mínimo, `npm run typecheck && npm test`). Nunca diga que passou sem ter rodado.
@@ -88,6 +92,7 @@ Mais de uma situação ao mesmo tempo? Chame na ordem da tabela.
 | Vai editar, commitar ou abrir PR; apareceu `[sync]`; "alguém mexeu na main?" | `sincronizar` |
 | Começar ou retomar trabalho: "pega a issue 17", "bora fazer X", "implementa Y", "continua" | `comecar-tarefa` |
 | Algo entra ou muda no `PRODUCT.md`/`CONTEXT.md`: "anota no PRODUCT", "novo insight", "alinhamos que…", termo novo | `contexto-base` |
+| Regra nova para os agentes: "a partir de agora…", "sempre que…", "coloca no CLAUDE.md", "cria um hook/skill", "bloqueia X" | `nova-regra` |
 | Mudar um formato que outra parte usa: campo de API, tipo, evento, payload | `contrato` |
 | Criar ou editar aula/jornada (`*.journey.json`) | `nova-jornada` |
 | Criar tela ou componente | `nova-tela` |
