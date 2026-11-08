@@ -316,6 +316,9 @@ async function main(): Promise<void> {
           onAction: (a) => io.apply(a),
           onGoTo: goTo,
           onEscalate: (summary) => forward(entry.id, { question: text, summary, reason: "Não encontrei fonte confiável para responder." }),
+          // custo da sessão (#52): só no rastro, para auditar; nada em tela
+          onTiming: (t) =>
+            trail.update(entry.id, { llm_ms: t.total_ms, tokens_in: t.tokens_in ?? undefined, tokens_out: t.tokens_out ?? undefined, tokens_estimated: t.tokens_estimated }),
         },
       ));
     // gravado mesmo se a pessoa interrompeu: fica a resposta parcial
@@ -345,12 +348,14 @@ async function main(): Promise<void> {
   });
   document.addEventListener("callbar:end", () => {
     ended = true;
+    trail.endSession();
     clock.setEnded(true);
     cam.hide();
     render();
   });
   document.addEventListener("callbar:start", () => {
     ended = false;
+    trail.startSession(); // retomar a call reabre a sessão (#52)
     clock.setEnded(false);
     cam.show();
     render();
@@ -511,9 +516,11 @@ async function main(): Promise<void> {
       setAgent("thinking");
       await clock.wait(600);
       runner = createRunner(journey, profile, io);
+      trail.startSession();
       running = true;
       await runner.run();
       running = false;
+      trail.endSession();
       journeyPanel.setProgress(visitados, null);
       setAgent("done");
       el.moment.textContent = "sessão completa";

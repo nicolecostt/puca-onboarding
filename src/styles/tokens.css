@@ -2,11 +2,25 @@
    Mudar aqui muda o app inteiro. Componentes e telas usam só estas variáveis. */
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=Kalam:wght@400;700&display=swap");
 
+/* ângulo do arco-íris da Puca, animável */
+@property --holo-turn {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+@keyframes holo-spin {
+  to {
+    --holo-turn: 360deg;
+  }
+}
+
 :root {
   /* ---- Fontes ---- */
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-hand: "Kalam", "Comic Sans MS", cursive; /* letra do quadro */
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: "Creato Display", "Inter", ui-sans-serif, system-ui, sans-serif; /* títulos da landing (src/assets/fonts) */
 
   /* ---- Neutros ---- */
   --color-text: #0a0a0a;
@@ -14,6 +28,7 @@
   --color-sketch: #1e1e1e; /* traço do quadro */
   --color-muted: #737373;
   --color-subtle: #a3a3a3;
+  --color-dim: #949494; /* texto grande inativo, contraste 3:1 no branco */
   --color-faint: #6b7280; /* @dono nos nós */
   --color-border: #e5e5e5;
   --color-surface: #ffffff;
@@ -22,35 +37,47 @@
   --color-board: #fcfcfa; /* fundo do quadro */
   --color-board-dot: rgba(0, 0, 0, 0.07);
 
-  /* ---- Estados ---- */
-  --color-success: #047857;
-  --color-success-bg: #ecfdf5;
-  --color-success-border: #a7f3d0;
-  --color-success-strong: #16a34a;
-  --color-live: #26911c; /* bolinha de status da call */
+  /* ---- Estados ----
+     Só preto, branco e cinza: o estado se lê pela marca (cheio, vazado, tracejado), não pela cor.
+     A única cor do app é a da Puca (--puca-holo-stops). Vermelho fica só para erro e encerrar. */
+  --color-success: #171717;
+  --color-success-bg: #ffffff;
+  --color-success-border: #171717;
+  --color-success-strong: #171717;
+  --color-live: #171717; /* bolinha de status da call */
 
-  --color-warning: #b45309;
-  --color-warning-bg: #fffbeb;
+  --color-warning: #525252;
+  --color-warning-bg: #f5f5f5;
 
   --color-danger: #e40014;
   --color-danger-soft: #d12d26; /* botão de encerrar */
   --color-danger-bg: #fef2f2;
   --color-danger-text: #b91c1c;
 
-  --color-info: #1971c2;
-  --color-info-bg: #eef6ff;
-  --color-info-text: #0b4a8a;
+  --color-info: #171717;
+  --color-info-bg: #f5f5f5;
+  --color-info-text: #171717;
 
-  --color-puca: #d83995; /* cursor da Puca mexendo na tela */
+  --color-puca: #171717; /* cursor da Puca mexendo na tela */
   --color-puca-text: #ffffff;
 
-  /* esfera da Puca (src/lib/puca-sphere.ts): só #rrggbb, o canvas lê estes valores */
-  --puca-sphere-dot: #807c7a;
-  --puca-sphere-accent: #b04a30;
-  --puca-sphere-warm: #d63a2c;
-  --puca-sphere-core: #1e1e1e;
+  /* A cor da Puca: o arco-íris metálico da faixa da esfera, para poucos pontos especiais
+     (o foco dela no quadro, partículas). Use dentro da regra animada:
+     background: conic-gradient(from var(--holo-turn), var(--puca-holo-stops)); animation: holo-spin ... */
+  --puca-holo-stops:
+    hsl(330 75% 64%),
+    hsl(25 80% 64%),
+    hsl(75 60% 56%),
+    hsl(165 65% 52%),
+    hsl(215 80% 64%),
+    hsl(270 70% 68%),
+    hsl(330 75% 64%);
 
-  --color-highlight: rgba(250, 204, 21, 0.35); /* trecho sendo falado / foco no quadro */
+  /* esfera da Puca (src/lib/puca-sphere.ts): só #rrggbb, o canvas lê estes valores */
+  --puca-sphere-dot: #c9c9c9; /* pontos de fundo, cinza claro (a faixa é arco-íris, gerada no canvas) */
+
+  --color-highlight: rgba(0, 0, 0, 0.07); /* trecho sendo falado / foco no quadro */
+  --color-highlight-strong: rgba(0, 0, 0, 0.16); /* alvo na checagem: mais forte que o hover */
 
   /* ---- Formas ---- */
   --radius-sm: 6px;

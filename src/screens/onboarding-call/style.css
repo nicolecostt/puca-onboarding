@@ -54,7 +54,7 @@ body{overflow:hidden}
 .agent__orb[data-state="speaking"] .agent__ring--3{animation-delay:1.6s}
 .agent__orb[data-state="speaking"] .agent__core{animation:breathe 1.2s ease-in-out infinite}
 /* ouvindo: um anel parado, discreto */
-.agent__orb[data-state="listening"] .agent__ring--1{opacity:1;inset:14px;border-color:rgba(38,145,28,.35)}
+.agent__orb[data-state="listening"] .agent__ring--1{opacity:1;inset:14px;border-color:rgba(23,23,23,.25)}
 /* pausado / encerrado */
 .agent__orb[data-state="paused"] .agent__core,
 .agent__orb[data-state="ended"] .agent__core{opacity:.45;transform:scale(.96)}

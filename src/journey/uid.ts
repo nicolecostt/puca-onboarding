@@ -1,5 +1,5 @@
 // Id único que funciona fora de contexto seguro: crypto.randomUUID só existe em https e localhost,
-// e a Lousa também roda por http://<ip-da-rede> (outro computador ou celular na mesma rede).
+// e o Orbis também roda por http://<ip-da-rede> (outro computador ou celular na mesma rede).
 export function uid(): string {
   const c = globalThis.crypto as Crypto | undefined;
   if (c?.randomUUID) return c.randomUUID();

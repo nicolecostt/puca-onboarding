@@ -153,7 +153,7 @@
   box-shadow: var(--shadow-sketch), 0 0 0 4px rgba(23, 23, 23, 0.06);
 }
 .wb-node.is-open {
-  box-shadow: var(--shadow-sketch), 0 0 0 4px rgba(25, 113, 194, 0.18);
+  box-shadow: var(--shadow-sketch), 0 0 0 4px rgba(23, 23, 23, 0.14);
 }
 
 .wb-node--topic {
@@ -181,9 +181,24 @@
   color: var(--color-danger-text);
 }
 
-/* foco: anel amarelo (o que o agente está explicando agora) */
-.wb-node.is-focus {
-  box-shadow: 0 0 0 6px var(--color-highlight), var(--shadow-sketch);
+/* foco: anel com a cor da Puca (o que ela está explicando agora) */
+.wb-node.is-focus::after {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: calc(var(--radius-lg) + 7px);
+  padding: 3px;
+  background: conic-gradient(from var(--holo-turn), var(--puca-holo-stops));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: holo-spin 6s linear infinite;
+  pointer-events: none;
+}
+.wb-node--topic.is-focus::after,
+.wb-node--dlq.is-focus::after {
+  border-radius: calc(var(--radius-node-pill) + 7px);
 }
 
 .wb-node__lock {
@@ -328,19 +343,35 @@
   border-color: var(--color-info);
   background: var(--color-info-bg);
 }
+/* Sem cor, o estado se lê pela marca:
+   acerto = contorno cheio e grosso com um visto; alerta = contorno duplo cinza (diferente do tracejado da caixa preta). */
 .wb-node.tone-warn {
-  border-color: var(--color-warning);
+  border: 4px double var(--color-warning);
   background: var(--color-warning-bg);
 }
 .wb-node.tone-ok {
-  border-color: var(--color-success-strong);
+  border: 3px solid var(--color-success-strong);
   background: var(--color-success-bg);
+}
+.wb-node.tone-ok::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  /* visto branco desenhado (svg) sobre o círculo preto */
+  background: var(--color-success-strong)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-4.9' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 12px no-repeat;
 }
 .wb-edge.tone-focus path {
   stroke: var(--color-info);
 }
 .wb-edge.tone-warn path {
   stroke: var(--color-warning);
+  stroke-width: 3;
 }
 .wb-edge.tone-ok path {
   stroke: var(--color-success-strong);
@@ -351,7 +382,6 @@
   fill: var(--color-info);
   opacity: 0;
   transition: opacity 0.2s ease;
-  filter: drop-shadow(0 0 6px rgba(25, 113, 194, 0.5));
 }
 .wb-pulse.is-on {
   opacity: 1;
@@ -359,10 +389,13 @@
 
 /* ---- Modo de escolha (checagem): nós visíveis viram alvos ---- */
 .wb--selecting .wb-node.is-shown:hover {
-  box-shadow: 0 0 0 6px var(--color-highlight), var(--shadow-sketch);
+  box-shadow: 0 0 0 6px var(--color-highlight-strong), var(--shadow-sketch);
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .wb-node.is-focus::after {
+    animation: none;
+  }
   .wb-node,
   .wb-label,
   .wb-badge,
