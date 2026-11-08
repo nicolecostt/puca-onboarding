@@ -3,7 +3,8 @@
 //
 // Mouse: a esfera inclina na direção do cursor e os pontos perto dele crescem e escurecem.
 // Clique: solta uma ondulação que corre pela superfície.
-// Faixa: arco-íris holográfico (o tom muda ao longo da faixa e gira com o tempo); o fundo fica claro.
+// Faixa: arco-íris metálico (o tom muda ao longo da faixa e gira com o tempo, com brilho onde a luz bate); o fundo fica claro.
+// O clique também solta uma onda em arco-íris.
 import type { AgentVisual, AgentVisualFactory, AgentVisualState, RGB } from "./agent-visual";
 
 // ---- Ajustes ----
@@ -48,10 +49,10 @@ function hsl(h: number, s: number, l: number): RGB {
 // arco-íris: quantos graus de tom por volta da esfera e por segundo
 const HUE_SPREAD = 360; // graus de tom ao longo de uma volta da faixa
 const HUE_SPEED = 40; // graus por segundo (pensando gira mais rápido)
+const WHITE: RGB = { r: 255, g: 255, b: 255 }; // brilho metálico
 
 export const mountPucaSphere: AgentVisualFactory = (container) => {
   const BASE = tokenColor("--puca-sphere-dot", { r: 201, g: 201, b: 201 }); // cinza dos pontos de fundo
-  const CLICK = tokenColor("--puca-sphere-click", { r: 47, g: 91, b: 255 }); // ondulação do clique
 
   const canvas = document.createElement("canvas");
   canvas.style.cssText = "display:block;width:100%;height:100%";
@@ -200,7 +201,7 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
     }
 
     hue = (hue + dt * HUE_SPEED * (1 + warmMix * 1.5)) % 360;
-    const sat = 0.85 + warmMix * 0.15;
+    const sat = 0.75 + warmMix * 0.2;
     const R = Math.min(w, h) * 0.44;
     const cxS = w / 2;
     const cyS = h / 2;
@@ -259,10 +260,13 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
 
       // tom do ponto: anda com a longitude e com a posição na tela (brilho holográfico)
       const h = hue + (lo / (Math.PI * 2)) * HUE_SPREAD + (sx[i] - sy[i]) * 140;
-      let c = mix(BASE, hsl(h, sat, 0.62), heat);
-      c = mix(c, hsl(h + 30, sat, 0.75), dark);
-      // o clique corre pela esfera em azul
-      c = mix(c, CLICK, Math.min(1, ring * 3));
+      // metálico: tons escuros, e um brilho branco onde a luz (de cima à esquerda) bate
+      let c = mix(BASE, hsl(h, sat, 0.42), heat);
+      c = mix(c, hsl(h + 30, sat, 0.3), dark);
+      const shine = Math.pow(Math.max(0, -sx[i] * 0.45 - sy[i] * 0.55 + z * 0.7), 14);
+      c = mix(c, WHITE, shine * heat * 0.85);
+      // o clique corre pela esfera em arco-íris, com o tom adiantado em relação à faixa
+      c = mix(c, hsl(h + 120 + ring * 90, 0.85, 0.45), Math.min(1, ring * 3));
 
       const size = Math.max(0.45, (0.5 + depth * 0.85) * (1 + heat * 0.6 + dark * 1.3 + touch * 0.8 + ring * 0.6) * (R / 210));
       const alpha = (0.06 + Math.pow(depth, 1.3) * 0.94) * (0.6 + 0.4 * Math.max(heat, dark, 0.3));
@@ -288,7 +292,7 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
       warm = on;
     },
     getColor() {
-      const c = hsl(hue, 0.85, 0.62);
+      const c = hsl(hue, 0.75, 0.42);
       return { r: Math.round(c.r), g: Math.round(c.g), b: Math.round(c.b) };
     },
   };
