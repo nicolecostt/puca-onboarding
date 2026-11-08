@@ -172,6 +172,8 @@ Expected: relatório com cerca de 200 arquivos alterados e a lista do que sobrou
 
 À mão, só o que `acharMarca` ainda lista. `src/frontend/static/img/kota.svg` vira o logo da Kota (wordmark simples em SVG) e `favicon.png` é trocado.
 
+A troca leva a senha de demo `bankofanthos` a `kota` no `docker-compose.yml` e no `scripts/verificar-local.sh`, mas o `DEFAULT_PASSHASH` de `src/accounts/accounts-db/initdb/1-load-testdata.sh` continua sendo o bcrypt de `bankofanthos` (conferido). Gere o hash da senha nova nesse arquivo, ou o login da fumaça falha.
+
 Run: `npm run check:kota -- --repo ../kota-bank-oficina` e, na oficina, `scripts/testar.sh && scripts/verificar-local.sh`
 Expected: regra `marca` sem erro, testes verdes, fumaça verde com `MARCA=Kota` (o padrão).
 
