@@ -1,4 +1,5 @@
-// Call inicial: a Puca se apresenta e coleta as infos iniciais do usuário, como numa entrevista.
+// Call inicial: a Puca se apresenta, confirma os dados da admissão e levanta o que a pessoa já sabe e
+// o que ela quer (a calibragem), como numa entrevista.
 // Por enquanto a conversa é simulada (roteiro abaixo). A pessoa pode responder
 // "por voz" (resposta de exemplo depois de alguns segundos) ou digitando no chat.
 import "../../styles/base.css";
@@ -9,45 +10,100 @@ import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../
 import { emit } from "../../lib/events";
 import { qs } from "../../lib/dom";
 import { activeProfile, company } from "../../data";
-import { profileFromAnswers, saveProfile } from "../../journey/profile";
+import { callAnswers } from "../../data/call-answers";
+import { normalize } from "../../journey/conditions";
+import { profileFromAnswers, saveProfile, vinculoFromAnswer } from "../../journey/profile";
+import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem";
 
 // ---- Roteiro ----
-type FieldKey = "nome" | "vinculo" | "cargo" | "time" | "gestor" | "ferramentas" | "aprender";
+// A Puca confirma os dados da admissão (não pergunta o que a empresa já sabe) e gasta a conversa com o que
+// só a pessoa pode contar: experiência, o que já sabe de cada tema da aula e os objetivos. Quem está
+// mudando de time ganha perguntas sobre o time anterior. No fim, as respostas viram a calibragem.
+type FieldKey =
+  | "nome" | "vinculo" | "confirma" | "cargo" | "time" | "gestor"
+  | "time_anterior" | "experiencia" | "aproveita" | "diferencas"
+  | "pagamentos" | "mensageria" | "falhas" | "objetivos" | "aprender";
 type Answers = Partial<Record<FieldKey, string>>;
 
 interface Field {
   key: FieldKey;
-  label: string;
+  question: (a: Answers) => string;
+  /** Só pergunta quando a condição vale (ex.: só na transição). */
+  when?: (a: Answers) => boolean;
   /** Resposta de exemplo usada quando a pessoa "responde por voz" na simulação. */
   sample: string;
 }
 
-// Respostas de exemplo vêm do perfil da demo (?perfil=bruno | ana)
+// Dados da admissão e respostas de exemplo vêm do perfil da demo (?perfil=bruno | ana)
 const profile = activeProfile();
+const sample = callAnswers[profile.id] ?? {};
+const admissao = {
+  cargo: profile.role,
+  time: profile.toTeam,
+  gestor: company.people[profile.managerId]?.name ?? "",
+};
+const transicao = (a: Answers) => vinculoFromAnswer(a.vinculo) === "transicao";
+const corrigir = (a: Answers) => /^(nao|errado)\b/.test(normalize(a.confirma ?? ""));
+
 const FIELDS: Field[] = [
-  { key: "nome", label: "Como prefere ser chamado", sample: profile.nickname },
+  {
+    key: "nome",
+    question: () =>
+      "Oi! Eu sou a Puca, e vou te acompanhar na sua primeira semana. Antes de começar, quero te conhecer um pouco. Como você prefere ser chamado?",
+    sample: profile.nickname,
+  },
   {
     key: "vinculo",
-    label: "Primeira vez ou mudando de time",
-    sample: profile.kind === "transfer" ? `Estou mudando de time, vim do ${profile.fromTeam ?? "outro time"}` : "Primeira vez",
+    question: (a) => `Prazer, ${a.nome}! É a sua primeira vez aqui na empresa ou você está mudando de time?`,
+    sample: sample.vinculo ?? "",
   },
-  { key: "cargo", label: "Cargo", sample: profile.role },
-  { key: "time", label: "Time", sample: profile.toTeam },
-  { key: "gestor", label: "Gestor(a)", sample: company.people[profile.managerId]?.name ?? "" },
-  { key: "ferramentas", label: "Ferramentas que já usa", sample: profile.tools },
-  { key: "aprender", label: "Como prefere aprender", sample: profile.learningStyle },
+  {
+    key: "confirma",
+    question: () =>
+      `Vi aqui que você vai entrar como ${admissao.cargo.toLowerCase()} no time ${admissao.time}, com ${admissao.gestor} na gestão. Está certo?`,
+    sample: sample.confirma ?? "Sim",
+  },
+  { key: "cargo", when: corrigir, question: () => "Me corrige então: qual vai ser o seu cargo?", sample: admissao.cargo },
+  { key: "time", when: corrigir, question: () => "E em qual time você vai entrar?", sample: admissao.time },
+  { key: "gestor", when: corrigir, question: () => "E quem vai ser sua gestora ou gestor?", sample: admissao.gestor },
+  { key: "time_anterior", when: transicao, question: () => "De qual time você está vindo?", sample: sample.time_anterior ?? "" },
+  {
+    key: "experiencia",
+    question: (a) =>
+      transicao(a) ? "Me conta rapidinho o que você fazia lá." : "Me conta rapidinho o que você fazia antes de chegar aqui.",
+    sample: sample.experiencia ?? "",
+  },
+  {
+    key: "aproveita",
+    when: transicao,
+    question: () => "O que do seu time antigo você acha que vai continuar usando aqui?",
+    sample: sample.aproveita ?? "",
+  },
+  {
+    key: "diferencas",
+    when: transicao,
+    question: () => "E o que você já sabe que vai ser novo pra você?",
+    sample: sample.diferencas ?? "",
+  },
+  {
+    key: "pagamentos",
+    question: () => "Agora sobre o que a gente vai ver junto. Você já trabalhou com pagamentos, tipo cartão e maquininha?",
+    sample: sample.pagamentos ?? "",
+  },
+  { key: "mensageria", question: () => "E com mensageria, tipo Kafka ou filas?", sample: sample.mensageria ?? "" },
+  {
+    key: "falhas",
+    question: () => "Quando algo falha num sistema, tipo retry ou fila de erro, você já lidou com isso?",
+    sample: sample.falhas ?? "",
+  },
+  { key: "objetivos", question: () => "O que você quer conseguir fazer nas primeiras semanas?", sample: sample.objetivos ?? "" },
+  {
+    key: "aprender",
+    question: () => "E pra fechar: você aprende melhor lendo, vendo alguém fazer ou fazendo junto?",
+    sample: profile.learningStyle,
+  },
 ];
 
-const QUESTIONS: Record<FieldKey, (a: Answers) => string> = {
-  nome: () =>
-    "Oi! Eu sou a Puca, e vou te acompanhar na sua primeira semana. Antes de começar, quero te conhecer um pouco. Como você prefere ser chamado?",
-  vinculo: (a) => `Prazer, ${a.nome}! É a sua primeira vez aqui na empresa ou você está mudando de time?`,
-  cargo: () => "E qual vai ser o seu cargo?",
-  time: () => "Legal. Em qual time você vai entrar?",
-  gestor: () => "E quem é a pessoa que vai ser sua gestora ou gestor?",
-  ferramentas: () => "Quais ferramentas você já usa no dia a dia?",
-  aprender: () => "E pra fechar: você aprende melhor lendo, vendo alguém fazer ou fazendo junto?",
-};
 const OUTRO = (a: Answers) =>
   `Perfeito, ${a.nome}. Já tenho o que preciso. Vou montar sua primeira semana com o time ${a.time} e te mostro em seguida.`;
 
@@ -63,13 +119,6 @@ const LABELS: Record<ShownState, string> = {
   paused: "Pausado",
   ended: "Call encerrada",
   done: "Montando sua semana…",
-};
-const STATUS: Partial<Record<ShownState, string>> = {
-  speaking: "Puca falando…",
-  listening: "Ouvindo você…",
-  thinking: "Pensando na sua resposta…",
-  paused: "Call pausada",
-  done: "Montando sua primeira semana…",
 };
 const VISUAL_STATE: Record<ShownState, AgentVisualState> = {
   idle: "idle",
@@ -95,7 +144,6 @@ async function main(): Promise<void> {
     captionAgent: qs(document, "#caption-agent"),
     captionUser: qs(document, "#caption-user"),
     captionHint: qs(document, "#caption-hint"),
-    live: qs(document, "#live"),
     timer: qs(document, "#timer"),
   };
 
@@ -105,7 +153,7 @@ async function main(): Promise<void> {
   let pendingAnswer: ((text: string) => void) | null = null; // resposta da pergunta atual pelo chat
 
   const chat = mountChatPanel({ title: "Transcrição da call", messages: [] });
-  const call = mountCallBar({ status: "Conectando…", chat });
+  mountCallBar({ chat });
 
   // Visual da Puca (teste local). Sem ele, fica o círculo neutro.
   let visual: AgentVisual | null = null;
@@ -140,17 +188,12 @@ async function main(): Promise<void> {
       visual.setWarm(agentState === "thinking"); // continua quente mesmo se pausar no meio
     }
     el.agentState.textContent = LABELS[shown];
-    const status = STATUS[shown];
-    if (status) call.setStatus(status);
-    el.live.classList.toggle("is-off", state.ended);
     el.captionHint.textContent =
       shown === "listening" && state.muted
         ? "Seu microfone está mudo. Responda pelo chat."
-        : shown === "listening"
-          ? "Fale normalmente ou responda pelo chat."
-          : shown === "ended"
-            ? "Use “Ligar para a Puca” para continuar de onde parou."
-            : "";
+        : shown === "ended"
+          ? "Use “Ligar para a Puca” para continuar de onde parou."
+          : "";
   }
 
   // Espera que só corre com a call ativa (pausa e encerramento seguram o tempo)
@@ -234,20 +277,25 @@ async function main(): Promise<void> {
   render();
   await wait(900);
   for (const f of FIELDS) {
-    await say(QUESTIONS[f.key](answers));
+    if (f.when && !f.when(answers)) continue;
+    await say(f.question(answers));
     const answer = await listen(f);
     // depois da resposta, ela "pensa" um pouco antes de anotar
     setAgent("thinking");
     await wait(1800);
     remember(f.key, answer);
+    // dados da admissão confirmados: entram como se a pessoa tivesse respondido
+    if (f.key === "confirma" && !corrigir(answers)) for (const [k, v] of Object.entries(admissao)) remember(k as FieldKey, v);
     await wait(400);
   }
   await say(OUTRO(answers));
   state.done = true;
   setAgent("done");
 
-  // Entrega o perfil para a aula no quadro e mostra o caminho até ela.
-  saveProfile(profileFromAnswers(answers));
+  // Entrega o perfil e a calibragem para a aula no quadro e mostra o caminho até ela.
+  const perfil = profileFromAnswers(answers);
+  saveProfile(perfil);
+  saveCalibragem(calibragemFromAnswers(perfil, answers));
   const next = document.createElement("a");
   next.className = "caption__next";
   next.href = "../lesson/";

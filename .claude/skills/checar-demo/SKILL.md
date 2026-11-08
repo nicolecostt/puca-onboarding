@@ -1,6 +1,6 @@
 ---
 name: checar-demo
-description: Use antes da apresentação, depois de integrar PRs na main ou quando alguém perguntar "a demo está funcionando?". Confere os fluxos de docs/demo.md e diz o que está quebrado. Não corrige nada sozinho.
+description: Chame automaticamente antes da apresentação, depois de integrar PRs na main ou quando perguntarem "a demo está funcionando?", "dá pra apresentar?", "o que está quebrado?". Confere os passos de docs/demo.md e o que o PRODUCT.md exige, e diz o que está quebrado. Não corrige nada sozinho.
 ---
 
 # Checar a demo

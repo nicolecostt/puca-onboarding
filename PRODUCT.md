@@ -16,6 +16,8 @@
 10. [Complementos do alinhamento com Joaquim](#10-complementos-do-alinhamento-com-joaquim)
 11. [Posicionamento: Sana Learn como referência e foco em just-in-time learning](#11-posicionamento-sana-learn-como-referência-e-foco-em-just-in-time-learning)
 12. [Encaixe no Desafio Tako: a Puca como digital worker de onboarding](#12-encaixe-no-desafio-tako-a-puca-como-digital-worker-de-onboarding)
+13. [Avaliação pelos jurados: o mundo fictício da Tail](#13-avaliação-pelos-jurados-o-mundo-fictício-da-tail)
+14. [Modelo de negócio: quem compra e como cobramos](#14-modelo-de-negócio-quem-compra-e-como-cobramos)
 
 ---
 
@@ -48,7 +50,7 @@ Isso gera alguns problemas:
 - Dependência de colegas mais experientes para responder dúvidas recorrentes.
 - Documentação que nem sempre esclarece como os processos funcionam na prática.
 - Dificuldade em identificar as pessoas responsáveis por cada sistema ou atividade.
-- Jornadas de integração pouco adaptadas à experiência prévia do profissional.
+- Integrações pouco adaptadas à experiência prévia do profissional.
 - Falta de visibilidade para gestores, buddies e RH sobre etapas concluídas e dificuldades que exigem intervenção.
 
 Além disso, **quem muda de equipe enfrenta parte desses desafios novamente**, mesmo já conhecendo a empresa.
@@ -176,7 +178,7 @@ Depois de explicar os sistemas e processos da equipe, o agente identifica uma ta
 
 Durante a atividade, o profissional pode voltar ao quadro e fazer perguntas relacionadas ao que está desenvolvendo. Puca vira uma **ponte entre a teoria e a prática**, e o profissional ganha autonomia mais rápido, sem depender de explicações repetitivas a cada nova atividade.
 
-> **No hackathon:** pode ser demonstrada como uma primeira tarefa simulada e documentada no Notion. Não é preciso integração completa com Jira ou GitHub para validar a experiência.
+> **No hackathon:** pode ser demonstrada como uma primeira tarefa simulada e documentada no Notion. Não é preciso conexão completa com Jira ou GitHub para validar a experiência.
 
 ### 4.5. Conhecimento contínuo e encaminhamento humano
 
@@ -206,7 +208,7 @@ Além da experiência do funcionário, queremos dar visibilidade às pessoas res
 |---|---|
 | **Buddy** | Etapas de orientação concluídas, assuntos que ainda exigem suporte e pedidos de ajuda encaminhados a ele. |
 | **Gestor** | Marcos da integração, acessos pendentes, objetivos iniciais e possíveis bloqueios que dependam de decisões da equipe. |
-| **RH** | Etapas obrigatórias, pendências administrativas e indicadores agregados das jornadas de onboarding e transição. |
+| **RH** | Etapas obrigatórias, pendências administrativas e indicadores agregados das integrações, de novos e de transição. |
 
 **Exemplos de métricas:**
 
@@ -263,7 +265,7 @@ Para mostrar a personalização, usamos **uma única empresa fictícia com dois 
 
 Esses cenários mostram que o agente **não executa uma trilha fixa**: ele usa o contexto e o histórico disponíveis para decidir quais informações são relevantes.
 
-A apresentação pode ser complementada com um **painel simples** mostrando o acompanhamento de cada jornada por buddy, gestor ou RH.
+A apresentação pode ser complementada com um **painel simples** mostrando o acompanhamento de cada integração por buddy, gestor ou RH.
 
 ---
 
@@ -305,6 +307,17 @@ A call inicial é o momento de identificar **o que a pessoa já conhece**, suas 
 |---|---|
 | **Entrando na empresa** | Combina acolhimento e onboarding cultural com o levantamento do repertório técnico e das necessidades da função. |
 | **Saindo de um time e entrando em outro** | Considera o contexto anterior, confirma os conhecimentos que podem ser aproveitados e investiga as diferenças do novo time: sistemas, responsabilidades, pessoas, práticas e rituais. A jornada é ajustada a partir dessa conversa. |
+
+**A call inicial não é só coleta de informações.** Além de levantar o que a pessoa já sabe, a Puca faz o **onboarding cultural**: explica como a empresa funciona e o que ela valoriza, para a pessoa chegar à primeira aula sabendo onde está entrando.
+
+- **O que a Puca explica:** missão e valores, o jeito de trabalhar (rituais, combinados, como a comunicação acontece e onde pedir ajuda) e quem são as pessoas de referência (buddy, gestor, time).
+- **Como explica:** em conversa, intercalando com as perguntas, e não como uma palestra antes delas. Cada trecho é curto e se liga ao que a pessoa contou (ex.: quem vem de uma empresa grande ouve como as decisões andam aqui).
+- **De onde vem:** só da documentação oficial da empresa, com as mesmas regras de fonte da [§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano). O que não está documentado a Puca não inventa.
+- **Na transição entre times:** só as particularidades culturais do novo time, sem repetir a apresentação institucional ([Cenário B](#cenário-b--funcionário-em-transição-interna)).
+
+> **Exemplo:** “Antes de seguir, uma coisa sobre como a Tail trabalha: aqui quem encontra um problema é dono dele até alguém assumir. Você vai ver isso no seu primeiro ticket. E no seu time anterior, como funcionava?”
+
+> **No hackathon:** a tela da call inicial (`src/screens/onboarding-call`) hoje só faz perguntas; a cultura aparece na aula, no momento “empresa e cultura” da jornada da Tail. Trazer o onboarding cultural para a call está em #57.
 
 ### 10.2. Incorporação de respostas à base — opcional no hackathon
 
@@ -370,7 +383,7 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 
 | # | O que a Puca faz | O que isso mostra | Onde o humano entra |
 |---|---|---|---|
-| 1 | Na **call inicial**, levanta o que a pessoa já sabe, registra a calibragem e **monta a jornada dela** ([§10.1](#101-call-inicial-e-conhecimento-prévio)). | O agente planeja a partir de um objetivo. | — |
+| 1 | Na **call inicial**, faz o onboarding cultural, levanta o que a pessoa já sabe, registra a calibragem e **monta a jornada dela** ([§10.1](#101-call-inicial-e-conhecimento-prévio)). | O agente planeja a partir de um objetivo. | — |
 | 2 | Conduz a **aula** no quadro, seguindo a jornada e respondendo na hora ao que a pessoa diz: perguntas, pulos e interrupções. | O agente executa e se adapta, sem roteiro fixo. | — |
 | 3 | Faz uma **checagem leve de entendimento** e atualiza os objetivos que ainda faltam. | O agente acompanha o resultado do próprio trabalho. | — |
 | 4 | Quando falta fonte confiável, faz o **encaminhamento** ao buddy no Slack, com a dúvida, as fontes já consultadas e o motivo de não ter respondido ([§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano)). | O agente trata a exceção e passa para um humano *"com o contexto pronto para decidir"*. | O buddy responde ou indica o responsável. |
@@ -378,8 +391,114 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 
 ### 12.2. O que precisa aparecer na demo
 
-- **Agir num sistema, não só falar.** O encaminhamento do passo 4 precisa acontecer de fato no Slack simulado da tela `live-session`. O guia aceita integrações simuladas *"desde que o agente realmente opere sobre elas na demo"*.
+- **Agir num sistema, não só falar.** O encaminhamento do passo 4 precisa acontecer de fato no Slack simulado da tela `live-session`. O guia aceita conexões simuladas *"desde que o agente realmente opere sobre elas na demo"*.
 - **Rastro.** Cada decisão da Puca (o que respondeu, de qual fonte, quando encaminhou e por quê) fica registrada e pode ser auditada depois.
 - **Custo.** Mostrar quanto custa uma sessão em tempo e tokens, comparado com as horas que o buddy gastaria explicando a mesma coisa.
 
 > **Limites que o desafio impõe:** decisões sobre pessoas ficam com humanos, e a demo usa só dados sintéticos. A calibragem e o andamento descrevem o processo de integração, e não avaliam o desempenho da pessoa (ver o aviso de privacidade em [§5](#5-visibilidade-para-buddy-gestor-e-rh)).
+
+---
+
+## 13. Avaliação pelos jurados: o mundo fictício da Tail
+
+> Alinhamento com Joaquim em 2026-11-07.
+
+Não temos como prever **como** cada jurado vai testar a Puca, e o desafio pede só dados sintéticos ([§12.2](#122-o-que-precisa-aparecer-na-demo)). Então, em vez de roteirizar o teste, controlamos o
+**mundo** em que ele cai: a Tail, uma empresa fictícia completa, que a Puca conhece e que o jurado também recebe.
+
+### 13.1. O jurado vive a pessoa
+
+O jurado não assiste a uma demo: ele **é a pessoa** sendo integrada e **escolhe o perfil** com que entra:
+
+- **Novo**: acabou de entrar na Tail (como a Ana).
+- **Transição**: já está na Tail e muda de time (como o Bruno).
+
+A escolha muda a jornada, como em [§7](#7-demonstração-dos-dois-perfis).
+
+### 13.2. O kit da Tail: fonte e prova ao mesmo tempo
+
+O mundo fictício é um conjunto de materiais falsos, mas realistas o bastante para simular o primeiro dia numa empresa de verdade:
+
+- **Repositórios** falsos: código, README e ADRs;
+- **Documentação** falsa: Notion, políticas, organograma, rituais, responsáveis por sistema;
+- o que mais a Puca precisar citar como **fonte**.
+
+O kit tem dois papéis:
+
+1. **Fonte**: é de onde a Puca tira o que explica.
+2. **Prova**: o jurado recebe o mesmo kit e pode conferir que a Puca não inventou.
+
+Por isso o mundo precisa ser **coerente**: se a Puca diz "o serviço de pagamentos é do time X, por causa do ADR-003",
+o jurado tem que achar isso no repo. Afirmação sem fonte no kit cai no **encaminhamento** ([§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano)).
+
+### 13.3. Guia de uso
+
+O kit vai junto com um **guia de uso** para o jurado: quem ele é na história, como escolher o perfil, onde estão os
+materiais e o que vale tentar (inclusive perguntas fora do roteiro e dúvidas sem resposta na base).
+
+### 13.4. O que já existe é referência, não contrato
+
+A Tail de hoje (`src/data/company.ts`, `src/data/profiles.ts`) e a jornada de demo (`src/journey/data/tail.journey.json`)
+são **referência**. O mundo fictício pode redesenhar a Tail, as pessoas e a jornada do jeito que funcionar melhor.
+
+### 13.5. Em aberto
+
+- A jornada continua escrita à mão ou passa a ser derivada do kit (repos e docs)?
+- Como o kit chega ao jurado (repos públicos no GitHub, Notion público, arquivo junto do app)?
+- O que o jurado precisa conseguir fazer com o kit para acreditar que a Puca é de verdade, e não um roteiro?
+
+---
+
+## 14. Modelo de negócio: quem compra e como cobramos
+
+> Alinhamento com Joaquim em 2026-11-07.
+
+A Puca é vendida para empresas (B2B): **a empresa compra e o RH aprova**. A entrada é um **piloto** pago e pequeno, que vira contrato anual medido em **integrações**. Mercado, métricas, evidências externas e fontes estão em [`docs/negocio/contexto-de-negocio.md`](docs/negocio/contexto-de-negocio.md).
+
+### 14.1. Quem compra e quem participa
+
+| Papel | No modelo |
+|---|---|
+| **Empresa** | Contrata e paga. |
+| **RH** | Aprova a compra e acompanha se as integrações trazem resultado. Ninguém substitui o RH como aprovador por inferência. |
+| **Gestor e engenharia** | Ajudam a definir tarefas, contexto e qualidade esperada. |
+| **Buddy** | Orienta quando precisa e mostra onde há repetição ou bloqueio. |
+| **TI e segurança** | Participam da conexão com os sistemas da empresa e da avaliação de acessos, quando for o caso. |
+| **Pessoa** | Usa a Lousa para aprender e fazer as primeiras tarefas. |
+
+Foco inicial: empresas com times de tecnologia, contratações ou mudanças de time recorrentes e conhecimento espalhado em várias fontes. Não há corte de tamanho definido. Grandes empresas são um bom começo, não um limite.
+
+Os dois vínculos, novo e transição ([§3](#3-cenários-principais-de-uso)), fazem parte da proposta e aparecem na demo.
+
+### 14.2. Como cobramos
+
+- **Unidade:** a integração, ou seja, uma pessoa entrando num contexto de destino. Novo e transição consomem o **mesmo saldo**, com o mesmo preço, até os dados mostrarem diferença de custo ou de valor.
+- **Piloto pago:** preço e número de integrações menores que no contrato anual. Padrão de partida: **60 dias de uso**, contados depois que fontes e acessos estão disponíveis, em uma equipe. Revisão no meio e revisão comercial no fim.
+- **Contrato anual:** volume de integrações com **quantidade mínima**.
+- **Implantação:** conectar a Lousa às fontes e aos acessos de um cliente. A equipe já está construindo essa parte do produto, mas ainda não há implantação em nenhum cliente. Uma taxa separada só será proposta se o esforço observado justificar.
+
+O piloto vira contrato anual quando três coisas acontecem juntas:
+
+1. **Valor observado:** melhora em 1 ou 2 métricas combinadas antes do piloto, sem piorar a qualidade das tarefas nem esconder esforço.
+2. **Uso e viabilidade:** as pessoas usam o fluxo, o contexto é utilizável e o esforço de implantação é aceitável.
+3. **Continuidade:** o RH aprova e há volume futuro que justifique o mínimo anual.
+
+Sem informação suficiente, a decisão é explícita: encerrar, corrigir o escopo ou estender o piloto em acordo. Não há conversão automática nem piloto gratuito indefinido.
+
+### 14.3. O que prometemos
+
+- **Resultado principal:** menos tempo bloqueado por falta de contexto e menos explicação repetida para buddies e gestores ([§8](#8-proposta-de-valor)).
+- **Efeito a acompanhar, não promessa:** retenção e experiência nos primeiros 90 dias.
+- **Métricas do piloto:** tempo até autonomia, tempo bloqueado por contexto, esforço do buddy, qualidade das tarefas, clareza de papel e uso efetivo. Escolher 1 ou 2 por piloto.
+
+> ⚠️ **Métricas agregadas, sobre o processo:** valem as regras de privacidade da [§5](#5-visibilidade-para-buddy-gestor-e-rh). Tempo até autonomia e qualidade das tarefas descrevem o processo de integração do grupo, e não medem a competência de uma pessoa.
+
+> ⚠️ **Sem medição própria, não afirmamos:** redução percentual de tempo ou de turnover, ausência de concorrência, preço validado, margem conhecida ou clientes na lista de empresas pesquisadas. A lista completa está no doc de negócio.
+
+### 14.4. Em aberto
+
+- Preço por integração. Os R$ 900 do exercício de mercado são só uma premissa.
+- Quantidade mínima do contrato anual e forma de pagamento (antecipado ou parcelado).
+- O que uma integração cobre: duração, reabertura, troca de contexto, excedentes e validade do saldo.
+- Custos e margem: só depois da implementação, a partir do custo medido da sessão (#52).
+
