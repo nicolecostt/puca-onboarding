@@ -21,13 +21,12 @@ const SKILL_MS = 3200;
 
 function mountSkills(sphere: AgentVisual | null): void {
   const list = qs<HTMLElement>(document, "#skills");
-  const pauseBtn = qs<HTMLButtonElement>(document, "#skills-pause");
   const items = [...list.querySelectorAll<HTMLButtonElement>(".skill")];
   list.style.setProperty("--skill-ms", `${SKILL_MS}ms`);
 
   let index = 0;
   let timer = 0;
-  let paused = reduceMotion;
+  const paused = reduceMotion; // com movimento reduzido, a lista não troca sozinha
   let hovering = false;
   let visible = false;
 
@@ -61,17 +60,6 @@ function mountSkills(sphere: AgentVisual | null): void {
     hovering = false;
     restart();
   });
-
-  const syncPause = () => {
-    pauseBtn.textContent = paused ? "Continuar" : "Pausar";
-    pauseBtn.setAttribute("aria-pressed", String(paused));
-  };
-  pauseBtn.addEventListener("click", () => {
-    paused = !paused;
-    syncPause();
-    restart();
-  });
-  syncPause();
 
   // só corre quando a seção está na tela
   new IntersectionObserver(([e]) => {
@@ -146,7 +134,7 @@ function mountParticles(): void {
   const canvas = qs<HTMLCanvasElement>(document, "#particles");
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
-  const COUNT = Math.round(Math.min(140, (innerWidth * innerHeight) / 11000));
+  const COUNT = Math.round(Math.min(60, (innerWidth * innerHeight) / 24000));
   const dots = Array.from({ length: COUNT }, () => ({
     x: Math.random(),
     y: Math.random(),

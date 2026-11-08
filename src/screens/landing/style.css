@@ -261,6 +261,8 @@ main,
 
 /* ---- Exemplo de quadro ---- */
 .board {
+  position: relative;
+  background: var(--paper);
   margin: clamp(48px, 6vw, 80px) 0 0;
   border: 1px solid var(--ink);
   border-radius: var(--radius-xl);
@@ -539,23 +541,6 @@ main,
   to {
     transform: scaleX(1);
   }
-}
-
-.pause {
-  margin-top: 20px;
-  min-height: 44px;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--grey);
-  font: 500 14px/1 var(--font-sans);
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-.pause:hover {
-  color: var(--ink);
 }
 
 /* ---- Problema ---- */
