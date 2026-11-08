@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import demo from "../data/kota.journey.json";
-import { buddyOf, createOutbox, FORWARDING_KEY, forwardingMessage, type Forwarding } from "../forwarding";
+import { buddyOf, createOutbox, destinatario, FORWARDING_KEY, forwardingMessage, type Forwarding } from "../forwarding";
 import { memoryStore } from "../storage";
 import { loadJourney } from "../validate";
 
@@ -123,5 +123,23 @@ describe("createOutbox: posse do envio entre abas", () => {
     createOutbox(store).claim(f.id, "aba-2");
     expect(createOutbox(store).ownerOf(f.id)).toBe("aba-2");
     expect(createOutbox(store).pending()).toEqual([]);
+  });
+});
+
+describe("destinatario (#125: caso pessoal vai ao gestor ou a People)", () => {
+  const nomes = { buddy: "Beatriz Cavalcanti", gestor: "Natália Brandão" };
+
+  it("sem destino, ou buddy: a buddy, como antes", () => {
+    expect(destinatario(undefined, nomes)).toEqual({ name: "Beatriz Cavalcanti", role: "buddy" });
+    expect(destinatario("buddy", nomes)).toEqual({ name: "Beatriz Cavalcanti", role: "buddy" });
+  });
+
+  it("gestor: o gestor da pessoa; sem nome, a gestão do time", () => {
+    expect(destinatario("gestor", nomes)).toEqual({ name: "Natália Brandão", role: "gestor" });
+    expect(destinatario("gestor", { buddy: "Beatriz Cavalcanti" })).toEqual({ name: "Gestão do time", role: "gestor" });
+  });
+
+  it("rh: People", () => {
+    expect(destinatario("rh", nomes)).toEqual({ name: "People", role: "rh" });
   });
 });

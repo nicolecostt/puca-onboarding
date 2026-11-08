@@ -14,7 +14,8 @@ import { buildFaqs } from "../../journey/faq";
 import { routeUtterance } from "../../journey/route";
 import { enviarNoSlackReal, lerEmailDoSlack } from "../../journey/slack-real";
 import { browserStore } from "../../journey/storage";
-import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
+import { buddyOf, createOutbox, destinatario, looksLikeQuestion } from "../../journey/forwarding";
+import type { DestinoDoEncaminhamento } from "../../journey/encaminhamento-slack";
 import { createPedidos, PEDIDOS_KEY, tarefaDaPessoa, tarefaDoPasso } from "../../journey/primeira-tarefa";
 import { createTrail, sourcesFor } from "../../journey/trail";
 import { createAgentVoice, MIC_AVISO } from "../../voice/agent-voice";
@@ -303,11 +304,13 @@ async function main(): Promise<void> {
   const SLACK = { href: "../live-session/", target: "puca-slack", label: "Abrir Slack" };
 
   /** Encaminha a dúvida à buddy (§4.5): guarda para o Slack, marca no rastro e avisa na sessão. */
-  function forward(entryId: string, f: { question: string; summary: string; reason: string; consulted?: string[] }): void {
-    const consulted = [...new Set([...(f.consulted ?? []), ...consultedNow()])];
-    const created = outbox.add({ ...f, to: { name: buddy, role: "buddy" }, pessoa: profile.nome, consulted, moment: currentMoment?.id ?? null });
+  function forward(entryId: string, f: { question: string; summary: string; reason: string; consulted?: string[]; destino?: DestinoDoEncaminhamento }): void {
+    const { destino, ...dados } = f;
+    const consulted = [...new Set([...(dados.consulted ?? []), ...consultedNow()])];
+    const to = destinatario(destino, { buddy, gestor: profile.gestor });
+    const created = outbox.add({ ...dados, to, pessoa: profile.nome, consulted, moment: currentMoment?.id ?? null });
     trail.update(entryId, { forwarding_id: created.id });
-    showToast(`Encaminhado à ${buddy} no Slack`, SLACK);
+    showToast(`Encaminhado para ${created.to.name} no Slack`, SLACK);
     // com o e-mail do Slack da Kota, o servidor manda de verdade; senão, o Slack simulado envia (#129)
     void enviarNoSlackReal(created, { outbox, email: lerEmailDoSlack(browserStore()) }).then((link) => {
       if (!link) return;
@@ -470,7 +473,13 @@ async function main(): Promise<void> {
           },
           onAction: (a) => io.apply(a),
           onGoTo: goTo,
-          onEscalate: (summary) => forward(entry.id, { question: text, summary, reason: "Não encontrei fonte confiável para responder." }),
+          onEscalate: (summary, destino) =>
+            forward(entry.id, {
+              question: text,
+              summary,
+              destino,
+              reason: destino && destino !== "buddy" ? "É um caso pessoal: a regra geral está nas políticas da empresa, mas a resposta para você é de quem decide." : "Não encontrei fonte confiável para responder.",
+            }),
           // custo da sessão (#52): só no rastro, para auditar; nada em tela
           onTiming: (t) =>
             trail.update(entry.id, { llm_ms: t.total_ms, llm_error: t.llm_error ?? undefined, tokens_in: t.tokens_in ?? undefined, tokens_out: t.tokens_out ?? undefined, tokens_estimated: t.tokens_estimated }),

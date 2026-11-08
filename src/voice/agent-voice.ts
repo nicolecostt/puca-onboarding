@@ -1,6 +1,7 @@
 // Voz de Puca na tela: fala com áudio do servidor (fila, um por vez), pergunta ao agente (ponte + LLM)
 // e microfone (Deepgram) com barge-in. Sem servidor ou sem chaves, cada parte desliga sozinha e a
 // tela segue como antes (legenda e chat).
+import type { DestinoDoEncaminhamento } from "../journey/encaminhamento-slack";
 import type { BoardAction } from "../journey/types";
 import { classifyBargeIn } from "./barge-in";
 import { startMic, type Mic } from "./mic";
@@ -23,7 +24,8 @@ export interface AskHandlers {
   onAction(action: BoardAction): void;
   onGoTo(target: string): void;
   /** O agente não achou fonte confiável: a tela encaminha a dúvida à buddy (resumo do agente). */
-  onEscalate?(summary: string): void;
+  /** Sem fonte confiável; destino = quem recebe (sem destino, a buddy). */
+  onEscalate?(summary: string, destino?: DestinoDoEncaminhamento): void;
   /** Tempo e tokens do pedido (último evento; não chega se a pessoa interrompeu). Custo da sessão, #52. */
   onTiming?(timing: AskTimingSummary): void;
 }
@@ -285,7 +287,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
               spoken.push(h.onSpeak(ev.text, play));
             } else if (ev.type === "action") actions.push(ev.action);
             else if (ev.type === "go_to") h.onGoTo(ev.target);
-            else if (ev.type === "escalate") h.onEscalate?.(ev.summary);
+            else if (ev.type === "escalate") h.onEscalate?.(ev.summary, ev.destino);
             else if (ev.type === "timing") h.onTiming?.(ev.timing);
           }
         }

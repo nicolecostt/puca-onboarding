@@ -19,6 +19,7 @@ vi.mock("../llm", () => ({
   },
 }));
 const { ask } = await import("./ask");
+const { buildTools } = await import("./prompt");
 type AskEvent = Parameters<Parameters<typeof ask>[1]>[0];
 
 const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/kota.journey.json", import.meta.url), "utf8")));
@@ -50,6 +51,25 @@ describe("ask: encaminhamento", () => {
     expect(escalations(evs)).toEqual([{ type: "escalate", summary: "Política de home office" }]);
     expect(evs.findIndex((e) => e.type === "escalate")).toBeLessThan(evs.findIndex((e) => e.type === "timing"));
     expect(evs.at(-1)?.type).toBe("timing");
+  });
+
+  it("caso pessoal: o LLM escolhe rh ou gestor e o destino vai junto (#125, mensagem real do #129)", async () => {
+    for (const destino of ["rh", "gestor"] as const) {
+      script = [
+        { type: "text", text: "Isso é com People. " },
+        { type: "tool_call", name: "escalate_to_buddy", args: { summary: "Bônus", destino }, raw: "" },
+        { type: "done", finishReason: "stop" },
+      ];
+      expect(escalations(await run())).toEqual([{ type: "escalate", summary: "Bônus", destino }]);
+    }
+  });
+
+  it("destino desconhecido é ignorado: vai à buddy, como antes", async () => {
+    script = [
+      { type: "tool_call", name: "escalate_to_buddy", args: { summary: "x", destino: "canal-geral" }, raw: "" },
+      { type: "done", finishReason: "stop" },
+    ];
+    expect(escalations(await run())).toEqual([{ type: "escalate", summary: "x" }]);
   });
 
   it("o LLM só diz que não confirmou: escalate com a pergunta como resumo", async () => {
@@ -112,5 +132,14 @@ describe("ask: encaminhamento", () => {
     await ask({ journey, profile: DEMO_PROFILES.novo, momentId: "pagamentos", stepId: "pg-pergunta", text,
       tts: null, model: "x", timeoutMs: 2000 }, (e) => evs.push(e));
     expect(escalations(evs)).toEqual([]);
+  });
+});
+
+describe("escalate_to_buddy: o que o LLM recebe", () => {
+  it("tem destino opcional: buddy, gestor ou rh", () => {
+    const tool = buildTools({ journey, profile: DEMO_PROFILES.novo, momentId: "pagamentos", stepId: "pg-pergunta" }).find((t) => t.function.name === "escalate_to_buddy")!;
+    const params = tool.function.parameters as { properties: Record<string, { enum?: string[] }>; required: string[] };
+    expect(params.properties.destino.enum).toEqual(["buddy", "gestor", "rh"]);
+    expect(params.required).toEqual(["summary"]);
   });
 });

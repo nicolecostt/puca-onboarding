@@ -72,8 +72,15 @@ export function buildTools(ctx: TurnContext): ToolSpec[] {
       type: "function",
       function: {
         name: "escalate_to_buddy",
-        description: "Encaminha a dúvida para a buddy quando não há fonte confiável.",
-        parameters: { type: "object", properties: { summary: { type: "string" } }, required: ["summary"] },
+        description: "Encaminha a dúvida quando não há fonte confiável: à buddy, ou, no caso pessoal (salário, bônus, contrato), ao gestor ou a People (rh).",
+        parameters: {
+          type: "object",
+          properties: {
+            summary: { type: "string" },
+            destino: { type: "string", enum: ["buddy", "gestor", "rh"], description: "Quem recebe na empresa. Sem destino, a buddy." },
+          },
+          required: ["summary"],
+        },
       },
     },
   ];

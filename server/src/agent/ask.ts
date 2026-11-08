@@ -1,6 +1,7 @@
 // Pergunta que a tela não resolveu sozinha (fora das respostas sugeridas, do conhecimento e do FAQ).
 // Sem estado: a tela manda momento, passo, perfil e o histórico curto. A primeira coisa que sai é
 // uma fala-ponte (áudio em cache); o LLM responde atrás dela, frase a frase.
+import type { DestinoDoEncaminhamento } from "../../../src/journey/encaminhamento-slack";
 import { randomUUID } from "node:crypto";
 import { detectIntent } from "../../../src/journey/conditions";
 import { looksLikeQuestion } from "../../../src/journey/forwarding";
@@ -12,6 +13,8 @@ import { buildMessages, buildTools, visibleNodes } from "./prompt";
 import { SentenceSplitter } from "./sentences";
 
 export type SpeakSource = "bridge" | "llm" | "fallback";
+const DESTINOS: readonly DestinoDoEncaminhamento[] = ["buddy", "gestor", "rh"];
+
 export type LlmFailure = "timeout" | "interrupted" | "provider_error" | "refusal" | "empty_response";
 
 export type AskEvent =
@@ -19,8 +22,8 @@ export type AskEvent =
   | { type: "action"; action: BoardAction }
   /** A pessoa pediu outro ponto da sessão: "moment:<id>" ou "step:<id>" (transições do passo atual). */
   | { type: "go_to"; target: string }
-  /** Sem fonte confiável: a tela encaminha a dúvida à buddy (no máximo um por pedido, antes do timing). */
-  | { type: "escalate"; summary: string }
+  /** Sem fonte confiável: a tela encaminha a dúvida (no máximo um por pedido, antes do timing). Sem destino, à buddy. */
+  | { type: "escalate"; summary: string; destino?: DestinoDoEncaminhamento }
   | { type: "timing"; timing: AskTiming };
 
 export interface AskTiming {
@@ -83,7 +86,12 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   let escalationSummary: string | null = null;
   let saidNoSource = false;
   let refused = false;
-  const escalate = (summary: string) => { escalationSummary ??= summary; };
+  let escalationDestino: DestinoDoEncaminhamento | undefined;
+  const escalate = (summary: string, destino?: DestinoDoEncaminhamento) => {
+    if (escalationSummary) return;
+    escalationSummary = summary;
+    escalationDestino = destino;
+  };
   const sentence = (s: string) => {
     timing.llm_first_sentence_ms ??= ms();
     spoke = true;
@@ -117,8 +125,10 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
       } else if (ev.name === "open_card" && a?.target && ids.has(a.target)) {
         emit({ type: "action", action: { type: "card", target: a.target } });
       } else if (ev.name === "escalate_to_buddy") {
-        const summary = (ev.args as { summary?: unknown } | null)?.summary;
-        escalate(typeof summary === "string" && summary.trim() ? summary.trim() : input.text);
+        const args = ev.args as { summary?: unknown; destino?: unknown } | null;
+        const summary = args?.summary;
+        const destino = DESTINOS.find((d) => d === args?.destino);
+        escalate(typeof summary === "string" && summary.trim() ? summary.trim() : input.text, destino);
       } else if (ev.name === "go_to" && typeof a?.target === "string") {
         wentTo = true;
         emit({ type: "go_to", target: a.target });
@@ -149,7 +159,7 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   if (timing.llm_error && timing.llm_error !== "interrupted") {
     say(FAILURE_LINE, "fallback");
   } else if (!input.signal?.aborted && looksLikeQuestion(input.text)) {
-    if (escalationSummary) emit({ type: "escalate", summary: escalationSummary });
+    if (escalationSummary) emit({ type: "escalate", summary: escalationSummary, ...(escalationDestino ? { destino: escalationDestino } : {}) });
     else if (saidNoSource) emit({ type: "escalate", summary: input.text });
   }
   timing.total_ms = ms();
