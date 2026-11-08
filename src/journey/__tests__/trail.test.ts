@@ -60,7 +60,7 @@ describe("createTrail", () => {
   it("exportJson devolve o resumo das sessões e as falas", () => {
     const trail = createTrail(memoryStore());
     trail.startSession();
-    trail.record(entry("a"));
+    trail.update(trail.record(entry("a")).id, { ms: 900 });
     const json = JSON.parse(trail.exportJson());
     expect(json.entries).toHaveLength(1);
     expect(json.sessions).toHaveLength(1);
@@ -104,28 +104,57 @@ describe("custo da sessão (#52)", () => {
     expect(summarizeSessions(trail.list(), trail.sessions())[0].duration_ms).toBe(90_000);
   });
 
-  it("ask sem timing conta como não medido", () => {
+  it("ask que chegou ao servidor mas sem timing (a pessoa interrompeu) conta como não medido", () => {
     const trail = createTrail(memoryStore());
     trail.startSession();
-    trail.record(entry("interrompida"));
+    trail.update(trail.record(entry("interrompida")).id, { ms: 1100 });
     expect(summarizeSessions(trail.list(), trail.sessions())[0]).toMatchObject({ llm_calls: 1, llm_calls_unmeasured: 1, tokens_in: 0, tokens_out: 0 });
   });
 
   it("qualquer token estimado marca a sessão como estimada", () => {
     const trail = createTrail(memoryStore());
     trail.startSession();
-    trail.update(trail.record(entry("a")).id, { tokens_in: 10, tokens_out: 1, tokens_estimated: false });
-    trail.update(trail.record(entry("b")).id, { tokens_in: 10, tokens_out: 1, tokens_estimated: true });
+    trail.update(trail.record(entry("a")).id, { llm_ms: 900, tokens_in: 10, tokens_out: 1, tokens_estimated: false });
+    trail.update(trail.record(entry("b")).id, { llm_ms: 900, tokens_in: 10, tokens_out: 1, tokens_estimated: true });
     expect(summarizeSessions(trail.list(), trail.sessions())[0].tokens_estimated).toBe(true);
   });
 
   it("entradas antigas sem os campos novos não quebram o resumo", () => {
     const store = memoryStore();
-    store.setItem(TRAIL_KEY, JSON.stringify([{ id: "1", at: "2026-11-07T22:00:00Z", session: "velha", from: "chat", utterance: "x", route: "ask", answer: "", sources: [], moment: null, step: null }]));
+    store.setItem(TRAIL_KEY, JSON.stringify([{ id: "1", at: "2026-11-07T22:00:00Z", session: "velha", from: "chat", utterance: "x", route: "ask", answer: "", sources: [], moment: null, step: null, ms: 900 }]));
     const trail = createTrail(store);
     expect(() => trail.exportJson()).not.toThrow();
     const [s] = summarizeSessions(trail.list(), trail.sessions());
     expect(s).toMatchObject({ session: "velha", started_at: "2026-11-07T22:00:00Z", utterances: 1, llm_calls_unmeasured: 1 });
+  });
+
+  it("pergunta sem servidor (nem ms nem timing) não conta como chamada ao agente", () => {
+    const trail = createTrail(memoryStore());
+    trail.startSession();
+    trail.record(entry("servidor fora do ar"));
+    expect(summarizeSessions(trail.list(), trail.sessions())[0]).toMatchObject({ utterances: 1, llm_calls: 0, llm_calls_unmeasured: 0 });
+  });
+
+  it("timing sem tokens (o provedor recusou) conta como chamada medida, sem tokens", () => {
+    const trail = createTrail(memoryStore());
+    trail.startSession();
+    trail.update(trail.record(entry("sem chave")).id, { ms: 300, llm_ms: 250, tokens_estimated: false });
+    expect(summarizeSessions(trail.list(), trail.sessions())[0]).toMatchObject({ llm_calls: 1, llm_calls_unmeasured: 0, tokens_in: 0, llm_ms: 250 });
+  });
+
+  it("recomeçar depois do fim reabre a sessão, com o mesmo início", () => {
+    const c = clock();
+    const trail = createTrail(memoryStore(), { now: c.now });
+    trail.startSession();
+    c.advance(60_000);
+    trail.endSession();
+    c.advance(10_000);
+    trail.startSession();
+    c.advance(600_000);
+    trail.record(entry("depois de recomeçar"));
+    const [s] = summarizeSessions(trail.list(), trail.sessions());
+    expect(s.ended_at).toBeNull();
+    expect(s.duration_ms).toBe(670_000);
   });
 
   it("sessões gravadas com lixo viram lista vazia", () => {

@@ -355,6 +355,7 @@ async function main(): Promise<void> {
   });
   document.addEventListener("callbar:start", () => {
     ended = false;
+    trail.startSession(); // retomar a call reabre a sessão (#52)
     clock.setEnded(false);
     cam.show();
     render();

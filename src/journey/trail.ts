@@ -47,8 +47,9 @@ export interface SessionSummary {
   ended_at: string | null;
   duration_ms: number;
   utterances: number;
+  /** Perguntas ao agente que chegaram ao servidor (sem servidor, a fala não conta). */
   llm_calls: number;
-  /** Perguntas ao agente sem tokens no navegador (a pessoa interrompeu); o log do servidor tem o número. */
+  /** Perguntas que chegaram ao servidor, mas cujo timing não chegou ao navegador (a pessoa interrompeu); o log do servidor tem o número. */
   llm_calls_unmeasured: number;
   llm_ms: number;
   tokens_in: number;
@@ -86,10 +87,13 @@ export function createTrail(store: KeyValueStore, opts: { now?: () => Date; sess
     },
     list: read,
     sessions: readSessions,
-    /** A aula começou. Recomeçar na mesma página mantém o início. */
+    /** A aula começou. Recomeçar na mesma página mantém o início e reabre a sessão (apaga o fim). */
     startSession(): void {
       const list = readSessions();
-      if (list.some((s) => s.session === session)) return;
+      if (list.some((s) => s.session === session)) {
+        writeSessions(list.map((s) => (s.session === session ? { ...s, ended_at: null } : s)));
+        return;
+      }
       writeSessions([...list, { session, started_at: now().toISOString(), ended_at: null }]);
     },
     /** A call foi encerrada ou a aula terminou. */
@@ -123,7 +127,8 @@ export function summarizeSessions(entries: TrailEntry[], sessions: TrailSession[
       const started_at = rec?.started_at ?? mine[0]?.at ?? "";
       const ended_at = rec?.ended_at ?? null;
       const end = ended_at ?? mine.at(-1)?.at ?? started_at;
-      const asks = mine.filter((e) => e.route === "ask");
+      // só conta a pergunta que chegou ao servidor: com ms (o navegador recebeu resposta) ou com o timing
+      const asks = mine.filter((e) => e.route === "ask" && (e.ms !== undefined || e.llm_ms !== undefined));
       const sum = (f: (e: TrailEntry) => number | undefined) => asks.reduce((n, e) => n + (f(e) ?? 0), 0);
       return {
         session: id,
@@ -132,7 +137,7 @@ export function summarizeSessions(entries: TrailEntry[], sessions: TrailSession[
         duration_ms: Math.max(0, Date.parse(end) - Date.parse(started_at)) || 0,
         utterances: mine.length,
         llm_calls: asks.length,
-        llm_calls_unmeasured: asks.filter((e) => e.tokens_in === undefined).length,
+        llm_calls_unmeasured: asks.filter((e) => e.llm_ms === undefined).length,
         llm_ms: sum((e) => e.llm_ms),
         tokens_in: sum((e) => e.tokens_in),
         tokens_out: sum((e) => e.tokens_out),
