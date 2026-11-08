@@ -18,10 +18,10 @@ type AskEvent = Parameters<Parameters<typeof ask>[1]>[0];
 
 const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/tail.journey.json", import.meta.url), "utf8")));
 
-async function timing() {
+async function timing(profile = DEMO_PROFILES.novo) {
   const evs: AskEvent[] = [];
   const t = await ask(
-    { journey, profile: DEMO_PROFILES.novo, momentId: "pagamentos", stepId: "pg-pergunta", text: "Qual a política de home office do time?", tts: null, model: "x", timeoutMs: 2000 },
+    { journey, profile, momentId: "pagamentos", stepId: "pg-pergunta", text: "Qual a política de home office do time?", tts: null, model: "x", timeoutMs: 2000 },
     (e) => evs.push(e),
   );
   const last = evs.at(-1);
@@ -64,5 +64,18 @@ describe("ask: tokens no timing", () => {
     expect(t.tokens_estimated).toBe(true);
     expect(t.tokens_in).toBeGreaterThan(0);
     expect(t.tokens_out).toBeGreaterThan(0);
+  });
+
+  it("o provedor recusou antes de responder (sem chave, 401, 429): nenhum token, não estimado", async () => {
+    failAfterScript = true; // lança antes de qualquer evento
+    const t = await timing();
+    expect(t.llm_error).not.toBeNull();
+    expect(t).toMatchObject({ tokens_in: null, tokens_out: null, tokens_estimated: false });
+  });
+
+  it("perfil inválido não trava a resposta: sai a fala de reserva e o timing", async () => {
+    const t = await timing(null as never);
+    expect(t.llm_error).not.toBeNull();
+    expect(t.tokens_in).toBeNull();
   });
 });

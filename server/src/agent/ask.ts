@@ -28,7 +28,7 @@ export interface AskTiming {
   llm_first_sentence_ms: number | null;
   total_ms: number;
   llm_error: string | null;
-  /** Tokens de entrada e de saída da chamada ao LLM (null só se ele não foi chamado). */
+  /** Tokens de entrada e de saída da chamada ao LLM (null quando nada foi consumido: o provedor recusou antes de responder). */
   tokens_in: number | null;
   tokens_out: number | null;
   /** true quando o provedor não informou e os tokens foram estimados (estimateTokens). */
@@ -93,13 +93,17 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
     if (NO_SOURCE.test(s)) saidNoSource = true;
   };
 
-  const messages = buildMessages(ctx, input.text);
-  const tools = buildTools(ctx);
   // custo (#52): o que foi enviado e o que chegou, para estimar se o provedor não informar
+  let sentChars: number | null = null;
   let outChars = 0;
+  let reached = false;
   let usage: { input: number; output: number } | null = null;
   try {
+    const messages = buildMessages(ctx, input.text);
+    const tools = buildTools(ctx);
+    sentChars = JSON.stringify(messages).length + JSON.stringify(tools).length;
     for await (const ev of streamChat({ model: input.model, messages, tools, thinking: false, maxTokens: 250, signal: ac.signal })) {
+      reached = true;
       if (ev.type === "usage") usage = { input: ev.input, output: ev.output };
       if (ev.type === "text") outChars += ev.text.length;
       if (ev.type === "tool_call") outChars += ev.raw.length;
@@ -127,9 +131,17 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   } finally {
     clearTimeout(timer);
   }
-  timing.tokens_estimated = !usage;
-  timing.tokens_in = usage?.input ?? estimateTokens(JSON.stringify(messages).length + JSON.stringify(tools).length);
-  timing.tokens_out = usage?.output ?? estimateTokens(outChars);
+  // o provedor recusou antes de responder (sem chave, 401, 429) ou o pedido nem foi montado: nada foi consumido.
+  // Interrompido ou estourado o tempo, o pedido já saiu: estima.
+  const consumed = usage || reached || (ac.signal.aborted && sentChars !== null);
+  if (usage) {
+    timing.tokens_in = usage.input;
+    timing.tokens_out = usage.output;
+  } else if (consumed) {
+    timing.tokens_estimated = true;
+    timing.tokens_in = estimateTokens(sentChars ?? 0);
+    timing.tokens_out = estimateTokens(outChars);
+  }
   if (saidNoSource) escalate(input.text);
   if (!spoke && !wentTo && !input.signal?.aborted) {
     say(FALLBACK_LINE, "fallback");

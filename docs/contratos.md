@@ -163,7 +163,7 @@ Exemplo (Bruno, transição; saída de `montarJornadaDaPessoa(journey, DEMO_CALI
 Tempo e tokens de cada sessão, para o time auditar a demo (#52, PRODUCT.md §12.2). **Nada disso aparece em tela.**
 
 - **`timing` do `/api/ask`** (`AskTiming` em `server/src/agent/ask.ts`), último evento do SSE. Campos novos, aditivos:
-  `tokens_in` e `tokens_out` (tokens de entrada e de saída da chamada ao LLM; `null` só se o LLM não foi chamado) e
+  `tokens_in` e `tokens_out` (tokens de entrada e de saída da chamada ao LLM; `null` quando nada foi consumido: o provedor recusou antes de responder, como sem chave, 401 ou 429) e
   `tokens_estimated` (`true` quando o provedor não informou e o servidor estimou, à razão de 4 caracteres por token).
   ```json
   { "type": "timing", "timing": { "first_speak_ms": 2, "llm_first_token_ms": 3185, "llm_first_sentence_ms": 3333,
@@ -175,11 +175,12 @@ Tempo e tokens de cada sessão, para o time auditar a demo (#52, PRODUCT.md §12
   e `tokens_in`, `tokens_out` e `tokens_estimated`, copiados do `timing`. Sem esses campos, a pergunta não foi medida no
   navegador (a pessoa interrompeu); o log do servidor tem o número.
 - **Sessão** (`TrailSession`, chave `puca:sessoes` no `localStorage`): `{ session, started_at, ended_at }`, com o mesmo
-  `session` das entradas. A aula grava o início quando começa (recomeçar na mesma página mantém o início) e o fim
-  quando a call é encerrada ou a aula termina. "Limpar", na tela de rastro, apaga as falas e as sessões.
+  `session` das entradas. A aula grava o início quando começa e o fim quando a call é encerrada ou a aula termina;
+  recomeçar a aula ou retomar a call na mesma página mantém o início e reabre a sessão. "Limpar", na tela de rastro, apaga as falas e as sessões.
 - **JSON baixado** na tela de rastro (`exportJson()`), ⚠️ **quebra só no arquivo baixado**: era a lista de entradas,
   agora é `{ "sessions": SessionSummary[], "entries": TrailEntry[] }`. O resumo é calculado por `summarizeSessions`;
-  a duração vai do início ao fim da sessão, ou até a última fala se ela não terminou.
+  a duração vai do início ao fim da sessão, ou até a última fala se ela não terminou. `llm_calls` conta só as
+  perguntas que chegaram ao servidor, e `llm_calls_unmeasured`, as que chegaram mas cujo `timing` não voltou.
   ```json
   { "session": "a91e…", "started_at": "2026-11-07T22:00:00.000Z", "ended_at": "2026-11-07T22:14:30.000Z",
     "duration_ms": 870000, "utterances": 6, "llm_calls": 2, "llm_calls_unmeasured": 1, "llm_ms": 3561,
