@@ -20,16 +20,19 @@ const QUEM: Record<PedidoDeEncaminhamento["destino"], (para: string) => string> 
   rh: () => "o RH da Kota",
 };
 
+/** Texto vindo do app: o Slack lê `<...>` como menção, <!channel> ou link disfarçado; escapado, vira texto. */
+const semComando = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
 /** Texto da mensagem: a quem iria na Kota, a dúvida, o que foi consultado e o motivo. Sem o nome digitado. */
 export function mensagemDoEncaminhamento(p: PedidoDeEncaminhamento): string {
-  const fontes = p.fontes_consultadas.length ? p.fontes_consultadas.join("; ") : "não achei nenhuma fonte sobre isso.";
+  const fontes = p.fontes_consultadas.length ? p.fontes_consultadas.map(semComando).join("; ") : "não achei nenhuma fonte sobre isso.";
   return [
     "Oi! Aqui é a Puca, do Orbis.",
-    `Você me fez uma pergunta que eu não consegui responder com segurança. Na Kota, ela iria para ${QUEM[p.destino](p.para)}.`,
-    `*Pergunta:* "${p.pergunta}"`,
-    ...(p.resumo && p.resumo !== p.pergunta ? [`*Resumo:* ${p.resumo}`] : []),
+    `Você me fez uma pergunta que eu não consegui responder com segurança. Na Kota, ela iria para ${QUEM[p.destino](semComando(p.para))}.`,
+    `*Pergunta:* "${semComando(p.pergunta)}"`,
+    ...(p.resumo && p.resumo !== p.pergunta ? [`*Resumo:* ${semComando(p.resumo)}`] : []),
     `*O que eu já consultei:* ${fontes}`,
-    `*Por que não respondi:* ${p.motivo}`,
+    `*Por que não respondi:* ${semComando(p.motivo)}`,
   ].join("\n");
 }
 
@@ -37,13 +40,24 @@ export function mensagemDoEncaminhamento(p: PedidoDeEncaminhamento): string {
  * Encaminha uma vez por id: a mesma chamada repetida (ou ao mesmo tempo, de duas abas) devolve o mesmo resultado sem
  * postar de novo (#70). Vale enquanto o servidor não reinicia. Falha do Slack não fica guardada: dá para tentar de novo.
  */
-export function createEncaminhador(slack: SlackDm) {
+export function createEncaminhador(slack: SlackDm, opts: { now?: () => number; maxPorDestinatarioPorHora?: number } = {}) {
   const feitos = new Map<string, Promise<ResultadoDoEncaminhamento>>();
+  const now = opts.now ?? Date.now;
+  const max = opts.maxPorDestinatarioPorHora ?? 5;
+  // Sem login (#159), o e-mail vem do app: o teto por destinatário impede usar a Puca para encher a caixa de alguém.
+  const enviosPorDestinatario = new Map<string, number[]>();
+  function cabeMaisUm(usuario: string): boolean {
+    const desde = now() - 60 * 60_000;
+    const recentes = (enviosPorDestinatario.get(usuario) ?? []).filter((t) => t > desde);
+    if (recentes.length >= max) return false;
+    enviosPorDestinatario.set(usuario, [...recentes, now()]);
+    return true;
+  }
 
   async function enviar(p: PedidoDeEncaminhamento): Promise<ResultadoDoEncaminhamento> {
     if (!p.email) return { enviado: false, motivo: "sem_slack" };
     const usuario = await slack.acharPorEmail(p.email);
-    if (!usuario) return { enviado: false, motivo: "sem_slack" };
+    if (!usuario || !cabeMaisUm(usuario)) return { enviado: false, motivo: "sem_slack" };
     const canal = await slack.abrirConversa(usuario);
     const ts = await slack.postar({ canal, texto: mensagemDoEncaminhamento(p) });
     return { enviado: true, canal, ts, link: await slack.link(canal, ts) };

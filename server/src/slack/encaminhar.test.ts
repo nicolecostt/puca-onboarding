@@ -83,7 +83,28 @@ describe("createEncaminhador", () => {
   });
 });
 
+describe("createEncaminhador: abuso (revisão de segurança do #183)", () => {
+  it("o mesmo destinatário recebe no máximo 5 mensagens por hora; depois, sem_slack sem postar", async () => {
+    const { slack, posts } = slackFalso();
+    let agora = Date.parse("2026-11-08T13:00:00Z");
+    const encaminhar = createEncaminhador(slack, { now: () => agora, maxPorDestinatarioPorHora: 5 });
+    for (let i = 0; i < 5; i++) expect((await encaminhar(pedido({ id: `f${i}` }))).enviado).toBe(true);
+    expect(await encaminhar(pedido({ id: "f5" }))).toEqual({ enviado: false, motivo: "sem_slack" });
+    expect(posts).toHaveLength(5);
+    agora += 60 * 60_000 + 1;
+    expect((await encaminhar(pedido({ id: "f6" }))).enviado).toBe(true);
+  });
+});
+
 describe("mensagemDoEncaminhamento", () => {
+  it("escapa o que o Slack trata como comando: sem menção, link disfarçado ou <!channel>", () => {
+    const msg = mensagemDoEncaminhamento(pedido({ pergunta: "<!channel> veja <https://mal.example|aqui> & <@U123>", resumo: "<!here>", para: "<@U9>", fontes_consultadas: ["<#C1>"], motivo: "a > b" }));
+    expect(msg).not.toMatch(/<[!@#h]/);
+    expect(msg).toContain("&lt;!channel&gt;");
+    expect(msg).toContain("&amp;");
+    expect(msg).toContain("a &gt; b");
+  });
+
   it("diz a quem iria na Kota e leva a pergunta, as fontes e o motivo", () => {
     const msg = mensagemDoEncaminhamento(pedido());
     expect(msg).toContain("Paula Nunes");

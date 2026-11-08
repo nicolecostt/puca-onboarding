@@ -130,7 +130,8 @@ type ResultadoDoEncaminhamento =
   | { enviado: false; motivo: "sem_slack" };   // sem e-mail ou e-mail sem conta no Slack da Kota
 // 400 {"error":"pedido_invalido"} · 503 {"enviado":false,"motivo":"sem_slack"} (servidor sem SLACK_BOT_TOKEN)
 // 502 {"error":"slack_falhou"} (erro do Slack; o mesmo id pode ser mandado de novo, nada foi postado em duplicata)
-// Limite: 10 por hora por pessoa (pelo token; sem token, pelo IP).
+// Limite: 10 por hora por pessoa (pelo token; sem token, pelo IP) e 5 mensagens por hora para o mesmo destinatário
+// (passou: sem_slack, sem postar). O texto do app vai escapado (<, > e &): nada de menção, <!channel> ou link disfarçado.
 ```
 
 Exemplo válido:
