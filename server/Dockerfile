@@ -9,6 +9,7 @@ RUN npm ci --omit=dev && npm install -g tsx@4.23.15 && npm cache clean --force
 COPY tsconfig.json ./
 COPY src ./src
 COPY server ./server
+COPY kit ./kit
 
 EXPOSE 8787
 CMD ["tsx", "server/src/server.ts"]

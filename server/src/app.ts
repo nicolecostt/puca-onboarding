@@ -10,6 +10,7 @@ import { DEMO_PROFILES } from "../../src/journey/profile";
 import type { Journey, Profile } from "../../src/journey/types";
 import { loadJourney } from "../../src/journey/validate";
 import { ask, type AskEvent } from "./agent/ask";
+import { carregarBrain, type Brain } from "./brain/brain";
 import { bearer, criaVerificaToken, type VerificaToken } from "./auth";
 import type { ChatMessage } from "./llm";
 import { env } from "./env";
@@ -82,6 +83,8 @@ export interface BuildAppOptions {
   corsOrigins?: string[];
   /** Para testes: substitui a geração do token do Deepgram. */
   mintSttToken?: typeof mintSttToken;
+  /** Company brain; padrão: carregado do kit da Kota em process.cwd() (sem kit, sobe sem brain). */
+  brain?: Brain;
 }
 
 export function buildApp(opts: BuildAppOptions = {}) {
@@ -94,6 +97,15 @@ export function buildApp(opts: BuildAppOptions = {}) {
   const mintToken = opts.mintSttToken ?? mintSttToken;
   // trustProxy: atrás do proxy do Fly, o IP da pessoa vem no X-Forwarded-For
   const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? "info" }, trustProxy: true });
+  let brain = opts.brain;
+  if (!brain) {
+    try {
+      brain = carregarBrain(process.cwd());
+      app.log.info({ trechos: brain.total }, "brain carregado");
+    } catch (err) {
+      app.log.warn({ err }, "brain sem kit da Kota: o /api/ask responde sem trechos");
+    }
+  }
 
   app.register(cors, { origin: opts.corsOrigins ?? env.corsOrigins, methods: ["GET", "POST"], allowedHeaders: ["Authorization", "Content-Type"] });
 
@@ -150,7 +162,7 @@ export function buildApp(opts: BuildAppOptions = {}) {
         reply.raw.on("close", () => { if (!reply.raw.writableFinished) ac.abort(); });
         const emit = sse(reply);
         const timing = await ask(
-          { journey, profile: perfilSeguro(b.profile, b.perfil), momentId: moment.id, stepId: step.id, text, history, tts, model: env.model, timeoutMs: env.llmTimeoutMs, signal: ac.signal },
+          { journey, profile: perfilSeguro(b.profile, b.perfil), momentId: moment.id, stepId: step.id, text, history, tts, model: env.model, timeoutMs: env.llmTimeoutMs, signal: ac.signal, brain },
           emit,
         );
         reply.raw.end();
