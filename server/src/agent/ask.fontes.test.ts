@@ -19,7 +19,8 @@ type AskEvent = Parameters<Parameters<typeof ask>[1]>[0];
 
 const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/tail.journey.json", import.meta.url), "utf8")));
 const trecho: Trecho = { id: "f1", titulo: "Deploy · Do merge à produção", url: "https://exemplo.notion.site/deploy", texto: "O PR entra na main com CI verde." };
-const brain: Brain = { buscar: () => [trecho] };
+let achados: Trecho[] = [trecho];
+const brain: Brain = { buscar: () => achados };
 
 async function run(): Promise<AskEvent[]> {
   const evs: AskEvent[] = [];
@@ -35,6 +36,7 @@ describe("ask: fontes", () => {
   beforeEach(() => {
     script = [];
     sistema = "";
+    achados = [trecho];
   });
 
   it("tira a marca do texto falado e emite a fonte antes do timing", async () => {
@@ -58,6 +60,27 @@ describe("ask: fontes", () => {
   it("não repete a mesma fonte", async () => {
     script = [{ type: "text", text: "Primeiro o CI [f1]. Depois a homologação [f1]." }, { type: "done", finishReason: "stop" }];
     const evs = await run();
+    expect(evs.filter((e) => e.type === "fontes")).toEqual([{ type: "fontes", fontes: [{ titulo: trecho.titulo, url: trecho.url }] }]);
+  });
+
+  it("tira [f1, f2], [f1][f2] e [F1] do texto falado e guarda todos os ids citados", async () => {
+    const outro: Trecho = { id: "f2", titulo: "Code review · Aprovação", url: "https://exemplo.notion.site/code-review", texto: "Duas aprovações." };
+    achados = [trecho, outro];
+    script = [
+      { type: "text", text: "O deploy sai pelo CI [f1, f2]. Antes passa pela revisão [F2][f1]." },
+      { type: "done", finishReason: "stop" },
+    ];
+    const evs = await run();
+    expect(falas(evs)).toEqual(["O deploy sai pelo CI.", "Antes passa pela revisão."]);
+    expect(evs.filter((e) => e.type === "fontes")).toEqual([
+      { type: "fontes", fontes: [{ titulo: trecho.titulo, url: trecho.url }, { titulo: outro.titulo, url: outro.url }] },
+    ]);
+  });
+
+  it("frase que sobra só com pontuação não é falada, mas a fonte conta", async () => {
+    script = [{ type: "text", text: "O deploy sai pelo CI. [f1]." }, { type: "done", finishReason: "stop" }];
+    const evs = await run();
+    expect(falas(evs)).toEqual(["O deploy sai pelo CI."]);
     expect(evs.filter((e) => e.type === "fontes")).toEqual([{ type: "fontes", fontes: [{ titulo: trecho.titulo, url: trecho.url }] }]);
   });
 });

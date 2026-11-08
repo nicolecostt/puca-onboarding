@@ -22,7 +22,8 @@ const STOPWORDS = new Set(
     + "seu sua seus suas meu minha meus minhas isso isto esse essa esses essas este esta estes estas aquele aquela "
     + "mas mais menos muito muita muitos muitas tem ter tenho temos sao ser sou somos foi era estar esta estao "
     + "qual quais quem onde quando porque pois entao tambem ainda sobre entre ate sem sob apos cada outro outra "
-    + "outros outras mesmo mesma todo toda todos todas nao sim aqui ali hoje vai vou funciona fazer faz feito")
+    + "outros outras mesmo mesma todo toda todos todas nao sim aqui ali hoje vai vou funciona fazer faz feito "
+    + "dele dela deles delas")
     .split(" "),
 );
 
@@ -102,19 +103,26 @@ export function criarBrain(trechos: Trecho[]): Brain {
     buscar(texto, limite = 5) {
       const q = [...new Set(termos(texto))];
       if (!q.length) return [];
-      return docs
+      // relevância mínima: nota ≥ 30% da melhor E pelo menos metade dos termos distintos da consulta no trecho
+      const minimos = Math.max(1, Math.ceil(q.length / 2));
+      const pontuados = docs
         .map((d) => {
           let nota = 0;
+          let casados = 0;
           for (const x of q) {
             const f = d.tf.get(x);
             if (!f) continue;
+            casados++;
             const nx = df.get(x)!;
             const idf = Math.log(1 + (n - nx + 0.5) / (nx + 0.5));
             nota += (idf * f * (K1 + 1)) / (f + K1 * (1 - B + (B * d.len) / media));
           }
-          return { t: d.t, nota };
+          return { t: d.t, nota, casados };
         })
-        .filter((r) => r.nota > 0)
+        .filter((r) => r.nota > 0 && r.casados >= minimos);
+      const melhor = pontuados.reduce((m, r) => Math.max(m, r.nota), 0);
+      return pontuados
+        .filter((r) => r.nota >= melhor * 0.3)
         .sort((a, b) => b.nota - a.nota)
         .slice(0, limite)
         .map((r) => r.t);

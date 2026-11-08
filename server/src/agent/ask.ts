@@ -62,7 +62,8 @@ export interface AskInput {
 }
 
 // Marca de citação do LLM ("... pelo CI [f1]."): sai do texto falado, com o espaço antes.
-const CITACAO = /\s*\[f(\d+)\]/g;
+// Aceita [f1], [F1], [f1, f2] e [f1][f2] (cada colchete é uma marca); guarda todos os ids citados.
+const CITACAO = /\s*\[\s*f\d+(?:\s*,\s*f\d+)*\s*\]/gi;
 
 // O LLM às vezes admite que não confirmou sem chamar escalate_to_buddy: vale como encaminhamento.
 const NO_SOURCE = /não (consegui|consigo) confirmar|não (achei|tenho) (isso )?confirmad/i;
@@ -95,8 +96,9 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   let refused = false;
   const escalate = (summary: string) => { escalationSummary ??= summary; };
   const sentence = (raw: string) => {
-    const s = raw.replace(CITACAO, (_m, n: string) => { citados.add(Number(n)); return ""; }).trim();
-    if (!s) return;
+    const s = raw.replace(CITACAO, (m) => { for (const n of m.match(/\d+/g) ?? []) citados.add(Number(n)); return ""; }).trim();
+    // frase vazia, ou que sobrou só com pontuação ("CI. [f1]." deixa "."), não é falada
+    if (!/[\p{L}\p{N}]/u.test(s)) return;
     timing.llm_first_sentence_ms ??= ms();
     spoke = true;
     say(s, "llm");
