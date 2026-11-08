@@ -28,6 +28,8 @@ export interface TrailEntry {
   ms?: number;
   /** Custo (#52), copiado do `timing` do servidor: tempo total do pedido e tokens do LLM. */
   llm_ms?: number;
+  /** Motivo estável da falha do LLM; nunca guarda mensagem bruta do provedor. */
+  llm_error?: "timeout" | "interrupted" | "provider_error" | "refusal" | "empty_response";
   tokens_in?: number;
   tokens_out?: number;
   tokens_estimated?: boolean;
@@ -82,7 +84,7 @@ export function createTrail(store: KeyValueStore, opts: { now?: () => Date; sess
       write([...read(), entry]);
       return entry;
     },
-    update(id: string, patch: Partial<Pick<TrailEntry, "answer" | "forwarding_id" | "ms" | "llm_ms" | "tokens_in" | "tokens_out" | "tokens_estimated">>): void {
+    update(id: string, patch: Partial<Pick<TrailEntry, "answer" | "forwarding_id" | "ms" | "llm_ms" | "llm_error" | "tokens_in" | "tokens_out" | "tokens_estimated">>): void {
       write(read().map((e) => (e.id === id ? { ...e, ...patch } : e)));
     },
     list: read,

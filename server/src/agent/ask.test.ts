@@ -7,7 +7,7 @@ import { ask, type AskEvent } from "./ask";
 const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/tail.journey.json", import.meta.url), "utf8")));
 
 describe("ask", () => {
-  it("LLM fora do ar: a ponte sai na hora e o fallback fecha, sem travar", async () => {
+  it("LLM fora do ar: a ponte sai na hora e a fala de falha fecha, sem encaminhar", async () => {
     process.env.FEATHERLESS_BASE_URL = "http://127.0.0.1:9";
     process.env.FEATHERLESS_API_KEY = "test";
     const evs: AskEvent[] = [];
@@ -17,8 +17,8 @@ describe("ask", () => {
     );
     const speaks = evs.filter((e) => e.type === "speak");
     expect(speaks.map((s) => s.source)).toEqual(["bridge", "fallback"]);
-    // sem agente, a dúvida vira encaminhamento
-    expect(evs.filter((e) => e.type === "escalate")).toEqual([{ type: "escalate", summary: "Quanto ganha um pleno aqui?" }]);
+    expect(speaks.at(-1)).toMatchObject({ text: "Tive um problema para pensar nisso agora. Pode perguntar de novo?" });
+    expect(evs.filter((e) => e.type === "escalate")).toEqual([]);
     expect(t.first_speak_ms!).toBeLessThan(50);
     expect(t.llm_error).not.toBeNull();
     expect(evs.at(-1)?.type).toBe("timing");

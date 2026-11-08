@@ -4,7 +4,7 @@
 // Free tier do ElevenLabs = 10k caracteres/mês: rode --dry para ver o custo antes.
 import { parseArgs } from "node:util";
 import "../src/env";
-import { allScriptedTexts, BRIDGES, FALLBACK_LINE } from "../src/agent/bridges";
+import { allScriptedTexts, BRIDGES, FAILURE_LINE } from "../src/agent/bridges";
 import { buildFaqs } from "../../src/journey/faq";
 import { loadDemoJourney, tryCreateTts } from "../src/app";
 import { DEMO_PROFILES } from "../../src/journey/profile";
@@ -12,7 +12,7 @@ import { DEMO_PROFILES } from "../../src/journey/profile";
 const { values } = parseArgs({ options: { only: { type: "string" }, dry: { type: "boolean", default: false } } });
 const journey = loadDemoJourney();
 const profiles = Object.values(DEMO_PROFILES);
-const pontes = [...Object.values(BRIDGES).flat(), FALLBACK_LINE];
+const pontes = [...Object.values(BRIDGES).flat(), FAILURE_LINE];
 const faq = profiles.flatMap((p) => buildFaqs(journey, p).map((f) => f.text));
 const all = profiles.flatMap((p) => allScriptedTexts(journey, p));
 const pick = { pontes, faq, roteiro: all.filter((t) => !pontes.includes(t) && !faq.includes(t)) }[values.only as "pontes" | "faq" | "roteiro"] ?? all;
