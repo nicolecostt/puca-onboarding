@@ -20,7 +20,7 @@ import { buildFaqs } from "../../journey/faq";
 import { createTrail } from "../../journey/trail";
 import { tarefaDaPessoa } from "../../journey/primeira-tarefa";
 import demoJourney from "../../journey/data/tail.journey.json";
-import { createAgentVoice } from "../../voice/agent-voice";
+import { createAgentVoice, MIC_AVISO } from "../../voice/agent-voice";
 import { TOOLS, TRAIL, tasksFor, type AccessStatus, type TaskState, type Tool } from "./data";
 
 // ---- Quem é a pessoa: o que a call inicial salvou (ou o ?perfil=), completado pelo perfil da demo do mesmo vínculo ----
@@ -168,12 +168,17 @@ async function main(): Promise<void> {
     await Promise.race([voice.unlock().catch(() => undefined), new Promise((r) => setTimeout(r, 800))]);
     if (voice.stt && !listening) {
       listening = true;
-      void voice.listen((text) => {
-        if (!inCall || muted || !text.trim()) return;
-        chat.addMessage({ from: "user", text });
-        void reply(text, "voz");
-      }).catch(() => {
-        listening = false; // sem microfone (ou sem permissão): a conversa segue pelo chat
+      void voice.listen({
+        onFinal: (text) => {
+          if (!inCall || muted || !text.trim()) return;
+          chat.addMessage({ from: "user", text });
+          void reply(text, "voz");
+        },
+        onState: (s) => {
+          if (s === "ouvindo") return;
+          listening = false; // sem microfone (ou sem permissão): a conversa segue pelo chat
+          chat.addMessage({ from: "agent", text: MIC_AVISO[s] });
+        },
       });
     }
     await say(
@@ -185,6 +190,8 @@ async function main(): Promise<void> {
   document.addEventListener("callbar:end", () => {
     inCall = false;
     voice.stop();
+    voice.stopListening(); // call encerrada: o microfone desliga (e para de mandar áudio ao STT)
+    listening = false;
     cam.setState("idle");
     cam.hide();
   });

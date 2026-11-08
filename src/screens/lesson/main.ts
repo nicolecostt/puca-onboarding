@@ -16,7 +16,7 @@ import { browserStore } from "../../journey/storage";
 import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
 import { createPedidos, PEDIDOS_KEY, tarefaDaPessoa, tarefaDoPasso } from "../../journey/primeira-tarefa";
 import { createTrail, sourcesFor } from "../../journey/trail";
-import { createAgentVoice } from "../../voice/agent-voice";
+import { createAgentVoice, MIC_AVISO } from "../../voice/agent-voice";
 import { interpolate, interpolateDeep, resolveProfile } from "../../journey/profile";
 import { atualizarCalibragem, resolveCalibragem, saveCalibragem } from "../../journey/calibragem";
 import { montarJornadaDaPessoa } from "../../journey/jornada-da-pessoa";
@@ -143,6 +143,7 @@ async function main(): Promise<void> {
 
   let paused = false;
   let ended = false;
+  let micOk = false; // o microfone está ouvindo (sem ele, a conversa segue pelo chat)
   let agentState: AgentState = "thinking";
   let currentBoard: string | null = null;
   let board: Whiteboard | null = null;
@@ -167,7 +168,7 @@ async function main(): Promise<void> {
     const off = paused || ended;
     const voice = off ? "paused" : agentState === "speaking" ? "talk" : "listen";
     el.voice.dataset.state = voice;
-    el.voice.setAttribute("aria-label", ended ? "Sessão encerrada" : paused ? "Puca pausada" : voice === "talk" ? "Puca falando" : "Puca ouvindo");
+    el.voice.setAttribute("aria-label", ended ? "Sessão encerrada" : paused ? "Puca pausada" : voice === "talk" ? "Puca falando" : micOk ? "Puca ouvindo" : "Puca esperando pelo chat");
     el.liveDot.classList.toggle("is-off", off);
     cam.setPaused(off);
     if (!off) cam.setState(CAM_STATE[agentState]);
@@ -480,6 +481,19 @@ async function main(): Promise<void> {
     render();
   });
 
+  /** Liga o microfone. Se não der, a Puca avisa no chat e a conversa segue por ele. */
+  function ouvir(): void {
+    void voice.listen({
+      onFinal: (t) => void handleUtterance(t, "voz"),
+      onCaption: (t) => (el.captionUser.textContent = t),
+      onState: (s) => {
+        micOk = s === "ouvindo";
+        if (s !== "ouvindo") chat.addMessage({ from: "agent", text: MIC_AVISO[s] });
+        render();
+      },
+    });
+  }
+
   // ---- Vistas ----
   function showLogo(): void {
     el.boardHost.hidden = true;
@@ -690,7 +704,7 @@ async function main(): Promise<void> {
     window.setTimeout(() => cam.sync(), 300);
     // sem gesto reconhecido, o navegador pode segurar o áudio: a sessão começa assim mesmo, com legenda
     if (!(await voice.unlock())) chat.addMessage({ from: "agent", text: SOM_BLOQUEADO });
-    void voice.listen((t) => void handleUtterance(t, "voz"), (t) => (el.captionUser.textContent = t)).catch((e) => console.warn("microfone:", e));
+    ouvir();
     void start();
   });
 }
