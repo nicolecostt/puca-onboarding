@@ -312,19 +312,54 @@ async function main(): Promise<void> {
         case "reset": return board.reset();
       }
     },
-    async say(text) {
+    async say(text, cues = []) {
       setAgent("speaking");
       el.captionUser.textContent = "";
       // trecho em amarelo: o highlight do passo, se esta fala for a fala do passo
       const highlight = currentStep?.highlight && text.includes(currentStep.highlight) ? currentStep.highlight : undefined;
-      const words = text.split(" ");
-      const audio = voice.speak(text); // voz de verdade junto com a legenda (sem servidor, resolve na hora)
-      for (let i = 0; i < words.length; i++) {
-        el.captionAgent.innerHTML = captionHTML(text, words.slice(0, i + 1).join(" ").length, highlight);
-        await clock.wait(150);
+      // Até onde a fala já chegou (em caracteres): move a legenda e dispara as ações marcadas com `at`.
+      const ends = [...text.matchAll(/\S+/g)].map((m) => m.index + m[0].length);
+      let spoken = 0;
+      let next = 0;
+      const advance = (to: number) => {
+        if (to <= spoken) return;
+        spoken = to;
+        el.captionAgent.innerHTML = captionHTML(text, spoken, highlight);
+        while (next < cues.length && cues[next].at < spoken) io.apply(cues[next++].action);
+      };
+      let heard = false; // chegou o tempo de alguma palavra do áudio
+      let finished = false;
+      // estimativa de 150 ms por palavra, a partir de onde a fala está; uma só por vez
+      let estimating: Promise<void> | null = null;
+      const estimate = () =>
+        (estimating ??= (async () => {
+          for (const end of ends) {
+            if (heard || finished) return;
+            if (end <= spoken) continue;
+            advance(end);
+            await clock.wait(150);
+          }
+        })());
+      try {
+        // com voz, a legenda e o quadro seguem as palavras do áudio; sem voz, a estimativa de 150 ms por palavra
+        const audio = voice.speak(text, {
+          onWord: (i) => {
+            if (i < 0 || finished) return;
+            heard = true;
+            advance(ends[Math.min(i, ends.length - 1)]);
+          },
+        });
+        if (voice.tts) {
+          // áudio sem tempo das palavras: depois de 2 s sem nenhuma, volta para a estimativa
+          void clock.wait(2000).then(() => (heard || finished ? undefined : estimate())).catch(() => {});
+          await audio;
+          if (!heard) await estimate(); // áudio falhou ou veio sem os tempos: termina no ritmo da estimativa
+        } else await estimate();
+      } finally {
+        finished = true;
+        advance(text.length); // fala cortada ou áudio que falhou: o quadro chega ao estado final do passo
       }
       chat.addMessage({ from: "agent", text });
-      await audio;
       await clock.wait(voice.tts ? 250 : 700);
     },
     listen(replies) {

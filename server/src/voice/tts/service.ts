@@ -24,6 +24,8 @@ interface Job {
   error: Error | null;
   waiters: Set<() => void>;
   abort: AbortController;
+  /** Resultado da síntese (palavras com tempo); preenchido logo depois de criar o job. */
+  result?: Promise<SpeakResult>;
 }
 
 export interface TtsServiceOptions {
@@ -42,6 +44,13 @@ export class TtsService {
 
   has(action_id: string): boolean {
     return this.jobs.has(action_id);
+  }
+
+  /** Tempo de cada palavra do áudio: resolve quando a síntese termina ([] se falhou). null se o id não existe. */
+  words(action_id: string): Promise<WordTiming[]> | null {
+    const job = this.jobs.get(action_id);
+    if (!job?.result) return null;
+    return job.result.then((r) => r.words, () => []);
   }
 
   cancel(action_id: string): void {
@@ -112,6 +121,7 @@ export class TtsService {
     };
 
     const result = run();
+    job.result = result;
     result.catch(() => undefined); // errors are reported through the returned promise and stream()
     const retain = setTimeout(() => this.jobs.delete(req.action_id), this.opts.retainMs ?? 5 * 60_000);
     retain.unref?.();

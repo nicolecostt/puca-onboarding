@@ -6,6 +6,7 @@ import { classifyBargeIn } from "./barge-in";
 import { startMic, type Mic } from "./mic";
 import { PcmPlayer } from "./pcm-player";
 import { createSttSession, type SttSession } from "./stt-session";
+import type { WordTiming } from "./types";
 
 export interface AskRequest {
   text: string;
@@ -22,6 +23,11 @@ export interface AskHandlers {
   onGoTo(target: string): void;
 }
 
+export interface SpeakOptions {
+  /** Cada palavra na hora em que é falada: `index` é a posição dela em `text.split(/\s+/)`. */
+  onWord?(index: number, word: WordTiming): void;
+}
+
 export interface AgentVoice {
   /** Servidor com TTS (voz de verdade) e com STT (microfone). */
   readonly tts: boolean;
@@ -29,7 +35,7 @@ export interface AgentVoice {
   /** Precisa de um clique: o browser só libera áudio e microfone depois de um gesto. */
   unlock(): Promise<void>;
   /** Fala um texto (entra na fila). Resolve quando o áudio acabou ou foi cortado. */
-  speak(text: string): Promise<void>;
+  speak(text: string, opts?: SpeakOptions): Promise<void>;
   /** Corta o que está tocando e o que ia tocar. */
   stop(): void;
   /** Pergunta ao agente. false = servidor indisponível (a tela usa o fallback dela). */
@@ -53,16 +59,46 @@ export async function createAgentVoice(): Promise<AgentVoice> {
   let mic: Mic | null = null;
   let session: SttSession | null = null;
 
-  function enqueue(text: string, url: () => Promise<string>): Promise<void> {
+  interface Audio {
+    audio_url: string;
+    /** Tempo de cada palavra (GET /api/tts/:id/words); pode chegar depois de o áudio começar. */
+    words?: Promise<WordTiming[]>;
+  }
+
+  /** Busca os tempos das palavras de um áudio do servidor; [] se não vierem. */
+  function wordsOf(id: string): Promise<WordTiming[]> {
+    return fetch(`/api/tts/${id}/words`)
+      .then((r) => (r.ok ? r.json() : { words: [] }))
+      .then((b: { words?: WordTiming[] }) => b.words ?? [])
+      .catch(() => []);
+  }
+
+  /** Põe um áudio na fila. onStart roda quando chega a vez dele; onWord, a cada palavra falada. */
+  function enqueue(text: string, audio: () => Promise<Audio>, opts: SpeakOptions & { onStart?: () => void } = {}): Promise<void> {
     const gen = generation;
     const job = chain.then(async () => {
       if (gen !== generation) return;
       speaking = text;
+      opts.onStart?.();
+      let off = () => {};
       try {
-        await player.play(await url());
+        const a = await audio();
+        if (opts.onWord) {
+          const onWord = opts.onWord;
+          let words: WordTiming[] = [];
+          off = player.onWord((w) => onWord(words.indexOf(w), w));
+          player.setWords([]); // não herda as palavras do áudio anterior
+          void a.words?.then((ws) => {
+            if (gen !== generation || speaking !== text) return; // chegou tarde: já é outra fala
+            words = ws;
+            player.setWords(ws);
+          });
+        }
+        await player.play(a.audio_url);
       } catch {
         /* sem áudio: a legenda continua */
       } finally {
+        off();
         if (gen === generation) speaking = "";
       }
     });
@@ -70,10 +106,11 @@ export async function createAgentVoice(): Promise<AgentVoice> {
     return job;
   }
 
-  async function speakUrl(text: string): Promise<string> {
+  async function speakAudio(text: string, withWords: boolean): Promise<Audio> {
     const r = await fetch("/api/speak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
     if (!r.ok) throw new Error(`speak HTTP ${r.status}`);
-    return (await r.json()).audio_url as string;
+    const { id, audio_url } = (await r.json()) as { id: string; audio_url: string };
+    return { audio_url, words: withWords ? wordsOf(id) : undefined };
   }
 
   const voice: AgentVoice = {
@@ -85,9 +122,9 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       await ctx.resume().catch(() => undefined);
       void ctx.close();
     },
-    speak(text) {
+    speak(text, opts = {}) {
       if (!tts) return Promise.resolve();
-      return enqueue(text, () => speakUrl(text));
+      return enqueue(text, () => speakAudio(text, !!opts.onWord), opts);
     },
     stop() {
       generation++;
@@ -109,6 +146,8 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
       let buf = "";
       const spoken: Promise<void>[] = [];
+      // ações do agente esperam a frase seguinte começar a tocar (contrato Voz ↔ quadro)
+      let actions: BoardAction[] = [];
       try {
         for (;;) {
           const { done, value } = await reader.read();
@@ -122,15 +161,19 @@ export async function createAgentVoice(): Promise<AgentVoice> {
             const ev = JSON.parse(block.slice(6));
             if (ev.type === "speak") {
               const url: string | null = ev.audio_url;
-              const play = () => (url ? enqueue(ev.text, async () => url) : Promise.resolve());
+              const before = actions;
+              actions = [];
+              const start = () => before.forEach((a) => h.onAction(a));
+              const play = () => (url ? enqueue(ev.text, async () => ({ audio_url: url }), { onStart: start }) : Promise.resolve(start()));
               spoken.push(h.onSpeak(ev.text, play));
-            } else if (ev.type === "action") h.onAction(ev.action);
+            } else if (ev.type === "action") actions.push(ev.action);
             else if (ev.type === "go_to") h.onGoTo(ev.target);
           }
         }
       } catch {
         /* interrompida */
       }
+      if (!ac.signal.aborted) actions.forEach((a) => h.onAction(a)); // ações depois da última frase
       await Promise.all(spoken);
       return true;
     },

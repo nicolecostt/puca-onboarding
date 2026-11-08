@@ -3,7 +3,7 @@ import demo from "../data/tail.journey.json";
 import { loadJourney } from "../validate";
 import { createRunner, type RunnerIO } from "../runner";
 import { DEMO_PROFILES } from "../profile";
-import type { BoardAction, Profile } from "../types";
+import type { BoardAction, Journey, Profile, SpeechCue } from "../types";
 
 const journey = loadJourney(demo);
 
@@ -98,5 +98,48 @@ describe("runner", () => {
     const r = await createRunner(journey, DEMO_PROFILES.transicao, f.io, { maxSteps: 40 }).run();
     expect(r.ended).toBe("limit");
     expect(r.steps).toHaveLength(40);
+  });
+
+  it("ação sem at sai antes da fala; com at vira marca na fala, na ordem do texto e com o perfil preenchido", async () => {
+    const j = JSON.parse(JSON.stringify(demo)) as Journey;
+    j.moments = [
+      {
+        id: "m",
+        title: "Teste",
+        goal: "testar as marcas na fala",
+        view: { mode: "board", board: j.moments[3].view && "board" in j.moments[3].view ? j.moments[3].view.board : "" },
+        steps: [
+          {
+            id: "s",
+            goal: "falar com marcas",
+            line: "Oi, {nome}: primeiro o POS, depois o gateway.",
+            actions: [
+              { type: "reveal", targets: ["gateway"], at: "o gateway" },
+              { type: "clear_highlight" },
+              { type: "reveal", targets: ["pos"], at: "o POS" },
+            ],
+          },
+        ],
+      },
+    ];
+    const events: string[] = [];
+    let cues: SpeechCue[] | undefined;
+    const io: RunnerIO = {
+      enterView: () => {},
+      apply: (a) => events.push(`apply ${a.type}`),
+      say: async (t, c) => {
+        events.push(`say ${t}`);
+        cues = c;
+      },
+      listen: async () => "",
+      select: async () => "",
+    };
+    await createRunner(loadJourney(j), DEMO_PROFILES.transicao, io).run();
+    expect(events).toEqual(["apply clear_highlight", "say Oi, Bruno: primeiro o POS, depois o gateway."]);
+    const line = "Oi, Bruno: primeiro o POS, depois o gateway.";
+    expect(cues?.map((c) => [c.at, c.action.type === "reveal" ? c.action.targets[0] : ""])).toEqual([
+      [line.indexOf("o POS"), "pos"],
+      [line.indexOf("o gateway"), "gateway"],
+    ]);
   });
 });

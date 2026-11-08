@@ -66,7 +66,7 @@ Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json)
 | `line` | O que o agente fala. É uma orientação, não um texto decorado: com um LLM, a Puca adapta as palavras à conversa. |
 | `highlight` | Trecho da fala que fica destacado em amarelo na legenda. |
 | `knowledge` | Contexto extra do passo, como o do momento. |
-| `actions` | Ações no quadro, aplicadas antes da fala (tabela abaixo). |
+| `actions` | Ações no quadro: antes da fala, ou no trecho marcado em `at` (tabela abaixo). |
 | `decision` | `auto` (padrão: segue sozinho), `wait` (espera resposta) ou `select` (espera um toque num nó). |
 | `suggested_replies` | Botões de resposta para passos `wait`. O texto livre do chat é comparado com eles por palavras-chave. |
 | `expect` | Para `select`: `{ nodes, on_correct, on_wrong, retries?, on_reveal? }`. Errou: fala `on_wrong` e deixa tentar de novo; esgotou as tentativas: destaca a resposta e fala `on_reveal`. |
@@ -85,6 +85,18 @@ Um passo `wait` precisa terminar em pergunta ou ter `suggested_replies`, senão 
 | `{ "type": "flow", "path": [ids de arestas] }` | Um pulso percorre o caminho. |
 | `{ "type": "card", "target": id }` / `{ "type": "close_card" }` | Abre ou fecha o cartão do nó. |
 | `{ "type": "reset" }` | Esconde tudo. |
+
+Qualquer ação aceita `at`: um trecho da `line` do passo. A ação acontece quando a Puca chega nesse trecho da fala,
+para o quadro acompanhar a explicação; sem `at`, ela acontece antes da fala. O trecho precisa estar na `line`.
+
+```jsonc
+"line": "Os valores são três: cliente no centro, dono do problema e simples primeiro.",
+"actions": [
+  { "type": "reveal", "targets": ["valor-cliente"], "at": "cliente no centro" },
+  { "type": "reveal", "targets": ["valor-dono"], "at": "dono do problema" },
+  { "type": "reveal", "targets": ["valor-simples"], "at": "simples primeiro" }
+]
+```
 
 ### Transições
 
@@ -130,7 +142,7 @@ A aula escolhe o perfil nesta ordem:
 - `version` é 1; campos obrigatórios presentes; quadros com nós e arestas válidos.
 - Ids de momento e de passo únicos; objetivos únicos (o agente se perde com objetivos iguais).
 - O primeiro momento tem `view`; ações de quadro só em momentos com quadro.
-- Ações, `expect` e `flow` citam só nós e arestas do quadro em vigor.
+- Ações, `expect` e `flow` citam só nós e arestas do quadro em vigor; o `at` de uma ação é trecho da `line` do passo.
 - Transições apontam para destinos que existem; `if.reply` está nas `suggested_replies` do passo.
 - Passo `wait` com pergunta ou respostas sugeridas; passo `select` com `expect` completo.
 

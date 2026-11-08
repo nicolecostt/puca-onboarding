@@ -4,13 +4,17 @@
 import { evaluate, matchReply } from "./conditions";
 import { interpolate } from "./profile";
 import { effectiveViews } from "./validate";
-import type { BoardAction, Journey, Moment, Profile, Step, Transition, View } from "./types";
+import type { BoardAction, Journey, Moment, Profile, SpeechCue, Step, Transition, View } from "./types";
 
 export interface RunnerIO {
   /** Mostra a vista do momento. fresh = o momento declara a vista (recomeça o quadro); false = herda o estado. */
   enterView(view: View, fresh: boolean): void;
   apply(action: BoardAction): void;
-  say(text: string): Promise<void>;
+  /**
+   * Fala um texto. `cues` são ações para disparar quando a fala chegar na posição `at`; se a fala for cortada,
+   * aplique as que faltaram antes de devolver (contrato Voz ↔ quadro em docs/contratos.md).
+   */
+  say(text: string, cues?: SpeechCue[]): Promise<void>;
   /** Espera a resposta (botão de resposta sugerida, chat ou voz). Devolve o texto dito. */
   listen(replies: string[]): Promise<string>;
   /** Espera um clique num nó do quadro. Devolve o id do nó. */
@@ -100,8 +104,15 @@ export function createRunner(journey: Journey, profile: Profile, io: RunnerIO, o
 
       let reply: string | null = null;
       try {
-        for (const a of step.actions ?? []) io.apply(a);
-        await say(step.line);
+        // ações sem `at` antes da fala; as com `at` viram marcas na fala, na ordem em que aparecem
+        const line = interpolate(step.line, profile);
+        const cues: SpeechCue[] = [];
+        for (const a of step.actions ?? []) {
+          if (a.at === undefined) io.apply(a);
+          else cues.push({ at: Math.max(0, line.indexOf(interpolate(a.at, profile))), action: a });
+        }
+        cues.sort((x, y) => x.at - y.at);
+        await io.say(line, cues.length ? cues : undefined);
 
         const decision = step.decision ?? "auto";
         if (decision === "wait") {
