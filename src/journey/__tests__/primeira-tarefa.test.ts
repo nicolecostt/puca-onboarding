@@ -176,7 +176,7 @@ describe("pedidoMessage", () => {
     expect(text).not.toMatch(/\b(ele|ela|o Bruno|a Bruno)\b/);
   });
 
-  it("sem nome, fala da pessoa que Puca acompanha", () => {
+  it("sem nome, fala da pessoa que o Puca acompanha", () => {
     const pedidos = createPedidos(memoryStore());
     for (const pessoa of ["", "você"]) {
       expect(pedidoMessage(pedidos.add(draft(pessoa)))).toContain("da pessoa que estou acompanhando");

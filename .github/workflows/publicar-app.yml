@@ -1,0 +1,39 @@
+# Publicar uma versão nova do app para Mac, à mão: Actions → Publicar o app → Run workflow (branch main).
+# Confere o projeto e roda scripts/publicar-app.sh. Em outra branch, só gera o app, sem publicar.
+# Não roda sozinho a cada merge: a versão que o jurado instala só muda quando alguém pede.
+name: Publicar o app
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar-app
+  cancel-in-progress: false
+
+jobs:
+  mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - name: Só gerar (fora da main)
+        if: github.ref != 'refs/heads/main'
+        run: npm run build:app
+      - name: Publicar (main)
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          npm run publicar-app -- "0.2.${{ github.run_number }}"

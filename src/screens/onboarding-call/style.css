@@ -1,5 +1,5 @@
 /* Call inicial no visual da landing (DESIGN.md): papel branco, tinta preta, fios de 1px,
-   títulos em Creato Display. A única cor é a de Puca: a esfera e as partículas do fundo.
+   títulos em Creato Display. A única cor é a do Puca: a esfera e as partículas do fundo.
    Barra de call (embaixo) e chat (à direita) são componentes. */
 :root {
   --ink: var(--color-text);
@@ -13,7 +13,9 @@
 body {
   background: var(--paper);
   color: var(--ink);
-  overflow: hidden;
+  /* fala longa de Puca: a página rola em vez de esconder o fim da conversa atrás da barra de call */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 ::selection {
@@ -21,7 +23,7 @@ body {
   color: var(--paper);
 }
 
-/* ---- Partículas de Puca no fundo ---- */
+/* ---- Partículas do Puca no fundo ---- */
 .particles {
   position: fixed;
   inset: 0;
@@ -67,7 +69,7 @@ body {
 }
 
 .brand__mark {
-  /* logo: as bolinhas de Puca (src/assets/orbis-logo.png) */
+  /* logo: as bolinhas do Puca (src/assets/orbis-logo.png) */
   display: block;
   flex: none;
   width: 26px;
@@ -104,12 +106,12 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* ---- Palco: Puca no centro, a conversa embaixo dela ---- */
+/* ---- Palco: o Puca no centro, a conversa embaixo dele ---- */
 .stage {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center; /* mais alto que a tela: começa do topo, sem cortar */
   gap: 20px;
   max-width: 1280px;
   min-height: calc(100vh - 65px);
@@ -132,7 +134,7 @@ body {
   aspect-ratio: 1;
 }
 
-/* sem o visual de Puca: um círculo neutro */
+/* sem o visual do Puca: um círculo neutro */
 .agent__core {
   position: relative;
   z-index: 1;
@@ -192,7 +194,7 @@ body {
   }
 }
 
-/* com a esfera de Puca */
+/* com a esfera do Puca */
 .agent__orb.has-visual > .agent__core,
 .agent__orb.has-visual > .agent__ring {
   display: none;
@@ -240,7 +242,7 @@ body {
   text-align: center;
 }
 
-/* fio curto separando Puca da conversa */
+/* fio curto separando o Puca da conversa */
 .caption::before {
   content: "";
   width: 48px;
@@ -301,6 +303,7 @@ body {
 .caption__hint {
   font-size: 14px;
   color: var(--grey);
+  scroll-margin-bottom: 120px; /* ao rolar até ele, fica acima da barra de call */
 }
 
 /* ---- Fim da call: a conversa e os controles saem, e a página estoura para a tela inicial ---- */
@@ -376,4 +379,22 @@ body.is-leaving .call-dock .call-live {
   .agent__orb[data-state="speaking"] .agent__ring--1 {
     opacity: 1;
   }
+}
+
+/* Botão de entrada: o navegador só libera som e microfone depois de um clique. */
+.call-gate {
+  position: fixed;
+  left: 50%;
+  bottom: 120px;
+  transform: translateX(-50%);
+  z-index: 50;
+  height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-text);
+  color: var(--color-surface);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
 }
