@@ -110,7 +110,8 @@ export function buildApp(opts: BuildAppOptions = {}) {
   app.register(rateLimit, {
     global: false,
     hook: "preHandler",
-    keyGenerator: (req) => req.pessoa?.id ?? req.ip,
+    // sem token, pelo IP que o proxy do Fly grava (o X-Forwarded-For o cliente consegue forjar)
+    keyGenerator: (req) => req.pessoa?.id ?? String(req.headers["fly-client-ip"] ?? req.ip),
     errorResponseBuilder: (_req, ctx) => ({ statusCode: 429, error: "rate_limited", retry_after_ms: ctx.ttl }),
   });
 
