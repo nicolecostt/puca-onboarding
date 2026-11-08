@@ -1,7 +1,7 @@
 ---
 name: nova-jornada
-description: Chame automaticamente para criar ou editar uma aula ou jornada (src/journey/data/*.journey.json) — ex.: "cria uma aula sobre X", "muda a fala do passo Y", "adiciona um nó no quadro", momentos, passos, transições, perguntas e conhecimento. Não use para mudar o motor ou o formato da jornada (isso é a skill contrato).
-argument-hint: "[assunto da aula ou o que mudar na jornada]"
+description: Chame automaticamente para criar ou editar uma sessão ou jornada (src/journey/data/*.journey.json) — ex.: "cria uma sessão sobre X", "muda a fala do passo Y", "adiciona um nó no quadro", momentos, passos, transições, perguntas e conhecimento. Não use para mudar o motor ou o formato da jornada (isso é a skill contrato).
+argument-hint: "[assunto da sessão ou o que mudar na jornada]"
 ---
 
 # Criar ou editar uma jornada
@@ -9,7 +9,7 @@ argument-hint: "[assunto da aula ou o que mudar na jornada]"
 Pedido: $ARGUMENTS
 
 > **Base do sistema:** o glossário do `CONTEXT.md` já está no seu contexto (o `CLAUDE.md` importa); use os termos dele.
-> Uma jornada é conteúdo de produto: leia no `PRODUCT.md` a aula (§4.1–4.3), os perfis (§7) e o que a demo precisa mostrar. Falas, títulos e `goal` usam os termos do glossário (momento, passo, nó, fonte, encaminhamento). Se o pedido contradiz o `PRODUCT.md`, pare e mostre a contradição. Se algo novo precisa entrar na base, use a skill `contexto-base`.
+> Uma jornada é conteúdo de produto: leia no `PRODUCT.md` a sessão (§4.1–4.3), os perfis (§7) e o que a demo precisa mostrar. Falas, títulos e `goal` usam os termos do glossário (momento, passo, nó, fonte, encaminhamento). Se o pedido contradiz o `PRODUCT.md`, pare e mostre a contradição. Se algo novo precisa entrar na base, use a skill `contexto-base`.
 
 O formato completo está em `docs/journey-format.md`. Leia antes de escrever. Use `src/journey/data/tail.journey.json`
 como exemplo do que já funciona.

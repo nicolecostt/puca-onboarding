@@ -1,6 +1,6 @@
 ---
 name: Orbis
-description: A Puca dá aulas no quadro para quem chega no time; preto no branco, e a única cor é a dela.
+description: A Puca conduz sessões no quadro para quem chega no time; preto no branco, e a única cor é a dela.
 colors:
   ink: "#0a0a0a"
   ink-button: "#171717"
@@ -118,7 +118,7 @@ components:
 
 Um cartaz tipográfico suíço: papel branco, tinta preta, cinzas só para o que é secundário ou inativo, fios de 1px marcando a grade, e um único objeto colorido: a Puca. Tudo o que não é a Puca é monocromático; o arco-íris metálico dela (a faixa da esfera de pontos, o anel `--puca-holo`, as partículas) aparece em poucos pontos, e é justamente essa raridade que faz o olho achar a Puca na tela.
 
-Na landing o mundo é plano e editorial: Creato Display grande alinhada à esquerda numa grade de 12 colunas, listas separadas por fios, nenhum fundo colorido, nenhuma sombra. Nas telas do app (aula, call) o mesmo mundo vale para cor e acabamento, com uma densidade de ferramenta: quadro pontilhado, nós contornados em tinta, e sombras suaves só nos componentes que flutuam sobre o quadro.
+Na landing o mundo é plano e editorial: Creato Display grande alinhada à esquerda numa grade de 12 colunas, listas separadas por fios, nenhum fundo colorido, nenhuma sombra. Nas telas do app (sessão, call) o mesmo mundo vale para cor e acabamento, com uma densidade de ferramenta: quadro pontilhado, nós contornados em tinta, e sombras suaves só nos componentes que flutuam sobre o quadro.
 
 O estado nunca depende de cor: lê-se pela marca. Nó cheio é o escolhido pela pessoa, contorno sólido é provado, tracejado é caixa preta ou selo inferido, contorno grosso com visto é acerto, contorno duplo cinza é alerta, e o anel arco-íris é o que a Puca está explicando agora. Vermelho fica reservado para erro e para encerrar a call.
 

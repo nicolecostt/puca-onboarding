@@ -1,6 +1,6 @@
-// Painel "Sua jornada" (aula no quadro, canto de cima à esquerda): o objetivo da pessoa, os momentos da jornada
+// Painel "Sua jornada" (sessão no quadro, canto de cima à esquerda): o objetivo da pessoa, os momentos da jornada
 // marcados pela calibragem (aprender, revisar, já conhece, fora) e os próximos passos. Não está no Figma;
-// segue o visual dos cartões da aula. Recolhe para não tampar o quadro.
+// segue o visual dos cartões da sessão. Recolhe para não tampar o quadro.
 //   const panel = mountJourneyPanel({ jornada, final: "primeira-tarefa" });
 //   panel.setProgress(["boas-vindas"], "seu-time");
 //   panel.setJornada(montarJornadaDaPessoa(journey, calibragemNova)); // depois de uma checagem
@@ -46,7 +46,7 @@ function momentoHTML(m: MomentoDaPessoa, p: Progresso): string {
   const mark = p === "feito" ? "✓" : "";
   const current = p === "agora" ? ' aria-current="step"' : "";
   const motivo = m.motivo ? `<span class="jp-moment__why">${esc(m.motivo)}</span>` : "";
-  // selo só onde a calibragem disse algo (momentos sem tema, como a checagem, são parte da aula para todos)
+  // selo só onde a calibragem disse algo (momentos sem tema, como a checagem, são parte da sessão para todos)
   const tag = m.temas.length || m.estado !== "aprender" ? `<span class="jp-tag jp-tag--${m.estado}">${ESTADO_LABEL[m.estado]}</span>` : "";
   return `
     <li class="jp-moment jp-moment--${p} jp-moment--${m.estado}"${current}>

@@ -47,7 +47,7 @@ export interface JourneyStep {
   label: string;
 }
 
-// ---- Aula no quadro ----
+// ---- Sessão no quadro ----
 
 /** Quanto a informação é confiável (contexto 4.3: deixar explícito quando não foi confirmado). */
 export type Evidence = "proven" | "inferred";

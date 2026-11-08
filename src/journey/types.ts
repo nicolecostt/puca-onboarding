@@ -26,7 +26,7 @@ export type Tema = "empresa" | "rituais" | "pagamentos" | "mensageria" | "falhas
 /** O que a pessoa já sabe do assunto. Não é nota: só o ponto de partida. */
 export type Nivel = "nao_conhece" | "ja_ouviu" | "usa" | "domina";
 
-/** alta = a pessoa disse com clareza; media = deduzido do que ela contou; baixa = palpite, confirmar na aula. */
+/** alta = a pessoa disse com clareza; media = deduzido do que ela contou; baixa = palpite, confirmar na sessão. */
 export type Certeza = "alta" | "media" | "baixa";
 
 export interface ItemCalibragem {
@@ -35,9 +35,9 @@ export interface ItemCalibragem {
   certeza: Certeza;
   /** A frase da pessoa que levou a essa conclusão (vazia quando foi deduzido). */
   evidencia: string;
-  /** call = respondeu na call · vinculo = deduzido de ser novo ou de transição · aula = atualizado na checagem. */
-  origem: "call" | "vinculo" | "aula";
-  /** Só com origem "aula": resultado da última checagem do tema. Não é nota. */
+  /** call = respondeu na call · vinculo = deduzido de ser novo ou de transição · sessao = atualizado na checagem. */
+  origem: "call" | "vinculo" | "sessao";
+  /** Só com origem "sessao": resultado da última checagem do tema. Não é nota. */
   checagem?: ResultadoDaChecagem;
 }
 
@@ -94,7 +94,7 @@ export interface MomentoDaPessoa {
   motivo: string;
   /** Temas da calibragem que o momento cobre (vazio nos momentos sem tema, como a checagem). */
   temas: Tema[];
-  /** A checagem da aula pediu para rever: o momento volta aos próximos passos mesmo já visto. */
+  /** A checagem da sessão pediu para rever: o momento volta aos próximos passos mesmo já visto. */
   rever?: true;
 }
 

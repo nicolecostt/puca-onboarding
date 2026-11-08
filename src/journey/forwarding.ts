@@ -1,6 +1,6 @@
 // Encaminhamento (PRODUCT.md §4.5 e §12.1, passo 4): quando a Puca não tem fonte confiável, a dúvida vai
 // para a buddy com o contexto pronto (o que a pessoa perguntou, o que a Puca já consultou e por que não
-// respondeu). A aula cria; a tela do Slack (screens/live-session) envia. Formato em docs/contratos.md.
+// respondeu). A sessão cria; a tela do Slack (screens/live-session) envia. Formato em docs/contratos.md.
 import { normalize } from "./conditions";
 import { readJson, writeJson, type KeyValueStore } from "./storage";
 import type { Journey } from "./types";
@@ -103,7 +103,7 @@ export function buddyOf(journey: Journey): string {
 export function forwardingMessage(f: Forwarding): string {
   // sem nome, profile.nome vira "você" (journey/profile.ts)
   const nome = f.pessoa.trim();
-  const asked = nome && nome.toLowerCase() !== "você" ? `Pergunta de ${nome} na aula` : "A pessoa que estou acompanhando perguntou na aula";
+  const asked = nome && nome.toLowerCase() !== "você" ? `Pergunta de ${nome} na sessão` : "A pessoa que estou acompanhando perguntou na sessão";
   const consulted = f.consulted.length ? f.consulted.join("; ") : "Não achei nenhuma fonte sobre isso.";
   const summary = f.summary.trim() && normalize(f.summary) !== normalize(f.question) ? [`Resumo: ${f.summary.trim()}`] : [];
   return [

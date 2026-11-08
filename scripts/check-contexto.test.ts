@@ -47,8 +47,8 @@ describe("checarGlossario", () => {
     expect(r.erros.join("\n")).toMatch(/"_Avoid_" tem que ser a última linha/);
   });
   it("acusa termo repetido, a menos que diga 'Não confundir'", () => {
-    expect(checarGlossario(g("**Aula**:\nUma sessão.\n\n**Aula**:\nOutra coisa.")).erros.join()).toMatch(/repetido/);
-    expect(checarGlossario(g("**Aula**:\nUma sessão.\n\n**Aula**:\nOutra coisa. (Não confundir com a sessão.)")).erros).toEqual([]);
+    expect(checarGlossario(g("**Sessão**:\nUma sessão.\n\n**Sessão**:\nOutra coisa.")).erros.join()).toMatch(/repetido/);
+    expect(checarGlossario(g("**Sessão**:\nUma sessão.\n\n**Sessão**:\nOutra coisa. (Não confundir com a sessão.)")).erros).toEqual([]);
   });
   it("acusa _Avoid_ que contradiz outro termo, a menos que venha explicado", () => {
     expect(checarGlossario(g("**Lousa**:\nO produto.\n\n**Quadro**:\nA vista.\n_Avoid_: lousa")).erros.join()).toMatch(/manda evitar "Lousa"/);

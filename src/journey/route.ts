@@ -4,7 +4,7 @@
 //   reply     → bateu numa resposta sugerida   → segue o roteiro (numa checagem, qualquer fala que não seja
 //               pergunta nem pulo é a resposta: o motor decide se entendeu)
 //   select    → disse o nome de um nó          → conta como o toque no quadro
-//   knowledge → o conhecimento da aula responde
+//   knowledge → o conhecimento da sessão responde
 //   faq       → pergunta sobre um nó do quadro ("quem cuida do X?")
 //   ask       → nada disso: pergunta ao agente
 import { matchFaq, scoreReply, normalize } from "./conditions";

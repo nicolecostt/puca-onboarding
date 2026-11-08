@@ -51,7 +51,7 @@ export function saveProfile(p: Profile): void {
   try {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(p));
   } catch {
-    // sem storage (aba privada, preview): a aula cai no perfil de demo
+    // sem storage (aba privada, preview): a sessão cai no perfil de demo
   }
 }
 

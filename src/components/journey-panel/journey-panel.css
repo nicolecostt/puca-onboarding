@@ -1,5 +1,5 @@
 /* Painel "Sua jornada": canto de cima à esquerda, abaixo do cabeçalho (56px). Não está no Figma;
-   segue os cartões da aula (borda, raio e sombra dos tokens). Recolhido, fica só o cabeçalho. */
+   segue os cartões da sessão (borda, raio e sombra dos tokens). Recolhido, fica só o cabeçalho. */
 .journey-panel {
   position: fixed;
   left: 16px;
@@ -168,7 +168,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-/* Já feito: some o motivo, para a lista encurtar enquanto a aula anda */
+/* Já feito: some o motivo, para a lista encurtar enquanto a sessão anda */
 .jp-moment--feito .jp-moment__why {
   display: none;
 }

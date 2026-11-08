@@ -67,7 +67,7 @@ function itemPerguntado(tema: Tema, resposta: string | undefined, experiencia: s
   if (exp && has(exp, TEMA_PALAVRAS[tema] ?? [])) {
     return { tema, nivel: "usa", certeza: "media", evidencia: experiencia!.trim(), origem: "call" };
   }
-  // não deu para saber: nível do meio, para a aula confirmar na checagem
+  // não deu para saber: nível do meio, para a sessão confirmar na checagem
   return { tema, nivel: "ja_ouviu", certeza: "baixa", evidencia: resposta?.trim() ?? "", origem: "call" };
 }
 
@@ -111,14 +111,14 @@ export function itemDoTema(c: Calibragem, tema: Tema): ItemCalibragem | undefine
 const ORDEM_NIVEL: Record<Nivel, number> = { nao_conhece: 0, ja_ouviu: 1, usa: 2, domina: 3 };
 
 /**
- * A checagem da aula atualiza o tema conferido (função pura; quem grava é a tela, com saveCalibragem).
+ * A checagem da sessão atualiza o tema conferido (função pura; quem grava é a tela, com saveCalibragem).
  * Entendeu: nível pelo menos "usa". Rever: o nível não muda (não é nota), o tema só fica marcado para rever.
  */
 export function atualizarCalibragem(c: Calibragem, r: ResultadoChecagem, agora = new Date()): Calibragem {
   const conhecimentos = c.conhecimentos.map((item): ItemCalibragem => {
     if (item.tema !== r.tema) return item;
     const nivel = r.entendeu && ORDEM_NIVEL[item.nivel] < ORDEM_NIVEL.usa ? "usa" : item.nivel;
-    return { tema: item.tema, nivel, certeza: "alta", evidencia: r.resposta.trim(), origem: "aula", checagem: r.entendeu ? "entendeu" : "rever" };
+    return { tema: item.tema, nivel, certeza: "alta", evidencia: r.resposta.trim(), origem: "sessao", checagem: r.entendeu ? "entendeu" : "rever" };
   });
   return { ...c, conhecimentos, atualizada_em: agora.toISOString() };
 }

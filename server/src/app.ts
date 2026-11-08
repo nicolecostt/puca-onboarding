@@ -1,5 +1,5 @@
 // API do agente (sem estado): fala → áudio, pergunta → ponte + LLM por SSE, token do STT e áudio do TTS.
-// Quem conduz a aula é a tela (src/screens/lesson), com o runner da jornada.
+// Quem conduz a sessão é a tela (src/screens/lesson), com o runner da jornada.
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import Fastify, { type FastifyReply } from "fastify";
@@ -65,11 +65,13 @@ export function buildApp(opts: { journey?: Journey; tts?: TtsService | null } = 
       const ac = new AbortController();
       reply.raw.on("close", () => { if (!reply.raw.writableFinished) ac.abort(); });
       const emit = sse(reply);
-      await ask(
+      const timing = await ask(
         { journey, profile: b.profile ?? DEMO_PROFILES[b.perfil ?? "novo"], momentId: moment.id, stepId: step.id, text, history, tts, model: env.model, timeoutMs: env.llmTimeoutMs, signal: ac.signal },
         emit,
       );
       reply.raw.end();
+      // custo da sessão (#52): auditável mesmo quando a pessoa interrompe; nunca leva o texto da pessoa
+      req.log.info({ moment: moment.id, step: step.id, timing }, "ask");
     },
   );
 

@@ -26,6 +26,8 @@ export type LlmEvent =
   | { type: "text"; text: string }
   | { type: "reasoning"; text: string }
   | { type: "tool_call"; name: string; args: unknown; raw: string }
+  /** Tokens que o provedor informou no fim do stream (no máximo um, antes do `done`). */
+  | { type: "usage"; input: number; output: number }
   | { type: "done"; finishReason: string | null };
 
 export class LlmError extends Error {
@@ -45,6 +47,8 @@ export async function* streamChat(req: ChatRequest, apiKey = process.env.FEATHER
     model: req.model,
     messages: req.messages,
     stream: true,
+    // o provedor manda os tokens num chunk final, sem choices
+    stream_options: { include_usage: true },
     max_tokens: req.maxTokens ?? 300,
     temperature: req.temperature ?? 0.4,
   };
@@ -69,6 +73,7 @@ export async function* streamChat(req: ChatRequest, apiKey = process.env.FEATHER
   // Tool calls chegam fatiados por índice; montamos e emitimos no fim.
   const calls = new Map<number, { name: string; args: string }>();
   let finishReason: string | null = null;
+  let usage: { input: number; output: number } | null = null;
   const decoder = new TextDecoder();
   let buf = "";
 
@@ -88,6 +93,9 @@ export async function* streamChat(req: ChatRequest, apiKey = process.env.FEATHER
         continue;
       }
       if (json.error) throw new LlmError(json.error.message ?? "stream error", json.error.code ?? "stream");
+      if (typeof json.usage?.prompt_tokens === "number" && typeof json.usage?.completion_tokens === "number") {
+        usage = { input: json.usage.prompt_tokens, output: json.usage.completion_tokens };
+      }
       const choice = json.choices?.[0];
       if (!choice) continue;
       const d = choice.delta ?? {};
@@ -111,5 +119,6 @@ export async function* streamChat(req: ChatRequest, apiKey = process.env.FEATHER
     } catch {}
     yield { type: "tool_call", name, args: parsed, raw: args };
   }
+  if (usage) yield { type: "usage", ...usage };
   yield { type: "done", finishReason };
 }

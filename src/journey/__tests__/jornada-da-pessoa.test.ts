@@ -82,7 +82,7 @@ describe("montarJornadaDaPessoa depois da checagem", () => {
 
   it("o motivo fala da checagem, sem nota", () => {
     const m = montarJornadaDaPessoa(journey, checa(DEMO_CALIBRAGENS.novo, "falhas", false)).momentos.find((x) => x.id === "falha")!;
-    expect(m.motivo).toBe("Na checagem da aula, vale rever este assunto.");
+    expect(m.motivo).toBe("Na checagem da sessão, vale rever este assunto.");
   });
 });
 

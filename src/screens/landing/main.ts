@@ -78,7 +78,7 @@ function mountSkills(sphere: AgentVisual | null): void {
   show(0);
 }
 
-// ---- Nós do exemplo de quadro: dados lidos da jornada da Tail (o mesmo quadro da aula) ----
+// ---- Nós do exemplo de quadro: dados lidos da jornada da Tail (o mesmo quadro da sessão) ----
 interface NodeCard {
   title: string;
   role: string;

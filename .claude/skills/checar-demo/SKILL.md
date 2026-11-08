@@ -14,7 +14,7 @@ e os pontos obrigatórios do desafio em §12). Se o `PRODUCT.md` pede algo que o
 2. **Servidor.** Suba `npm run dev` em segundo plano e espere responder em `http://localhost:5173/`.
 3. **Páginas respondem.** Para cada endereço da tabela de `docs/demo.md`, `curl -s -o /dev/null -w "%{http_code}"` tem que dar 200.
 4. **Fluxos ao vivo.** Se houver ferramenta de navegador disponível, abra cada fluxo, siga o "o que precisa acontecer"
-   e leia o console. Para a aula, use `?auto=1` e espere até o fim. Sem navegador, diga isso claramente e entregue
+   e leia o console. Para a sessão, use `?auto=1` e espere até o fim. Sem navegador, diga isso claramente e entregue
    a lista para uma pessoa conferir à mão: **não marque como ok o que não foi visto**.
 5. **Desligue** o servidor que você subiu.
 
