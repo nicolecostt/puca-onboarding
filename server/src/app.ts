@@ -34,7 +34,7 @@ export function tryCreateTts(): TtsService | null {
 export function tryCreateVerificaToken(): VerificaToken | null {
   // no Fly (EXIGE_TOKEN=1), subir sem Supabase deixaria o servidor aberto: melhor não subir
   if (env.exigeToken && !env.supabaseUrl) throw new Error("EXIGE_TOKEN=1 sem SUPABASE_URL: o servidor ficaria sem login");
-  if (!env.supabaseUrl) return null;
+  if (!env.supabaseUrl || env.tokenDesligado) return null;
   return criaVerificaToken({ supabaseUrl: env.supabaseUrl, jwksUrl: env.supabaseJwksUrl });
 }
 

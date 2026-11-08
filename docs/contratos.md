@@ -71,8 +71,9 @@ respondem as mesmas rotas. O que muda é o que cada requisição precisa levar:
 - **Token:** toda rota, menos `GET /api/health`, exige `Authorization: Bearer <access_token do Supabase>`. O servidor
   confere a assinatura pelo JWKS do projeto, o emissor (`<SUPABASE_URL>/auth/v1`) e a audiência (`authenticated`), e
   usa o `sub` como id da pessoa. Vale para o áudio também: `GET /api/tts/:id` e `/words` levam o mesmo cabeçalho.
-  Sem `SUPABASE_URL` no ambiente (dev local), nenhuma rota exige token. No Fly, `EXIGE_TOKEN=1` impede o servidor de
-  subir sem Supabase.
+  Sem `SUPABASE_URL` no ambiente (dev local), nenhuma rota exige token. `EXIGE_TOKEN=1` exige o token e impede o
+  servidor de subir sem Supabase; `EXIGE_TOKEN=0` não exige, mesmo com Supabase. **Hoje o Fly está com `0`**: o app
+  ainda não faz login, e o token volta com a #159.
 - **Limite por pessoa** (pelo id do token; sem token, pelo IP), por minuto: `POST /api/ask` 30, `POST /api/speak`
   120, `POST /api/voice/token` 20.
 - **Travas diárias globais** (meia-noite de São Paulo; reiniciar o servidor zera), por `LIMITE_DIARIO_*`, sem valor =

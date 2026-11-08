@@ -12,8 +12,9 @@ primary_region = "iad"
 
 [env]
   PORT = "8787"
-  # sem SUPABASE_URL (fly secrets), o servidor não sobe: nunca fica aberto sem login
-  EXIGE_TOKEN = "1"
+  # "0" até o app fazer login anônimo e mandar o token (#159); aí volta para "1" (exige token e não sobe sem Supabase).
+  # Desligado, o custo fica limitado pelas travas diárias abaixo e pelo limite por IP.
+  EXIGE_TOKEN = "0"
   TTS_MODE = "ws"
   ELEVENLABS_MODEL_ID = "eleven_flash_v2_5"
   # travas diárias globais (docs/stack.md §5.3): passou, a rota cai no comportamento sem servidor
