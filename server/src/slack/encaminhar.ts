@@ -27,7 +27,7 @@ const semComando = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
 export function mensagemDoEncaminhamento(p: PedidoDeEncaminhamento): string {
   const fontes = p.fontes_consultadas.length ? p.fontes_consultadas.map(semComando).join("; ") : "não achei nenhuma fonte sobre isso.";
   return [
-    "Oi! Aqui é a Puca, do Orbis.",
+    "Oi! Aqui é Puca, do Orbis.",
     `Você me fez uma pergunta que eu não consegui responder com segurança. Na Kota, ela iria para ${QUEM[p.destino](semComando(p.para))}.`,
     `*Pergunta:* "${semComando(p.pergunta)}"`,
     ...(p.resumo && p.resumo !== p.pergunta ? [`*Resumo:* ${semComando(p.resumo)}`] : []),
@@ -44,7 +44,7 @@ export function createEncaminhador(slack: SlackDm, opts: { now?: () => number; m
   const feitos = new Map<string, Promise<ResultadoDoEncaminhamento>>();
   const now = opts.now ?? Date.now;
   const max = opts.maxPorDestinatarioPorHora ?? 5;
-  // Sem login (#159), o e-mail vem do app: o teto por destinatário impede usar a Puca para encher a caixa de alguém.
+  // Sem login (#159), o e-mail vem do app: o teto por destinatário impede usar Puca para encher a caixa de alguém.
   const enviosPorDestinatario = new Map<string, number[]>();
   function cabeMaisUm(usuario: string): boolean {
     const desde = now() - 60 * 60_000;

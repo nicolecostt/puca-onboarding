@@ -1,4 +1,4 @@
-# Servidor da Puca no Fly.io: uma máquina sempre ligada (docs/stack.md §5, decisão 0006).
+# Servidor de Puca no Fly.io: uma máquina sempre ligada (docs/stack.md §5, decisão 0006).
 # Chaves só por `fly secrets` (lista em docs/stack.md §13.3); aqui vai só o que é público.
 app = "orbis-puca"
 primary_region = "iad"

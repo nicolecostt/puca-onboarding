@@ -15,7 +15,7 @@
 9. [Direcionamento do produto](#9-direcionamento-do-produto)
 10. [Complementos do alinhamento com Joaquim](#10-complementos-do-alinhamento-com-joaquim)
 11. [Posicionamento: Sana Learn como referência e foco em just-in-time learning](#11-posicionamento-sana-learn-como-referência-e-foco-em-just-in-time-learning)
-12. [Encaixe no Desafio Tako: a Puca como digital worker de onboarding](#12-encaixe-no-desafio-tako-a-puca-como-digital-worker-de-onboarding)
+12. [Encaixe no Desafio Tako: Puca como digital worker de onboarding](#12-encaixe-no-desafio-tako-puca-como-digital-worker-de-onboarding)
 13. [Avaliação pelos jurados: o mundo fictício da Kota](#13-avaliação-pelos-jurados-o-mundo-fictício-da-kota)
 14. [Modelo de negócio: quem compra e como cobramos](#14-modelo-de-negócio-quem-compra-e-como-cobramos)
 
@@ -214,7 +214,7 @@ Além da experiência do funcionário, queremos dar visibilidade às pessoas res
 
 - Percentual de etapas concluídas.
 - Tarefas ou acessos pendentes.
-- Sessões com a Puca realizadas.
+- Sessões com Puca realizadas.
 - Solicitações de suporte ainda abertas.
 - Assuntos que frequentemente geram dúvidas.
 - Tempo até a conclusão de marcos previamente definidos.
@@ -308,11 +308,11 @@ A call inicial é o momento de identificar **o que a pessoa já conhece**, suas 
 | **Entrando na empresa** | Combina acolhimento e onboarding cultural com o levantamento do repertório técnico e das necessidades da função. |
 | **Saindo de um time e entrando em outro** | Considera o contexto anterior, confirma os conhecimentos que podem ser aproveitados e investiga as diferenças do novo time: sistemas, responsabilidades, pessoas, práticas e rituais. A jornada é ajustada a partir dessa conversa. |
 
-**A call inicial não é só coleta de informações.** Além de levantar o que a pessoa já sabe, a Puca faz o **onboarding cultural**: explica como a empresa funciona e o que ela valoriza, para a pessoa chegar à primeira sessão sabendo onde está entrando.
+**A call inicial não é só coleta de informações.** Além de levantar o que a pessoa já sabe, Puca faz o **onboarding cultural**: explica como a empresa funciona e o que ela valoriza, para a pessoa chegar à primeira sessão sabendo onde está entrando.
 
-- **O que a Puca explica:** missão e valores, o jeito de trabalhar (rituais, combinados, como a comunicação acontece e onde pedir ajuda) e quem são as pessoas de referência (buddy, gestor, time).
+- **O que Puca explica:** missão e valores, o jeito de trabalhar (rituais, combinados, como a comunicação acontece e onde pedir ajuda) e quem são as pessoas de referência (buddy, gestor, time).
 - **Como explica:** em conversa, intercalando com as perguntas, e não como uma palestra antes delas. Cada trecho é curto e se liga ao que a pessoa contou (ex.: quem vem de uma empresa grande ouve como as decisões andam aqui).
-- **De onde vem:** só da documentação oficial da empresa, com as mesmas regras de fonte da [§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano). O que não está documentado a Puca não inventa.
+- **De onde vem:** só da documentação oficial da empresa, com as mesmas regras de fonte da [§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano). O que não está documentado Puca não inventa.
 - **Na transição entre times:** só as particularidades culturais do novo time, sem repetir a apresentação institucional ([Cenário B](#cenário-b--funcionário-em-transição-interna)).
 
 > **Exemplo:** “Antes de seguir, uma coisa sobre como a Kota trabalha: aqui a gente pergunta em público. Dúvida vai no canal de ajuda do time, não em mensagem privada, para a resposta ficar para quem vier depois. Você vai ver isso na sua primeira tarefa. E no seu time anterior, como funcionava?”
@@ -375,15 +375,15 @@ A cobertura equivalente se refere às capacidades mostradas nas imagens e repres
 
 ---
 
-## 12. Encaixe no Desafio Tako: a Puca como digital worker de onboarding
+## 12. Encaixe no Desafio Tako: Puca como digital worker de onboarding
 
 O Desafio Tako pede um **digital worker**: um agente com papel definido que *"executa um processo de ponta a ponta, em vez de só responder perguntas"*, opera os sistemas que o time já usa (Slack, entre outros) e *"chama um humano quando sai do roteiro"*. **Admissão e onboarding** é uma das frentes listadas pela Tako.
 
-Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio guia, e não na de digital worker. Para encaixar no desafio, ela precisa **receber um objetivo e conduzir a integração inteira**, agindo nos sistemas do time e envolvendo pessoas só onde elas são necessárias.
+Se Puca só responder dúvidas, ela fica na categoria de chatbot do próprio guia, e não na de digital worker. Para encaixar no desafio, ela precisa **receber um objetivo e conduzir a integração inteira**, agindo nos sistemas do time e envolvendo pessoas só onde elas são necessárias.
 
-### 12.1. O processo que a Puca conduz
+### 12.1. O processo que Puca conduz
 
-| # | O que a Puca faz | O que isso mostra | Onde o humano entra |
+| # | O que Puca faz | O que isso mostra | Onde o humano entra |
 |---|---|---|---|
 | 1 | Na **call inicial**, faz o onboarding cultural, levanta o que a pessoa já sabe, registra a calibragem e **monta a jornada dela** ([§10.1](#101-call-inicial-e-conhecimento-prévio)). | O agente planeja a partir de um objetivo. | — |
 | 2 | Conduz a **sessão** no quadro, seguindo a jornada e respondendo na hora ao que a pessoa diz: perguntas, pulos e interrupções. | O agente executa e se adapta, sem roteiro fixo. | — |
@@ -393,14 +393,14 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 
 ### 12.2. O que precisa aparecer na demo
 
-- **Agir num sistema, não só falar.** A Puca age nos sistemas reais da Kota ([§13](#13-avaliação-pelos-jurados-o-mundo-fictício-da-kota)), e não em telas simuladas. O guia aceitaria conexões simuladas *"desde que o agente realmente opere sobre elas na demo"*; agir no sistema de verdade é a nossa aposta de diferencial.
+- **Agir num sistema, não só falar.** Puca age nos sistemas reais da Kota ([§13](#13-avaliação-pelos-jurados-o-mundo-fictício-da-kota)), e não em telas simuladas. O guia aceitaria conexões simuladas *"desde que o agente realmente opere sobre elas na demo"*; agir no sistema de verdade é a nossa aposta de diferencial.
   - O **encaminhamento** do passo 4 sai de fato no **Slack da Kota**, numa mensagem direta para a própria pessoa, dizendo a quem iria na Kota, com a dúvida, as fontes já consultadas e o motivo de não ter respondido. Nunca num canal: todos os jurados entram no mesmo Slack, e a dúvida de um não pode aparecer para os outros ([§5](#5-visibilidade-para-buddy-gestor-e-rh)).
   - O Slack simulado continua para a **aprovação do gestor** (primeira tarefa e acessos) e como reserva quando o Slack real não responde.
-  - Dentro do Orbis, a Puca tem um **navegador** onde abre o repositório, o Notion e o Slack da Kota. Ali ela aponta, circula, marca e mostra imagens por cima da página, clica e preenche, e percebe o que a pessoa faz na mesma página: pode mostrar, apontar para a pessoa clicar ou acompanhar a pessoa fazendo. Ela só abre o mundo da Kota, pede o ok da pessoa antes de publicar algo em nome dela e nunca digita senha.
-  - Quando a pessoa fala por cima, a Puca para o que está fazendo no navegador e escuta, como na fala.
+  - Dentro do Orbis, Puca tem um **navegador** onde abre o repositório, o Notion e o Slack da Kota. Ali ela aponta, circula, marca e mostra imagens por cima da página, clica e preenche, e percebe o que a pessoa faz na mesma página: pode mostrar, apontar para a pessoa clicar ou acompanhar a pessoa fazendo. Ela só abre o mundo da Kota, pede o ok da pessoa antes de publicar algo em nome dela e nunca digita senha.
+  - Quando a pessoa fala por cima, Puca para o que está fazendo no navegador e escuta, como na fala.
 
   > Alinhamento com Joaquim em 2026-11-08. Escolhas técnicas nas decisões [0004](docs/decisoes/0004-app-desktop-electron.md) e [0008](docs/decisoes/0008-acoes-reais-e-navegador-da-puca.md) e em [`docs/stack.md`](docs/stack.md).
-- **Rastro.** Cada decisão da Puca (o que respondeu, de qual fonte, quando encaminhou e por quê) fica registrada e pode ser auditada depois.
+- **Rastro.** Cada decisão de Puca (o que respondeu, de qual fonte, quando encaminhou e por quê) fica registrada e pode ser auditada depois.
 - **Custo.** Cada sessão registra quanto custou em tempo e tokens, para o time auditar a demo (o JSON baixado do rastro e o log do servidor). Esse número não aparece na tela. A comparação com as horas que o buddy gastaria explicando a mesma coisa, e o valor em dinheiro, ficam para quando tudo estiver pronto (#94).
 
   > Decisão da Nicole em 2026-11-07.
@@ -413,8 +413,8 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 
 > Alinhamento com Joaquim em 2026-11-07 e 2026-11-08.
 
-Não temos como prever **como** cada jurado vai testar a Puca, e o desafio pede só dados sintéticos ([§12.2](#122-o-que-precisa-aparecer-na-demo)). Então, em vez de roteirizar o teste, controlamos o
-**mundo** em que ele cai: a **Kota**, um banco digital fictício completo, que a Puca conhece e que o jurado também recebe.
+Não temos como prever **como** cada jurado vai testar Puca, e o desafio pede só dados sintéticos ([§12.2](#122-o-que-precisa-aparecer-na-demo)). Então, em vez de roteirizar o teste, controlamos o
+**mundo** em que ele cai: a **Kota**, um banco digital fictício completo, que Puca conhece e que o jurado também recebe.
 O desenho do kit está em [`docs/kit-da-kota.md`](docs/kit-da-kota.md), e as escolhas técnicas, em [`docs/decisoes/0005-kit-da-kota.md`](docs/decisoes/0005-kit-da-kota.md).
 
 ### 13.1. O jurado vive a pessoa
@@ -432,19 +432,19 @@ O mundo fictício precisa ser realista o bastante para simular o primeiro dia nu
 
 - **Código de verdade**: o da Kota vem de um projeto aberto real, renomeado e sem a marca original, num repositório público. O jurado sobe o banco, abre o site e roda os testes.
 - **Engenharia no repositório**: README de cada serviço, responsáveis por pasta, ADRs ancorados no código, runbooks e issues de primeira tarefa ([§4.4](#44-do-aprendizado-à-primeira-tarefa)).
-- **A empresa num Notion de verdade**: missão e valores, pessoas e times, sistemas e responsáveis, jeito de trabalhar, RFCs, políticas (inclusive desempenho, carreira e bônus), onboarding por perfil e o guia de uso. O Notion também é uma das integrações que mostram que a Puca se conecta a sistemas reais.
+- **A empresa num Notion de verdade**: missão e valores, pessoas e times, sistemas e responsáveis, jeito de trabalhar, RFCs, políticas (inclusive desempenho, carreira e bônus), onboarding por perfil e o guia de uso. O Notion também é uma das integrações que mostram que Puca se conecta a sistemas reais.
 
 O kit tem dois papéis:
 
-1. **Fonte**: é de onde a Puca tira o que explica.
-2. **Prova**: o jurado recebe o mesmo kit e pode conferir que a Puca não inventou.
+1. **Fonte**: é de onde Puca tira o que explica.
+2. **Prova**: o jurado recebe o mesmo kit e pode conferir que Puca não inventou.
 
-Por isso o mundo precisa ser **coerente**: se a Puca diz "o saldo é do time de Livro-razão e fica em cache por causa de um ADR",
+Por isso o mundo precisa ser **coerente**: se Puca diz "o saldo é do time de Livro-razão e fica em cache por causa de um ADR",
 o jurado tem que achar o responsável e o ADR no repositório. Afirmação sem fonte no kit cai no **encaminhamento** ([§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano)).
 
-Como a Kota tem os documentos que uma empresa real tem, o encaminhamento aparece de dois jeitos: o **caso pessoal** ("qual vai ser o meu bônus?"), em que a Puca explica a regra geral com a fonte e leva o caso ao RH ou ao gestor, e o que **nenhum documento cobre**.
+Como a Kota tem os documentos que uma empresa real tem, o encaminhamento aparece de dois jeitos: o **caso pessoal** ("qual vai ser o meu bônus?"), em que Puca explica a regra geral com a fonte e leva o caso ao RH ou ao gestor, e o que **nenhum documento cobre**.
 
-> ⚠️ **A Puca explica a política de desempenho da Kota, mas nunca avalia a pessoa** ([§12.2](#122-o-que-precisa-aparecer-na-demo)).
+> ⚠️ **Puca explica a política de desempenho da Kota, mas nunca avalia a pessoa** ([§12.2](#122-o-que-precisa-aparecer-na-demo)).
 
 ### 13.3. Guia de uso
 
@@ -466,7 +466,7 @@ foram só para testes. A Kota começa do zero, com pessoas, times e jornada nova
 
 > Alinhamento com Joaquim em 2026-11-08.
 
-A jornada continua **escrita à mão**, mas se passa inteira na Kota: toda fonte que a Puca cita num nó é um arquivo do
+A jornada continua **escrita à mão**, mas se passa inteira na Kota: toda fonte que Puca cita num nó é um arquivo do
 repositório ou uma página do Notion da Kota, que o jurado consegue abrir.
 
 ---
@@ -475,7 +475,7 @@ repositório ou uma página do Notion da Kota, que o jurado consegue abrir.
 
 > Alinhamento com Joaquim em 2026-11-07.
 
-A Puca é vendida para empresas (B2B): **a empresa compra e o RH aprova**. A entrada é um **piloto** pago e pequeno, que vira contrato anual medido em **integrações**. Mercado, métricas, evidências externas e fontes estão em [`docs/negocio/contexto-de-negocio.md`](docs/negocio/contexto-de-negocio.md).
+Puca é vendida para empresas (B2B): **a empresa compra e o RH aprova**. A entrada é um **piloto** pago e pequeno, que vira contrato anual medido em **integrações**. Mercado, métricas, evidências externas e fontes estão em [`docs/negocio/contexto-de-negocio.md`](docs/negocio/contexto-de-negocio.md).
 
 ### 14.1. Quem compra e quem participa
 

@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm ci --ignore-scripts",
+  "buildCommand": "vite build && cp dist/src/screens/landing/index.html dist/index.html",
+  "outputDirectory": "dist"
+}

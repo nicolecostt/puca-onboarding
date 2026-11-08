@@ -1,4 +1,4 @@
-// Navegador da Puca (decisão 0008, docs/stack.md §4, contrato "Computer use"): uma área da janela do Orbis com um
+// Navegador de Puca (decisão 0008, docs/stack.md §4, contrato "Computer use"): uma área da janela do Orbis com um
 // navegador de verdade, controlado pelo protocolo de depuração do Chromium. A sessão pede ações pelo IPC; elas rodam
 // numa fila serial que para quando a pessoa fala por cima.
 import { BrowserWindow, ipcMain, WebContentsView } from "electron";
@@ -137,7 +137,7 @@ export function ligarNavegador(win: BrowserWindow): void {
       v.setBounds(bounds);
       v.setVisible(true);
     };
-    void obter().then(aplicar).catch((e) => console.warn("navegador da Puca:", e));
+    void obter().then(aplicar).catch((e) => console.warn("navegador de Puca:", e));
   });
   ipcMain.on("orbis:navegador:esconder", () => view?.setVisible(false));
   ipcMain.on("orbis:navegador:cancelar", () => {

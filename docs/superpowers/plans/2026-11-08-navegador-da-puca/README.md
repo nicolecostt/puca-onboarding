@@ -1,10 +1,10 @@
-# Navegador da Puca (computer use de verdade): plano de implementação
+# Navegador de Puca (computer use de verdade): plano de implementação
 
 > **Para agentes:** sub-skill obrigatória: `superpowers:subagent-driven-development` (recomendado) ou
 > `superpowers:executing-plans`. Passos com checkbox (`- [ ]`). **Reta final (`CLAUDE.md`, decisão 0010):** até 12:00
 > de 2026-11-08; cada tarefa tem um tempo-alvo. Passou 15 min do alvo? Corte para o que a tarefa diz em "Se apertar".
 
-**Objetivo:** no app para Mac, a sessão abre o mundo da Kota num navegador de verdade dentro da tela, e a Puca aponta,
+**Objetivo:** no app para Mac, a sessão abre o mundo da Kota num navegador de verdade dentro da tela, e Puca aponta,
 circula, marca e clica nele no ritmo da fala; quando a pessoa fala por cima, para na hora. No `npm run dev`, nada muda.
 
 **Arquitetura:** o processo principal do Electron (`desktop/navegador/`) cria um `WebContentsView` e o controla pelo
@@ -24,7 +24,7 @@ escolher ações por intenção (#173, #174) vem depois e consome o mesmo `windo
 
 - `npm run dev` no navegador comum continua igual: sem `window.orbis.navegador`, a ação `navegador` é ignorada e a
   `live-session` simulada segue (critério da #123).
-- O navegador da Puca só abre o mundo da Kota: `https://github.com/JucaGF/kota-bank` (e caminhos abaixo dele) e
+- O navegador de Puca só abre o mundo da Kota: `https://github.com/JucaGF/kota-bank` (e caminhos abaixo dele) e
   `https://lean-ptarmigan-dd2.notion.site/`. Slack fica fora deste plano.
 - Nunca `digitar`, nunca publicar: as ações deste plano são `abrir`, `apontar`, `circular`, `marcar`, `clicar`,
   `rolar` e `limpar`.
@@ -139,7 +139,7 @@ Use a skill `contrato` só para o checklist dela; não abra discussão (reta fin
   depois em `h1, h2, h3, p, li, span, td`, faz `scrollIntoView({ block: "center" })` e só então devolve
   `{ doc, vp }` (retângulo no documento e na tela), ou `null`.
 - O mesmo script instala, uma vez (`window.__pucaOuvindo`), o ouvinte de `click` em captura que ignora cliques com
-  `window.__pucaClicando`. (Perceber a pessoa fica fora deste plano; o ouvinte só evita contar o clique da Puca.)
+  `window.__pucaClicando`. (Perceber a pessoa fica fora deste plano; o ouvinte só evita contar o clique de Puca.)
 
 - [ ] **Passo 1: testes que falham.**
   - `guarda.test.ts`: `permitido("https://github.com/JucaGF/kota-bank")` → `true`;
@@ -287,7 +287,7 @@ curl -s -o /dev/null -w '%{http_code}\n' https://github.com/JucaGF/kota-bank/blo
 
 - [ ] **Passo 1:** `npm run check` → verde.
 - [ ] **Passo 2: no app** (`npm run dev:fly` ou `npm run dev` + `npm run dev:app`), sessão com `?perfil=` da Kota:
-  1. Nos dois passos da Tarefa 5, o palco troca para o navegador, a página da Kota abre e o cursor da Puca circula ou
+  1. Nos dois passos da Tarefa 5, o palco troca para o navegador, a página da Kota abre e o cursor de Puca circula ou
      aponta na hora da palavra marcada.
   2. Falar por cima (ou tomar a vez pelo chat) durante `abrir` → nada mais acontece no navegador, os desenhos somem e a
      Puca escuta.
@@ -307,5 +307,5 @@ curl -s -o /dev/null -w '%{http_code}\n' https://github.com/JucaGF/kota-bank/blo
 - Ações pedidas pelo LLM ou pelo mapa (`mostrar` da #174, plano 4), até 3 por turno.
 - Ações no rastro (critério da #123): não há entrada de rastro para fala da jornada hoje; precisa de campo novo no
   contrato do rastro.
-- `seta`, `cartao`, `digitar`; Slack no navegador da Puca (o encaminhamento real é da #129).
+- `seta`, `cartao`, `digitar`; Slack no navegador de Puca (o encaminhamento real é da #129).
 - Abrir a fonte de um nó no navegador quando a pessoa toca nele (`docs/stack.md` §9).

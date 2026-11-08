@@ -6,7 +6,7 @@ const arg = process.argv.find((a) => a.startsWith("--orbis-versao="));
 
 contextBridge.exposeInMainWorld("orbis", {
   versao: arg?.slice("--orbis-versao=".length) ?? "",
-  // navegador da Puca (contrato "Computer use"): só estes quatro métodos, pelo IPC
+  // navegador de Puca (contrato "Computer use"): só estes quatro métodos, pelo IPC
   navegador: {
     mostrar: (bounds: { x: number; y: number; width: number; height: number }) => ipcRenderer.send("orbis:navegador:mostrar", bounds),
     esconder: () => ipcRenderer.send("orbis:navegador:esconder"),

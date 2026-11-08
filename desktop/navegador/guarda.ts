@@ -1,4 +1,4 @@
-// Guarda do navegador da Puca (docs/contratos.md, "Computer use"): ele só abre o mundo da Kota.
+// Guarda do navegador de Puca (docs/contratos.md, "Computer use"): ele só abre o mundo da Kota.
 
 const REPO = "/JucaGF/kota-bank";
 const NOTION = "lean-ptarmigan-dd2.notion.site";
