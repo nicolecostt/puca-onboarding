@@ -106,3 +106,32 @@ describe("turn: destino do encaminhamento (#125, mensagem real do #129)", () => 
   });
 });
 
+describe("turn: tarefas (assign_task)", () => {
+  it("assign_task vira evento tarefa, com os textos limpos; sem título é descartado", async () => {
+    script = [
+      { type: "text", text: "Uma tarefa para hoje: rode o ledgerwriter." },
+      tool("assign_task", { titulo: "  Rodar o ledgerwriter  ", porque: "Grava cada transferência.", passos: ["Clone o repo", " "], onde: "README do ledgerwriter" }),
+      tool("assign_task", { porque: "sem título" }),
+      tool("next_step", {}),
+    ];
+    const evs = await run();
+    expect(evs.filter((e) => e.type === "tarefa")).toEqual([
+      { type: "tarefa", tarefa: { titulo: "Rodar o ledgerwriter", porque: "Grava cada transferência.", passos: ["Clone o repo"], onde: "README do ledgerwriter" } },
+    ]);
+    expect(evs).toContainEqual({ type: "next_step" });
+  });
+
+  it("só a tarefa, sem fala: não é resposta vazia", async () => {
+    script = [tool("assign_task", { titulo: "Ler o README", porque: "x", passos: [] })];
+    const evs = await run();
+    expect(evs.some((e) => e.type === "speak" && e.source === "fallback")).toBe(false);
+  });
+
+  it("assign_task está nas ferramentas fixas e as regras dizem quando usar", async () => {
+    const tool = buildTurnTools(journey).find((t) => t.function.name === "assign_task")!;
+    expect((tool.function.parameters as { required: string[] }).required).toEqual(["titulo", "porque", "passos"]);
+    script = [{ type: "text", text: "Oi." }];
+    await run();
+    expect(sent[0].content).toContain("assign_task");
+  });
+});

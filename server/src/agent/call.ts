@@ -6,7 +6,9 @@ import type { TtsService } from "../voice/tts/service";
 import { streamChat, type ChatMessage, type ToolSpec } from "../llm";
 import { estimateTokens, type AskTiming } from "./ask";
 import { FAILURE_LINE, pickBridge } from "./bridges";
+import { lerTarefaDoAgente, type TarefaDoAgente } from "../../../src/journey/tarefas";
 import { SentenceSplitter } from "./sentences";
+import { ASSIGN_TASK } from "./tarefa-tool";
 
 /** O que a call anota: as mesmas chaves que profileFromAnswers e calibragemFromAnswers leem. */
 export const CAMPOS_DA_CALL = [
@@ -27,6 +29,8 @@ export type CallEvent =
   | { type: "answer"; key: CampoDaCall; value: string }
   /** Puca contou um assunto do onboarding cultural. */
   | { type: "culture"; topic: string }
+  /** Puca passou uma tarefa de preparação (assign_task): a tela grava e mostra em screens/tarefas. */
+  | { type: "tarefa"; tarefa: TarefaDoAgente }
   /** A call acabou: a tela grava o perfil e a calibragem e segue para as boas-vindas. */
   | { type: "done" }
   | { type: "timing"; timing: AskTiming };
@@ -76,7 +80,7 @@ Perguntas norteadoras (a pauta da call, não um roteiro: diga com as suas palavr
 6. O que ela já sabe de banco digital (transferência, saldo, extrato; vai na chave pagamentos), de mensageria (Kafka, filas) e de falhas (retry, fila de erro).
 7. O que ela quer conseguir nas primeiras semanas.
 8. Como ela aprende melhor: lendo, vendo alguém fazer ou fazendo junto.
-9. Feche: agradeça, diga em uma frase o que você vai preparar e chame end_call.
+9. Feche: agradeça, diga em uma frase o que você vai preparar, passe uma tarefa de preparação para antes da primeira sessão (ex.: entrar nos canais do time, ler uma página do Notion que ela citou) dizendo-a em uma frase e chamando assign_task, e chame end_call.
 
 Follow-ups:
 - Resposta vaga ou curta: faça um follow-up curto antes de seguir ("o que você fazia nessa agência?").
@@ -146,6 +150,7 @@ export const CALL_TOOLS: ToolSpec[] = [
       parameters: { type: "object", properties: { topic: { type: "string", enum: TEMAS_DE_CULTURA } }, required: ["topic"] },
     },
   },
+  ASSIGN_TASK,
   { type: "function", function: { name: "end_call", description: "Encerra a call depois de cobrir a pauta.", parameters: { type: "object", properties: {}, required: [] } } },
 ];
 
@@ -194,6 +199,9 @@ export async function callTurn(input: CallInput, emit: (ev: CallEvent) => void):
         emit({ type: "answer", key: a.key as CampoDaCall, value: a.value.trim().slice(0, 300) });
       } else if (ev.name === "culture_told" && TEMAS_DE_CULTURA.includes((ev.args as { topic?: string }).topic ?? "")) {
         emit({ type: "culture", topic: (ev.args as { topic: string }).topic });
+      } else if (ev.name === "assign_task") {
+        const tarefa = lerTarefaDoAgente(ev.args);
+        if (tarefa) emit({ type: "tarefa", tarefa });
       } else if (ev.name === "end_call" && !ended) {
         ended = true;
       }

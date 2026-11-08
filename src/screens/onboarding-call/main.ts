@@ -16,6 +16,8 @@ import { ID_DO_VINCULO } from "../../journey/escolha";
 import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem";
 import { createAgentVoice, MIC_AVISO, type CallRequest, type SpeakOptions } from "../../voice/agent-voice";
 import { dadosParaSessao } from "./recuperacao";
+import { browserStore } from "../../journey/storage";
+import { createTarefas } from "../../journey/tarefas";
 
 const savedProfile = loadSavedProfile();
 if (!savedProfile) qs<HTMLAnchorElement>(document, ".brand").href = "../boas-vindas/";
@@ -231,6 +233,8 @@ async function main(): Promise<void> {
           emit("onboarding:answer", { key, value, answers: { ...answers } });
         },
         onCulture: (topic) => cultura.push(topic),
+        // tarefa de preparação: aparece na tela de tarefas (screens/tarefas) depois da call
+        onTarefa: (t) => void createTarefas(browserStore()).add(t, { origem: "call" }),
         onDone: () => (acabou = true),
       },
     );

@@ -53,4 +53,18 @@ describe("callTurn", () => {
     expect(ctx).not.toContain("cultura:missao");
     expect(ctx).toContain("time_anterior");
   });
+
+  it("assign_task no fim da call vira evento tarefa; sem título não", async () => {
+    script = [
+      { type: "text", text: "Antes da sessão, entre nos canais do time." },
+      tool("assign_task", { titulo: "Entrar nos canais do time", porque: "É onde o time conversa.", passos: ["Entre em #terminais"] }),
+      tool("assign_task", { titulo: "" }),
+      tool("end_call", {}),
+    ];
+    const evs = await run();
+    expect(evs.filter((e) => e.type === "tarefa")).toEqual([
+      { type: "tarefa", tarefa: { titulo: "Entrar nos canais do time", porque: "É onde o time conversa.", passos: ["Entre em #terminais"] } },
+    ]);
+    expect(sent[0].content).toContain("assign_task");
+  });
 });
