@@ -5,6 +5,14 @@ import { fileURLToPath } from "node:url";
 const path = fileURLToPath(new URL("../.env", import.meta.url));
 if (existsSync(path)) process.loadEnvFile(path);
 
+/** Número de uma variável; vazia ou inválida = sem limite (Infinity). */
+function limite(name: string): number {
+  const v = Number(process.env[name]);
+  return Number.isFinite(v) && v > 0 ? v : Infinity;
+}
+
+const supabaseUrl = (process.env.SUPABASE_URL ?? "").replace(/\/+$/, "");
+
 export const env = {
   port: Number(process.env.PORT ?? 8787),
   model: process.env.LLM_MODEL ?? "Qwen/Qwen3-32B",
@@ -15,4 +23,18 @@ export const env = {
   elevenModel: process.env.ELEVENLABS_MODEL_ID ?? "eleven_flash_v2_5",
   ttsMode: (process.env.TTS_MODE ?? "ws") as "ws" | "http",
   cacheDir: process.env.TTS_CACHE_DIR ?? fileURLToPath(new URL("../cache/tts", import.meta.url)),
+  /** Sem SUPABASE_URL (dev local), o servidor não exige token e o cache de áudio fica no disco. */
+  supabaseUrl,
+  /** No Fly: sem SUPABASE_URL o servidor não sobe (não fica aberto por engano). */
+  exigeToken: process.env.EXIGE_TOKEN === "1",
+  supabaseJwksUrl: process.env.SUPABASE_JWKS_URL || (supabaseUrl ? `${supabaseUrl}/auth/v1/.well-known/jwks.json` : ""),
+  supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+  /** Travas diárias globais por provedor pago (docs/stack.md §5.3). Vazias = sem trava. */
+  limiteDiario: {
+    llm: limite("LIMITE_DIARIO_LLM"),
+    tts: limite("LIMITE_DIARIO_TTS"),
+    stt: limite("LIMITE_DIARIO_STT"),
+  },
+  /** Origens aceitas pelo CORS: o app (Electron) e o Vite em dev. */
+  corsOrigins: (process.env.CORS_ORIGINS ?? "app://orbis,http://localhost:5173").split(",").map((o) => o.trim()).filter(Boolean),
 };

@@ -1,0 +1,119 @@
+{
+  "at": "2026-11-08T10:25:44.210Z",
+  "url": "https://orbis-puca.fly.dev",
+  "summary": {
+    "turns": 13,
+    "local": 9,
+    "ask": 4,
+    "first_response_p50": 0.23,
+    "first_response_p95": 407,
+    "first_audio_byte_p50": 462,
+    "llm_first_sentence_p50": 2979
+  },
+  "rows": [
+    {
+      "text": "O que é ser dono do problema?",
+      "route": "reply",
+      "first_response_ms": 0.26,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: O que é ser dono do problema?)"
+    },
+    {
+      "text": "pode seguir",
+      "route": "reply",
+      "first_response_ms": 0.03,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: Pode seguir)"
+    },
+    {
+      "text": "Qual a diferença entre gestor e buddy?",
+      "route": "reply",
+      "first_response_ms": 0.01,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: Qual a diferença entre gestor e buddy?)"
+    },
+    {
+      "text": "beleza, ficou claro",
+      "route": "reply",
+      "first_response_ms": 0.06,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: Ficou claro)"
+    },
+    {
+      "text": "E se a liquidação falhar?",
+      "route": "reply",
+      "first_response_ms": 0.01,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: E se a liquidação falhar?)"
+    },
+    {
+      "text": "Quem cuida do authorizer?",
+      "route": "faq",
+      "first_response_ms": 0.23,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "Quem cuida do authorizer é Júlia Paiva, do time Autorização."
+    },
+    {
+      "text": "me explica o settlement-worker",
+      "route": "faq",
+      "first_response_ms": 0.32,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "settlement-worker: junta as vendas aprovadas e manda para a liquidação."
+    },
+    {
+      "text": "quero ver a primeira tarefa",
+      "route": "jump",
+      "first_response_ms": 0.17,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(pula: Primeira tarefa)"
+    },
+    {
+      "text": "e se der ruim na hora de cobrar o cartão, o que rola?",
+      "route": "ask",
+      "first_response_ms": 407,
+      "first_audio_byte_ms": 619,
+      "llm_first_sentence_ms": 2979,
+      "said": "[bridge] Boa pergunta. Só um instante. [llm] Qu!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!! [llm] !!!!!!!!!"
+    },
+    {
+      "text": "Quanto ganha um engenheiro pleno aqui?",
+      "route": "ask",
+      "first_response_ms": 218,
+      "first_audio_byte_ms": 462,
+      "llm_first_sentence_ms": null,
+      "said": "[bridge] Deixa eu ver isso pra você. [fallback] Não consegui confirmar isso agora. Vale perguntar pra sua buddy."
+    },
+    {
+      "text": "a gente usa kafka ou rabbit nessa fila?",
+      "route": "ask",
+      "first_response_ms": 205,
+      "first_audio_byte_ms": 417,
+      "llm_first_sentence_ms": null,
+      "said": "[bridge] Hum, deixa eu pensar um segundo. [fallback] Não consegui confirmar isso agora. Vale perguntar pra sua buddy."
+    },
+    {
+      "text": "isso já aconteceu em produção alguma vez?",
+      "route": "ask",
+      "first_response_ms": 212,
+      "first_audio_byte_ms": 417,
+      "llm_first_sentence_ms": null,
+      "said": "[bridge] Boa pergunta. Só um instante. [fallback] Não consegui confirmar isso agora. Vale perguntar pra sua buddy."
+    },
+    {
+      "text": "terminar por hoje",
+      "route": "reply",
+      "first_response_ms": 0.08,
+      "first_audio_byte_ms": null,
+      "llm_first_sentence_ms": null,
+      "said": "(segue: Terminar por hoje)"
+    }
+  ]
+}

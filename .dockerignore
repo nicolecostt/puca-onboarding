@@ -1,0 +1,15 @@
+# Imagem do servidor (server/Dockerfile): só o que ele roda. Chaves vão por fly secrets, nunca na imagem.
+**/.env
+**/.env.*
+!**/.env.example
+.git
+.claude
+node_modules
+dist
+sandbox
+desktop
+docs
+server/cache
+server/bench/results
+**/*.test.ts
+**/__tests__
