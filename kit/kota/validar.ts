@@ -3,6 +3,8 @@ import type { AreaId, MapaKota, PessoaKota } from "./tipos";
 const AREAS_FORA_DOS_TIMES: AreaId[] = ["people", "seguranca"];
 const EMAIL_KOTA = /^[^@\s]+@kota\.example$/;
 const AVATAR = "https://api.dicebear.com/9.x/initials/png?seed=";
+// A database Pessoas sai do mapa, e a trilha de carreira (notion/paginas/trilha-de-carreira.md) diz que o cargo traz o nível.
+const CARGO_DA_TRILHA = /^(Engenheir[oa] de (software|plataforma) (júnior|pleno|sênior)|Tech lead|Gestora? de engenharia)$/;
 
 export function validarMapa(m: MapaKota, nomesProibidos: string[] = []): string[] {
   return [
@@ -11,6 +13,7 @@ export function validarMapa(m: MapaKota, nomesProibidos: string[] = []): string[
     ...avatares(m.pessoas),
     ...emailsForaDaKota(m),
     ...contagem(m.pessoas),
+    ...cargos(m.pessoas),
     ...responsaveis(m),
     ...sistemas(m),
     ...adrsERfcs(m),
@@ -63,6 +66,12 @@ function contagem(pessoas: PessoaKota[]): string[] {
     if (!pessoas.some((p) => p.area === area)) erros.push(`ninguém de ${area}`);
   }
   return erros;
+}
+
+function cargos(pessoas: PessoaKota[]): string[] {
+  return pessoas
+    .filter((p) => !AREAS_FORA_DOS_TIMES.includes(p.area) && !CARGO_DA_TRILHA.test(p.cargo))
+    .map((p) => `pessoa ${p.id}: cargo "${p.cargo}" fora da trilha de carreira`);
 }
 
 function responsaveis(m: MapaKota): string[] {
