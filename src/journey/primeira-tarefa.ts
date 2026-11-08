@@ -4,7 +4,7 @@
 import { pendentes, proximaTentativa, type Reivindicavel } from "./claim-queue";
 import { normalize } from "./conditions";
 import { readJson, writeJson, type KeyValueStore } from "./storage";
-import type { BoardNode, Journey, Step } from "./types";
+import type { BoardNode, Journey, Profile, Step } from "./types";
 import { uid } from "./uid";
 
 /** Uma tarefa do catálogo, lida de um nó `task` da jornada. */
@@ -61,6 +61,18 @@ export function tarefaDoNo(node: BoardNode): TarefaDoTime | null {
     tarefa[campo] = b.slice(prefixo.length).trim();
   }
   return tarefa as TarefaDoTime;
+}
+
+/**
+ * A tarefa do catálogo para a pessoa: o nó `task` com `info.vinculo` igual ao dela; senão, o único nó `task` sem
+ * vínculo; senão null (a jornada não tem tarefa para ela).
+ */
+export function tarefaDaPessoa(journey: Journey, profile: Profile): TarefaDoTime | null {
+  const tasks = Object.values(journey.boards).flatMap((b) => b.nodes).filter((n) => n.kind === "task");
+  const dela = tasks.find((n) => n.info?.vinculo === profile.vinculo);
+  if (dela) return tarefaDoNo(dela);
+  const semVinculo = tasks.filter((n) => !n.info?.vinculo);
+  return semVinculo.length === 1 ? tarefaDoNo(semVinculo[0]) : null;
 }
 
 /** A tarefa cujo cartão o passo abre; null se o passo não apresenta uma tarefa. */

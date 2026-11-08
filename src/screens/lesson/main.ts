@@ -14,7 +14,7 @@ import { buildFaqs } from "../../journey/faq";
 import { routeUtterance } from "../../journey/route";
 import { browserStore } from "../../journey/storage";
 import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
-import { createPedidos, PEDIDOS_KEY, tarefaDoPasso } from "../../journey/primeira-tarefa";
+import { createPedidos, PEDIDOS_KEY, tarefaDaPessoa, tarefaDoPasso } from "../../journey/primeira-tarefa";
 import { createTrail, sourcesFor } from "../../journey/trail";
 import { createAgentVoice } from "../../voice/agent-voice";
 import { interpolate, interpolateDeep, resolveProfile } from "../../journey/profile";
@@ -111,6 +111,8 @@ async function main(): Promise<void> {
   const buddy = buddyOf(journey);
   // Primeira tarefa (§4.4 e §12.1, passo 5): o pedido de aprovação ao gestor; a tela do Slack envia e grava a aprovação.
   const pedidos = createPedidos(browserStore());
+  // A tarefa da pessoa (pelo vínculo): responde as dúvidas sobre ela durante a sessão (#79).
+  const tarefaDaSessao = tarefaDaPessoa(journey, profile);
   let pedidoDaSessao: string | null = null;
   const aprovacaoAvisada = new Set<string>();
   const history: { role: "user" | "assistant"; content: string }[] = [];
@@ -245,8 +247,9 @@ async function main(): Promise<void> {
   const SLACK = { href: "../live-session/", target: "puca-slack", label: "Abrir Slack" };
 
   /** Encaminha a dúvida à buddy (§4.5): guarda para o Slack, marca no rastro e avisa na sessão. */
-  function forward(entryId: string, f: { question: string; summary: string; reason: string }): void {
-    const created = outbox.add({ ...f, to: { name: buddy, role: "buddy" }, pessoa: profile.nome, consulted: consultedNow(), moment: currentMoment?.id ?? null });
+  function forward(entryId: string, f: { question: string; summary: string; reason: string; consulted?: string[] }): void {
+    const consulted = [...new Set([...(f.consulted ?? []), ...consultedNow()])];
+    const created = outbox.add({ ...f, to: { name: buddy, role: "buddy" }, pessoa: profile.nome, consulted, moment: currentMoment?.id ?? null });
     trail.update(entryId, { forwarding_id: created.id });
     showToast(`Encaminhado à ${buddy} no Slack`, SLACK);
   }
@@ -299,8 +302,8 @@ async function main(): Promise<void> {
     return line;
   }
 
-  // Fala da pessoa (chat ou voz). A ordem está em journey/route.ts: pulo → resposta sugerida → nome de
-  // um item do quadro → conhecimento da sessão → FAQ do nó → agente (ponte na hora + LLM no servidor).
+  // Fala da pessoa (chat ou voz). A ordem está em journey/route.ts: pulo → resposta sugerida → dúvida da primeira
+  // tarefa → nome de um item do quadro → FAQ do nó → conhecimento da sessão → agente (ponte na hora + LLM no servidor).
   async function handleUtterance(text: string, from: "chat" | "voz"): Promise<void> {
     text = text.trim();
     if (!text) return;
@@ -309,7 +312,16 @@ async function main(): Promise<void> {
       chat.addMessage({ from: "user", text });
     }
     const waiting = pending?.kind === "reply" ? { kind: "reply" as const, replies: pending.replies ?? [], check: !!currentStep?.check } : pending?.kind === "select" ? { kind: "select" as const } : null;
-    const route = routeUtterance(text, { journey, moment: currentMoment, step: currentStep, waiting, board: currentBoard, faqs });
+    const route = routeUtterance(text, {
+      journey,
+      moment: currentMoment,
+      step: currentStep,
+      waiting,
+      board: currentBoard,
+      faqs,
+      tarefa: tarefaDaSessao,
+      tarefaApresentada: visitados.includes("primeira-tarefa"),
+    });
     const entry = trail.record({
       from,
       utterance: text,
@@ -333,6 +345,23 @@ async function main(): Promise<void> {
         remember("user", text);
         trail.update(entry.id, { answer: route.text });
         return speakAside(route.text);
+      case "tarefa": {
+        remember("user", text);
+        const r = route.resposta;
+        if (r.kind === "sem_fonte") {
+          // a tarefa não diz isso: não chuta, encaminha à buddy com o motivo (§4.5)
+          const line = "Isso não está na tarefa, então não quero chutar. Já encaminhei a sua pergunta no Slack.";
+          trail.update(entry.id, { answer: line });
+          // a tarefa foi o que a Puca consultou (§4.5: o encaminhamento leva o que já foi consultado)
+          const daTarefa = tarefaDaSessao ? [`Primeira tarefa · ${tarefaDaSessao.titulo}`] : [];
+          forward(entry.id, { question: text, summary: text, reason: r.motivo, consulted: daTarefa });
+          return speakAside(line);
+        }
+        trail.update(entry.id, { answer: r.texto });
+        const noQuadro = currentBoard && journey.boards[currentBoard]?.nodes.some((n) => n.id === tarefaDaSessao?.no);
+        if (r.kind === "resposta" && noQuadro && tarefaDaSessao) io.apply({ type: "highlight", targets: [tarefaDaSessao.no], tone: "focus" });
+        return speakAside(r.texto);
+      }
       case "faq": {
         remember("user", text);
         // dono sem fonte confiável: a dúvida vai para a buddy, com contexto

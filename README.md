@@ -81,8 +81,8 @@ npm run bench:turn   # tempo até a Puca começar a responder, por caminho (--tt
 ```
 
 Regra: a resposta nunca espera o LLM. Cada fala (voz ou chat) passa por `src/journey/route.ts`, nesta ordem:
-pulo de assunto → resposta sugerida → nome de um item do quadro → FAQ do nó (nó + intenção) → conhecimento da sessão →
-FAQ só pelo nome → agente (`/api/ask`: fala-ponte na hora + LLM em streaming, frase a frase para o TTS).
+pulo de assunto → resposta sugerida → dúvida da primeira tarefa (campos da tarefa da pessoa) → nome de um item do quadro →
+FAQ do nó (nó + intenção) → conhecimento da sessão → FAQ só pelo nome → agente (`/api/ask`: fala-ponte na hora + LLM em streaming, frase a frase para o TTS).
 
 Sem chave de TTS, a tela usa a voz do browser. Sem chave de STT, use o campo de texto.
 
