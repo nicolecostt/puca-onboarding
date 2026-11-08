@@ -8,6 +8,7 @@
   "author": "Orbis",
   "scripts": {
     "dev": "vite",
+    "dev:fly": "API_TARGET=https://orbis-puca.fly.dev vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "typecheck": "tsc",

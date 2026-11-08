@@ -32,6 +32,7 @@ o que não estiver no código, numa issue, num PR ou nestes docs, os outros agen
 
 ```bash
 npm run dev          # telas (Vite)
+npm run dev:fly      # telas usando o servidor do Fly (Claude e voz), sem dev:server nem chaves
 npm run dev:server   # API em :8787 (o Vite repassa /api)
 npm run typecheck
 npm test             # valida a jornada de demo e o motor

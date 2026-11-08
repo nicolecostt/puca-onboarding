@@ -9,11 +9,16 @@ Quando um passo da demo mudar de estado, atualize a tabela no mesmo PR.
 git switch main && git pull
 npm ci
 npm run check      # tem que estar verde
-npm run dev:server # API em :8787; precisa de server/.env (modelo em server/.env.example)
-npm run dev        # http://localhost:5173
+npm run dev:fly    # http://localhost:5173, usando o servidor do Fly (Claude e voz); não precisa de server/.env
 ```
 
-Sem as chaves de voz no `server/.env`, a sessão usa texto e a voz do browser. Sem o servidor, segue só com legenda e chat.
+Para testar uma mudança no servidor, troque o `dev:fly` por `npm run dev:server` (API em :8787, precisa de
+`server/.env`, modelo em `server/.env.example`) e `npm run dev`. Qualquer outro servidor: `API_TARGET=<url> npm run dev`.
+
+O `dev:fly` gasta a cota do Fly, que é de todo mundo: a trava diária de voz é baixa (#156) e o servidor está sem token
+(#160). Antes de apresentar, abra `https://orbis-puca.fly.dev/api/health`: `"tts": false` é a trava de voz esgotada, e a
+saída é o `dev:server` com chave própria. Sem voz (trava esgotada ou `server/.env` sem as chaves), a sessão segue com
+legenda e chat; sem servidor nenhum, também.
 
 ## Fluxo da demo
 
