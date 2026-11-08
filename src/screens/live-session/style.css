@@ -812,5 +812,7 @@ body:not(.has-agent-cam) .cu-pill {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cu-frame,
+  .cu-frame {
+    animation: none;
   }
+}
