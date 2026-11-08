@@ -29,8 +29,10 @@ import { TOOLS, tasksFor, type AccessStatus, type TaskState, type Tool } from ".
 // ---- Quem é a pessoa: o que a call inicial salvou (ou o ?perfil=), completado pelo perfil da demo do mesmo vínculo ----
 const { profile, source } = resolveProfile(location.search);
 
-if (!sessionCompleted(profile)) {
-  location.replace(screenHref(source === "demo" ? "../boas-vindas/" : "../lesson/"));
+// Sem perfil nenhum, as boas-vindas pedem a escolha. Vindo da call inicial, o Início abre antes da sessão e leva a ela.
+const sessaoFeita = sessionCompleted(profile);
+if (source === "demo") {
+  location.replace(screenHref("../boas-vindas/"));
 } else {
   renderHome();
 }
@@ -38,6 +40,10 @@ if (!sessionCompleted(profile)) {
 function renderHome(): void {
   preserveProfileLinks();
   qs(document, "main").removeAttribute("hidden");
+  if (!sessaoFeita) {
+    const link = document.querySelector<HTMLAnchorElement>('.orbis-link[href^="../lesson/"]');
+    if (link) link.textContent = "Começar sessão";
+  }
   const base = profile.vinculo === "transicao" ? profiles.bruno : profiles.ana;
   const gestor = profile.gestor || company.people[base.managerId]?.name || "";
   const buddy = company.people[base.buddyId]?.name ?? "sua buddy";
@@ -72,7 +78,7 @@ function renderHome(): void {
     const pedido = tarefa ? pedidos.list().filter(
       (p) => p?.tarefa?.no === tarefa.no && p.pessoa === profile.nome && p.gestor === gestor,
     ).sort((a, b) => Date.parse(b.at) - Date.parse(a.at))[0] ?? null : null;
-    const tasks = tasksFor(tarefa, tarefaNo?.sublabel, pedido);
+    const tasks = tasksFor(tarefa, tarefaNo?.sublabel, pedido, sessaoFeita);
     const next = tasks.find((task) => task.state === "now" && task.action);
     const nextStep = qs(document, "#next-step");
     nextStep.hidden = !next?.action;

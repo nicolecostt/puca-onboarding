@@ -321,10 +321,10 @@ async function main(): Promise<void> {
   });
 }
 
-/** Fim da call: a conversa e os controles somem (style.css, body.is-leaving) antes de abrir o quadro. */
+/** Fim da call: a conversa e os controles somem (style.css, body.is-leaving) antes de abrir o Início, que leva à sessão. */
 function leaveToSession(): void {
   document.body.classList.add("is-leaving");
-  window.setTimeout(() => location.replace("../lesson/"), 460);
+  window.setTimeout(() => location.replace("../inicio/"), 460);
 }
 
 void main();
