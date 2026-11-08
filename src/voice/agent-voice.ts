@@ -4,6 +4,7 @@
 import type { BoardAction } from "../journey/types";
 import { classifyBargeIn } from "./barge-in";
 import { startMic, type Mic } from "./mic";
+import { AUDIO_RESUME_TIMEOUT_MS, resumeWithin } from "./pcm";
 import { PcmPlayer } from "./pcm-player";
 import { createSttSession, type SttSession } from "./stt-session";
 import type { WordTiming } from "./types";
@@ -44,8 +45,11 @@ export interface AgentVoice {
   /** Servidor com TTS (voz de verdade) e com STT (microfone). */
   readonly tts: boolean;
   readonly stt: boolean;
-  /** Precisa de um clique: o browser só libera áudio e microfone depois de um gesto. */
-  unlock(): Promise<void>;
+  /**
+   * Precisa de um clique: o browser só libera áudio e microfone depois de um gesto. Desiste em ~1 s e devolve false
+   * se o som não foi liberado; aí `speak` não toca nada e a sessão segue com legenda.
+   */
+  unlock(): Promise<boolean>;
   /** Fala um texto (entra na fila). Resolve quando o áudio acabou ou foi cortado. */
   speak(text: string, opts?: SpeakOptions): Promise<void>;
   /** Corta o que está tocando e o que ia tocar. */
@@ -68,6 +72,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
   let generation = 0;
   let speaking = "";
   let askAbort: AbortController | null = null;
+  let somBloqueado = false;
   let mic: Mic | null = null;
   let session: SttSession | null = null;
 
@@ -129,13 +134,16 @@ export async function createAgentVoice(): Promise<AgentVoice> {
     tts,
     stt,
     async unlock() {
-      // toca 0 ms de silêncio dentro do gesto para destravar o AudioContext do player
+      // destrava o AudioContext dentro do gesto; sem gesto reconhecido, o resume() não resolve
       const ctx = new AudioContext();
-      await ctx.resume().catch(() => undefined);
+      const ok = await resumeWithin(ctx, AUDIO_RESUME_TIMEOUT_MS);
       void ctx.close();
+      somBloqueado = !ok;
+      return ok;
     },
     speak(text, opts = {}) {
-      if (!tts) return Promise.resolve();
+      // som bloqueado: nem pede o áudio ao servidor (não gasta TTS); a sessão segue com legenda
+      if (!tts || somBloqueado) return Promise.resolve();
       return enqueue(text, () => speakAudio(text, !!opts.onWord), opts);
     },
     stop() {
