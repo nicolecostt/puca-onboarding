@@ -243,10 +243,11 @@ export async function turn(input: TurnInput, emit: (ev: TurnEvent) => void): Pro
   if (refused) timing.llm_error = "refusal";
   if (!spoke && !moved && !escalation && !timing.llm_error) timing.llm_error = "empty_response";
   if (timing.llm_error && timing.llm_error !== "interrupted") say(FAILURE_LINE, "fallback");
-  else if (escalation && !input.signal?.aborted && input.kind === "fala" && looksLikeQuestion(input.text ?? "")) {
-    // sem destino na tool, vale a fala de Puca; caso pessoal sem nada vai a People (PRODUCT.md §13.2)
+  else if ((escalation || isCasoPessoal(input.text ?? "")) && !input.signal?.aborted && input.kind === "fala" && looksLikeQuestion(input.text ?? "")) {
+    // caso pessoal encaminha mesmo sem a tool (o LLM às vezes só explica a regra), como no /api/ask (#189).
+    // Sem destino na tool, vale a fala de Puca; caso pessoal sem nada vai a People (PRODUCT.md §13.2)
     const destino = escalationDestino ?? destinoPelaFala(falado) ?? (isCasoPessoal(input.text ?? "") ? "rh" : undefined);
-    emit({ type: "escalate", summary: escalation, ...(destino ? { destino } : {}) });
+    emit({ type: "escalate", summary: escalation ?? input.text ?? "", ...(destino ? { destino } : {}) });
   }
   timing.total_ms = ms();
   emit({ type: "timing", timing });

@@ -86,6 +86,11 @@ describe("turn: destino do encaminhamento (#125, mensagem real do #129)", () => 
     expect(escalates(await run({ kind: "fala", text: "qual vai ser o meu bônus?" }))).toEqual([{ type: "escalate", summary: "Bônus", destino: "rh" }]);
   });
 
+  it("caso pessoal encaminha a People mesmo sem a tool (o LLM só explicou a regra)", async () => {
+    script = [{ type: "text", text: "A PLR é paga uma vez por ano, conforme a política." }, { type: "done", finishReason: "end_turn" }];
+    expect(escalates(await run({ kind: "fala", text: "qual vai ser o meu bônus?" }))).toEqual([{ type: "escalate", summary: "qual vai ser o meu bônus?", destino: "rh" }]);
+  });
+
   it("dúvida técnica sem destino: a buddy, sem destino no evento", async () => {
     script = [
       { type: "text", text: "Não consegui confirmar isso. " },
