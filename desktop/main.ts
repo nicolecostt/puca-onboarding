@@ -87,6 +87,23 @@ function montarMenu(): void {
       {
         label: "Visualizar",
         submenu: [
+          {
+            label: "Voltar",
+            accelerator: "CmdOrCtrl+[",
+            click: (_item, janela) => {
+              const h = (janela as BrowserWindow | undefined)?.webContents.navigationHistory;
+              if (h?.canGoBack()) h.goBack();
+            },
+          },
+          {
+            label: "Avançar",
+            accelerator: "CmdOrCtrl+]",
+            click: (_item, janela) => {
+              const h = (janela as BrowserWindow | undefined)?.webContents.navigationHistory;
+              if (h?.canGoForward()) h.goForward();
+            },
+          },
+          { type: "separator" },
           { role: "reload", label: "Recarregar" },
           { role: "togglefullscreen", label: "Tela cheia" },
           { type: "separator" },
