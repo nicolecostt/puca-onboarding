@@ -1,7 +1,6 @@
 import { ARVORE } from "../../notion/arvore";
+import { URL_PUBLICA } from "../../notion/links";
 import type { Regra } from "../contexto";
-
-const URL_PUBLICA = /^https:\/\/([a-z0-9-]+)\.notion\.site\/\S+$/;
 
 export const regraNotionUrls: Regra = {
   nome: "notion-urls",

@@ -125,6 +125,32 @@ describe("resolverLinks", () => {
 
   it("chave com nome de propriedade de objeto não vira URL", () =>
     expect(() => resolverLinks("[x](notion:constructor)", urls)).toThrow(/notion:constructor sem URL/));
+
+  it("resolve link com título, por referência, entre <>, autolink, com espaço e com Notion: maiúsculo", () =>
+    expect(resolverLinks([
+      '[a](notion:bonus "Bônus") e [b][r]',
+      "[c](<notion:bonus>), <notion:rituais>, [d]( notion:bonus ) e [e](Notion:rituais)",
+      "No Notion: a gente escreve tudo.",
+      "",
+      "[r]: notion:rituais",
+    ].join("\n"), urls)).toBe([
+      '[a](https://kota.notion.site/Bonus-0a1b "Bônus") e [b][r]',
+      "[c](<https://kota.notion.site/Bonus-0a1b>), <https://kota.notion.site/Rituais-2c3d>, [d]( https://kota.notion.site/Bonus-0a1b ) e [e](https://kota.notion.site/Rituais-2c3d)",
+      "No Notion: a gente escreve tudo.",
+      "",
+      "[r]: https://kota.notion.site/Rituais-2c3d",
+    ].join("\n")));
+
+  it("falha com chave sem URL em qualquer forma de link", () => {
+    for (const md of ['[x](notion:ferias "Férias")', "[x][f]\n\n[f]: notion:ferias", "<notion:ferias>", "[x](<notion:ferias>)", "[x](Notion:ferias)"])
+      expect(() => resolverLinks(md, urls), md).toThrow(/notion:ferias sem URL/);
+  });
+
+  it("falha com URL vazia, nula ou que não é pública", () => {
+    for (const url of ["", null, "https://www.notion.so/Bonus-0a1b"])
+      expect(() => resolverLinks("[b](notion:bonus)", { bonus: url } as Record<string, string>), String(url))
+        .toThrow(/notion:bonus sem URL pública/);
+  });
 });
 
 describe("regras das páginas", () => {
@@ -161,6 +187,23 @@ describe("regras das páginas", () => {
       expect.stringMatching(/ferias\.md.*notion:despesa\b/),
     ]));
   });
+
+  it("regra paginas acusa chave inexistente em link com título, por referência, entre <> e autolink", () => {
+    const erros = checar(pastaCom({
+      ferias: ['[a](notion:feriass "Férias") e [b][f]', "<notion:ferias-x> e [c](<Notion:ferias-y>)", "", "[f]: notion:feriazz"].join("\n"),
+    }));
+    expect(erros).toHaveLength(4);
+    expect(erros).toEqual(expect.arrayContaining(
+      ["feriass", "ferias-x", "ferias-y", "feriazz"].map((c) => expect.stringMatching(new RegExp(`ferias\\.md.*notion:${c}\\b`))),
+    ));
+  });
+
+  it("regra paginas acusa link fixo do Notion, que quebra quando a página é recriada", () =>
+    expect(checar(pastaCom({ bonus: "Veja [bônus](https://www.notion.so/Bonus-0a1b2c) e https://kota.notion.site/Promocao-3d4e" })))
+      .toEqual([
+        expect.stringMatching(/bonus\.md.*www\.notion\.so\/Bonus-0a1b2c/),
+        expect.stringMatching(/bonus\.md.*kota\.notion\.site\/Promocao-3d4e/),
+      ]));
 
   it("acusa e-mail de fora da kota mesmo sem @handle", () =>
     expect(checar(pastaCom({ despesas: "Reembolso: financeiro@empresa.com.br" })))

@@ -7,6 +7,7 @@ import type { ContextoKota, Regra } from "../contexto";
 
 const EMAIL = /[\p{L}\p{N}._%+-]+@[\p{L}\p{N}-]+(?:\.[\p{L}\p{N}-]+)+/gu;
 const HANDLE = /(?<![\p{L}\p{N}_.%+-])@[\p{L}\p{N}_-]+/gu;
+const LINK_FIXO_NOTION = /(?:[\w-]+\.)*notion\.(?:so|site)\b[^\s<>()[\]"'`]*/gi;
 // Comece aqui é o guia de uso do jurado, escrito na C5. Página que agrupa subpáginas mostra a lista delas no Notion,
 // e nenhum grupo da N3 escreve texto para ela.
 const agrupam = new Set(ARVORE.map((n) => n.pai));
@@ -43,6 +44,8 @@ function conferirTexto(arquivo: string, md: string, ctx: ContextoKota): string[]
   const emails = new Set<string>([...ctx.mapa.pessoas.map((p) => p.email), ...ctx.mapa.aliases]);
   return [
     ...chavesCitadas(md).filter((c) => !chaves.has(c)).map((c) => `${arquivo}: notion:${c} não existe na árvore`),
+    ...[...md.matchAll(LINK_FIXO_NOTION)]
+      .map(([l]) => `${arquivo}: link fixo do Notion ${l} quebra quando a página é recriada; escreva notion:<chave>`),
     ...[...md.matchAll(EMAIL)].map(([e]) => e).filter((e) => !emails.has(e))
       .map((e) => `${arquivo}: e-mail ${e} não é de pessoa do mapa nem alias`),
     ...[...md.matchAll(HANDLE)].map(([h]) => `${arquivo}: ${h} é @handle; cite a pessoa pelo nome ou pelo e-mail do mapa`),
