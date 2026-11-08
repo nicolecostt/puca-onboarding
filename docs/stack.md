@@ -577,7 +577,7 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
   são membros reais (decisão 0005), e todos os jurados entram no mesmo workspace pelo mesmo convite: **nunca** postar
   num canal compartilhado, porque a dúvida de um jurado (às vezes um caso pessoal) apareceria para os outros (§5 do
   `PRODUCT.md`). A mensagem não leva o nome digitado no login.
-- **Como achar o jurado no Slack (proposta):** a tela de entrada pede, opcional, o e-mail com que ele entrou no Slack
+- **Como achar o jurado no Slack (feito na #129):** a tela de início pede, opcional, o e-mail com que ele entrou no Slack
   da Kota; o servidor acha o id com `users.lookupByEmail`. Sem e-mail ou sem conta no Slack, nada é postado: a Puca
   mostra a mensagem num cartão e o rastro registra "não enviado: sem Slack".
 - **Como aparece:** `chat.postMessage` com `chat:write.customize`, `username: "Puca"` e o ícone da Puca. A mensagem
@@ -586,7 +586,7 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
   aponta para a mensagem. Sem login no Slack, mostra a mensagem num cartão.
 - **Sem duplicar:** o app manda um `id` próprio; o servidor grava em `encaminhamentos` com esse id único e, se ele já
   existir, devolve o mesmo resultado sem postar de novo (resolve a corrida da #70).
-- **Contrato (proposta):**
+- **Contrato:** o que está valendo é a seção "Encaminhamento no Slack da Kota" de `docs/contratos.md` (#129); a proposta abaixo foi o ponto de partida.
 
 ```ts
 // POST /api/encaminhamentos

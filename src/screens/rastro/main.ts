@@ -53,7 +53,7 @@ function row(e: TrailEntry, sent: Map<string, string>): HTMLTableRowElement {
 
 function render(): void {
   const list = trail.list();
-  const sent = new Map(outbox.list().map((f) => [f.id, `→ ${f.to.name} (${f.status})`]));
+  const sent = new Map(outbox.list().map((f) => [f.id, `→ ${f.to.name} (${f.status}${f.slack_link ? ", no Slack da Kota" : ""})`]));
   rows.replaceChildren(...list.map((e) => row(e, sent)).reverse()); // mais recente primeiro
   table.hidden = !list.length;
   empty.hidden = !!list.length;

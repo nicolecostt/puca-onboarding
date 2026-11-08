@@ -24,6 +24,8 @@ export interface TrailEntry {
   step: string | null;
   /** A fala virou encaminhamento (journey/forwarding.ts). */
   forwarding_id?: string;
+  /** Link da mensagem no Slack da Kota, quando o encaminhamento saiu de verdade pelo servidor (#129). */
+  forwarding_link?: string;
   /** Tempo da resposta do agente, em ms (route "ask"), medido no navegador. */
   ms?: number;
   /** Custo (#52), copiado do `timing` do servidor: tempo total do pedido e tokens do LLM. */
@@ -84,7 +86,7 @@ export function createTrail(store: KeyValueStore, opts: { now?: () => Date; sess
       write([...read(), entry]);
       return entry;
     },
-    update(id: string, patch: Partial<Pick<TrailEntry, "answer" | "forwarding_id" | "ms" | "llm_ms" | "llm_error" | "tokens_in" | "tokens_out" | "tokens_estimated">>): void {
+    update(id: string, patch: Partial<Pick<TrailEntry, "answer" | "forwarding_id" | "forwarding_link" | "ms" | "llm_ms" | "llm_error" | "tokens_in" | "tokens_out" | "tokens_estimated">>): void {
       write(read().map((e) => (e.id === id ? { ...e, ...patch } : e)));
     },
     list: read,
