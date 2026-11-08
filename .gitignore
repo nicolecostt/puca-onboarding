@@ -25,3 +25,6 @@ server/cache/
 # app para Mac: compilado do desktop/ e pacotes gerados
 dist-desktop/
 release/
+
+# vercel: ligação local com o projeto
+.vercel/
