@@ -6,15 +6,12 @@ import "./style.css";
 import { activeProfile } from "../../data";
 import { mountEscolhaPerfil } from "../../components/escolha-perfil/escolha-perfil";
 import { ID_DO_VINCULO } from "../../journey/escolha";
-import { loadSavedProfile } from "../../journey/profile";
 import { preserveProfileLinks } from "../../lib/navigation";
 import { qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
 
-const savedProfile = loadSavedProfile();
-if (savedProfile) {
-  location.replace("../inicio/"); // depois da call, o Início vem primeiro e leva à sessão
-} else if (new URLSearchParams(location.search).get("perfil")) {
+// O app sempre abre aqui: boas-vindas → call inicial → Início → sessão. Perfil salvo de outra vez não pula a entrevista.
+if (new URLSearchParams(location.search).get("perfil")) {
   // perfil já escolhido no endereço (link de apresentação): cumprimenta e vai direto para a call
   preserveProfileLinks();
   const profile = activeProfile("ana");
@@ -26,7 +23,7 @@ if (savedProfile) {
   home.classList.add("home--escolha");
   home.replaceChildren();
   mountEscolhaPerfil(home, {
-    aoEscolher: (vinculo) => location.assign(`../onboarding-call/?perfil=${ID_DO_VINCULO[vinculo]}`),
+    aoEscolher: (vinculo) => location.assign(`./?perfil=${ID_DO_VINCULO[vinculo]}`), // escolha → welcome → call
   });
   particulas(".topbar__row > *, .escolha__titulo, .escolha__texto, .escolha__cartao");
 }
