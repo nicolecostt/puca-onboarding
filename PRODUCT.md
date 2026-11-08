@@ -386,12 +386,17 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 | 1 | Na **call inicial**, faz o onboarding cultural, levanta o que a pessoa já sabe, registra a calibragem e **monta a jornada dela** ([§10.1](#101-call-inicial-e-conhecimento-prévio)). | O agente planeja a partir de um objetivo. | — |
 | 2 | Conduz a **sessão** no quadro, seguindo a jornada e respondendo na hora ao que a pessoa diz: perguntas, pulos e interrupções. | O agente executa e se adapta, sem roteiro fixo. | — |
 | 3 | Faz uma **checagem leve de entendimento** e atualiza os objetivos que ainda faltam. | O agente acompanha o resultado do próprio trabalho. | — |
-| 4 | Quando falta fonte confiável, faz o **encaminhamento** ao buddy no Slack, com a dúvida, as fontes já consultadas e o motivo de não ter respondido ([§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano)). | O agente trata a exceção e passa para um humano *"com o contexto pronto para decidir"*. | O buddy responde ou indica o responsável. |
+| 4 | Quando falta fonte confiável, faz o **encaminhamento** ao buddy no Slack da Kota, com a dúvida, as fontes já consultadas e o motivo de não ter respondido ([§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano)). | O agente trata a exceção e passa para um humano *"com o contexto pronto para decidir"*. | O buddy responde ou indica o responsável. |
 | 5 | Entrega a **primeira tarefa** ([§4.4](#44-do-aprendizado-à-primeira-tarefa)) e informa o andamento ao buddy e ao gestor ([§5](#5-visibilidade-para-buddy-gestor-e-rh)). | O processo fecha, da entrada à primeira atividade real. | O gestor aprova a tarefa e acompanha os marcos. |
 
 ### 12.2. O que precisa aparecer na demo
 
-- **Agir num sistema, não só falar.** O encaminhamento do passo 4 precisa acontecer de fato no Slack simulado da tela `live-session`. O guia aceita conexões simuladas *"desde que o agente realmente opere sobre elas na demo"*.
+- **Agir num sistema, não só falar.** A Puca age nos sistemas reais da Kota ([§13](#13-avaliação-pelos-jurados-o-mundo-fictício-da-kota)), e não em telas simuladas. O guia aceitaria conexões simuladas *"desde que o agente realmente opere sobre elas na demo"*; agir no sistema de verdade é a nossa aposta de diferencial.
+  - O **encaminhamento** do passo 4 sai de fato no **Slack da Kota**, no canal de ajuda do time, com a dúvida, as fontes já consultadas e o motivo de não ter respondido.
+  - Dentro do Orbis, a Puca tem um **navegador** onde abre o repositório, o Notion e o Slack da Kota. Ali ela aponta, circula, marca e mostra imagens por cima da página, clica e preenche, e percebe o que a pessoa faz na mesma página: pode mostrar, apontar para a pessoa clicar ou acompanhar a pessoa fazendo.
+  - Quando a pessoa fala por cima, a Puca para o que está fazendo no navegador e escuta, como na fala.
+
+  > Alinhamento com Joaquim em 2026-11-08. Escolhas técnicas nas decisões [0004](docs/decisoes/0004-app-desktop-electron.md) e [0008](docs/decisoes/0008-acoes-reais-e-navegador-da-puca.md) e em [`docs/stack.md`](docs/stack.md).
 - **Rastro.** Cada decisão da Puca (o que respondeu, de qual fonte, quando encaminhou e por quê) fica registrada e pode ser auditada depois.
 - **Custo.** Cada sessão registra quanto custou em tempo e tokens, para o time auditar a demo (o JSON baixado do rastro e o log do servidor). Esse número não aparece na tela. A comparação com as horas que o buddy gastaria explicando a mesma coisa, e o valor em dinheiro, ficam para quando tudo estiver pronto (#94).
 
@@ -443,6 +448,11 @@ Como a Kota tem os documentos que uma empresa real tem, o encaminhamento aparece
 O kit vai junto com um **guia de uso** para o jurado, que é a página de entrada do Notion da Kota: quem ele é na história, como escolher o perfil, onde estão os
 materiais, como subir o banco e o que vale tentar (inclusive perguntas fora do roteiro e casos pessoais que viram encaminhamento).
 Os links do repositório e do Notion também ficam na landing (#48).
+
+O Orbis é um **app para Mac**: o jurado instala com **um comando no terminal**, que está no guia, e entra no Slack da
+Kota pelo convite do guia. No hackathon, só macOS.
+
+> Alinhamento com Joaquim em 2026-11-08 ([decisão 0004](docs/decisoes/0004-app-desktop-electron.md)).
 
 ### 13.4. A Tail sai inteira
 
