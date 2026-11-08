@@ -65,6 +65,15 @@
           <p class="notice__text" id="notice-text"></p>
         </div>
         <ul class="tools__list" id="tools"></ul>
+        <form class="slack-email" id="slack-email" novalidate>
+          <label class="slack-email__label" for="slack-email-input">Seu e-mail no Slack da Kota <span>(opcional)</span></label>
+          <p class="slack-email__hint">Se eu não souber responder uma dúvida, te mando por mensagem direta lá, dizendo a quem ela iria na Kota.</p>
+          <div class="slack-email__row">
+            <input class="slack-email__input" id="slack-email-input" type="email" autocomplete="email" placeholder="voce@exemplo.com" />
+            <button class="slack-email__save" type="submit">Salvar</button>
+          </div>
+          <p class="slack-email__status" id="slack-email-status" role="status" aria-live="polite"></p>
+        </form>
       </section>
     </div>
   </main>

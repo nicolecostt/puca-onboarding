@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gustavo Schmitt <gustavo@kota.example>
+Date: Sun, 8 Nov 2026 09:10:53 -0300
+Subject: [PATCH] test(transactionhistory): extrato de outra conta responde 403
+
+---
+ .../transactionhistory/TransactionHistoryControllerTest.java  | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/ledger/transactionhistory/src/test/java/br/com/kota/transactionhistory/TransactionHistoryControllerTest.java b/src/ledger/transactionhistory/src/test/java/br/com/kota/transactionhistory/TransactionHistoryControllerTest.java
+index dd61f46..c634021 100644
+--- a/src/ledger/transactionhistory/src/test/java/br/com/kota/transactionhistory/TransactionHistoryControllerTest.java
++++ b/src/ledger/transactionhistory/src/test/java/br/com/kota/transactionhistory/TransactionHistoryControllerTest.java
+@@ -173,7 +173,7 @@ class TransactionHistoryControllerTest {
+     }
+ 
+     @Test
+-    @DisplayName("Given the user is authenticated but cannot access the account, return 401")
++    @DisplayName("Given the user is authenticated but cannot access the account, return 403")
+     void getTransactionsFailsWhenAccountDoesNotMatchAuthenticatedUser() {
+         // Given
+         when(verifier.verify(TOKEN)).thenReturn(jwt);
+@@ -185,7 +185,7 @@ class TransactionHistoryControllerTest {
+ 
+         // Then
+         assertNotNull(actualResult);
+-        assertEquals(HttpStatus.UNAUTHORIZED, actualResult.getStatusCode());
++        assertEquals(HttpStatus.FORBIDDEN, actualResult.getStatusCode());
+     }
+ 
+     @Test

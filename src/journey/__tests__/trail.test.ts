@@ -76,6 +76,14 @@ describe("createTrail", () => {
     expect(eb.answer).toBe("");
   });
 
+  it("update grava o link do encaminhamento no Slack da Kota (#129)", () => {
+    const trail = createTrail(memoryStore());
+    const e = trail.record(entry("quem cuida do tail-common?"));
+    trail.update(e.id, { forwarding_id: "f1", forwarding_link: "https://kota.slack.com/archives/D1/p12" });
+    expect(trail.list()[0]).toMatchObject({ forwarding_id: "f1", forwarding_link: "https://kota.slack.com/archives/D1/p12" });
+    expect(JSON.parse(trail.exportJson()).entries[0].forwarding_link).toBe("https://kota.slack.com/archives/D1/p12");
+  });
+
   it("exportJson devolve o resumo das sessões e as falas", () => {
     const trail = createTrail(memoryStore());
     trail.startSession();

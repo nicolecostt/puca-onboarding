@@ -1,5 +1,5 @@
 /* Barra de call flutuante (Figma: "Session control bar", nó 24:54), no visual da landing (DESIGN.md):
-   controles leves e soltos (círculo branco com fio, ligado = tinta cheia) e o mic no centro com a cor da Puca.
+   controles leves e soltos (círculo branco com fio, ligado = tinta cheia) e o mic no centro com a cor de Puca.
    Fica fixa na base da tela, por cima de qualquer conteúdo. */
 .call-dock {
   position: fixed;
@@ -98,7 +98,7 @@
   justify-content: center;
 }
 
-/* Linha de status acima da barra (o que a Puca está fazendo) */
+/* Linha de status acima da barra (o que Puca está fazendo) */
 .call-status {
   display: flex;
   align-items: center;
@@ -125,7 +125,7 @@
   background: var(--color-text);
 }
 
-/* A barra: controles leves e soltos (círculo branco com fio), o mic no centro com a cor da Puca */
+/* A barra: controles leves e soltos (círculo branco com fio), o mic no centro com a cor de Puca */
 .call-bar {
   display: flex;
   align-items: center;
@@ -255,7 +255,7 @@
   }
 }
 
-/* ---- Presa embaixo da câmera da Puca (opção attachTo): compacta, da largura da câmera ---- */
+/* ---- Presa embaixo da câmera de Puca (opção attachTo): compacta, da largura da câmera ---- */
 .call-dock.is-attached {
   left: 0;
   top: 0;

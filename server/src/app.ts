@@ -5,6 +5,8 @@ import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
+import { lerPedidoDeEncaminhamento, type PedidoDeEncaminhamento, type ResultadoDoEncaminhamento } from "../../src/journey/encaminhamento-slack";
+import { createEncaminhador, slackDmDeVerdade } from "./slack/encaminhar";
 import Fastify, { type FastifyReply } from "fastify";
 import { DEMO_PROFILES } from "../../src/journey/profile";
 import type { Journey, Profile } from "../../src/journey/types";
@@ -82,6 +84,12 @@ export interface BuildAppOptions {
   corsOrigins?: string[];
   /** Para testes: substitui a geração do token do Deepgram. */
   mintSttToken?: typeof mintSttToken;
+  /** Encaminhamento no Slack da Kota (#129); null = sem Slack. Padrão: pelo SLACK_BOT_TOKEN do ambiente. */
+  encaminhar?: ((p: PedidoDeEncaminhamento) => Promise<ResultadoDoEncaminhamento>) | null;
+}
+
+export function tryCreateEncaminhador(): ((p: PedidoDeEncaminhamento) => Promise<ResultadoDoEncaminhamento>) | null {
+  return env.slackBotToken ? createEncaminhador(slackDmDeVerdade(env.slackBotToken)) : null;
 }
 
 export function buildApp(opts: BuildAppOptions = {}) {
@@ -92,6 +100,7 @@ export function buildApp(opts: BuildAppOptions = {}) {
   const trava = { llm: new TravaDiaria(limites.llm), tts: new TravaDiaria(limites.tts), stt: new TravaDiaria(limites.stt) };
   tts?.limitarCom(trava.tts); // vale também para as frases do /api/ask
   const mintToken = opts.mintSttToken ?? mintSttToken;
+  const encaminhar = opts.encaminhar === undefined ? tryCreateEncaminhador() : opts.encaminhar;
   // trustProxy: atrás do proxy do Fly, o IP da pessoa vem no X-Forwarded-For
   const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? "info" }, trustProxy: true });
 
@@ -128,6 +137,21 @@ export function buildApp(opts: BuildAppOptions = {}) {
       const id = randomUUID();
       tts.start({ action_id: id, text }).catch((err) => req.log.warn({ err }, "tts failed"));
       return { id, audio_url: `/api/tts/${id}` };
+    });
+
+    /** Encaminhamento no Slack da Kota: mensagem direta ao próprio jurado (#129, docs/contratos.md). */
+    api.post("/api/encaminhamentos", { config: { rateLimit: { max: 10, timeWindow: "1 hour" } } }, async (req, reply) => {
+      if (!encaminhar) return reply.status(503).send({ enviado: false, motivo: "sem_slack" });
+      const pedido = lerPedidoDeEncaminhamento(req.body);
+      if (!pedido) return reply.status(400).send({ error: "pedido_invalido" });
+      try {
+        const r = await encaminhar(pedido);
+        req.log.info({ id: pedido.id, enviado: r.enviado }, "encaminhamento");
+        return r;
+      } catch (err) {
+        req.log.warn({ err, id: pedido.id }, "encaminhamento falhou");
+        return reply.status(502).send({ error: "slack_falhou" });
+      }
     });
 
     /** Pergunta que a tela não resolveu: ponte na hora + LLM em streaming. */

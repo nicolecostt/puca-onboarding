@@ -9,7 +9,7 @@ argument-hint: "[a regra, como a pessoa disse]"
 Regra: $ARGUMENTS
 
 > **Base do sistema:** o glossário do `CONTEXT.md` já está no seu contexto (o `CLAUDE.md` importa); use os termos dele.
-> Se a regra contradiz o `PRODUCT.md`, pare e mostre a contradição. Se ela é sobre o produto (o que a Puca faz) ou é um termo, use a skill `contexto-base`.
+> Se a regra contradiz o `PRODUCT.md`, pare e mostre a contradição. Se ela é sobre o produto (o que Puca faz) ou é um termo, use a skill `contexto-base`.
 
 O harness são as regras que todo agente do time segue: `CLAUDE.md` (que o `AGENTS.md` espelha), as skills e o revisor
 em `.claude/`, os hooks e as permissões do `.claude/settings.json` e o que o `npm run check` confere no CI.
@@ -23,7 +23,7 @@ Se a regra já existia escrita e foi quebrada mesmo assim, suba um degrau.
 | A regra é… | Vai em |
 |---|---|
 | Preferência só sua (tom, atalhos, comando liberado só para você) | `CLAUDE.local.md` ou `.claude/settings.local.json` (fora do git). Pare aqui. |
-| Sobre o produto, a Puca ou um termo | skill `contexto-base` (não aqui) |
+| Sobre o produto, Puca ou um termo | skill `contexto-base` (não aqui) |
 | Escolha técnica do código (biblioteca, formato, onde guardar dados) | `docs/decisoes/` (não aqui) |
 | Curta e vale em toda tarefa | `CLAUDE.md`: código e produto em **Regras do projeto**; issue, branch, PR e git em **Como trabalhamos** |
 | Um procedimento de vários passos que vale numa situação | skill nova ou passo numa skill que já existe, e a linha na tabela de skills do `CLAUDE.md` |

@@ -7,7 +7,7 @@ import type { Regra } from "../contexto";
 // A política explica a regra geral; o caso da pessoa vai ao gestor ou a People por esta linha (#125).
 const LINHA = "Casos individuais: fale com seu gestor ou com People (people@kota.example).";
 const COM_A_LINHA = ["bonus", "promocao", "revisao-salarial"];
-// O ciclo de desempenho mede por estas páginas; se elas citam quem o jurado vive, a Puca acaba avaliando a pessoa (§12.2).
+// O ciclo de desempenho mede por estas páginas; se elas citam quem o jurado vive, Puca acaba avaliando a pessoa (§12.2).
 const REGUA = ["quem-somos", "ciclo-de-desempenho", "trilha-de-carreira", "promocao", "bonus", "revisao-salarial"];
 
 // Página que falta é acusada pela paginas-escritas.

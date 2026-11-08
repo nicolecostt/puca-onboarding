@@ -33,15 +33,15 @@ Pedido: $ARGUMENTS
 
 As telas rodam dentro do app Electron ([`docs/stack.md`](../../../docs/stack.md) §3 e §4, decisão 0008).
 
-- Recurso do app (navegador da Puca, microfone do sistema) só com `if (window.orbis)`. Sem ele, no `npm run dev` do
+- Recurso do app (navegador de Puca, microfone do sistema) só com `if (window.orbis)`. Sem ele, no `npm run dev` do
   navegador, a tela continua funcionando com o simulado de hoje.
 - Antes de usar `window.orbis`, o formato dele (e o tipo no `Window`) tem que estar na seção "Computer use" de
   `docs/contratos.md`, pela skill `contrato`. Enquanto não estiver, a tela só reserva a área e segue com o simulado.
-- O navegador da Puca é desenhado **por cima** do HTML do Orbis. Tela que mostra o navegador (a `live-session`) reserva
+- O navegador de Puca é desenhado **por cima** do HTML do Orbis. Tela que mostra o navegador (a `live-session`) reserva
   uma área para ele, mede com `getBoundingClientRect` + `ResizeObserver` e chama `window.orbis.navegador.mostrar(bounds)`.
   Barra de call, chat e câmera ficam em volta dessa área, nunca por cima. O Slack simulado de hoje continua com os
   controles por cima: a regra vale para o navegador de verdade.
-- O que a Puca desenha sobre um site (cursor, círculo, cartão) fica na camada do app, não no front.
+- O que Puca desenha sobre um site (cursor, círculo, cartão) fica na camada do app, não no front.
 
 ## Regras de visual
 

@@ -12,17 +12,17 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | Voz ↔ quadro | `BoardAction.at` em `src/journey/types.ts` + `RunnerIO.say(text, cues)` + `GET /api/tts/:id/words` — [seção abaixo](#voz--quadro) | `runner.ts`, `screens/lesson` (`io.say`), `src/voice/agent-voice.ts`, quem escreve jornadas | `validate.test.ts`, `runner.test.ts`, `server/src/voice/tts/service.test.ts` |
 | Jornada da pessoa | `src/journey/types.ts` (`JornadaDaPessoa`) + `src/journey/jornada-da-pessoa.ts` (`montarJornadaDaPessoa`, `proximosPassos`) — [seção abaixo](#jornada-da-pessoa) | sessão, painel "Sua jornada" (#17) → progresso (#18), painel do buddy (#19), checagem (#24) | `__tests__/jornada-da-pessoa.test.ts` |
 | Rota da fala | `src/journey/route.ts` (`Route`: jump → reply → tarefa → select → knowledge → faq → ask; numa checagem, `waiting.check`: o que não é pergunta nem pulo é `reply`; `tarefa`: pergunta que cita a primeira tarefa, respondida pelos campos dela em `src/journey/duvidas-da-tarefa.ts`, com `RouteContext.tarefa`/`tarefaApresentada` opcionais) | `screens/lesson`, voz e chat | `__tests__/route.test.ts` |
-| API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask`, `/api/voice/token`; token do Supabase, limites e CORS — [seção abaixo](#api-do-servidor) | `src/voice/agent-voice.ts`, `src/voice/pcm-player.ts`, `screens/lesson`, `server/bench/turn-latency.ts` | `server/src/app.test.ts`, `server/src/**/*.test.ts` |
+| API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask`, `/api/voice/token`, `/api/encaminhamentos`; token do Supabase, limites e CORS — [seção abaixo](#api-do-servidor) | `src/voice/agent-voice.ts`, `src/voice/pcm-player.ts`, `screens/lesson`, `server/bench/turn-latency.ts` | `server/src/app.test.ts`, `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
-| Rastro (decisões da Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
-| Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` | `screens/lesson` (cria), `screens/live-session` (envia no Slack), rastro (`forwarding_id`), `screens/rh` (conta os abertos pelo `status`) | `__tests__/forwarding.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
+| Rastro (decisões de Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
+| Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` | `screens/lesson` (cria e pede o envio no Slack da Kota pelo servidor, `src/journey/slack-real.ts`), `screens/live-session` (envia no Slack simulado o que ficou pendente), rastro (`forwarding_id`, `forwarding_link`), `screens/rh` (conta os abertos pelo `status`); envio real: [seção abaixo](#encaminhamento-no-slack-da-kota) | `__tests__/forwarding.test.ts`, `__tests__/slack-real.test.ts`, `server/src/slack/encaminhar.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
 | Primeira tarefa | `src/journey/primeira-tarefa.ts` (`TarefaDoTime`, `PedidoDeAprovacao`, chave `puca:primeiras-tarefas` no `localStorage`) e os nós `kind: "task"` da jornada — [seção abaixo](#primeira-tarefa) | `screens/lesson` (cria o pedido quando o cartão da tarefa abre), `screens/live-session` (pede a aprovação ao gestor no Slack e grava a aprovação), `screens/primeira-tarefa` (página da tarefa), `screens/rh` (conta pessoas com pedido não aprovado, por `status` e `pessoa`) | `__tests__/primeira-tarefa.test.ts`, `screens/primeira-tarefa/pagina.test.ts` |
 | App para Mac (`window.orbis`) | `desktop/preload.ts` + `src/orbis.d.ts` — [seção abaixo](#app-para-mac) | telas que testam `if (window.orbis)`; a #123 acrescenta `navegador` | `tsc` |
-| Visual da Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
+| Visual de Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
 
-Exemplo válido de `TrailEntry` (uma fala da pessoa e o que a Puca fez com ela):
+Exemplo válido de `TrailEntry` (uma fala da pessoa e o que Puca fez com ela):
 
 ```json
 {
@@ -105,6 +105,52 @@ Content-Type: application/json
 {"text":"Quem cuida do balancereader?","moment_id":"pagamentos","step_id":"pg-pergunta","perfil":"novo"}
 ```
 
+## Encaminhamento no Slack da Kota
+
+O encaminhamento sai de verdade no Slack da Kota (#129, decisão 0008, `docs/stack.md` §10.1): o servidor manda, com o
+bot da Kota, uma **mensagem direta ao próprio jurado**, nunca num canal (todos os jurados entram no mesmo workspace),
+dizendo a quem a dúvida iria na Kota. A mensagem não leva o nome que a pessoa digitou. O jurado é achado pelo e-mail do
+Slack que ele informa, opcional, no início do Orbis (`localStorage` `puca:slack-email`).
+
+```ts
+// POST /api/encaminhamentos   (src/journey/slack-real.ts → server/src/slack/encaminhar.ts)
+interface PedidoDeEncaminhamento {
+  id: string;                       // o id do Forwarding: o mesmo id duas vezes não posta duas vezes
+  destino: "buddy" | "gestor" | "rh"; // hoje a sessão só manda "buddy"; gestor e rh são da #104 e da #125
+  para: string;                     // quem receberia na Kota (ex.: "Paula Nunes")
+  pergunta: string;
+  resumo: string;
+  fontes_consultadas: string[];     // títulos, como em Forwarding.consulted
+  motivo: string;                   // por que Puca não respondeu (Forwarding.reason)
+  email?: string;                   // e-mail do jurado no Slack da Kota; sem ele, nada é postado
+}
+// 200
+type ResultadoDoEncaminhamento =
+  | { enviado: true; canal: string; ts: string; link: string }
+  | { enviado: false; motivo: "sem_slack" };   // sem e-mail ou e-mail sem conta no Slack da Kota
+// 400 {"error":"pedido_invalido"} · 503 {"enviado":false,"motivo":"sem_slack"} (servidor sem SLACK_BOT_TOKEN)
+// 502 {"error":"slack_falhou"} (erro do Slack; o mesmo id pode ser mandado de novo, nada foi postado em duplicata)
+// Limite: 10 por hora por pessoa (pelo token; sem token, pelo IP) e 5 mensagens por hora para o mesmo destinatário
+// (passou: sem_slack, sem postar). O texto do app vai escapado (<, > e &): nada de menção, <!channel> ou link disfarçado.
+```
+
+Exemplo válido:
+
+```http
+POST /api/encaminhamentos HTTP/1.1
+Content-Type: application/json
+
+{"id":"544ac694-d4d5-49f0-9cd9-866dbcc7a018","destino":"buddy","para":"Paula Nunes","pergunta":"Quem cuida do tail-common?","resumo":"Quem cuida do tail-common?","fontes_consultadas":["ADR-012","README do pos-gateway"],"motivo":"Não há responsável confirmado para o tail-common nas fontes.","email":"jurado@exemplo.com"}
+```
+
+```json
+{"enviado":true,"canal":"D0123ABCD","ts":"1794135025.123456","link":"https://kota.slack.com/archives/D0123ABCD/p1794135025123456"}
+```
+
+Com `enviado: true`, o app marca o encaminhamento como `enviado` e guarda o link (`Forwarding.slack_link`): ele sai
+dos pendentes e o Slack simulado não envia de novo. O rastro guarda o link em `TrailEntry.forwarding_link`. Com
+`enviado: false`, sem servidor ou com erro, nada muda: o Slack simulado da `live-session` envia, como antes.
+
 ## App para Mac
 
 O app Electron (decisão 0004, `docs/stack.md` §3, #158) abre o mesmo front por `app://orbis/` e expõe ao front só
@@ -127,7 +173,7 @@ if (window.orbis) console.log(`Orbis ${window.orbis.versao}`); // no app
 
 ## Calibragem
 
-O que a Puca concluiu na call inicial sobre o que a pessoa já sabe e o que ela quer (glossário: **calibragem**).
+O que Puca concluiu na call inicial sobre o que a pessoa já sabe e o que ela quer (glossário: **calibragem**).
 A call inicial grava no fim da conversa; quem lê usa `resolveCalibragem(location.search)`
 (`?perfil=` → calibragem salva pela call → demo do Bruno), no mesmo padrão do perfil.
 Enquanto a sua parte não lê de verdade, use `DEMO_CALIBRAGENS.novo` (Ana) e `DEMO_CALIBRAGENS.transicao` (Bruno) como mock.
@@ -177,9 +223,9 @@ e sem os campos da transição.
 
 ## Voz ↔ quadro
 
-Cada ação do quadro acontece na palavra em que a Puca fala dela (PRODUCT.md §4.1: o quadro é construído progressivamente).
+Cada ação do quadro acontece na palavra em que Puca fala dela (PRODUCT.md §4.1: o quadro é construído progressivamente).
 
-- **Na jornada:** qualquer ação de `actions` aceita `at`, um trecho da `line` do passo. A ação sai quando a Puca chega
+- **Na jornada:** qualquer ação de `actions` aceita `at`, um trecho da `line` do passo. A ação sai quando Puca chega
   nesse trecho; sem `at`, sai antes da fala (como sempre foi). O validador exige que o trecho exista na fala.
   ```json
   { "type": "reveal", "targets": ["valor-dono", "m-dono"], "at": "dono do problema" }
@@ -279,7 +325,7 @@ ele é, para o FAQ e o agente não falarem da tarefa do outro perfil:
 `Problema: …` · `Por que importa: …` · `Sistemas: …` · `Onde ler: …` · `Quem ajuda: …`
 
 Quando o cartão de um nó `task` abre, a sessão cria um **pedido de aprovação** para o gestor. A tela do Slack pega o pedido,
-a Puca escreve na DM do gestor, e o gestor aprova com um clique. A página da tarefa e a sessão escutam o evento `storage`.
+Puca escreve na DM do gestor, e o gestor aprova com um clique. A página da tarefa e a sessão escutam o evento `storage`.
 
 - Status: `pendente` (a sessão criou) → `enviando` (uma aba do Slack pegou; `claimed_by`/`claimed_at`, com a mesma regra de 30 s
   do encaminhamento) → `aguardando` (mensagem enviada na DM do gestor) → `aprovada` (o gestor clicou; `aprovada_por` e `aprovada_em`).
