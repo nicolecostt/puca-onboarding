@@ -17,7 +17,7 @@ function overlap(a: string[], b: string[]): number {
  */
 export function findJump(text: string, journey: Journey, currentMomentId?: string): Moment | null {
   const said = normalize(text);
-  if (!NAV_CUES.some((c) => said.includes(c))) return null;
+  if (!NAV_CUES.some((c) => said.includes(c)) && !said.startsWith("pule para ")) return null;
   const words = keywords(text);
   let best: Moment | null = null;
   let bestScore = 0;
