@@ -101,7 +101,7 @@ A jornada é **mais curta e direcionada**, sem repetir a apresentação instituc
 
 ## 4. Funcionalidades centrais e oportunidades de inovação
 
-### 4.1. Aula visual e interativa em tempo real
+### 4.1. Sessão visual e interativa em tempo real
 
 > ⭐ **Principal funcionalidade a demonstrar no hackathon.**
 
@@ -168,7 +168,7 @@ Funcionalidade prevista para a evolução do produto: conectar o aprendizado às
 
 Depois de explicar os sistemas e processos da equipe, o agente identifica uma tarefa adequada ao contexto e ao nível de experiência do usuário, a partir de atividades **previamente disponibilizadas ou aprovadas pelo time**.
 
-**Exemplo.** Após uma aula sobre o fluxo de checkout, Puca apresenta uma issue relacionada a esse serviço e explica:
+**Exemplo.** Após uma sessão sobre o fluxo de checkout, Puca apresenta uma issue relacionada a esse serviço e explica:
 
 - Qual problema precisa ser resolvido.
 - Por que essa atividade é importante.
@@ -261,7 +261,7 @@ Para mostrar a personalização, usamos **uma única empresa fictícia com dois 
 | | Perfil 1 — Novo contratado | Perfil 2 — Mudando de equipe |
 |---|---|---|
 | **Situação** | Está começando na empresa. | Já conhece a organização, mas está migrando para uma nova equipe de tecnologia. |
-| **O que Puca faz** | Apresenta informações institucionais, explica quem é o gestor, introduz os processos e depois inicia uma aula técnica sobre o sistema. | Pula a apresentação institucional básica, identifica o novo contexto, apresenta os responsáveis e vai direto para os sistemas e práticas do time. |
+| **O que Puca faz** | Apresenta informações institucionais, explica quem é o gestor, introduz os processos e depois inicia uma sessão técnica sobre o sistema. | Pula a apresentação institucional básica, identifica o novo contexto, apresenta os responsáveis e vai direto para os sistemas e práticas do time. |
 
 Esses cenários mostram que o agente **não executa uma trilha fixa**: ele usa o contexto e o histórico disponíveis para decidir quais informações são relevantes.
 
@@ -308,7 +308,7 @@ A call inicial é o momento de identificar **o que a pessoa já conhece**, suas 
 | **Entrando na empresa** | Combina acolhimento e onboarding cultural com o levantamento do repertório técnico e das necessidades da função. |
 | **Saindo de um time e entrando em outro** | Considera o contexto anterior, confirma os conhecimentos que podem ser aproveitados e investiga as diferenças do novo time: sistemas, responsabilidades, pessoas, práticas e rituais. A jornada é ajustada a partir dessa conversa. |
 
-**A call inicial não é só coleta de informações.** Além de levantar o que a pessoa já sabe, a Puca faz o **onboarding cultural**: explica como a empresa funciona e o que ela valoriza, para a pessoa chegar à primeira aula sabendo onde está entrando.
+**A call inicial não é só coleta de informações.** Além de levantar o que a pessoa já sabe, a Puca faz o **onboarding cultural**: explica como a empresa funciona e o que ela valoriza, para a pessoa chegar à primeira sessão sabendo onde está entrando.
 
 - **O que a Puca explica:** missão e valores, o jeito de trabalhar (rituais, combinados, como a comunicação acontece e onde pedir ajuda) e quem são as pessoas de referência (buddy, gestor, time).
 - **Como explica:** em conversa, intercalando com as perguntas, e não como uma palestra antes delas. Cada trecho é curto e se liga ao que a pessoa contou (ex.: quem vem de uma empresa grande ouve como as decisões andam aqui).
@@ -317,7 +317,7 @@ A call inicial é o momento de identificar **o que a pessoa já conhece**, suas 
 
 > **Exemplo:** “Antes de seguir, uma coisa sobre como a Tail trabalha: aqui quem encontra um problema é dono dele até alguém assumir. Você vai ver isso no seu primeiro ticket. E no seu time anterior, como funcionava?”
 
-> **No hackathon:** a tela da call inicial (`src/screens/onboarding-call`) hoje só faz perguntas; a cultura aparece na aula, no momento “empresa e cultura” da jornada da Tail. Trazer o onboarding cultural para a call está em #57.
+> **No hackathon:** a tela da call inicial (`src/screens/onboarding-call`) hoje só faz perguntas; a cultura aparece na sessão, no momento “empresa e cultura” da jornada da Tail. Trazer o onboarding cultural para a call está em #57.
 
 ### 10.2. Incorporação de respostas à base — opcional no hackathon
 
@@ -347,7 +347,7 @@ A partir das capturas da página de onboarding da Sana Learn compartilhadas por 
 | **Criação e atualização de conteúdo** | Apoiar especialistas na organização e no compartilhamento do conhecimento com IA, aproveitando documentação, ADRs e codebase. |
 | **Pré-onboarding** | Oferecer materiais de boas-vindas, contatos relevantes, expectativas e preparação para a primeira semana antes do início. |
 | **Acompanhamento do progresso** | Apresentar marcos, etapas, pendências e necessidades de suporte, com visões adequadas para funcionário, buddy, gestor e RH. |
-| **Sessões e conexão com pessoas** | Considerar a criação e organização de encontros ao vivo, presenciais ou híbridos, para integração cultural e contato com o time. |
+| **Encontros e conexão com pessoas** | Considerar a criação e organização de encontros ao vivo, presenciais ou híbridos, para integração cultural e contato com o time. |
 | **Just-in-time learning** | Permitir que o funcionário procure o tutor quando surgir uma dúvida e receba orientação contextualizada, sustentada no conhecimento da empresa. |
 
 ### 11.2. Principal aposta de diferenciação
@@ -384,7 +384,7 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 | # | O que a Puca faz | O que isso mostra | Onde o humano entra |
 |---|---|---|---|
 | 1 | Na **call inicial**, faz o onboarding cultural, levanta o que a pessoa já sabe, registra a calibragem e **monta a jornada dela** ([§10.1](#101-call-inicial-e-conhecimento-prévio)). | O agente planeja a partir de um objetivo. | — |
-| 2 | Conduz a **aula** no quadro, seguindo a jornada e respondendo na hora ao que a pessoa diz: perguntas, pulos e interrupções. | O agente executa e se adapta, sem roteiro fixo. | — |
+| 2 | Conduz a **sessão** no quadro, seguindo a jornada e respondendo na hora ao que a pessoa diz: perguntas, pulos e interrupções. | O agente executa e se adapta, sem roteiro fixo. | — |
 | 3 | Faz uma **checagem leve de entendimento** e atualiza os objetivos que ainda faltam. | O agente acompanha o resultado do próprio trabalho. | — |
 | 4 | Quando falta fonte confiável, faz o **encaminhamento** ao buddy no Slack, com a dúvida, as fontes já consultadas e o motivo de não ter respondido ([§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano)). | O agente trata a exceção e passa para um humano *"com o contexto pronto para decidir"*. | O buddy responde ou indica o responsável. |
 | 5 | Entrega a **primeira tarefa** ([§4.4](#44-do-aprendizado-à-primeira-tarefa)) e informa o andamento ao buddy e ao gestor ([§5](#5-visibilidade-para-buddy-gestor-e-rh)). | O processo fecha, da entrada à primeira atividade real. | O gestor aprova a tarefa e acompanha os marcos. |

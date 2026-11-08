@@ -44,14 +44,14 @@ Antes de dizer que terminou: `npm run check` (ou, no mínimo, `npm run typecheck
 
 ## Prioridade no hackathon
 
-O critério de tudo é a demo: call inicial → jornada → aula no quadro → verificação de compreensão → primeira tarefa → progresso,
+O critério de tudo é a demo: call inicial → jornada → sessão no quadro → verificação de compreensão → primeira tarefa → progresso,
 mais uma pergunta que muda o rumo e uma dúvida que vira encaminhamento ([`docs/demo.md`](docs/demo.md)).
 Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o fluxo. Label `se-der-tempo` fica por último.
 
 ## Regras do projeto
 
 - A resposta nunca espera o LLM. Toda fala passa por `src/journey/route.ts`, do caminho mais barato ao mais caro; o LLM é o último.
-- A aula (`src/screens/lesson/`) conduz a jornada no browser; o servidor só dá voz e LLM.
+- A sessão (`src/screens/lesson/`) conduz a jornada no browser; o servidor só dá voz e LLM.
 - Sem fonte confiável, a Puca diz que não confirmou e encaminha para a buddy. Nunca inventar responsável por um sistema.
 - Textos de interface, comentários e docs em português.
 - Framework, banco, serviço externo ou mudança de stack: registre a decisão em `docs/decisoes/` antes de implementar.
@@ -94,7 +94,7 @@ Mais de uma situação ao mesmo tempo? Chame na ordem da tabela.
 | Algo entra ou muda no `PRODUCT.md`/`CONTEXT.md`: "anota no PRODUCT", "novo insight", "alinhamos que…", termo novo | `contexto-base` |
 | Regra nova para os agentes: "a partir de agora…", "sempre que…", "coloca no CLAUDE.md", "cria um hook/skill", "bloqueia X" | `nova-regra` |
 | Mudar um formato que outra parte usa: campo de API, tipo, evento, payload | `contrato` |
-| Criar ou editar aula/jornada (`*.journey.json`) | `nova-jornada` |
+| Criar ou editar sessão/jornada (`*.journey.json`) | `nova-jornada` |
 | Criar tela ou componente | `nova-tela` |
 | "Revisa", "tá bom pra subir?", "pode aprovar?", "dá pra mergear?", revisar PR de alguém | `revisar` (usa o subagente `revisor`) |
 | "Terminei", "pronto", "pode subir", "abre o PR" | `handoff` |

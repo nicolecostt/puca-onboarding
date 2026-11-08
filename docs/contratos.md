@@ -5,12 +5,12 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 
 | Contrato | Onde está definido | Quem depende | Testado por |
 |---|---|---|---|
-| Jornada da aula (JSON) | `src/journey/types.ts` + [`journey-format.md`](journey-format.md) | `runner.ts`, `whiteboard/from-journey.ts`, `screens/lesson`, quem escreve jornadas | `validate.ts` + `__tests__/validate.test.ts` |
+| Jornada da sessão (JSON) | `src/journey/types.ts` + [`journey-format.md`](journey-format.md) | `runner.ts`, `whiteboard/from-journey.ts`, `screens/lesson`, quem escreve jornadas | `validate.ts` + `__tests__/validate.test.ts` |
 | Eventos entre componentes | `src/lib/events.ts` (`DocumentEventMap`) | telas e componentes que escutam `callbar:*`, `chatpanel:*`, `onboarding:*`, `journey:*`, `journeypanel:*`, `agentcam:*` | `tsc` |
-| Perfil da pessoa | `src/journey/profile.ts` e `src/data/types.ts` | call inicial (grava `sessionStorage` `puca:profile`) → aula → `POST /api/ask` | `__tests__/validate.test.ts` |
+| Perfil da pessoa | `src/journey/profile.ts` e `src/data/types.ts` | call inicial (grava `sessionStorage` `puca:profile`) → sessão → `POST /api/ask` | `__tests__/validate.test.ts` |
 | Calibragem | `src/journey/types.ts` (`Calibragem`) + `src/journey/calibragem.ts` (temas, regras, `sessionStorage` `puca:calibragem`) — [seção abaixo](#calibragem) | call inicial escreve (#16) → jornada (#17) e adaptação das explicações (#23) leem | `__tests__/calibragem.test.ts` |
 | Voz ↔ quadro | `BoardAction.at` em `src/journey/types.ts` + `RunnerIO.say(text, cues)` + `GET /api/tts/:id/words` — [seção abaixo](#voz--quadro) | `runner.ts`, `screens/lesson` (`io.say`), `src/voice/agent-voice.ts`, quem escreve jornadas | `validate.test.ts`, `runner.test.ts`, `server/src/voice/tts/service.test.ts` |
-| Jornada da pessoa | `src/journey/types.ts` (`JornadaDaPessoa`) + `src/journey/jornada-da-pessoa.ts` (`montarJornadaDaPessoa`, `proximosPassos`) — [seção abaixo](#jornada-da-pessoa) | aula, painel "Sua jornada" (#17) → progresso (#18), painel do buddy (#19), checagem (#24) | `__tests__/jornada-da-pessoa.test.ts` |
+| Jornada da pessoa | `src/journey/types.ts` (`JornadaDaPessoa`) + `src/journey/jornada-da-pessoa.ts` (`montarJornadaDaPessoa`, `proximosPassos`) — [seção abaixo](#jornada-da-pessoa) | sessão, painel "Sua jornada" (#17) → progresso (#18), painel do buddy (#19), checagem (#24) | `__tests__/jornada-da-pessoa.test.ts` |
 | Rota da fala | `src/journey/route.ts` (`Route`: jump → reply → select → knowledge → faq → ask) | `screens/lesson`, voz e chat | `__tests__/route.test.ts` |
 | API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask`, `/api/voice/token` | `src/voice/agent-voice.ts`, `screens/lesson` | `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
@@ -73,8 +73,8 @@ Enquanto a sua parte não lê de verdade, use `DEMO_CALIBRAGENS.novo` (Ana) e `D
   momentos da jornada que controla em `CALIBRAGEM_TEMAS` (ex.: `falhas` → `falha`). Tema novo entra nos dois lugares.
 - **Nível** (`Nivel`): `nao_conhece` → `ja_ouviu` → `usa` → `domina`. É ponto de partida, não nota.
 - **Certeza** (`Certeza`): `alta` (a pessoa disse com clareza), `media` (deduzido do que ela contou),
-  `baixa` (palpite: a aula confirma na checagem).
-- **Origem**: `call` (respondeu na call), `vinculo` (deduzido de ser novo ou de transição), `aula` (atualizado na checagem).
+  `baixa` (palpite: a sessão confirma na checagem).
+- **Origem**: `call` (respondeu na call), `vinculo` (deduzido de ser novo ou de transição), `sessao` (atualizado na checagem).
 - `conhecimentos` tem sempre um item por tema. `time_anterior`, `aproveita` e `diferencas` só existem na transição.
 
 Exemplo (Bruno, transição; saída de `DEMO_CALIBRAGENS.transicao`):
@@ -146,10 +146,10 @@ Exemplo (Bruno, transição; saída de `montarJornadaDaPessoa(journey, DEMO_CALI
   "versao": 1,
   "objetivos": ["Entender o caminho da transação e fazer minha primeira mudança no terminal-config sozinho"],
   "momentos": [
-    { "id": "boas-vindas", "titulo": "Boas-vindas", "objetivo": "Cumprimentar e explicar o roteiro da aula conforme o momento da pessoa",
+    { "id": "boas-vindas", "titulo": "Boas-vindas", "objetivo": "Cumprimentar e explicar o roteiro da sessão conforme o momento da pessoa",
       "estado": "aprender", "motivo": "", "temas": [] },
     { "id": "empresa-e-cultura", "titulo": "A Tail", "objetivo": "Apresentar missão, valores e áreas da empresa",
-      "estado": "fora", "motivo": "Você já é da Tail: a aula vai direto ao seu time.", "temas": ["empresa"] },
+      "estado": "fora", "motivo": "Você já é da Tail: a sessão vai direto ao seu time.", "temas": ["empresa"] },
     { "id": "pagamentos", "titulo": "O caminho de uma transação", "objetivo": "Mostrar o caminho de uma transação da maquininha até a liquidação",
       "estado": "aprender", "motivo": "Você disse: “Um pouco, pelo lado da fraude, mas adquirência eu não conheço”", "temas": ["pagamentos", "mensageria"] },
     { "id": "falha", "titulo": "Quando falha", "objetivo": "Explicar o caminho de erro e o que ainda não está confirmado",
