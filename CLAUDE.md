@@ -85,7 +85,10 @@ Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o
    ninguém?", e só conta problema com evidência e cenário concreto. `scripts/pr-check.sh <n>` dá os fatos (merge com a
    `main`, conflitos reais com outros PRs e se são mecânicos, CI, base depois do merge). Hooks: pedido de revisão traz
    esses fatos sozinho; `gh pr merge` e aprovar são barrados com conflito com a `main`, CI vermelho ou base quebrada.
-9. **Material que não é código** (negócio, pitch, TAM/SAM/SOM, ferramentas da submissão) vai em `docs/negocio/`.
+9. **PR aberto é PR acompanhado** (skill `acompanhar-pr`): quem abre o PR fica de olho no CI, nos comentários e no merge
+   com a `main` e resolve cada item (corrige, responde com o motivo, abre issue ou pergunta à pessoa) até o PR ficar
+   pronto para integrar. Pronto não é integrar: só integre se a pessoa pedir.
+10. **Material que não é código** (negócio, pitch, TAM/SAM/SOM, ferramentas da submissão) vai em `docs/negocio/`.
 
 ## Skills da equipe: chame sozinho, ninguém vai pedir
 
@@ -103,6 +106,7 @@ Mais de uma situação ao mesmo tempo? Chame na ordem da tabela.
 | Criar ou editar sessão/jornada (`*.journey.json`) | `nova-jornada` |
 | Criar tela ou componente | `nova-tela` |
 | "Revisa", "tá bom pra subir?", "pode aprovar?", "dá pra mergear?", revisar PR de alguém | `revisar` (usa o subagente `revisor`) |
+| Acabou de abrir um PR (apareceu `[pr]`); "acompanha o PR", "tem comentário no PR?", "resolve os comentários" | `acompanhar-pr` |
 | "Terminei", "pronto", "pode subir", "abre o PR" | `handoff` |
 | "A demo funciona?", antes de apresentar, depois de merges | `checar-demo` |
 
