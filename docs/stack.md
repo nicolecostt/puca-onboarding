@@ -149,7 +149,7 @@ window.orbis = {
   `codesign --force --deep --sign - Orbis.app`. Sem isso o Mac com Apple Silicon recusa abrir. Sem conta da Apple,
   sem notarização.
 - **Releases:** um workflow do GitHub Actions em `macos-14` roda a cada tag `v*`: `npm ci`, `npm run build`,
-  `npm run build:app`, e sobe `Orbis-mac-arm64.zip` e `Orbis-mac-x64.zip` no Release. O repositório é público, então
+  `npm run build:app`, e sobe `Orbis-mac-arm64.zip` e `Orbis-mac-x64.zip`, cada um com o seu `.sha256`, no Release. O repositório é público, então
   os minutos de macOS saem de graça.
 - **`scripts/instalar.sh`** (o guia de uso só pede este comando):
 
@@ -161,9 +161,15 @@ curl -fsSL https://raw.githubusercontent.com/nicolecostt/puca-onboarding/main/sc
   1. lê `uname -m` (`arm64` ou `x86_64`) e escolhe o `.zip`;
   2. baixa com `curl -fL` de `…/releases/latest/download/Orbis-mac-<arch>.zip` (arquivo baixado com `curl` não recebe
      a quarentena do macOS, conferido em 2026-11-08);
-  3. extrai com `ditto -x -k` em `~/Applications/Orbis.app`, substituindo a versão anterior (sem `sudo`);
-  4. por garantia, `xattr -dr com.apple.quarantine` no app;
-  5. abre com `open`.
+  3. baixa também o `Orbis-mac-<arch>.zip.sha256` publicado no mesmo Release e confere com `shasum -a 256 -c`; se
+     não bater, para sem instalar;
+  4. extrai com `ditto -x -k` em `~/Applications/Orbis.app`, substituindo a versão anterior (sem `sudo`);
+  5. tira a quarentena com `xattr -dr com.apple.quarantine`, para o caso de o arquivo ter chegado por outro caminho
+     (pelo `curl` ela não vem);
+  6. abre com `open`.
+
+  O guia de uso diz que o app não é notarizado pela Apple e por que o comando é seguro: o script é legível no repo,
+  não pede `sudo` e só escreve em `~/Applications/Orbis.app`.
 
   `bash -s -- --desinstalar` apaga o app e os dados locais. O script fica no repo para o jurado ler antes de rodar.
 - **Atualização:** sem assinatura da Apple não há atualização automática. Versão nova = rodar o comando de novo. Como
@@ -292,7 +298,8 @@ Como a Puca percebe a pessoa:
 ### 4.7. Guarda
 
 - **Lista de endereços permitidos** **(proposta)**: `github.com/JucaGF/kota-bank`, o Notion da Kota
-  (`*.notion.site` do workspace) e o Slack da Kota (`app.slack.com` no workspace da Kota). `will-navigate` e
+  (`*.notion.site` do workspace) e o Slack da Kota (`app.slack.com`, o endereço do workspace em `*.slack.com` e
+  `slack.com/signin`, por onde passa o login). `will-navigate` e
   `setWindowOpenHandler` bloqueiam o resto: a pessoa vê "fora do mundo da Kota" e um botão para abrir no navegador
   dela.
 - **Confirmação:** ação que publica algo em nome de alguém (`digitar` + enviar) pede o ok da pessoa na tela.
@@ -303,9 +310,9 @@ Como a Puca percebe a pessoa:
 - O navegador da Puca usa uma partição persistente (`partition: "persist:kota"`): a pessoa entra uma vez e o login
   fica entre aberturas do app.
 - GitHub e Notion da Kota são públicos e não pedem login para ler.
-- O Slack da Kota pede: o jurado entra pelo convite do guia de uso, uma vez, dentro do navegador da Puca. Sem login, o
-  encaminhamento sai do mesmo jeito (pelo servidor, §10.1) e a Puca mostra a mensagem num cartão em vez de abrir o
-  Slack.
+- O Slack da Kota pede: o jurado entra pelo convite do guia de uso, uma vez, dentro do navegador da Puca. O
+  encaminhamento chega como mensagem direta do bot para ele (§10.1); sem login ou sem Slack, a Puca mostra a mensagem
+  num cartão em vez de abrir o Slack.
 
 ### 4.9. Fora do MVP
 
@@ -318,7 +325,7 @@ Como a Puca percebe a pessoa:
 
 ## 5. Servidor (Fly.io)
 
-Decisão: [0006](decisoes/0006-infra-servidor-e-dados.md). Issue: #49.
+Decisão: [0006](decisoes/0006-infra-servidor-e-dados.md). Issue: #124 (o ambiente do jurado é a #49).
 
 ### 5.1. Por que um processo sempre ligado
 
@@ -377,8 +384,12 @@ primary_region = "iad"
   | `POST /api/encaminhamentos` | 10 por hora |
   | `POST /api/voice/token` | 20 por minuto |
 
-  Mais uma trava diária global (`LIMITE_DIARIO_LLM`): passou, o `/api/ask` responde só pela ponte e pelo
-  encaminhamento até o dia seguinte.
+  Como a chave pública do Supabase vai no app, qualquer um cria contas anônimas, cada uma com o próprio limite. Por
+  isso o que segura o custo são as **travas diárias globais**, uma por provedor pago: `LIMITE_DIARIO_LLM` (chamadas
+  ao `/api/ask`), `LIMITE_DIARIO_TTS` (caracteres no `/api/speak`) e `LIMITE_DIARIO_STT` (tokens do
+  `/api/voice/token`). Passou, a rota cai no comportamento sem servidor: ponte e encaminhamento no lugar do LLM, voz do
+  navegador no lugar do TTS, chat no lugar do microfone. E o login anônimo fica com o limite por IP do Supabase e, se
+  houver abuso, captcha (o Supabase Auth aceita Turnstile ou hCaptcha nesse login).
 - **CORS:** só a origem `app://orbis` (e `http://localhost:5173` em dev).
 - **Cache de áudio:** sai do disco e vai para o Supabase Storage, bucket privado `tts-cache`, chave = hash(texto, voz,
   modelo). Na memória, um LRU dos áudios mais usados. As falas da jornada são pré-geradas no deploy
@@ -402,8 +413,9 @@ Decisão: [0006](decisoes/0006-infra-servidor-e-dados.md). Issues: #18, #19.
 
 - **Login anônimo do Supabase por instalação** (`signInAnonymously`): cada jurado ganha um id próprio, sem e-mail nem
   senha, e os dados de um não se misturam com os de outro.
-- A tela de entrada parece um login: nome e escolha do perfil (novo ou transição). O nome e o perfil vão para os
-  metadados da conta no Supabase Auth e para a tabela `pessoas`.
+- A tela de entrada parece um login: nome, escolha do perfil (novo ou transição) e, opcional, o e-mail com que a
+  pessoa entrou no Slack da Kota (só para o encaminhamento chegar a ela, §10.1). Vão para os metadados da conta no
+  Supabase Auth e para a tabela `pessoas`.
 - Para a apresentação, contas fixas com e-mail e senha (`ana@kota.example`, `bruno@kota.example`), criadas pelo
   painel do Supabase já confirmadas.
 - A sessão do Supabase fica guardada pelo `supabase-js` no app; reabrir o app volta para onde a pessoa parou.
@@ -554,8 +566,14 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
 
 - **Quem envia:** o servidor, com o token do bot do app da Kota (o mesmo de #118). Não é o navegador da Puca
   digitando: a ação precisa sair sempre, mesmo sem login no Slack.
-- **Para onde:** o canal de ajuda do time (`#livro-razao-ajuda`), citando a buddy pelo nome; caso pessoal (#125)
-  vai ao canal de RH ou ao gestor. As pessoas da Kota não são membros reais (decisão 0005).
+- **Para onde:** uma **mensagem direta do bot para o próprio jurado** (`conversations.open` + `chat.postMessage`),
+  dizendo a quem ela iria na Kota (a buddy pelo nome, o RH ou o gestor no caso pessoal da #125). As pessoas da Kota não
+  são membros reais (decisão 0005), e todos os jurados entram no mesmo workspace pelo mesmo convite: **nunca** postar
+  num canal compartilhado, porque a dúvida de um jurado (às vezes um caso pessoal) apareceria para os outros (§5 do
+  `PRODUCT.md`). A mensagem não leva o nome digitado no login.
+- **Como achar o jurado no Slack (proposta):** a tela de entrada pede, opcional, o e-mail com que ele entrou no Slack
+  da Kota; o servidor acha o id com `users.lookupByEmail`. Sem e-mail ou sem conta no Slack, nada é postado: a Puca
+  mostra a mensagem num cartão e o rastro registra "não enviado: sem Slack".
 - **Como aparece:** `chat.postMessage` com `chat:write.customize`, `username: "Puca"` e o ícone da Puca. A mensagem
   traz a dúvida, um resumo, as fontes consultadas e o motivo de não ter respondido (§4.5 do `PRODUCT.md`).
 - **Depois:** o servidor pede o link (`chat.getPermalink`) e devolve ao app. O app abre o link no navegador da Puca e
@@ -569,13 +587,17 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
 { id: string; destino: "buddy" | "gestor" | "rh"; pergunta: string; resumo: string;
   fontes_consultadas: { titulo: string; url: string }[]; motivo: "sem_fonte" | "caso_pessoal" | "acesso" }
 // 201
-{ canal: string; ts: string; link: string }
+{ enviado: true; canal: string; ts: string; link: string } | { enviado: false; motivo: "sem_slack" }
 ```
 
-- **Escopos do bot:** `chat:write`, `chat:write.customize`, `channels:manage` (preencher os canais),
-  `channels:read`. Nada de ler mensagens privadas.
-- **A tela simulada:** o Slack simulado da `live-session` sai quando o real estiver funcionando. Até lá, os dois
-  convivem e o app usa o real se o servidor responder.
+- **Escopos do bot:** `chat:write`, `chat:write.customize`, `im:write` (abrir a mensagem direta), `users:read` e
+  `users:read.email` (achar o jurado), e `channels:manage` só para o script que preenche os canais da Kota (#118).
+  Nada de ler mensagens.
+- **O Slack simulado fica.** A `live-session` simulada continua: no `npm run dev` sem servidor (princípio 6), como
+  plano B quando o servidor ou o Slack falham, e na **aprovação do gestor** (primeira tarefa, passo 5 do
+  `docs/demo.md`, e pedido de acesso da #104). Aprovar no Slack real exigiria um botão interativo, com o recurso de
+  interatividade do app do Slack apontando para o servidor; isso fica fora do MVP. Com o servidor no ar, o
+  encaminhamento sai no Slack real e a aprovação continua no simulado.
 
 ### 10.2. GitHub
 
@@ -604,11 +626,11 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
 | Risco | Proteção |
 |---|---|
 | Chave de API vazar pelo app | Nenhuma chave paga no app; só o endereço do servidor e a chave pública do Supabase |
-| Alguém gastar as chaves pelo servidor público | Token do Supabase obrigatório, limite por pessoa e trava diária (§5.3) |
-| Um jurado ver dados de outro | Login anônimo por instalação + RLS por `auth.uid()` |
+| Alguém gastar as chaves pelo servidor público | Travas diárias globais por provedor (LLM, TTS, STT); limite por pessoa; limite por IP e captcha no login anônimo (§5.3). O token do Supabase sozinho não basta: contas anônimas são de graça |
+| Um jurado ver dados de outro | Login anônimo por instalação + RLS por `auth.uid()` no Supabase. No Slack, que todos os jurados compartilham, o encaminhamento só vai por mensagem direta ao próprio jurado, sem o nome digitado; nunca em canal (§10.1) |
 | A Puca agir fora do mundo da Kota | Lista de endereços permitidos no navegador da Puca (§4.7) |
 | Conteúdo do LLM injetar HTML na página | DOMPurify em todo cartão (§4.4) |
-| Mensagem indevida no Slack | Bot com escopos mínimos, só canais da Kota, limite de 10 por hora |
+| Mensagem indevida no Slack | Bot com escopos mínimos, só mensagem direta ao próprio jurado, `id` contra duplicata, limite de 10 por hora |
 | Senhas | A Puca nunca digita senha nem guarda teclas |
 | Avaliação de desempenho | O rastro e o painel descrevem o processo, nunca dão nota à pessoa (`PRODUCT.md` §5 e §12.2) |
 | Dados reais | Só dados sintéticos, e-mails em `kota.example` (decisão 0005) |
@@ -657,11 +679,11 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
 | `ANTHROPIC_API_KEY` | servidor (`fly secrets`, `server/.env`) | não |
 | `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL_ID` | servidor | não |
 | `DEEPGRAM_API_KEY` | servidor | não |
-| `SLACK_BOT_TOKEN`, `SLACK_CANAL_AJUDA` | servidor | não |
+| `SLACK_BOT_TOKEN` | servidor | não |
 | `GITHUB_TOKEN` (só se §10.2 precisar) | servidor | não |
 | `SUPABASE_URL`, `SUPABASE_JWKS_URL` | servidor | sim |
 | `SUPABASE_SERVICE_ROLE_KEY` | servidor (Storage, idempotência dos encaminhamentos) | não |
-| `LIMITE_DIARIO_LLM` | servidor | — |
+| `LIMITE_DIARIO_LLM`, `LIMITE_DIARIO_TTS`, `LIMITE_DIARIO_STT` | servidor | — |
 | `VITE_API_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | app (no build) | sim |
 
 `FEATHERLESS_API_KEY`, `FEATHERLESS_BASE_URL` e `LLM_MODEL` saem quando o cliente da Anthropic estiver na `main`.
@@ -680,6 +702,9 @@ Cada mudança vai pelo caminho certo, num PR próprio:
 | Encaminhamento: destino, `id`, link do Slack, `POST /api/encaminhamentos` | `docs/contratos.md` | skill `contrato` (combinar com #104 e #125) |
 | API do servidor: token obrigatório, rotas novas | `docs/contratos.md` | skill `contrato` |
 | Progresso e memória: tabelas do Supabase e fila local | `docs/contratos.md` | skill `contrato` |
+| Perfil e calibragem saem do `sessionStorage` para o `localStorage` | linhas "Perfil" e "Calibragem" de `docs/contratos.md`, `docs/journey-format.md` | skill `contrato`, com a #18 |
+| Primeira tarefa: a aprovação do gestor continua no Slack simulado; se um dia for para o Slack real, muda o contrato | linha "Primeira tarefa" de `docs/contratos.md` | skill `contrato`, quando for o caso |
+| Featherless sai; a chave obrigatória passa a ser a da Anthropic | `README.md` (seção do servidor), `server/.env.example` | na #128 |
 | Como rodar o app, o servidor e o deploy | `README.md`, `docs/demo.md` | no PR de cada parte |
 
 ---
@@ -693,7 +718,7 @@ Pela prioridade do hackathon: primeiro o que o jurado precisa para abrir o Orbis
 | Frente | Entrega | Issue |
 |---|---|---|
 | App | `desktop/` abrindo o front, microfone, `npm run dev:app`, empacotamento, `instalar.sh`, release por tag | #47 |
-| Servidor | Fly no ar, chaves, token do Supabase obrigatório, limite de uso, cache de áudio no Storage | #49 |
+| Servidor | Fly no ar, chaves, token do Supabase obrigatório, limite de uso, cache de áudio no Storage | #124 |
 | Login e dados | projeto Supabase, login anônimo, tabelas e RLS, fila local de sincronização | #18 |
 | LLM | cliente da Anthropic atrás do `LlmEvent`, bench com `--provider` | #128 |
 

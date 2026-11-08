@@ -17,9 +17,13 @@ junto. A decisão 0005 deixou para a #13 se a Puca age no Slack real da Kota e s
   agente autônomo clicando sozinho. Três modos: mostrar, apontar e acompanhar.
 - **Guarda em código:** o navegador da Puca só abre o mundo da Kota; ação que publica algo pede confirmação; a Puca
   nunca digita senha.
-- O **encaminhamento sai no Slack real da Kota**, enviado pelo servidor com o bot da Kota no canal de ajuda do time.
-  O app abre a mensagem no navegador da Puca e aponta para ela. O Slack simulado da `live-session` sai quando o real
-  funcionar.
+- O **encaminhamento sai no Slack real da Kota**, enviado pelo servidor com o bot da Kota, como **mensagem direta ao
+  próprio jurado**, dizendo a quem iria na Kota. Nunca num canal: todos os jurados entram no mesmo workspace, e a dúvida
+  de um (às vezes um caso pessoal) não pode aparecer para os outros. O app abre a mensagem no navegador da Puca e
+  aponta para ela.
+- O **Slack simulado da `live-session` fica**: no `npm run dev` sem servidor, como plano B quando o servidor ou o
+  Slack falham, e na aprovação do gestor (primeira tarefa e pedido de acesso), que no Slack real exigiria botão
+  interativo, fora do MVP.
 - **Sem MCP na hora da sessão:** o conhecimento vem de cópias locais do kit e as ações são poucas e fixas.
 
 Desenho completo: [`docs/stack.md`](../stack.md) §4 e §10.
@@ -31,7 +35,7 @@ Desenho completo: [`docs/stack.md`](../stack.md) §4 e §10.
 - Contratos novos ou alterados antes de implementar (skill `contrato`): "Computer use" (`AcaoDaPuca`,
   `AcaoDaPessoa`, `window.orbis`) e "Encaminhamento" (`POST /api/encaminhamentos` com `id` para não duplicar,
   destinos buddy, gestor e RH).
-- `SLACK_BOT_TOKEN` no servidor; o bot com escopos mínimos (`chat:write`, `chat:write.customize`, `channels:manage`,
-  `channels:read`).
+- `SLACK_BOT_TOKEN` no servidor; o bot com escopos mínimos (`chat:write`, `chat:write.customize`, `im:write`, `users:read`,
+  `users:read.email`; `channels:manage` só para o script que preenche os canais, #118).
 - Apps nativos (Slack desktop, editor, terminal) e ver a tela por print ficam fora do MVP.
 - `npm run dev` no navegador comum continua com o computer use simulado.
