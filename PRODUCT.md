@@ -1,6 +1,6 @@
 # Puca — agente de IA para onboarding e transição entre equipes
 
-> **Em uma frase:** Puca transforma o conhecimento disperso de uma organização em uma experiência de integração guiada, visual e personalizada, ajudando pessoas a se adaptarem a novos contextos de trabalho.
+> **Em uma frase:** O Puca transforma o conhecimento disperso de uma organização em uma experiência de integração guiada, visual e personalizada, ajudando pessoas a se adaptarem a novos contextos de trabalho.
 
 ## Sumário
 
@@ -15,7 +15,7 @@
 9. [Direcionamento do produto](#9-direcionamento-do-produto)
 10. [Complementos do alinhamento com Joaquim](#10-complementos-do-alinhamento-com-joaquim)
 11. [Posicionamento: Sana Learn como referência e foco em just-in-time learning](#11-posicionamento-sana-learn-como-referência-e-foco-em-just-in-time-learning)
-12. [Encaixe no Desafio Tako: Puca como digital worker de onboarding](#12-encaixe-no-desafio-tako-puca-como-digital-worker-de-onboarding)
+12. [Encaixe no Desafio Tako: O Puca como digital worker de onboarding](#12-encaixe-no-desafio-tako-o-puca-como-digital-worker-de-onboarding)
 13. [Avaliação pelos jurados: o mundo fictício da Kota](#13-avaliação-pelos-jurados-o-mundo-fictício-da-kota)
 14. [Modelo de negócio: quem compra e como cobramos](#14-modelo-de-negócio-quem-compra-e-como-cobramos)
 
@@ -23,7 +23,7 @@
 
 ## 1. Visão geral do produto
 
-Puca é um agente de inteligência artificial projetado para auxiliar profissionais durante a **entrada em uma empresa** ou a **transição entre equipes**, oferecendo uma experiência de integração personalizada, interativa e contextualizada.
+O Puca é um agente de inteligência artificial projetado para auxiliar profissionais durante a **entrada em uma empresa** ou a **transição entre equipes**, oferecendo uma experiência de integração personalizada, interativa e contextualizada.
 
 A proposta é atuar como um **mentor digital** que acompanha o profissional nos primeiros passos, ajudando-o a compreender:
 
@@ -32,7 +32,7 @@ A proposta é atuar como um **mentor digital** que acompanha o profissional nos 
 - as pessoas responsáveis por cada atividade;
 - e, especialmente em equipes de tecnologia, a arquitetura, os sistemas e as decisões técnicas do time.
 
-Diferentemente de chatbots corporativos tradicionais, que normalmente respondem perguntas com base em documentos, Puca busca **transformar o conhecimento organizacional em uma experiência de aprendizado guiado**.
+Diferentemente de chatbots corporativos tradicionais, que normalmente respondem perguntas com base em documentos, o Puca busca **transformar o conhecimento organizacional em uma experiência de aprendizado guiado**.
 
 **Principal diferencial:** uma interface visual e interativa, na qual o agente explica conceitos, constrói mapas de conhecimento, destaca conexões e adapta a explicação conforme as dúvidas e o nível de familiaridade de cada profissional.
 
@@ -55,7 +55,7 @@ Isso gera alguns problemas:
 
 Além disso, **quem muda de equipe enfrenta parte desses desafios novamente**, mesmo já conhecendo a empresa.
 
-Puca busca resolver esses problemas com um agente que reúne o contexto disponível, personaliza a jornada e transforma as informações relevantes em explicações compreensíveis e visualmente navegáveis.
+O Puca busca resolver esses problemas com um agente que reúne o contexto disponível, personaliza a jornada e transforma as informações relevantes em explicações compreensíveis e visualmente navegáveis.
 
 ---
 
@@ -65,7 +65,7 @@ Puca busca resolver esses problemas com um agente que reúne o contexto disponí
 
 Um profissional acaba de entrar na empresa.
 
-1. Puca começa identificando **cargo, equipe, responsabilidades e conhecimentos prévios**, a partir do processo de admissão da própria equipe.
+1. O Puca começa identificando **cargo, equipe, responsabilidades e conhecimentos prévios**, a partir do processo de admissão da própria equipe.
 2. Faz uma **call inicial** com o funcionário: onboarding cultural e extração de informações importantes sobre a pessoa.
 3. A partir dessas informações, **organiza uma jornada de integração**.
 
@@ -84,7 +84,7 @@ Essa jornada é **mais abrangente**, pois o profissional ainda precisa conhecer 
 
 Um profissional que já trabalha na empresa está mudando de equipe, projeto ou área de atuação.
 
-Puca reconhece que ele já conhece a organização e **evita repetir conteúdos introdutórios desnecessários**. O foco fica nas diferenças entre o contexto anterior e o novo:
+O Puca reconhece que ele já conhece a organização e **evita repetir conteúdos introdutórios desnecessários**. O foco fica nas diferenças entre o contexto anterior e o novo:
 
 - Responsabilidades da nova equipe.
 - Novos gestores, buddies e pessoas de referência.
@@ -95,7 +95,7 @@ Puca reconhece que ele já conhece a organização e **evita repetir conteúdos 
 
 A jornada é **mais curta e direcionada**, sem repetir a apresentação institucional completa. Ainda assim, particularidades culturais do novo time (rituais, combinados e formas de colaboração) continuam relevantes.
 
-> **Diferencial:** Puca não oferece a mesma experiência para todos — considera o histórico e a necessidade de cada profissional.
+> **Diferencial:** O Puca não oferece a mesma experiência para todos — considera o histórico e a necessidade de cada profissional.
 
 ---
 
@@ -105,13 +105,13 @@ A jornada é **mais curta e direcionada**, sem repetir a apresentação instituc
 
 > ⭐ **Principal funcionalidade a demonstrar no hackathon.**
 
-O profissional conversa com Puca por **texto ou voz** e, conforme o agente explica um assunto, **um quadro visual é construído ou atualizado**.
+O profissional conversa com o Puca por **texto ou voz** e, conforme o agente explica um assunto, **um quadro visual é construído ou atualizado**.
 
 **Exemplo.** Um novo desenvolvedor pergunta:
 
 > “Como funciona o processamento de pagamentos da nossa aplicação?”
 
-Puca apresenta o fluxo geral, mostrando o frontend, o serviço de pagamentos e as demais dependências relevantes. Enquanto explica, destaca componentes, apresenta conexões e revela novas partes do sistema.
+O Puca apresenta o fluxo geral, mostrando o frontend, o serviço de pagamentos e as demais dependências relevantes. Enquanto explica, destaca componentes, apresenta conexões e revela novas partes do sistema.
 
 Se o usuário perguntar:
 
@@ -127,13 +127,13 @@ Pontos importantes:
 
 ### 4.2. Aprendizado ativo e personalizado
 
-Puca não deve só explicar conteúdos: deve também verificar, de forma **leve e interativa**, se o usuário compreendeu os conceitos principais.
+O Puca não deve só explicar conteúdos: deve também verificar, de forma **leve e interativa**, se o usuário compreendeu os conceitos principais.
 
 Durante uma sessão, o agente pode perguntar:
 
 > “Qual serviço você acha que deveria investigar primeiro se essa operação falhasse?”
 
-O usuário pode responder por **texto, voz ou selecionando um componente do quadro**. Com base na resposta, Puca pode:
+O usuário pode responder por **texto, voz ou selecionando um componente do quadro**. Com base na resposta, o Puca pode:
 
 - Confirmar o entendimento com evidências.
 - Explicar novamente um conceito.
@@ -147,7 +147,7 @@ Isso aproxima a experiência de uma **mentoria individualizada**, e não de uma 
 
 ### 4.3. Conexão entre conhecimento técnico e organizacional
 
-Puca conecta **como os sistemas funcionam** com **como as pessoas e equipes trabalham**.
+O Puca conecta **como os sistemas funcionam** com **como as pessoas e equipes trabalham**.
 
 Um mapa técnico pode apresentar serviços, APIs, dependências e fluxos. Ao selecionar um componente, o usuário também encontra:
 
@@ -158,9 +158,9 @@ Um mapa técnico pode apresentar serviços, APIs, dependências e fluxos. Ao sel
 - Pessoas de referência, quando confirmadas.
 - Procedimentos para solicitar ajuda.
 
-**Exemplo.** Ao explicar um fluxo de autorização de pagamentos, Puca pode mostrar tanto a arquitetura envolvida quanto a decisão arquitetural (ADR) que explica por que aquele mecanismo foi escolhido. Se o usuário quiser conversar com alguém sobre a decisão, o agente indica o responsável registrado na documentação.
+**Exemplo.** Ao explicar um fluxo de autorização de pagamentos, o Puca pode mostrar tanto a arquitetura envolvida quanto a decisão arquitetural (ADR) que explica por que aquele mecanismo foi escolhido. Se o usuário quiser conversar com alguém sobre a decisão, o agente indica o responsável registrado na documentação.
 
-> Quando não houver fonte confiável, Puca deve deixar **explícito** que não conseguiu confirmar a informação e indicar uma conversa com o buddy.
+> Quando não houver fonte confiável, o Puca deve deixar **explícito** que não conseguiu confirmar a informação e indicar uma conversa com o buddy.
 
 ### 4.4. Do aprendizado à primeira tarefa
 
@@ -168,7 +168,7 @@ Funcionalidade prevista para a evolução do produto: conectar o aprendizado às
 
 Depois de explicar os sistemas e processos da equipe, o agente identifica uma tarefa adequada ao contexto e ao nível de experiência do usuário, a partir de atividades **previamente disponibilizadas ou aprovadas pelo time**.
 
-**Exemplo.** Após uma sessão sobre o fluxo de checkout, Puca apresenta uma issue relacionada a esse serviço e explica:
+**Exemplo.** Após uma sessão sobre o fluxo de checkout, o Puca apresenta uma issue relacionada a esse serviço e explica:
 
 - Qual problema precisa ser resolvido.
 - Por que essa atividade é importante.
@@ -176,13 +176,13 @@ Depois de explicar os sistemas e processos da equipe, o agente identifica uma ta
 - Onde encontrar as informações necessárias.
 - Quem pode ajudar caso surja algum bloqueio.
 
-Durante a atividade, o profissional pode voltar ao quadro e fazer perguntas relacionadas ao que está desenvolvendo. Puca vira uma **ponte entre a teoria e a prática**, e o profissional ganha autonomia mais rápido, sem depender de explicações repetitivas a cada nova atividade.
+Durante a atividade, o profissional pode voltar ao quadro e fazer perguntas relacionadas ao que está desenvolvendo. O Puca vira uma **ponte entre a teoria e a prática**, e o profissional ganha autonomia mais rápido, sem depender de explicações repetitivas a cada nova atividade.
 
 > **No hackathon:** pode ser demonstrada como uma primeira tarefa simulada e documentada no Notion. Não é preciso conexão completa com Jira ou GitHub para validar a experiência.
 
 ### 4.5. Conhecimento contínuo e encaminhamento humano
 
-Nem todas as dúvidas podem ser resolvidas automaticamente. Puca deve identificar **quando encaminhar o usuário a uma pessoa responsável**.
+Nem todas as dúvidas podem ser resolvidas automaticamente. O Puca deve identificar **quando encaminhar o usuário a uma pessoa responsável**.
 
 > “Não encontrei uma definição confirmada sobre essa política. A pessoa de referência indicada é a responsável de RH.”
 
@@ -194,7 +194,7 @@ O encaminhamento pode incluir:
 
 Assim, o funcionário não precisa explicar toda a situação de novo.
 
-No futuro, respostas confirmadas por especialistas poderão ser incorporadas à base de conhecimento, **mediante autorização e validação**. Dessa forma, Puca não só usa o conhecimento existente, como também ajuda a documentar e reaproveitar dúvidas recorrentes.
+No futuro, respostas confirmadas por especialistas poderão ser incorporadas à base de conhecimento, **mediante autorização e validação**. Dessa forma, o Puca não só usa o conhecimento existente, como também ajuda a documentar e reaproveitar dúvidas recorrentes.
 
 > **No hackathon:** essa incorporação passou a ser uma entrega opcional, condicionada ao tempo disponível. Ver [§10.2](#102-incorporação-de-respostas-à-base--opcional-no-hackathon).
 
@@ -214,7 +214,7 @@ Além da experiência do funcionário, queremos dar visibilidade às pessoas res
 
 - Percentual de etapas concluídas.
 - Tarefas ou acessos pendentes.
-- Sessões com Puca realizadas.
+- Sessões com o Puca realizadas.
 - Solicitações de suporte ainda abertas.
 - Assuntos que frequentemente geram dúvidas.
 - Tempo até a conclusão de marcos previamente definidos.
@@ -229,7 +229,7 @@ Além da experiência do funcionário, queremos dar visibilidade às pessoas res
 
 ## 6. Contexto corporativo e cultura organizacional
 
-Queremos ampliar Puca para além da engenharia de software, **sem perder o onboarding técnico como principal caso de uso inicial**.
+Queremos ampliar o Puca para além da engenharia de software, **sem perder o onboarding técnico como principal caso de uso inicial**.
 
 O mesmo mecanismo de explicação interativa pode apresentar:
 
@@ -244,7 +244,7 @@ O mesmo mecanismo de explicação interativa pode apresentar:
 
 > “Como funciona o processo de solicitação de férias?”
 
-Puca explica o procedimento com base na documentação oficial, indica as etapas envolvidas e aponta onde fazer a solicitação.
+O Puca explica o procedimento com base na documentação oficial, indica as etapas envolvidas e aponta onde fazer a solicitação.
 
 > “Qual é a diferença entre as responsabilidades do meu gestor e do meu buddy?”
 
@@ -261,7 +261,7 @@ Para mostrar a personalização, usamos **uma única empresa fictícia com dois 
 | | Perfil 1 — Novo contratado | Perfil 2 — Mudando de equipe |
 |---|---|---|
 | **Situação** | Está começando na empresa. | Já conhece a organização, mas está migrando para uma nova equipe de tecnologia. |
-| **O que Puca faz** | Apresenta informações institucionais, explica quem é o gestor, introduz os processos e depois inicia uma sessão técnica sobre o sistema. | Pula a apresentação institucional básica, identifica o novo contexto, apresenta os responsáveis e vai direto para os sistemas e práticas do time. |
+| **O que o Puca faz** | Apresenta informações institucionais, explica quem é o gestor, introduz os processos e depois inicia uma sessão técnica sobre o sistema. | Pula a apresentação institucional básica, identifica o novo contexto, apresenta os responsáveis e vai direto para os sistemas e práticas do time. |
 
 Esses cenários mostram que o agente **não executa uma trilha fixa**: ele usa o contexto e o histórico disponíveis para decidir quais informações são relevantes.
 
@@ -283,7 +283,7 @@ A apresentação pode ser complementada com um **painel simples** mostrando o ac
 
 ## 9. Direcionamento do produto
 
-Puca deve ser posicionada como um **agente de integração e aprendizagem contextual**, e não apenas como um chatbot de documentação ou uma ferramenta para gerar diagramas.
+O Puca deve ser posicionada como um **agente de integração e aprendizagem contextual**, e não apenas como um chatbot de documentação ou uma ferramenta para gerar diagramas.
 
 O diferencial está na combinação de:
 
@@ -308,11 +308,11 @@ A call inicial é o momento de identificar **o que a pessoa já conhece**, suas 
 | **Entrando na empresa** | Combina acolhimento e onboarding cultural com o levantamento do repertório técnico e das necessidades da função. |
 | **Saindo de um time e entrando em outro** | Considera o contexto anterior, confirma os conhecimentos que podem ser aproveitados e investiga as diferenças do novo time: sistemas, responsabilidades, pessoas, práticas e rituais. A jornada é ajustada a partir dessa conversa. |
 
-**A call inicial não é só coleta de informações.** Além de levantar o que a pessoa já sabe, Puca faz o **onboarding cultural**: explica como a empresa funciona e o que ela valoriza, para a pessoa chegar à primeira sessão sabendo onde está entrando.
+**A call inicial não é só coleta de informações.** Além de levantar o que a pessoa já sabe, o Puca faz o **onboarding cultural**: explica como a empresa funciona e o que ela valoriza, para a pessoa chegar à primeira sessão sabendo onde está entrando.
 
-- **O que Puca explica:** missão e valores, o jeito de trabalhar (rituais, combinados, como a comunicação acontece e onde pedir ajuda) e quem são as pessoas de referência (buddy, gestor, time).
+- **O que o Puca explica:** missão e valores, o jeito de trabalhar (rituais, combinados, como a comunicação acontece e onde pedir ajuda) e quem são as pessoas de referência (buddy, gestor, time).
 - **Como explica:** em conversa, intercalando com as perguntas, e não como uma palestra antes delas. Cada trecho é curto e se liga ao que a pessoa contou (ex.: quem vem de uma empresa grande ouve como as decisões andam aqui).
-- **De onde vem:** só da documentação oficial da empresa, com as mesmas regras de fonte da [§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano). O que não está documentado Puca não inventa.
+- **De onde vem:** só da documentação oficial da empresa, com as mesmas regras de fonte da [§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano). O que não está documentado o Puca não inventa.
 - **Na transição entre times:** só as particularidades culturais do novo time, sem repetir a apresentação institucional ([Cenário B](#cenário-b--funcionário-em-transição-interna)).
 
 > **Exemplo:** “Antes de seguir, uma coisa sobre como a Kota trabalha: aqui a gente pergunta em público. Dúvida vai no canal de ajuda do time, não em mensagem privada, para a resposta ficar para quem vier depois. Você vai ver isso na sua primeira tarefa. E no seu time anterior, como funcionava?”
@@ -327,7 +327,7 @@ O plano inclui a possibilidade de incorporar à base de conhecimento **respostas
 
 Fluxo previsto:
 
-1. Puca identifica uma lacuna.
+1. O Puca identifica uma lacuna.
 2. Encaminha a dúvida, com contexto, ao responsável.
 3. Depois que a resposta é validada e autorizada para reutilização, registra o conhecimento com sua fonte e contexto.
 4. Em uma dúvida futura, reutiliza essa resposta e indica sua origem.
@@ -365,7 +365,7 @@ Na referência compartilhada, a Sana descreve seu AI Tutor oferecendo respostas 
 - encaminhamento contextualizado ao especialista quando faltar informação confiável;
 - incorporação de respostas confirmadas à base como entrega opcional, se der tempo, aproveitando o trabalho de João ([§10.2](#102-incorporação-de-respostas-à-base--opcional-no-hackathon)).
 
-> **Exemplo:** durante uma tarefa, a pessoa pergunta o que acontece quando um pagamento falha. Puca usa o contexto do time para explicar o fluxo visualmente, destaca os componentes envolvidos, apresenta a decisão arquitetural relevante e adapta a explicação conforme as dúvidas e respostas da pessoa.
+> **Exemplo:** durante uma tarefa, a pessoa pergunta o que acontece quando um pagamento falha. O Puca usa o contexto do time para explicar o fluxo visualmente, destaca os componentes envolvidos, apresenta a decisão arquitetural relevante e adapta a explicação conforme as dúvidas e respostas da pessoa.
 
 ### 11.3. Direção de produto e prioridade de execução
 
@@ -375,15 +375,15 @@ A cobertura equivalente se refere às capacidades mostradas nas imagens e repres
 
 ---
 
-## 12. Encaixe no Desafio Tako: Puca como digital worker de onboarding
+## 12. Encaixe no Desafio Tako: O Puca como digital worker de onboarding
 
 O Desafio Tako pede um **digital worker**: um agente com papel definido que *"executa um processo de ponta a ponta, em vez de só responder perguntas"*, opera os sistemas que o time já usa (Slack, entre outros) e *"chama um humano quando sai do roteiro"*. **Admissão e onboarding** é uma das frentes listadas pela Tako.
 
-Se Puca só responder dúvidas, ela fica na categoria de chatbot do próprio guia, e não na de digital worker. Para encaixar no desafio, ela precisa **receber um objetivo e conduzir a integração inteira**, agindo nos sistemas do time e envolvendo pessoas só onde elas são necessárias.
+Se o Puca só responder dúvidas, ele fica na categoria de chatbot do próprio guia, e não na de digital worker. Para encaixar no desafio, ele precisa **receber um objetivo e conduzir a integração inteira**, agindo nos sistemas do time e envolvendo pessoas só onde elas são necessárias.
 
-### 12.1. O processo que Puca conduz
+### 12.1. O processo que o Puca conduz
 
-| # | O que Puca faz | O que isso mostra | Onde o humano entra |
+| # | O que o Puca faz | O que isso mostra | Onde o humano entra |
 |---|---|---|---|
 | 1 | Na **call inicial**, faz o onboarding cultural, levanta o que a pessoa já sabe, registra a calibragem e **monta a jornada dela** ([§10.1](#101-call-inicial-e-conhecimento-prévio)). | O agente planeja a partir de um objetivo. | — |
 | 2 | Conduz a **sessão** no quadro, seguindo a jornada e respondendo na hora ao que a pessoa diz: perguntas, pulos e interrupções. | O agente executa e se adapta, sem roteiro fixo. | — |
@@ -393,14 +393,14 @@ Se Puca só responder dúvidas, ela fica na categoria de chatbot do próprio gui
 
 ### 12.2. O que precisa aparecer na demo
 
-- **Agir num sistema, não só falar.** Puca age nos sistemas reais da Kota ([§13](#13-avaliação-pelos-jurados-o-mundo-fictício-da-kota)), e não em telas simuladas. O guia aceitaria conexões simuladas *"desde que o agente realmente opere sobre elas na demo"*; agir no sistema de verdade é a nossa aposta de diferencial.
+- **Agir num sistema, não só falar.** O Puca age nos sistemas reais da Kota ([§13](#13-avaliação-pelos-jurados-o-mundo-fictício-da-kota)), e não em telas simuladas. O guia aceitaria conexões simuladas *"desde que o agente realmente opere sobre elas na demo"*; agir no sistema de verdade é a nossa aposta de diferencial.
   - O **encaminhamento** do passo 4 sai de fato no **Slack da Kota**, numa mensagem direta para a própria pessoa, dizendo a quem iria na Kota, com a dúvida, as fontes já consultadas e o motivo de não ter respondido. Nunca num canal: todos os jurados entram no mesmo Slack, e a dúvida de um não pode aparecer para os outros ([§5](#5-visibilidade-para-buddy-gestor-e-rh)).
   - O Slack simulado continua para a **aprovação do gestor** (primeira tarefa e acessos) e como reserva quando o Slack real não responde.
-  - Dentro do Orbis, Puca tem um **navegador** onde abre o repositório, o Notion e o Slack da Kota. Ali ela aponta, circula, marca e mostra imagens por cima da página, clica e preenche, e percebe o que a pessoa faz na mesma página: pode mostrar, apontar para a pessoa clicar ou acompanhar a pessoa fazendo. Ela só abre o mundo da Kota, pede o ok da pessoa antes de publicar algo em nome dela e nunca digita senha.
-  - Quando a pessoa fala por cima, Puca para o que está fazendo no navegador e escuta, como na fala.
+  - Dentro do Orbis, o Puca tem um **navegador** onde abre o repositório, o Notion e o Slack da Kota. Ali ela aponta, circula, marca e mostra imagens por cima da página, clica e preenche, e percebe o que a pessoa faz na mesma página: pode mostrar, apontar para a pessoa clicar ou acompanhar a pessoa fazendo. Ela só abre o mundo da Kota, pede o ok da pessoa antes de publicar algo em nome dela e nunca digita senha.
+  - Quando a pessoa fala por cima, o Puca para o que está fazendo no navegador e escuta, como na fala.
 
   > Alinhamento com Joaquim em 2026-11-08. Escolhas técnicas nas decisões [0004](docs/decisoes/0004-app-desktop-electron.md) e [0008](docs/decisoes/0008-acoes-reais-e-navegador-da-puca.md) e em [`docs/stack.md`](docs/stack.md).
-- **Rastro.** Cada decisão de Puca (o que respondeu, de qual fonte, quando encaminhou e por quê) fica registrada e pode ser auditada depois.
+- **Rastro.** Cada decisão do Puca (o que respondeu, de qual fonte, quando encaminhou e por quê) fica registrada e pode ser auditada depois.
 - **Custo.** Cada sessão registra quanto custou em tempo e tokens, para o time auditar a demo (o JSON baixado do rastro e o log do servidor). Esse número não aparece na tela. A comparação com as horas que o buddy gastaria explicando a mesma coisa, e o valor em dinheiro, ficam para quando tudo estiver pronto (#94).
 
   > Decisão da Nicole em 2026-11-07.
@@ -413,8 +413,8 @@ Se Puca só responder dúvidas, ela fica na categoria de chatbot do próprio gui
 
 > Alinhamento com Joaquim em 2026-11-07 e 2026-11-08.
 
-Não temos como prever **como** cada jurado vai testar Puca, e o desafio pede só dados sintéticos ([§12.2](#122-o-que-precisa-aparecer-na-demo)). Então, em vez de roteirizar o teste, controlamos o
-**mundo** em que ele cai: a **Kota**, um banco digital fictício completo, que Puca conhece e que o jurado também recebe.
+Não temos como prever **como** cada jurado vai testar o Puca, e o desafio pede só dados sintéticos ([§12.2](#122-o-que-precisa-aparecer-na-demo)). Então, em vez de roteirizar o teste, controlamos o
+**mundo** em que ele cai: a **Kota**, um banco digital fictício completo, que o Puca conhece e que o jurado também recebe.
 O desenho do kit está em [`docs/kit-da-kota.md`](docs/kit-da-kota.md), e as escolhas técnicas, em [`docs/decisoes/0005-kit-da-kota.md`](docs/decisoes/0005-kit-da-kota.md).
 
 ### 13.1. O jurado vive a pessoa
@@ -432,19 +432,19 @@ O mundo fictício precisa ser realista o bastante para simular o primeiro dia nu
 
 - **Código de verdade**: o da Kota vem de um projeto aberto real, renomeado e sem a marca original, num repositório público. O jurado sobe o banco, abre o site e roda os testes.
 - **Engenharia no repositório**: README de cada serviço, responsáveis por pasta, ADRs ancorados no código, runbooks e issues de primeira tarefa ([§4.4](#44-do-aprendizado-à-primeira-tarefa)).
-- **A empresa num Notion de verdade**: missão e valores, pessoas e times, sistemas e responsáveis, jeito de trabalhar, RFCs, políticas (inclusive desempenho, carreira e bônus), onboarding por perfil e o guia de uso. O Notion também é uma das integrações que mostram que Puca se conecta a sistemas reais.
+- **A empresa num Notion de verdade**: missão e valores, pessoas e times, sistemas e responsáveis, jeito de trabalhar, RFCs, políticas (inclusive desempenho, carreira e bônus), onboarding por perfil e o guia de uso. O Notion também é uma das integrações que mostram que o Puca se conecta a sistemas reais.
 
 O kit tem dois papéis:
 
-1. **Fonte**: é de onde Puca tira o que explica.
-2. **Prova**: o jurado recebe o mesmo kit e pode conferir que Puca não inventou.
+1. **Fonte**: é de onde o Puca tira o que explica.
+2. **Prova**: o jurado recebe o mesmo kit e pode conferir que o Puca não inventou.
 
-Por isso o mundo precisa ser **coerente**: se Puca diz "o saldo é do time de Livro-razão e fica em cache por causa de um ADR",
+Por isso o mundo precisa ser **coerente**: se o Puca diz "o saldo é do time de Livro-razão e fica em cache por causa de um ADR",
 o jurado tem que achar o responsável e o ADR no repositório. Afirmação sem fonte no kit cai no **encaminhamento** ([§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano)).
 
-Como a Kota tem os documentos que uma empresa real tem, o encaminhamento aparece de dois jeitos: o **caso pessoal** ("qual vai ser o meu bônus?"), em que Puca explica a regra geral com a fonte e leva o caso ao RH ou ao gestor, e o que **nenhum documento cobre**.
+Como a Kota tem os documentos que uma empresa real tem, o encaminhamento aparece de dois jeitos: o **caso pessoal** ("qual vai ser o meu bônus?"), em que o Puca explica a regra geral com a fonte e leva o caso ao RH ou ao gestor, e o que **nenhum documento cobre**.
 
-> ⚠️ **Puca explica a política de desempenho da Kota, mas nunca avalia a pessoa** ([§12.2](#122-o-que-precisa-aparecer-na-demo)).
+> ⚠️ **O Puca explica a política de desempenho da Kota, mas nunca avalia a pessoa** ([§12.2](#122-o-que-precisa-aparecer-na-demo)).
 
 ### 13.3. Guia de uso
 
@@ -466,7 +466,7 @@ foram só para testes. A Kota começa do zero, com pessoas, times e jornada nova
 
 > Alinhamento com Joaquim em 2026-11-08.
 
-A jornada continua **escrita à mão**, mas se passa inteira na Kota: toda fonte que Puca cita num nó é um arquivo do
+A jornada continua **escrita à mão**, mas se passa inteira na Kota: toda fonte que o Puca cita num nó é um arquivo do
 repositório ou uma página do Notion da Kota, que o jurado consegue abrir.
 
 ---
@@ -475,7 +475,7 @@ repositório ou uma página do Notion da Kota, que o jurado consegue abrir.
 
 > Alinhamento com Joaquim em 2026-11-07.
 
-Puca é vendida para empresas (B2B): **a empresa compra e o RH aprova**. A entrada é um **piloto** pago e pequeno, que vira contrato anual medido em **integrações**. Mercado, métricas, evidências externas e fontes estão em [`docs/negocio/contexto-de-negocio.md`](docs/negocio/contexto-de-negocio.md).
+O Puca é vendido para empresas (B2B): **a empresa compra e o RH aprova**. A entrada é um **piloto** pago e pequeno, que vira contrato anual medido em **integrações**. Mercado, métricas, evidências externas e fontes estão em [`docs/negocio/contexto-de-negocio.md`](docs/negocio/contexto-de-negocio.md).
 
 ### 14.1. Quem compra e quem participa
 

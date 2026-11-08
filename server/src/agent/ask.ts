@@ -82,8 +82,10 @@ const CITACAO = new RegExp(
 );
 
 // O LLM às vezes admite que não confirmou sem chamar escalate_to_buddy: vale como encaminhamento.
-// ... ou diz que encaminha ("Escalo para People", "Vou te encaminhar"): a Puca não pode prometer e não encaminhar.
-const NO_SOURCE = /não (consegui|consigo) confirmar|não (achei|tenho) (isso )?confirmad|\b(vou (te |lhe )?(encaminhar|escalar)|encaminho|escalo)\b/i;
+const NO_SOURCE = /não (consegui|consigo) confirmar|não (achei|tenho) (isso )?confirmad/i;
+// Puca diz que encaminha ("Escalo para People", "Vou te encaminhar") sem chamar a tool: não pode prometer e não
+// encaminhar. Só vale sem fonte citada: "Vou te encaminhar para a página de férias [f1]" é levar a uma página.
+const PROMETEU = /\b(vou (te |lhe )?(encaminhar|escalar)|encaminho|escalo)\b/i;
 
 // Caso pessoal da pessoa ("qual vai ser o meu bônus?"): a regra geral vem do kit, mas o caso dela vai para a buddy.
 // Se o LLM não encaminhou, o código encaminha (nunca em falha técnica).
@@ -117,6 +119,7 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   let wentTo = false;
   let escalationSummary: string | null = null;
   let saidNoSource = false;
+  let prometeu = false;
   let refused = false;
   let escalationDestino: DestinoDoEncaminhamento | undefined;
   const escalate = (summary: string, destino?: DestinoDoEncaminhamento) => {
@@ -135,6 +138,7 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
     falado += ` ${s}`;
     // só marca: se o LLM chamar escalate_to_buddy logo depois, vale o resumo dele
     if (NO_SOURCE.test(s)) saidNoSource = true;
+    if (PROMETEU.test(s)) prometeu = true;
   };
 
   // custo (#52): o que foi enviado e o que chegou, para estimar se o provedor não informar
@@ -201,12 +205,12 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   if (timing.llm_error && timing.llm_error !== "interrupted") {
     say(FAILURE_LINE, "fallback");
   } else if (!input.signal?.aborted && looksLikeQuestion(input.text)) {
-    // sem destino na tool, vale o que a Puca acabou de dizer ("fale com People", "com sua gestora"): fala e mensagem
+    // sem destino na tool, vale o que Puca acabou de dizer ("fale com People", "com sua gestora"): fala e mensagem
     // batem; caso pessoal sem destino nenhum vai a People (PRODUCT.md §13.2)
     const destino = escalationDestino ?? destinoPelaFala(falado) ?? (isCasoPessoal(input.text) ? "rh" : undefined);
     const comDestino = destino ? { destino } : {};
     if (escalationSummary) emit({ type: "escalate", summary: escalationSummary, ...comDestino });
-    else if (saidNoSource || isCasoPessoal(input.text)) emit({ type: "escalate", summary: input.text, ...comDestino });
+    else if (saidNoSource || (prometeu && citados.size === 0) || isCasoPessoal(input.text)) emit({ type: "escalate", summary: input.text, ...comDestino });
   }
   timing.total_ms = ms();
   emit({ type: "timing", timing });

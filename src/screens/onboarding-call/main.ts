@@ -1,7 +1,6 @@
-// Call inicial: Puca se apresenta, confirma os dados da admissão e levanta o que a pessoa já sabe e
-// o que ela quer (a calibragem), como numa conversa.
-// Por enquanto a conversa é simulada (roteiro abaixo). A pessoa pode responder
-// "por voz" (resposta de exemplo depois de alguns segundos) ou digitando no chat.
+// Call inicial: o Puca acolhe, faz o onboarding cultural e conhece a pessoa (a calibragem), numa conversa de voz.
+// O LLM conduz pelo /api/call (#57, decisão 0012): perguntas norteadoras, follow-ups dele e a cultura vinda do
+// Notion da Kota. O que a pessoa conta chega como anotações, que viram o perfil e a calibragem da sessão.
 import "../../styles/base.css";
 import "./style.css";
 import { preserveProfileLinks } from "../../lib/navigation";
@@ -12,108 +11,26 @@ import { emit } from "../../lib/events";
 import { esc, qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
 import { activeProfile, company } from "../../data";
-import { callAnswers } from "../../data/call-answers";
-import { normalize } from "../../journey/conditions";
-import { loadSavedProfile, profileFromAnswers, saveProfile, vinculoFromAnswer } from "../../journey/profile";
+import { loadSavedProfile, profileFromAnswers, saveProfile } from "../../journey/profile";
 import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem";
+import { createAgentVoice, MIC_AVISO, type CallRequest, type SpeakOptions } from "../../voice/agent-voice";
 
 const savedProfile = loadSavedProfile();
 if (!savedProfile) qs<HTMLAnchorElement>(document, ".brand").href = "../boas-vindas/";
 preserveProfileLinks();
 
-// ---- Roteiro ----
-// Puca confirma os dados da admissão (não pergunta o que a empresa já sabe) e gasta a conversa com o que
-// só a pessoa pode contar: experiência, o que já sabe de cada tema da sessão e os objetivos. Quem está
-// mudando de time ganha perguntas sobre o time anterior. No fim, as respostas viram a calibragem.
-type FieldKey =
-  | "nome" | "vinculo" | "confirma" | "cargo" | "time" | "gestor"
-  | "time_anterior" | "experiencia" | "aproveita" | "diferencas"
-  | "pagamentos" | "mensageria" | "falhas" | "objetivos" | "aprender";
-type Answers = Partial<Record<FieldKey, string>>;
-
-interface Field {
-  key: FieldKey;
-  question: (a: Answers) => string;
-  /** Só pergunta quando a condição vale (ex.: só na transição). */
-  when?: (a: Answers) => boolean;
-  /** Resposta de exemplo usada quando a pessoa "responde por voz" na simulação. */
-  sample: string;
-}
-
-// Dados da admissão e respostas de exemplo vêm do perfil da demo (?perfil=bruno | ana)
+// Dados da admissão: a empresa já sabe, o Puca só confirma (o vínculo salvo nas boas-vindas escolhe a pessoa da demo).
 const profile = activeProfile(savedProfile?.vinculo === "transicao" ? "bruno" : "ana");
-const sample = callAnswers[profile.id] ?? {};
 const admissao = {
   cargo: profile.role,
   time: profile.toTeam,
   gestor: company.people[profile.managerId]?.name ?? "",
 };
-const transicao = (a: Answers) => vinculoFromAnswer(a.vinculo) === "transicao";
-const corrigir = (a: Answers) => /^(nao|errado)\b/.test(normalize(a.confirma ?? ""));
-
-const FIELDS: Field[] = [
-  {
-    key: "nome",
-    question: () =>
-      "Oi! Eu sou Puca, e vou te acompanhar na sua primeira semana. Antes de começar, quero te conhecer um pouco. Como você prefere ser chamado?",
-    sample: profile.nickname,
-  },
-  {
-    key: "vinculo",
-    question: (a) => `Prazer, ${a.nome}! É a sua primeira vez aqui na empresa ou você está mudando de time?`,
-    sample: sample.vinculo ?? "",
-  },
-  {
-    key: "confirma",
-    question: () =>
-      `Vi aqui que você vai entrar como ${admissao.cargo.toLowerCase()} no time ${admissao.time}, com ${admissao.gestor} na gestão. Está certo?`,
-    sample: sample.confirma ?? "Sim",
-  },
-  { key: "cargo", when: corrigir, question: () => "Me corrige então: qual vai ser o seu cargo?", sample: admissao.cargo },
-  { key: "time", when: corrigir, question: () => "E em qual time você vai entrar?", sample: admissao.time },
-  { key: "gestor", when: corrigir, question: () => "E quem vai ser sua gestora ou gestor?", sample: admissao.gestor },
-  { key: "time_anterior", when: transicao, question: () => "De qual time você está vindo?", sample: sample.time_anterior ?? "" },
-  {
-    key: "experiencia",
-    question: (a) =>
-      transicao(a) ? "Me conta rapidinho o que você fazia lá." : "Me conta rapidinho o que você fazia antes de chegar aqui.",
-    sample: sample.experiencia ?? "",
-  },
-  {
-    key: "aproveita",
-    when: transicao,
-    question: () => "O que do seu time antigo você acha que vai continuar usando aqui?",
-    sample: sample.aproveita ?? "",
-  },
-  {
-    key: "diferencas",
-    when: transicao,
-    question: () => "E o que você já sabe que vai ser novo pra você?",
-    sample: sample.diferencas ?? "",
-  },
-  {
-    key: "pagamentos",
-    question: () => "Agora sobre o que a gente vai ver junto. Você já trabalhou com banco, tipo transferência, saldo e extrato?",
-    sample: sample.pagamentos ?? "",
-  },
-  { key: "mensageria", question: () => "E com mensageria, tipo Kafka ou filas?", sample: sample.mensageria ?? "" },
-  {
-    key: "falhas",
-    question: () => "Quando algo falha num sistema, tipo retry ou fila de erro, você já lidou com isso?",
-    sample: sample.falhas ?? "",
-  },
-  { key: "objetivos", question: () => "O que você quer conseguir fazer nas primeiras semanas?", sample: sample.objetivos ?? "" },
-  {
-    key: "aprender",
-    question: () => "E pra fechar: você aprende melhor lendo, vendo alguém fazer ou fazendo junto?",
-    sample: profile.learningStyle,
-  },
-];
 
 
 
-const OUTRO = (a: Answers) =>
-  `Perfeito, ${a.nome}. Já tenho o que preciso. Vou montar sua primeira semana com o time ${a.time} e te mostro em seguida.`;
+const SEM_PUCA = "O Puca está fora do ar agora. Recarregue a página em alguns minutos para fazer a call.";
+const FALHOU = "Perdi a conexão para pensar agora. Pode repetir?";
 
 // ---- Estados ----
 type AgentState = "idle" | "speaking" | "listening" | "thinking" | "done";
@@ -141,7 +58,7 @@ const VISUAL_STATE: Record<ShownState, AgentVisualState> = {
 declare global {
   interface Window {
     /** Respostas coletadas na call (para a próxima tela usar). */
-    onboardingAnswers?: Answers;
+    onboardingAnswers?: Record<string, string>;
   }
 }
 
@@ -155,22 +72,28 @@ async function main(): Promise<void> {
     timer: qs(document, "#timer"),
   };
 
-  const answers: Answers = {};
-  const state = { paused: false, ended: false, muted: false, seconds: 0, done: false };
+  const answers: Record<string, string> = {};
+  const cultura: string[] = [];
+  const history: { role: "user" | "assistant"; content: string }[] = [];
+  const state = { paused: false, ended: false, muted: false, seconds: 0, done: false, started: false };
   let agentState: AgentState = "idle";
-  let pendingAnswer: ((text: string) => void) | null = null; // resposta da pergunta atual pelo chat
+  let turnoAtual = 0;
+  let silencio = 0;
+  let fraseAtual = "";
+  let cortada = "";
 
-  // partículas de Puca no fundo, atrás do texto, da esfera, do chat e da barra de call
+  // partículas do Puca no fundo, atrás do texto, da esfera, do chat e da barra de call
   mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
-    occluders: ".topbar__row > *, .agent__orb, .agent__meta, .caption > *, .chat-panel, .call-dock",
+    occluders: ".topbar__row > *, .agent__orb, .agent__meta, .caption > *, .chat-panel, .call-dock, .call-gate",
     round: ".agent__orb",
     max: 40,
   });
 
   const chat = mountChatPanel({ title: "Transcrição da call", messages: [] });
   mountCallBar({ chat });
+  const voice = await createAgentVoice();
 
-  // Visual de Puca (teste local). Sem ele, fica o círculo neutro.
+  // Visual do Puca (teste local). Sem ele, fica o círculo neutro.
   let visual: AgentVisual | null = null;
   const factory = await loadAgentVisual();
   if (factory) {
@@ -181,13 +104,12 @@ async function main(): Promise<void> {
     visual = factory(holder);
   }
 
-  // Guarda a resposta sem mostrar na tela: a pessoa vive uma conversa,
-  // não vê o que está sendo coletado. Fica em window.onboardingAnswers e no evento.
+  // A pessoa vive uma conversa: o que está sendo coletado não aparece na tela. Fica em window.onboardingAnswers e no evento.
   window.onboardingAnswers = answers;
-  function remember(key: FieldKey, value: string): void {
-    answers[key] = value;
-    emit("onboarding:answer", { key, value, answers: { ...answers } as Record<string, string> });
-  }
+  const remember = (role: "user" | "assistant", content: string) => {
+    history.push({ role, content });
+    if (history.length > 16) history.shift();
+  };
 
   function setAgent(s: AgentState): void {
     agentState = s;
@@ -207,115 +129,176 @@ async function main(): Promise<void> {
       shown === "listening" && state.muted
         ? "Seu microfone está mudo. Responda pelo chat."
         : shown === "ended"
-          ? "Use “Ligar para Puca” para continuar de onde parou."
+          ? "Use “Ligar para o Puca” para continuar de onde parou."
           : "";
   }
 
-  // Espera que só corre com a call ativa (pausa e encerramento seguram o tempo)
-  function wait(ms: number): Promise<void> {
-    return new Promise((resolve) => {
-      let left = ms;
-      const t = setInterval(() => {
-        if (state.paused || state.ended) return;
-        left -= 50;
-        if (left <= 0) {
-          clearInterval(t);
-          resolve();
-        }
-      }, 50);
-    });
-  }
-
   setInterval(() => {
-    if (state.paused || state.ended || state.done) return;
+    if (!state.started || state.paused || state.ended || state.done) return;
     state.seconds++;
     const m = String(Math.floor(state.seconds / 60)).padStart(2, "0");
     const s = String(state.seconds % 60).padStart(2, "0");
     el.timer.textContent = `${m}:${s}`;
   }, 1000);
 
-  // Agente "fala": a legenda aparece palavra por palavra
-  async function say(text: string): Promise<void> {
-    setAgent("speaking");
-    el.captionUser.textContent = "";
-    // a frase entra inteira e invisível (o texto não pula de linha); cada palavra aparece suave, em sequência
-    el.captionAgent.innerHTML = text
-      .split(" ")
-      .map((w) => `<span class="word">${esc(w)}</span>`)
-      .join(" ");
-    for (const word of el.captionAgent.querySelectorAll(".word")) {
-      word.classList.add("is-in");
-      await wait(95);
-    }
-    chat.addMessage({ from: "agent", text });
-    await wait(300);
+  /** Uma frase do Puca: a legenda entra quando o áudio começa e segue as palavras dele; chat e voz. */
+  async function falar(text: string, play: (o?: SpeakOptions) => Promise<void> = (o) => voice.speak(text, o)): Promise<void> {
+    let words: Element[] = [];
+    const show = () => {
+      if (words.length) return;
+      el.captionUser.textContent = "";
+      el.captionAgent.innerHTML = text
+        .split(/\s+/)
+        .map((w) => `<span class="word">${esc(w)}</span>`)
+        .join(" ");
+      words = [...el.captionAgent.querySelectorAll(".word")];
+      chat.addMessage({ from: "agent", text });
+      remember("assistant", text);
+    };
+    await play({
+      onStart: show,
+      onWord: (i) => {
+        show();
+        for (const w of words.slice(0, i + 1)) w.classList.add("is-in");
+      },
+    });
+    // sem os tempos das palavras (ou sem som): a frase inteira aparece no fim; frase descartada não aparece
+    words.forEach((w) => w.classList.add("is-in"));
   }
 
-  // Agente "ouve": resposta chega pelo chat ou, sem mudo, pela "voz" de exemplo
-  function listen(field: Field): Promise<string> {
+  /** Um turno da call. O Puca fala; se a call acabou, grava o perfil e segue para as boas-vindas. */
+  async function turno(kind: CallRequest["kind"], text?: string, interrupted?: string): Promise<void> {
+    const meu = ++turnoAtual;
+    clearTimeout(silencio);
+    setAgent("thinking");
+    let acabou = false;
+    // a fala deste turno vai no `text`, não no histórico
+    const passado = kind === "fala" ? history.slice(0, -1) : history.slice();
+    const ok = await voice.call(
+      { kind, text, history: passado, interrupted: interrupted ? { said: interrupted } : undefined, admissao, anotado: { ...answers }, cultura: [...cultura] },
+      {
+        onSpeak: (t, play) =>
+          falar(t, async (o) => {
+            if (meu !== turnoAtual) return;
+            await play({
+              ...o,
+              onStart: () => {
+                setAgent("speaking");
+                fraseAtual = t;
+                o?.onStart?.();
+              },
+            });
+            if (fraseAtual === t) fraseAtual = "";
+          }),
+        onAction: () => {},
+        onGoTo: () => {},
+        onAnswer: (key, value) => {
+          answers[key] = value;
+          emit("onboarding:answer", { key, value, answers: { ...answers } });
+        },
+        onCulture: (topic) => cultura.push(topic),
+        onDone: () => (acabou = true),
+      },
+    );
+    if (meu !== turnoAtual || state.ended) return; // a pessoa falou por cima: o turno dela decide
+    if (!ok) {
+      await falar(kind === "inicio" ? SEM_PUCA : FALHOU);
+      return setAgent(kind === "inicio" ? "idle" : "listening");
+    }
+    if (acabou) return encerrar();
     setAgent("listening");
-    return new Promise((resolve) => {
-      let finished = false;
-      const finish = (text: string, fromChat: boolean) => {
-        if (finished) return;
-        finished = true;
-        pendingAnswer = null;
-        if (!fromChat) chat.addMessage({ from: "user", text });
-        el.captionUser.textContent = text;
-        resolve(text);
-      };
-      pendingAnswer = (text) => finish(text, true);
-      void (async () => {
-        await wait(2600);
-        while (state.muted && !finished) await wait(200); // mudo: espera o chat
-        finish(field.sample, false);
-      })();
+    // ninguém respondeu: o Puca pergunta de novo, de outro jeito (uma vez por espera)
+    if (kind !== "silencio") silencio = window.setTimeout(() => meu === turnoAtual && !state.paused && !state.ended && void turno("silencio"), 15000);
+  }
+
+  /** Fala da pessoa (voz ou chat): corta o Puca e vira um turno, levando a frase que ela cortou. */
+  function fala(text: string, from: "voz" | "chat"): void {
+    text = text.trim();
+    if (!text || !state.started || state.paused || state.ended || state.done) return;
+    if (from === "voz") chat.addMessage({ from: "user", text });
+    el.captionUser.textContent = text;
+    const interrompida = cortada || fraseAtual;
+    cortada = "";
+    voice.stop();
+    remember("user", text);
+    void turno("fala", text, interrompida || undefined);
+  }
+
+  /** Fim da call: o perfil e a calibragem vão para a sessão no quadro, que abre em seguida. */
+  function encerrar(): void {
+    state.done = true;
+    setAgent("done");
+    voice.stopListening();
+    const perfil = profileFromAnswers(answers);
+    saveCalibragem(calibragemFromAnswers(perfil, answers));
+    saveProfile(perfil);
+    window.setTimeout(leaveToSession, 1400);
+  }
+
+  function ouvir(): void {
+    void voice.listen({
+      onFinal: (t) => fala(t, "voz"),
+      onCaption: (t) => (el.captionUser.textContent = t),
+      onBargeIn: () => {
+        // a voz já parou; o turno em andamento para de decidir até a fala da pessoa chegar
+        cortada = fraseAtual || cortada;
+        turnoAtual++;
+        clearTimeout(silencio);
+        setAgent("listening");
+      },
+      onState: (s) => {
+        if (s !== "ouvindo") chat.addMessage({ from: "agent", text: MIC_AVISO[s] });
+      },
     });
   }
 
-  document.addEventListener("chatpanel:send", (e) => pendingAnswer?.(e.detail.text.trim()));
-
+  document.addEventListener("chatpanel:send", (e) => fala(e.detail.text, "chat"));
   document.addEventListener("callbar:pause", (e) => {
     state.paused = !!e.detail.on;
+    if (state.paused) voice.pause();
+    else voice.resume();
     render();
   });
   document.addEventListener("callbar:mute", (e) => {
     state.muted = !!e.detail.on;
+    voice.setMuted(state.muted);
     render();
   });
   document.addEventListener("callbar:end", () => {
     state.ended = true;
+    turnoAtual++;
+    clearTimeout(silencio);
+    voice.stop();
+    voice.stopListening();
     render();
   });
   document.addEventListener("callbar:start", () => {
     state.ended = false;
     render();
+    if (!state.started || state.done) return;
+    ouvir();
+    void turno("silencio"); // o Puca retoma de onde parou
   });
 
   render();
-  await wait(900);
-  for (const f of FIELDS) {
-    if (f.when && !f.when(answers)) continue;
-    await say(f.question(answers));
-    const answer = await listen(f);
-    // depois da resposta, ela "pensa" um pouco antes de anotar
-    setAgent("thinking");
-    await wait(1800);
-    remember(f.key, answer);
-    // dados da admissão confirmados: entram como se a pessoa tivesse respondido
-    if (f.key === "confirma" && !corrigir(answers)) for (const [k, v] of Object.entries(admissao)) remember(k as FieldKey, v);
-    await wait(400);
+  if (!voice.llm) {
+    chat.addMessage({ from: "agent", text: SEM_PUCA });
+    el.captionAgent.textContent = SEM_PUCA;
+    return;
   }
-  await say(OUTRO(answers));
-  state.done = true;
-  setAgent("done");
-
-  // Entrega o perfil e a calibragem para a sessão no quadro e abre o quadro.
-  const perfil = profileFromAnswers(answers);
-  saveCalibragem(calibragemFromAnswers(perfil, answers));
-  saveProfile(perfil);
-  await wait(1400);
-  leaveToSession();
+  // O navegador só libera som e microfone depois de um clique.
+  const gate = document.createElement("button");
+  gate.type = "button";
+  gate.className = "call-gate";
+  gate.textContent = "Começar a call";
+  document.body.append(gate);
+  gate.addEventListener("click", async () => {
+    gate.remove();
+    state.started = true;
+    await voice.unlock();
+    ouvir();
+    void turno("inicio");
+  });
 }
 
 /** Fim da call: a conversa e os controles somem (style.css, body.is-leaving) antes de abrir o quadro. */

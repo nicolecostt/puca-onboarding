@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import demo from "../data/kota.journey.json";
-import { buddyOf, createOutbox, destinatario, FORWARDING_KEY, forwardingMessage, type Forwarding } from "../forwarding";
+import { buddyOf, createOutbox, destinatario, FORWARDING_KEY, forwardingMessage, motivoDoEncaminhamento, type Forwarding } from "../forwarding";
 import { memoryStore } from "../storage";
 import { loadJourney } from "../validate";
 
@@ -141,5 +141,20 @@ describe("destinatario (#125: caso pessoal vai ao gestor ou a People)", () => {
 
   it("rh: People", () => {
     expect(destinatario("rh", nomes)).toEqual({ name: "People", role: "rh" });
+  });
+});
+
+describe("motivoDoEncaminhamento", () => {
+  it("buddy (ou sem destino): não achou fonte confiável", () => {
+    expect(motivoDoEncaminhamento(undefined)).toBe("Não encontrei fonte confiável para responder.");
+    expect(motivoDoEncaminhamento("buddy")).toBe("Não encontrei fonte confiável para responder.");
+  });
+
+  it("gestor e People: diz quem responde, sem afirmar que é caso pessoal", () => {
+    for (const d of ["gestor", "rh"] as const) {
+      const m = motivoDoEncaminhamento(d);
+      expect(m).not.toMatch(/caso pessoal/i);
+      expect(m).toMatch(d === "rh" ? /People/ : /gestão/);
+    }
   });
 });

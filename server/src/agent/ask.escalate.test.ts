@@ -84,12 +84,19 @@ describe("ask: encaminhamento", () => {
     }
   });
 
-  it("a Puca diz que encaminha sem chamar a tool: encaminha de fato, com o destino da fala", async () => {
+  it("Puca diz que encaminha sem chamar a tool: encaminha de fato, com o destino da fala", async () => {
     const falas = ["Isso é uma dúvida pessoal. Escalo para o seu gestor ou para a equipe de People.", "Vou te encaminhar para a equipe de People.", "Vou encaminhar sua dúvida para a sua gestora."];
     for (const fala of falas) {
       script = [{ type: "text", text: fala }, { type: "done", finishReason: "stop" }];
       const [ev] = escalations(await run());
       expect(ev?.type).toBe("escalate");
+    }
+  });
+
+  it("\"encaminho\" no sentido de levar a uma página, com fonte citada, não é encaminhamento", async () => {
+    for (const fala of ["Encaminho você ao card do deploy [f1].", "Vou te encaminhar para a página de férias no Notion [f1]."]) {
+      script = [{ type: "text", text: fala }, { type: "done", finishReason: "stop" }];
+      expect(escalations(await run())).toEqual([]);
     }
   });
 

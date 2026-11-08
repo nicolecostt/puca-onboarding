@@ -1,5 +1,5 @@
 /* Landing do Orbis: cartaz suíço. Grade de 12 colunas, preto no branco, fios de 1px.
-   A única cor é a de Puca (--puca-holo-stops e a esfera), em poucos pontos. */
+   A única cor é a do Puca (--puca-holo-stops e a esfera), em poucos pontos. */
 :root {
   --ink: var(--color-text);
   --paper: var(--color-surface);
@@ -78,7 +78,7 @@ h3 {
   top: 12px;
 }
 
-/* ---- Partículas de Puca no fundo da página ---- */
+/* ---- Partículas do Puca no fundo da página ---- */
 .particles {
   position: fixed;
   inset: 0;
@@ -126,7 +126,7 @@ main,
 }
 
 .brand__mark {
-  /* logo: as bolinhas de Puca (src/assets/orbis-logo.png) */
+  /* logo: as bolinhas do Puca (src/assets/orbis-logo.png) */
   display: block;
   flex: none;
   width: 26px;
@@ -342,7 +342,7 @@ main,
   color: var(--dim);
 }
 
-/* foco de Puca: o único anel colorido */
+/* foco do Puca: o único anel colorido */
 .node.is-focus::after {
   content: "";
   position: absolute;

@@ -51,7 +51,7 @@ export function buildMessages(ctx: TurnContext, userText: string, mode: "min" | 
     g.personality_and_tone,
     g.safety_and_escalation,
     "Você está FALANDO em voz alta, em pt-BR. Responda em 1 a 3 frases curtas. A primeira frase tem no máximo 6 palavras.",
-    "Afirmação sobre a Kota só com um trecho ou fato abaixo; quando usar um trecho, cite o id dele entre colchetes no fim da frase (ex.: \"... pelo CI [f1].\"). Conhecimento geral pode, dito como geral. Sem trecho para uma pergunta sobre a Kota, diga que não conseguiu confirmar e chame escalate_to_buddy com um resumo da dúvida. Caso pessoal da pessoa (o meu bônus, o meu salário, as minhas férias, a minha avaliação ou promoção): diga a regra geral citando [fN] e chame escalate_to_buddy com um resumo, porque o caso dela só a buddy ou o gestor resolve.",
+    "Afirmação sobre a Kota só com um trecho ou fato abaixo; quando usar um trecho, cite o id dele entre colchetes no fim da frase (ex.: \"... pelo CI [f1].\"). Conhecimento geral pode, dito como geral. Sem trecho para uma pergunta sobre a Kota, diga que não conseguiu confirmar e chame escalate_to_buddy com um resumo da dúvida. Caso pessoal da pessoa (o meu bônus, o meu salário, as minhas férias, a minha avaliação ou promoção): diga a regra geral citando [fN], diga que vai encaminhar para People ou para o gestor e chame escalate_to_buddy com um resumo e destino \"rh\" (People) ou \"gestor\": o caso da pessoa só eles resolvem.",
     "Use as tools só com os ids listados. Sem markdown, sem listas, sem emojis.",
     "",
     `Pessoa: ${profile.nome}, ${profile.vinculo === "novo" ? "recém-contratada" : "mudando de time"}, time ${profile.time ?? "?"}, gestor ${profile.gestor ?? "?"}.`,

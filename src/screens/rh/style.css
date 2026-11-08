@@ -1,5 +1,5 @@
 /* Painel do RH no visual do Orbis (DESIGN.md): papel branco, tinta preta, fios de 1px, números e títulos em
-   Creato Display. Estado pela marca (cheio, anel, tracejado), nunca pela cor. A cor de Puca só nas bolinhas do rodapé. */
+   Creato Display. Estado pela marca (cheio, anel, tracejado), nunca pela cor. A cor do Puca só nas bolinhas do rodapé. */
 :root {
   --ink: var(--color-text);
   --paper: var(--color-surface);
@@ -340,7 +340,7 @@ h2 {
   width: 30px;
   height: 30px;
   font-size: 11px;
-  /* cor da pessoa no espectro de Puca (--hue vem do main.ts), com as iniciais em tinta */
+  /* cor da pessoa no espectro do Puca (--hue vem do main.ts), com as iniciais em tinta */
   background: hsl(var(--hue, 0) var(--person-saturation) var(--person-lightness));
   color: var(--ink);
 }

@@ -52,7 +52,7 @@ export interface ChatPanel {
   resetPosition(): void;
 }
 
-// Conversa de exemplo (tela de auxílio): Puca usando o Slack da pessoa, com os passos que está fazendo
+// Conversa de exemplo (tela de auxílio): O Puca usando o Slack da pessoa, com os passos que está fazendo
 const DEMO: ChatMessage[] = [
   { from: "user", text: "Onde fica o README do ledgerwriter?" },
   { from: "agent", text: "A Beatriz mandou o link hoje no #livro-razao. Vou abrir o canal e te mostrar." },
@@ -88,7 +88,7 @@ function shotHTML(label: string): string {
     </button>`;
 }
 
-// Um passo do que Puca está fazendo na tela: marca cheia com visto (feito) ou anel com ponto (fazendo agora)
+// Um passo do que o Puca está fazendo na tela: marca cheia com visto (feito) ou anel com ponto (fazendo agora)
 const STEP_CHECK = `<svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.3 2.3 4.7-4.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 function stepHTML(s: ActionStep): string {
   return `
@@ -152,7 +152,7 @@ export function mountChatPanel(opts: ChatPanelOptions = {}): ChatPanel {
     <div class="chat-body" aria-live="polite"></div>
     <div class="chat-compose">
       <div class="chat-compose__box">
-        <textarea class="chat-compose__input" rows="1" placeholder="Fale com Puca · @ menção · /comandos" aria-label="Mensagem para Puca"></textarea>
+        <textarea class="chat-compose__input" rows="1" placeholder="Fale com o Puca · @ menção · /comandos" aria-label="Mensagem para o Puca"></textarea>
         <button class="chat-compose__btn chat-stop" data-act="stop" aria-label="Parar geração" title="Parar"><img src="${stopIcon}" width="12" height="12" alt=""></button>
         <button class="chat-compose__btn chat-send" data-act="send" aria-label="Enviar" title="Enviar" disabled>${SEND_SVG}</button>
       </div>
@@ -175,7 +175,7 @@ export function mountChatPanel(opts: ChatPanelOptions = {}): ChatPanel {
     const list = current.messages;
     body.innerHTML = list.length
       ? list.map(msgHTML).join("")
-      : `<p class="chat-empty">Nova conversa. Pergunte qualquer coisa para Puca.</p>`;
+      : `<p class="chat-empty">Nova conversa. Pergunte qualquer coisa para o Puca.</p>`;
     body.scrollTop = body.scrollHeight;
   }
 

@@ -3,7 +3,7 @@
 - Data: 2026-11-08 · Quem: Joaquim
 - Status: valendo
 
-**Contexto:** o computer use de verdade (Puca abrindo, apontando e clicando nas ferramentas da pessoa) é a aposta de
+**Contexto:** o computer use de verdade (O Puca abrindo, apontando e clicando nas ferramentas da pessoa) é a aposta de
 diferencial, e no Mac ele exige um app com a permissão de Acessibilidade; o navegador não consegue. Portar para Swift
 significaria reescrever cerca de 8.900 linhas de front (quadro, motor da jornada, telas, voz) enquanto o time segue
 mudando esse mesmo código em TypeScript. Não há tempo para conta de desenvolvedor da Apple nem para a App Store.
@@ -13,10 +13,10 @@ mudando esse mesmo código em TypeScript. Não há tempo para conta de desenvolv
 - O Orbis é um **app desktop em Electron** em volta do front atual. Vite + TypeScript sem framework continua; o front
   roda igual no Electron (é o mesmo Chromium do desenvolvimento).
 - O MVP é **só para macOS** (Apple Silicon e Intel).
-- O computer use acontece num **navegador de Puca dentro do app** (uma área da janela do Orbis, um `WebContentsView`,
+- O computer use acontece num **navegador do Puca dentro do app** (uma área da janela do Orbis, um `WebContentsView`,
   com GitHub, Notion e Slack na versão web), controlado pelo protocolo de depuração do Chromium (`webContents.debugger`):
   navegar, clicar e passar o mouse com eventos de mouse reais, preencher campos e teclar. Como o navegador é do app, a
-  posição de cada elemento é conhecida e o cursor de Puca é desenhado por cima dele. Ver a tela por print fica fora do
+  posição de cada elemento é conhecida e o cursor do Puca é desenhado por cima dele. Ver a tela por print fica fora do
   MVP (0008). Apps nativos (Slack desktop, por exemplo) ficam
   fora do MVP. O desenho das ações está na decisão 0008 e na #123.
 - **Instalação pelo terminal**, sem App Store e sem conta da Apple: `curl -fsSL <endereço>/instalar | bash` baixa o
@@ -31,7 +31,7 @@ mudando esse mesmo código em TypeScript. Não há tempo para conta de desenvolv
 |---|---|---|
 | Sessão no Chrome | 28% | 700 MB |
 | Sessão no Electron | 33% | 400 MB |
-| Só a janela transparente com o cursor de Puca andando pela tela inteira | 6% | 95 MB |
+| Só a janela transparente com o cursor do Puca andando pela tela inteira | 6% | 95 MB |
 | Sessão + janela transparente | 39% | — |
 | Sessão atrás de outras janelas | ~0% | — |
 

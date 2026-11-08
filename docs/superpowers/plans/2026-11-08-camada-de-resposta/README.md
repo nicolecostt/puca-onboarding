@@ -1,6 +1,6 @@
-# Camada de resposta da Puca: plano em fases
+# Camada de resposta do Puca: plano em fases
 
-Índice dos planos que implementam o company brain como base de todas as ações da Puca e o modo sempre na tela. O
+Índice dos planos que implementam o company brain como base de todas as ações do Puca e o modo sempre na tela. O
 desenho (a especificação) é [`desenho.md`](desenho.md). Cada fase tem o seu plano, com tarefas, testes e comandos, e
 termina em algo demonstrável com dados reais da Kota.
 
@@ -9,11 +9,11 @@ termina em algo demonstrável com dados reais da Kota.
 | [`1-o-mapa-responde.md`](1-o-mapa-responde.md) | Degrau `intencao` na cascata: "quem cuida", "como se liga" e "mostra o ADR" respondidos pelo mapa, sem LLM e sem servidor; destino do encaminhamento pelo mapa; quadro que acrescenta sistemas | #174, #125 (destino) | Agora |
 | [`2-company-brain.md`](2-company-brain.md) | Ingestão do kit (mapa, `kota-bank` num commit fixo, páginas do Notion), índice, busca, conferência do literal; bench de recuperação com perguntas reais | #26, #25 | Agora, em paralelo ao 1 |
 | [`3-turno-com-fonte.md`](3-turno-com-fonte.md) | Medição; o `/api/ask` v2: plano do modelo em pedaços conferidos, tipos de resposta, "não sei" separado de "deu erro", executor único no app, fonte no rastro | #27, #25 (medição), nova (`voz`) | Planos 1 e 2 na `main` |
-| [`4-mostrar-e-sessao-sob-demanda.md`](4-mostrar-e-sessao-sob-demanda.md) | Fonte aberta e marcada no navegador da Puca; sessão sob demanda com volta ao passo; fontes nos nós da jornada | #27, nova (`app`) | Plano 3 na `main`; `mostrar` também espera a #123 |
-| [`5-sempre-na-tela.md`](5-sempre-na-tela.md) | Decisão nova; pílula sempre por cima, atalho, leitura do contexto no chamado (níveis 0, 1 e 2); passagem para a sessão própria | #175 (backlog, `se-der-tempo`) | Backlog: depois do plano 4, com o app Electron (#47) e o navegador da Puca (#123) na `main` |
+| [`4-mostrar-e-sessao-sob-demanda.md`](4-mostrar-e-sessao-sob-demanda.md) | Fonte aberta e marcada no navegador do Puca; sessão sob demanda com volta ao passo; fontes nos nós da jornada | #27, nova (`app`) | Plano 3 na `main`; `mostrar` também espera a #123 |
+| [`5-sempre-na-tela.md`](5-sempre-na-tela.md) | Decisão nova; pílula sempre por cima, atalho, leitura do contexto no chamado (níveis 0, 1 e 2); passagem para a sessão própria | #175 (backlog, `se-der-tempo`) | Backlog: depois do plano 4, com o app Electron (#47) e o navegador do Puca (#123) na `main` |
 
 Os planos 4 e 5 estão no nível de tarefa: arquivos, interfaces e testes. Os passos finos entram quando as dependências
-deles chegarem à `main`, porque a forma do navegador da Puca (#123) e do app Electron (#47) ainda pode mudar.
+deles chegarem à `main`, porque a forma do navegador do Puca (#123) e do app Electron (#47) ainda pode mudar.
 
 > **Decidido com Joaquim em 2026-11-08:** o modo sempre na tela (plano 5) fica no backlog (#175); a medição do plano 3,
 > tarefa 1, registra o resultado mas não trava o plano; o encaminhamento pede confirmação à pessoa antes de sair.
@@ -63,7 +63,7 @@ Cada arquivo compartilhado tem **um dono**. Os outros só leem.
 | #120 | jornada, perfis e dados da Kota no Orbis | demo dos portões 1 e 2 (o código dos planos 1 a 3 não depende dela) |
 | #113, #116 e PR #164 | ADRs, runbooks, READMEs e páginas do Notion da Kota | conteúdo do brain (plano 2 roda com o que já existir) |
 | #111 | `kota-bank` público com a marca da Kota | o `Dockerfile` clonar o repositório (plano 2, tarefa 8) |
-| #123 | navegador da Puca no app | `mostrar` (plano 4) |
+| #123 | navegador do Puca no app | `mostrar` (plano 4) |
 | #47 | app Electron | plano 5 |
 | #125, #104 e #129 | destino do encaminhamento (RH, gestor) e envio no Slack real | o contrato Encaminhamento do plano 1 é combinado com as três de uma vez |
 | #18 | token do Supabase no front | o `/api/ask` v2 com `req.pessoa` (plano 3) |
