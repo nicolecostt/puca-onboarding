@@ -32,5 +32,10 @@ Detalhes: [`docs/stack.md`](../stack.md) §7.
   novo estiver na `main`.
 - O `bench:llm` ganha `--provider anthropic|featherless`; os cenários passam para a jornada da Kota com a #120.
 - O raciocínio fica desligado no caminho da voz: ligado, a primeira frase passou de 3 s.
-- `stop_reason: "refusal"` vira encaminhamento, como o timeout de 8 s.
+- Timeout de 8 s, erro do modelo, `stop_reason: "refusal"` e resposta vazia **não viram encaminhamento**. A Puca diz
+  uma frase curta de falha, diferente da de falta de fonte (que manda perguntar à buddy), como "Tive um problema para
+  pensar nisso agora. Pode perguntar de novo?", e o rastro guarda o motivo da falha (campo novo no contrato do Rastro,
+  #85). Encaminhamento é só para falta de fonte confiável: falha do LLM não é falta de fonte, e no Slack real da Kota
+  viraria uma mensagem falsa. Na trava diária do LLM vale o mesmo para o que iria ao LLM; as rotas locais da
+  `route.ts` (`faq`, `tarefa`) continuam encaminhando como hoje. (Ajuste de 2026-11-08, #85.)
 - O modelo enxerga imagem, o que deixa aberto o computer use com visão sem trocar de modelo.

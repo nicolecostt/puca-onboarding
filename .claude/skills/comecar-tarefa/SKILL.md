@@ -22,6 +22,7 @@ Tarefa: $ARGUMENTS
 2. **Estado do git.** `git status -sb` e `git fetch`. Se houver alteração não commitada que não é sua, não mexa: pergunte.
    Crie a branch a partir da `main` atualizada: `git switch -c tipo/<n>-assunto-curto origin/main`.
    Se for retomar, leia `git log --oneline -10`, a issue e o PR aberto da branch (`gh pr view`) antes de qualquer coisa.
+   Se a branch já tem PR aberto e falta só levá-lo até integrar, siga pela skill `acompanhar-pr`.
 3. **Base do sistema e contexto mínimo.** Leia o **sumário** do `PRODUCT.md` e a(s) seção(ões) que a tarefa toca
    (cenário, funcionalidade, prioridade ou limite do hackathon). Confira se a issue bate com elas. Depois, só o que a tarefa toca:
    - tela ou componente → o `main.ts`/`.ts` dele e a seção do `README.md`;

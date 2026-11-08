@@ -4,7 +4,6 @@
 import type { BoardAction } from "../journey/types";
 import { classifyBargeIn } from "./barge-in";
 import { startMic, type Mic } from "./mic";
-import { AUDIO_RESUME_TIMEOUT_MS, resumeWithin } from "./pcm";
 import { PcmPlayer } from "./pcm-player";
 import { createSttSession, type SttSession } from "./stt-session";
 import type { WordTiming } from "./types";
@@ -41,6 +40,31 @@ export interface SpeakOptions {
   onWord?(index: number, word: WordTiming): void;
 }
 
+/** Como está o microfone: ouvindo, ou por que a conversa segue só pelo chat. */
+export type MicState = "ouvindo" | "negado" | "sem-microfone" | "indisponivel" | "caiu";
+
+export interface ListenHandlers {
+  /** Cada fala completa da pessoa. */
+  onFinal(text: string): void;
+  /** Legenda ao vivo do que a pessoa está dizendo. */
+  onCaption?(text: string): void;
+  /** A pessoa falou por cima da Puca: a fala já foi cortada; a tela decide o que fazer com o roteiro. */
+  onBargeIn?(): void;
+  /** O microfone ligou ("ouvindo") ou não vai ouvir (motivo). */
+  onState?(state: MicState): void;
+}
+
+/** O que a Puca diz no chat quando o microfone não vai ouvir. */
+export const MIC_AVISO: Record<Exclude<MicState, "ouvindo">, string> = {
+  negado: "O microfone está bloqueado. Sigo pelo chat; para falar comigo, libere o microfone e recarregue a página.",
+  "sem-microfone": "Não achei um microfone funcionando. Sigo pelo chat.",
+  indisponivel: "A voz da conversa está fora do ar agora. Sigo pelo chat.",
+  caiu: "Perdi a conexão do microfone. Sigo pelo chat; para voltar a falar, recarregue a página.",
+};
+
+/** Quantas vezes a conexão com o STT tenta voltar sozinha antes de desistir ("caiu"). */
+const RECONEXOES = 3;
+
 export interface AgentVoice {
   /** Servidor com TTS (voz de verdade) e com STT (microfone). */
   readonly tts: boolean;
@@ -54,11 +78,20 @@ export interface AgentVoice {
   speak(text: string, opts?: SpeakOptions): Promise<void>;
   /** Corta o que está tocando e o que ia tocar. */
   stop(): void;
-  /** Pergunta ao agente. false = servidor indisponível (a tela usa o fallback dela). */
+  /** Pergunta ao agente; corta a fala e a pergunta anteriores. false = servidor indisponível (a tela usa o fallback dela). */
   ask(req: AskRequest, h: AskHandlers): Promise<boolean>;
-  /** Liga o microfone. onFinal recebe cada fala completa da pessoa. */
-  listen(onFinal: (text: string) => void, onCaption?: (text: string) => void): Promise<void>;
+  /**
+   * Liga o microfone: primeiro o pedido de permissão, depois a conexão com o STT. Não lança: o resultado chega em
+   * `onState`. Chamar de novo com o microfone ligado não faz nada.
+   */
+  listen(h: ListenHandlers): Promise<void>;
+  /** Desliga o microfone e a conexão (encerrar a call). `listen` pode ligar de novo. */
+  stopListening(): void;
+  /** Mudo da pessoa; vale também se o microfone ainda não ligou. */
   setMuted(muted: boolean): void;
+  /** Pausa: a voz para na mesma palavra e o microfone fica mudo. */
+  pause(): void;
+  resume(): void;
 }
 
 export async function createAgentVoice(): Promise<AgentVoice> {
@@ -75,6 +108,13 @@ export async function createAgentVoice(): Promise<AgentVoice> {
   let somBloqueado = false;
   let mic: Mic | null = null;
   let session: SttSession | null = null;
+  let listening = false; // de listen() até stopListening() ou uma falha
+  let userMuted = false;
+  let paused = false;
+  const applyMute = () => {
+    mic?.setMuted(userMuted || paused);
+    session?.setMuted(userMuted || paused);
+  };
 
   interface Audio {
     audio_url: string;
@@ -130,14 +170,61 @@ export async function createAgentVoice(): Promise<AgentVoice> {
     return { audio_url, words: withWords ? wordsOf(id) : undefined };
   }
 
+  /** Abre a conexão com o STT (token novo a cada vez). Só fica valendo se o microfone ainda está ligado. */
+  async function openSession(h: ListenHandlers): Promise<void> {
+    const s = createSttSession({
+      getToken: async () => {
+        const r = await fetch("/api/voice/token", { method: "POST" });
+        if (!r.ok) throw new Error("microfone indisponível");
+        return r.json();
+      },
+      onEvent: (ev) => {
+        if (ev.type !== "caption" || paused) return;
+        const c = ev.caption;
+        // Mic aberto enquanto a Puca fala: o eco dela é ignorado; fala nova da pessoa corta.
+        if (speaking) {
+          const d = classifyBargeIn({ transcript: c.text, kind: c.kind, agentText: speaking });
+          if (d.decision === "echo" || d.decision === "wait") return;
+          voice.stop();
+          h.onBargeIn?.();
+        }
+        h.onCaption?.(c.text);
+        if (c.kind === "final" && c.speech_final && c.text.trim()) h.onFinal(c.text.trim());
+      },
+      // fechou sem stopListening (rede, STT): tenta voltar
+      onClose: () => {
+        if (session === s) void reconnect(h);
+      },
+    });
+    await s.start();
+    if (!mic) return s.stop();
+    session = s;
+    applyMute();
+  }
+
+  async function reconnect(h: ListenHandlers): Promise<void> {
+    session = null;
+    for (let i = 1; i <= RECONEXOES; i++) {
+      await new Promise((r) => setTimeout(r, 500 * i));
+      if (!mic) return; // a call foi encerrada nesse meio-tempo
+      try {
+        await openSession(h);
+        return;
+      } catch {
+        /* tenta de novo */
+      }
+    }
+    if (!mic) return;
+    voice.stopListening();
+    h.onState?.("caiu");
+  }
+
   const voice: AgentVoice = {
     tts,
     stt,
     async unlock() {
-      // destrava o AudioContext dentro do gesto; sem gesto reconhecido, o resume() não resolve
-      const ctx = new AudioContext();
-      const ok = await resumeWithin(ctx, AUDIO_RESUME_TIMEOUT_MS);
-      void ctx.close();
+      // destrava o AudioContext do próprio player, dentro do gesto; sem gesto reconhecido, o resume() não resolve
+      const ok = await player.unlock();
       somBloqueado = !ok;
       return ok;
     },
@@ -154,6 +241,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       askAbort?.abort();
     },
     async ask(req, h) {
+      voice.stop(); // nunca duas respostas juntas: a pergunta nova corta a anterior e o que ela ia falar
       const ac = new AbortController();
       askAbort = ac;
       let res: Response;
@@ -211,34 +299,59 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       await Promise.all(spoken);
       return true;
     },
-    async listen(onFinal, onCaption) {
-      if (!stt || mic) return;
-      session = createSttSession({
-        getToken: async () => {
-          const r = await fetch("/api/voice/token", { method: "POST" });
-          if (!r.ok) throw new Error("microfone indisponível");
-          return r.json();
-        },
-        onEvent: (ev) => {
-          if (ev.type !== "caption") return;
-          const c = ev.caption;
-          // Mic aberto enquanto a Puca fala: o eco dela é ignorado; fala nova da pessoa corta.
-          if (speaking) {
-            const d = classifyBargeIn({ transcript: c.text, kind: c.kind, agentText: speaking });
-            if (d.decision === "echo" || d.decision === "wait") return;
-            voice.stop();
-          }
-          onCaption?.(c.text);
-          if (c.kind === "final" && c.speech_final && c.text.trim()) onFinal(c.text.trim());
-        },
-      });
-      await session.start();
-      mic = await startMic((pcm) => session?.sendAudio(pcm));
+    async listen(h) {
+      if (!stt || listening) return;
+      listening = true;
+      // Permissão primeiro: o STT fecha a conexão depois de ~10 s sem áudio, e o pedido do navegador pode demorar.
+      let m: Mic;
+      try {
+        m = await startMic((pcm) => session?.sendAudio(pcm));
+      } catch (err) {
+        listening = false;
+        return h.onState?.(micState(err));
+      }
+      if (!listening) return m.stop(); // encerrou enquanto o pedido de permissão estava aberto
+      mic = m;
+      applyMute();
+      try {
+        await openSession(h);
+      } catch {
+        voice.stopListening();
+        return h.onState?.("indisponivel");
+      }
+      if (listening) h.onState?.("ouvindo");
+    },
+    stopListening() {
+      listening = false;
+      const m = mic;
+      const s = session;
+      mic = null;
+      session = null; // antes do stop(): o onClose desta sessão não reconecta
+      s?.stop();
+      m?.stop();
     },
     setMuted(muted) {
-      mic?.setMuted(muted);
-      session?.setMuted(muted);
+      userMuted = muted;
+      applyMute();
+    },
+    pause() {
+      paused = true;
+      player.pause();
+      applyMute();
+    },
+    resume() {
+      paused = false;
+      player.resume();
+      applyMute();
     },
   };
   return voice;
+}
+
+/** Motivo de o microfone não ligar, pelo erro do getUserMedia. */
+function micState(err: unknown): MicState {
+  const name = err instanceof Error ? err.name : "";
+  if (name === "NotAllowedError" || name === "SecurityError") return "negado";
+  if (name === "NotFoundError" || name === "OverconstrainedError" || name === "NotReadableError") return "sem-microfone";
+  return "indisponivel";
 }

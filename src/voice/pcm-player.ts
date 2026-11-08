@@ -29,23 +29,62 @@ export class PcmPlayer implements SpeechPlayer {
   /** Word timings of the audio that is playing (from the `speech_alignment` message); may arrive late. */
   setWords(words: WordTiming[]): void {
     this.words = words;
-    if (this.startedAt !== null) this.scheduleWords(this.startedAt);
+    this.nextWord = 0;
+    this.scheduleWords();
   }
-  private startedAt: number | null = null;
+  /** Audio-clock time (ctx.currentTime) of the first sample of the line playing. */
+  private startCtx: number | null = null;
+  /** Index of the next word to fire: after a pause only the words still ahead are scheduled again. */
+  private nextWord = 0;
+  private paused = false;
 
-  private scheduleWords(startedAtMs: number): void {
+  // Delays come from the audio clock, which stops while the context is suspended (pause): resuming reschedules exactly.
+  private scheduleWords(): void {
     this.timers.forEach(clearTimeout);
     this.timers = [];
-    for (const w of this.words) {
-      const delay = Math.max(0, startedAtMs + w.start_ms - performance.now());
-      this.timers.push(setTimeout(() => this.listeners.forEach((cb) => cb(w)), delay));
+    const ctx = this.ctx;
+    if (!ctx || this.startCtx === null || this.paused) return;
+    for (let i = this.nextWord; i < this.words.length; i++) {
+      const w = this.words[i];
+      const delay = Math.max(0, (this.startCtx + w.start_ms / 1000 - ctx.currentTime) * 1000);
+      this.timers.push(
+        setTimeout(() => {
+          this.nextWord = i + 1;
+          this.listeners.forEach((cb) => cb(w));
+        }, delay),
+      );
     }
+  }
+
+  /** Unlocks the output inside a user gesture: resume() is called synchronously on the context that plays. */
+  unlock(): Promise<boolean> {
+    return resumeWithin(this.ensure(), AUDIO_RESUME_TIMEOUT_MS);
+  }
+
+  /** Freezes the voice on the exact sample (AudioContext.suspend); the download keeps going. */
+  pause(): void {
+    if (this.paused) return;
+    this.paused = true;
+    this.timers.forEach(clearTimeout);
+    this.timers = [];
+    if (this.ctx?.state === "running") void this.ctx.suspend().catch(() => undefined);
+  }
+
+  /** Continues from the same sample, and the word callbacks from the same word. */
+  resume(): void {
+    if (!this.paused) return;
+    this.paused = false;
+    void this.ctx
+      ?.resume()
+      .then(() => this.scheduleWords())
+      .catch(() => undefined);
   }
 
   async play(audio_url: string, signal?: AbortSignal): Promise<void> {
     const ctx = this.ensure();
-    // navegador segurando o áudio: falha esta fala (a legenda segue) em vez de travar a fila
-    if (!(await resumeWithin(ctx, AUDIO_RESUME_TIMEOUT_MS))) throw new Error("áudio bloqueado pelo navegador");
+    // navegador segurando o áudio: falha esta fala (a legenda segue) em vez de travar a fila. Pausado, não destrava:
+    // a fala fica parada junto e começa no resume().
+    if (!this.paused && !(await resumeWithin(ctx, AUDIO_RESUME_TIMEOUT_MS))) throw new Error("áudio bloqueado pelo navegador");
     this.stop();
     const controller = new AbortController();
     this.controller = controller;
@@ -56,7 +95,7 @@ export class PcmPlayer implements SpeechPlayer {
     const reader = res.body.getReader();
 
     let nextTime = ctx.currentTime + 0.05;
-    this.startedAt = null;
+    this.startCtx = null;
     let leftover = new Uint8Array(0);
     let lastSource: AudioBufferSourceNode | null = null;
 
@@ -78,9 +117,9 @@ export class PcmPlayer implements SpeechPlayer {
         source.buffer = buffer;
         source.connect(this.analyser!);
         source.start(nextTime);
-        if (this.startedAt === null) {
-          this.startedAt = performance.now() + (nextTime - ctx.currentTime) * 1000;
-          this.scheduleWords(this.startedAt);
+        if (this.startCtx === null) {
+          this.startCtx = nextTime;
+          this.scheduleWords();
         }
         nextTime += buffer.duration;
         this.sources.add(source);
@@ -108,7 +147,7 @@ export class PcmPlayer implements SpeechPlayer {
       }
     }
     this.sources.clear();
-    this.startedAt = null;
+    this.startCtx = null;
   }
 
   onWord(cb: (word: WordTiming) => void): () => void {
