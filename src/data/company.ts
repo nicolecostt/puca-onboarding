@@ -19,6 +19,6 @@ export const company: Company = {
 export const journey: JourneyStep[] = [
   { id: "access", label: "Acessos" },
   { id: "lesson", label: "Sessão" },
-  { id: "first-ticket", label: "Primeiro ticket" },
+  { id: "first-ticket", label: "Primeira tarefa" },
   { id: "ready", label: "Pronto para contribuir" },
 ];
