@@ -22,7 +22,7 @@ import { createTtsService } from "./voice/index";
 import type { TtsService } from "./voice/tts/service";
 
 export function loadDemoJourney(): Journey {
-  return loadJourney(JSON.parse(readFileSync(new URL("../../src/journey/data/tail.journey.json", import.meta.url), "utf8")));
+  return loadJourney(JSON.parse(readFileSync(new URL("../../src/journey/data/kota.journey.json", import.meta.url), "utf8")));
 }
 
 /** TTS só quando há chave; sem ela o cliente cai no texto (e o servidor segue funcionando). */

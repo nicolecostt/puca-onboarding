@@ -95,7 +95,7 @@ export function routeUtterance(text: string, ctx: RouteContext): Route {
     if (hit) return { kind: "select", node: hit.id };
   }
 
-  // FAQ com nó + intenção ("quem cuida do authorizer?") é mais preciso que a busca por palavra na knowledge,
+  // FAQ com nó + intenção ("quem cuida do balancereader?") é mais preciso que a busca por palavra na knowledge,
   // que aceita uma palavra só em comum e respondia outra coisa sobre o mesmo nó.
   const faq = matchFaq(text, ctx.faqs.filter((f) => f.board === ctx.board));
   if (faq.faq && faq.score === 1) return { kind: "faq", faq: faq.faq };

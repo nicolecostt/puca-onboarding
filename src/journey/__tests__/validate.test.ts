@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import demo from "../data/tail.journey.json";
+import demo from "../data/kota.journey.json";
 import { validateJourney } from "../validate";
 import { matchReply } from "../conditions";
 import { interpolate, vinculoFromAnswer, DEMO_PROFILES } from "../profile";
@@ -27,9 +27,9 @@ describe("validateJourney", () => {
   it("aceita at que é trecho da fala e recusa o que não é", () => {
     const j = clone(demo);
     const step = j.moments[3].steps[0];
-    step.actions = [{ type: "reveal", targets: ["pos"], at: step.line.slice(0, 10) }];
+    step.actions = [{ type: "reveal", targets: ["frontend"], at: step.line.slice(0, 10) }];
     expect(errorsOf(j)).toEqual([]);
-    step.actions = [{ type: "reveal", targets: ["pos"], at: "trecho que ninguém fala" }];
+    step.actions = [{ type: "reveal", targets: ["frontend"], at: "trecho que ninguém fala" }];
     expect(errorsOf(j).join("\n")).toMatch(/at "trecho que ninguém fala", que não é trecho da fala/);
   });
 
@@ -118,7 +118,7 @@ describe("perfil", () => {
   });
 
   it("interpola campos do perfil com texto neutro quando faltam", () => {
-    expect(interpolate("Oi, {nome}! Time {time}.", DEMO_PROFILES.novo)).toBe("Oi, Ana! Time Terminais.");
+    expect(interpolate("Oi, {nome}! Time {time}.", DEMO_PROFILES.novo)).toBe("Oi, Ana! Time Livro-razão.");
     expect(interpolate("{gestor} lidera.", { nome: "Ana", vinculo: "novo" })).toBe("sua gestão lidera.");
   });
 });

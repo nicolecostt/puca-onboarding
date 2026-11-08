@@ -49,6 +49,24 @@ O critério de tudo é a demo: call inicial → jornada → sessão no quadro �
 mais uma pergunta que muda o rumo e uma dúvida que vira encaminhamento ([`docs/demo.md`](docs/demo.md)).
 Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o fluxo. Label `se-der-tempo` fica por último.
 
+### Reta final (08/11: implementação até 12:00, submissão às 13:00)
+
+O hook `scripts/reta-final.sh` diz a cada mensagem quanto falta e a fase (`[reta-final]`). Até a submissão, estas regras
+valem por cima do resto deste arquivo e das skills (decisão 0010). Git seguro, segredos e os guardas de merge continuam.
+
+- **Só o fluxo da demo.** Trabalhe só no que faz um passo de [`docs/demo.md`](docs/demo.md) funcionar ou deixar de quebrar.
+  Polimento, refatoração, `se-der-tempo` e doc que não é da demo ficam para depois.
+- **Decida e siga.** Sem pergunta que dá para resolver sozinho: escolha o caminho mais simples que funciona e diga no fim
+  o que escolheu. Pergunte só se muda o que a demo mostra ou se for destrutivo.
+- **Simulado vale.** Se o real (API externa, app, integração) não fecha a tempo, mantenha o fluxo de pé com dado fixo ou
+  o simulado que já existe, e diga isso no PR.
+- **Cerimônia mínima:** em `comecar-tarefa`, leia só o que a tarefa toca; lacuna fora do escopo vira uma linha no PR, não
+  issue (item 4); `docs/decisoes/` só se mudar a stack; no meio do trabalho, `npm run typecheck` e o teste do que mudou,
+  `npm run check` só antes do PR; `acompanhar-pr` em segundo plano, sem travar a próxima tarefa.
+- **Travou 15 min no mesmo problema?** Pare, diga o que tentou e proponha cortar ou simular.
+- **Paralelize** tarefas independentes (subagentes, `claude -w <nome>`). Respostas curtas: o que mudou, o que rodou, o que falta.
+- **Depois das 12:00:** nada de feature; só correção de bug que quebra a demo e a skill `checar-demo` depois de cada merge.
+
 ## Regras do projeto
 
 - A resposta nunca espera o LLM. Toda fala passa por `src/journey/route.ts`, do caminho mais barato ao mais caro; o LLM é o último.

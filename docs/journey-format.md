@@ -6,16 +6,16 @@ O modelo segue a ideia de jornadas usada em agentes de demonstração por voz:
 uma vista nova, o **quadro**, que o agente monta enquanto explica.
 
 Tipos: [`src/journey/types.ts`](../src/journey/types.ts). Validação: [`src/journey/validate.ts`](../src/journey/validate.ts).
-Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json).
+Jornada de exemplo: [`kota.journey.json`](../src/journey/data/kota.journey.json).
 
 ## Estrutura
 
 ```jsonc
 {
   "version": 1,
-  "id": "tail-terminais",
+  "id": "kota-livro-razao",
   "title": "Primeira semana — time fraud-score",
-  "company": "Tail",
+  "company": "Kota",
   "agent": { "name": "Puca", "guidelines": { "core_identity": "…", "personality_and_tone": "…", "safety_and_escalation": "…" } },
   "boards": { "<nome>": { "title": "…", "nodes": [ … ], "edges": [ … ] } },
   "moments": [ … ]
@@ -87,9 +87,9 @@ só diz se o tema está entendido ou se vale rever, e atualiza a calibragem e a 
 
 ```jsonc
 { "id": "fa-checa", "decision": "wait", "goal": "conferir o caminho de erro",
-  "line": "Uma pergunta rápida: depois das três tentativas, para onde vai a venda?",
-  "suggested_replies": ["Para a settlement.dlq", "Ela se perde", "Volta para a maquininha"],
-  "check": { "tema": "falhas", "replies": ["Para a settlement.dlq"] },
+  "line": "Uma pergunta rápida: se o balancereader estiver fora do ar, o que acontece com uma transferência?",
+  "suggested_replies": ["É recusada, sem gravar nada", "É gravada e o saldo confere depois", "Fica numa fila esperando"],
+  "check": { "tema": "falhas", "replies": ["É recusada, sem gravar nada"] },
   "transitions": [{ "to": { "step": "fa-reforco" }, "if": { "checagem": "rever" } }] }
 ```
 

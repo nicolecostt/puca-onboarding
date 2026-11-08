@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import demo from "../data/tail.journey.json";
+import demo from "../data/kota.journey.json";
 import { loadJourney } from "../validate";
 import { createRunner, type RunnerIO } from "../runner";
 import { DEMO_PROFILES } from "../profile";
@@ -39,7 +39,7 @@ describe("pulo de momento pedido pela pessoa", () => {
         }
         return "Terminar por hoje";
       },
-      select: async () => "settlement",
+      select: async () => "balancereader",
     };
     runner = createRunner(journey, DEMO_PROFILES.transicao, io);
     const r = await runner.run();
@@ -56,12 +56,14 @@ describe("pulo de momento pedido pela pessoa", () => {
 
 describe("respostas com o conhecimento do momento", () => {
   it("responde o que está no conhecimento", () => {
-    expect(answerFromKnowledge("onde está o cálculo do MDR?", null, moment("pagamentos"))).toMatch(/fees\/mdr/);
-    expect(answerFromKnowledge("e se o settlement-worker cair?", null, moment("pagamentos"))).toMatch(/nada se perde/);
-    expect(answerFromKnowledge("que horas é a daily?", null, moment("seu-time"))).toMatch(/9h30/);
+    expect(answerFromKnowledge("como o ledgerwriter confere o saldo?", null, moment("pagamentos"))).toMatch(/balancereader por HTTP/);
+    expect(answerFromKnowledge("o saldo pode estar atrasado?", null, moment("pagamentos"))).toMatch(/um ciclo atrasado/);
+    expect(answerFromKnowledge("que horas é a daily?", null, moment("seu-time"))).toMatch(/15 minutos/);
   });
 
   it("não chuta quando o conhecimento não cobre", () => {
     expect(answerFromKnowledge("qual o horário do almoço?", null, moment("seu-time"))).toBeNull();
+    // política fica no Notion e passa pelo agente; o conhecimento do time não responde por ela
+    expect(answerFromKnowledge("qual a política de home office do time?", null, moment("seu-time"))).toBeNull();
   });
 });
