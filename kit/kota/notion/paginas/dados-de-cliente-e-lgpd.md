@@ -4,7 +4,7 @@ Cada cliente confia à Kota o próprio dinheiro e os próprios dados. A LGPD, a 
 
 ## Que dados de cliente a Kota guarda
 
-- No `accounts-db`, do time de Contas, ficam o nome, a data de nascimento, o endereço, o CPF e o usuário de cada cliente. A senha fica guardada só como hash bcrypt. Os contatos que cada cliente salva para transferir, com conta e agência, ficam no mesmo banco.
+- No `accounts-db`, do time de Contas, ficam o nome, a data de nascimento, o endereço, o documento de identificação e o usuário de cada cliente. A senha fica guardada só como hash bcrypt. Os contatos que cada cliente salva para transferir, com conta e agência, ficam no mesmo banco.
 - No `ledger-db`, do Livro-razão, fica cada transação, com conta e agência de origem e de destino, valor, data e hora.
 
 Todo dado que leva a uma pessoa é dado pessoal. Isso inclui o número da conta, o saldo e o extrato.
@@ -21,8 +21,8 @@ Usamos os dados para abrir a conta, autenticar o cliente, movimentar o dinheiro 
 
 ## Onde dado de cliente não aparece
 
-- No Slack, no Notion, numa issue, num PR ou numa planilha pessoal. Para falar de um caso, use o número da transação. Nunca nome, CPF, saldo ou print de tela com dado de cliente.
-- Em log. Não registre senha, token, CPF ou endereço.
+- No Slack, no Notion, numa issue, num PR ou numa planilha pessoal. Para falar de um caso, use o número da transação. Nunca nome, documento, saldo ou print de tela com dado de cliente.
+- Em log. Não registre senha, token, documento ou endereço.
 - Em ferramenta de fora, como tradutor, assistente de IA ou site que formata JSON. Dado de cliente só entra em ferramenta que a segurança aprovou.
 
 ## Transação gravada não se apaga

@@ -22,7 +22,7 @@ As palavras que usamos todo dia na Kota, com o nome que cada uma tem no código.
 
 **Saldo.** O que entrou na conta menos o que saiu, somando todas as transações dela no livro-razão. O saldo não fica gravado em nenhuma tabela, é sempre essa soma. Quem responde é o balancereader, a partir de um cache em memória, e por isso ele pode estar até um ciclo de leitura atrasado. O desenho está no [ADR 4](https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0004-saldo-e-extrato-com-cache-em-memoria-lidos-do-livro-razao.md).
 
-**Extrato.** As transações de uma conta, de entrada e de saída, da mais recente para a mais antiga. Quem responde é o transactionhistory, que guarda em cache as últimas 100 de cada conta. Uma transferência que acabou de sair pode levar alguns segundos para aparecer no extrato. É o cache, e é esperado.
+**Extrato.** As transações de uma conta, de entrada e de saída, da mais recente para a mais antiga. Quem responde é o transactionhistory, que guarda em cache as últimas 100 de cada conta. Uma transferência que acabou de sair pode faltar na página que abre logo depois dela, se o próximo ciclo de leitura ainda não passou. Ela aparece quando a página carrega de novo, o que para quem usa o site parece alguns segundos. É o cache, e é esperado.
 
 ## No código do Livro-razão
 

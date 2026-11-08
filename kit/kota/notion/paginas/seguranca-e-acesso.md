@@ -5,7 +5,7 @@ A Kota guarda o dinheiro e os dados dos clientes. Esta página diz quem acessa c
 ## Segredo não vai para o Slack nem para o repositório
 
 - Senha, token e chave de API nunca vão em mensagem do Slack, nem em mensagem direta. Também não vão para o Notion, para uma issue ou para um commit.
-- A chave privada do JWT nunca entra no repositório. Cada ambiente gera o próprio par de chaves.
+- Nenhum ambiente usa uma chave privada do JWT tirada do repositório. Cada ambiente gera o próprio par de chaves.
 - No ambiente local, o `docker compose` gera o par na primeira subida e o guarda num volume da sua máquina, como decidido no [ADR 7](https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0007-ambiente-local-com-docker-compose-construido-do-codigo.md).
 - As senhas dos bancos que aparecem no [`docker-compose.yml`](https://github.com/JucaGF/kota-bank/blob/main/docker-compose.yml) valem só na máquina de quem desenvolve. Homologação e produção têm senhas próprias, e ninguém as copia para um arquivo local.
 
@@ -17,7 +17,7 @@ O [ADR 2](https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0002-jwt-assina
 
 - Só o `userservice` emite token. No login, ele confere a senha e assina um JWT com a chave privada. O token vale uma hora.
 - Cada serviço confere o token sozinho, com a chave pública. Depois, confere se o que foi pedido é do dono do token. O `balancereader`, por exemplo, só devolve o saldo da conta que está no token.
-- Serviço novo que atende cliente faz as duas conferências. Não existe rota sem token, nem em homologação.
+- Serviço novo que atende cliente faz as duas conferências. Fora o cadastro e o login, por onde o cliente chega ao token, nenhuma rota que devolve ou muda dado de cliente atende sem token, nem em homologação.
 
 Duas consequências valem para todo mundo:
 

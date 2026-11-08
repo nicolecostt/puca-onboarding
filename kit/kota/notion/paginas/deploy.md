@@ -8,7 +8,7 @@ O deploy é do time dono do serviço. Quem fez a mudança acompanha o que aconte
 - **Homologação**, por onde cada versão da `main` passa antes de produção. É lá que testamos com outros times e rodamos o teste de carga com o `loadgenerator`.
 - **Produção**, onde estão os clientes.
 
-O `kota-bank` tem só o ambiente local. A configuração da homologação e de produção é de Plataforma e fica fora do repositório.
+A partir do `kota-bank`, você sobe só o ambiente local. A configuração da homologação e de produção é de Plataforma.
 
 ## Do merge à produção
 
@@ -23,7 +23,7 @@ Um aviso no #livro-razao, por exemplo, fica assim: "Deploy do ledgerwriter hoje 
 
 ## Quando fazer
 
-Deploy em produção só em dia útil, das 10h às 16h. Na sexta depois do meio-dia e na véspera de feriado, não. Assim, se algo der errado, o time está por perto para resolver. Fora dessa janela, só correção de incidente, com o plantão e o tech lead do time sabendo.
+Deploy em produção só em dia útil, começando entre 10h e 16h. Na sexta depois do meio-dia e na véspera de feriado, não. Assim, a hora de acompanhamento ainda cai no horário comercial, e se algo der errado o time está por perto para resolver. Fora dessa janela, só correção de incidente, com o plantão e o tech lead do time sabendo.
 
 ## Quando algo dá errado
 

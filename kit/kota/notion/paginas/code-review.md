@@ -4,7 +4,7 @@ Toda mudança no [kota-bank](https://github.com/JucaGF/kota-bank) entra na `main
 
 ## Quem revisa
 
-O arquivo `CODEOWNERS` do repositório liga cada pasta ao time dono, e o GitHub pede a revisão desse time automaticamente. A mesma informação está na database [Sistemas](notion:sistemas).
+O arquivo `CODEOWNERS` do repositório mostra o time dono de cada pasta, com o tech lead e o gestor desse time. Alguém do time dono revisa o PR. O time dono de cada pasta também está na database [Sistemas](notion:sistemas).
 
 Mudança no que outro time usa pede também a revisão desse time. Mudar o formato do token do login, por exemplo, mexe na validação em Python e em Java, como mostra o [ADR 2](https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0002-jwt-assinado-pelo-userservice-e-validado-em-cada-servico.md). Nesse caso, Contas, Canais e Livro-razão revisam.
 
@@ -15,9 +15,9 @@ Mudança no que outro time usa pede também a revisão desse time. Mudar o forma
 - Mudança de comportamento vem com teste. Os testes de um serviço rodam com [`scripts/testar.sh`](https://github.com/JucaGF/kota-bank/blob/main/scripts/testar.sh) e o nome do serviço, e só precisam do Docker.
 - O lint passa. Python segue o `.pylintrc` da raiz, e cada serviço Java tem o seu `checkstyle.xml`, como diz o [ADR 5](https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0005-python-em-contas-e-canais-java-no-livro-razao.md).
 
-## O que o CI confere
+## O que conferir antes do merge
 
-O CI roda os testes de cada serviço e sobe o banco inteiro com o docker compose, conferindo o login de ponta a ponta. Com o CI vermelho, o PR não entra, mesmo aprovado.
+Além dos testes de cada serviço, o [`scripts/verificar-local.sh`](https://github.com/JucaGF/kota-bank/blob/main/scripts/verificar-local.sh) sobe o banco inteiro com o docker compose e confere o login de ponta a ponta, como um cliente faria. Com o CI vermelho, o PR não entra, mesmo aprovado.
 
 ## Como revisar
 

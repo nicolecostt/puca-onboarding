@@ -29,7 +29,7 @@ Bônus, promoção, salário e férias de cada pessoa são casos individuais. Pa
 
 ## Tech lead
 
-O tech lead não está no título desta página, mas aparece todo dia. Nas decisões técnicas do time, a palavra final é dele, inclusive na proposta que vira RFC e depois ADR, como conta [De RFC a ADR](notion:de-rfc-a-adr). O tech lead também libera o acesso a produção dos sistemas do time, como explica [Segurança e acesso a produção](notion:seguranca-e-acesso).
+O tech lead é a referência técnica do seu time. Nas decisões técnicas do time, a palavra final é dele, inclusive na proposta que vira RFC e depois ADR, como conta [De RFC a ADR](notion:de-rfc-a-adr). O tech lead também libera o acesso a produção dos sistemas do time, como explica [Segurança e acesso a produção](notion:seguranca-e-acesso).
 
 ## People
 

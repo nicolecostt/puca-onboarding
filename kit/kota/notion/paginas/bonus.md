@@ -2,7 +2,7 @@
 
 Na Kota, o bônus é a PLR, a participação nos lucros e resultados. Ela é paga uma vez por ano, em maio, e se refere ao ano anterior.
 
-O programa de PLR é negociado todo ano com uma comissão eleita pelas pessoas da Kota, como pede a Lei 10.101/2000. People manda o programa por e-mail para todo mundo no começo do ano, assim que ele é assinado.
+O programa de PLR é negociado todo ano numa comissão paritária, com representantes da Kota e das pessoas que trabalham aqui e um representante indicado pelo sindicato. É um dos dois caminhos que a Lei 10.101/2000 prevê. People manda o programa por e-mail para todo mundo no começo do ano, assim que ele é assinado.
 
 ## Como o valor é calculado
 

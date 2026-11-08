@@ -19,7 +19,7 @@ O gestor, o tech lead e o buddy de cada time estão na database [Times](notion:t
 Você pede os acessos ao seu gestor, que aprova cada um. Se no fim do segundo dia ainda faltar algum, avise o gestor.
 
 - [ ] E-mail da Kota. É o login de todo o resto, e People cria antes do seu primeiro dia.
-- [ ] Slack da Kota, nos canais #geral e #people e no canal e no canal de ajuda do seu time. Os canais de cada time estão em [Times](notion:times), e o que vai em cada canal está em [Comunicação](notion:comunicacao).
+- [ ] Slack da Kota, nos canais #geral e #people e nos dois canais do seu time, o principal e o de ajuda. Os canais de cada time estão em [Times](notion:times), e o que vai em cada canal está em [Comunicação](notion:comunicacao).
 - [ ] Notion da Kota. Todo mundo lê todas as páginas.
 - [ ] GitHub, no repositório [kota-bank](https://github.com/JucaGF/kota-bank). Lá estão o código, os ADRs, os runbooks e as issues.
 - [ ] Homologação. Toda a engenharia tem acesso, sempre com dados de teste.

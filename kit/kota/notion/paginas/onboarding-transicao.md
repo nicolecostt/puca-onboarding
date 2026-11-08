@@ -25,9 +25,9 @@ E-mail, Slack, Notion, GitHub, homologação e o ambiente local continuam iguais
 
 - Conversa com o gestor novo sobre o que o time faz e o que vem nas primeiras semanas.
 - Conversa com o buddy do time novo. Mesmo para quem conhece a Kota, os combinados de cada time são outros.
-- Sessão com a Puca, no Orbis. Ela sabe que você já é da Kota, então pula a parte institucional e vai direto ao time novo, aos sistemas dele e às decisões que ele tomou.
+- Call inicial com a Puca, no Orbis. Ela sabe que você já é da Kota, então pula a parte institucional e vai direto ao time novo, aos sistemas dele e às decisões que ele tomou.
 - Leia os ADRs do time novo e as [RFCs](notion:rfcs) que levaram a eles.
-- Acompanhe os rituais e alguns code reviews do time novo antes de abrir PR. O arquivo `CODEOWNERS` liga cada pasta ao time responsável, e o GitHub pede a revisão dele nos seus PRs, como conta o [Code review](notion:code-review).
+- Acompanhe os rituais e alguns code reviews do time novo antes de abrir PR. O arquivo `CODEOWNERS` mostra o time dono de cada pasta, e é esse time que revisa os seus PRs, como conta o [Code review](notion:code-review).
 - Pegue a primeira tarefa no time novo. É uma das [issues com o label `primeira-tarefa`](https://github.com/JucaGF/kota-bank/issues?q=label%3Aprimeira-tarefa), escolhida conforme o que você já sabe. O gestor novo aprova antes de você começar.
 - No fim da semana, uma conversa curta com o gestor novo sobre o que ficou confuso e o acesso que ainda falta.
 
