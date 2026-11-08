@@ -123,6 +123,9 @@ como estava.
 
 Caso pessoal da pessoa ("qual vai ser o meu bônus?", férias, salário, avaliação, promoção): o Puca explica a regra
 geral com a fonte e o servidor emite `escalate` (resumo = a fala) se o modelo não chamou `escalate_to_buddy`.
+Pergunta não pessoal respondida com fonte citada não encaminha: o `escalate_to_buddy` do modelo é ignorado (a Puca não
+avisou a pessoa), a não ser que a fala diga que não confirmou. O resumo do `escalate` sai sem marcas internas: `[fN]`,
+`(fN)` e `fN` viram o título do trecho (ou somem se o trecho não existe).
 
 ## Encaminhamento no Slack da Kota
 
