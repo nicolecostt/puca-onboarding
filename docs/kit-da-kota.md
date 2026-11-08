@@ -1,6 +1,6 @@
 # Kit da Kota
 
-Desenho do **kit da Kota**: o mundo fictício onde o jurado vive a pessoa, que é **fonte** do Puca e **prova** para o
+Desenho do **kit da Kota**: o mundo fictício onde o jurado vive a pessoa, que é **fonte** de Puca e **prova** para o
 jurado ([`PRODUCT.md` §13](../PRODUCT.md#13-avaliação-pelos-jurados-o-mundo-fictício-da-kota), issue #12). A escolha
 de base e de onde o kit mora está em [`docs/decisoes/0005-kit-da-kota.md`](decisoes/0005-kit-da-kota.md).
 
@@ -11,7 +11,7 @@ de base e de onde o kit mora está em [`docs/decisoes/0005-kit-da-kota.md`](deci
 
 Não dá para prever como cada jurado testa o Orbis. Em vez de roteirizar o teste, controlamos o **mundo** em que ele
 cai: uma empresa que parece de verdade, com código que roda, decisões registradas, cultura e políticas escritas. O
-jurado recebe o mesmo kit que o Puca usa e confere que ele não inventou.
+jurado recebe o mesmo kit que Puca usa e confere que ele não inventou.
 
 A Tail que existe hoje no código (`src/data/company.ts`, `src/data/profiles.ts`, `tail.journey.json`) foi só para
 testes. **Ela sai inteira.** A empresa nova é a **Kota** e começa do zero.
@@ -20,8 +20,8 @@ testes. **Ela sai inteira.** A empresa nova é a **Kota** e começa do zero.
 
 - Parecer o máximo possível uma empresa real, a ponto de o jurado abrir o repo ou o Notion e se sentir no primeiro dia.
 - Código que **roda** na máquina do jurado e que tem **testes** que ele consegue rodar.
-- Tudo o que o Puca afirma tem fonte no kit, com link que o jurado abre.
-- Notion **de verdade**: é uma das integrações que mostram que o Puca se conecta a sistemas reais.
+- Tudo o que Puca afirma tem fonte no kit, com link que o jurado abre.
+- Notion **de verdade**: é uma das integrações que mostram que Puca se conecta a sistemas reais.
 
 ### Não objetivos
 
@@ -31,10 +31,10 @@ testes. **Ela sai inteira.** A empresa nova é a **Kota** e começa do zero.
 
 ### Anti-objetivos (falhou, mesmo que funcione)
 
-- O Puca afirma algo que o jurado não encontra no kit.
+- Puca afirma algo que o jurado não encontra no kit.
 - O kit carrega nome, marca, pessoa ou commit reais da empresa de onde veio o código.
 - O jurado não consegue subir o banco seguindo só o guia.
-- Algum documento leva o Puca a avaliar o desempenho da pessoa (§12.2): ela explica a **política**, nunca julga a pessoa.
+- Algum documento leva Puca a avaliar o desempenho da pessoa (§12.2): ela explica a **política**, nunca julga a pessoa.
 
 ## 2. A Kota
 
@@ -83,7 +83,7 @@ O kit fica onde uma pessoa de verdade procuraria cada coisa: o que é de engenha
 
 ### 3.1. Repo `kota-bank` (GitHub, público)
 
-- **Código** do Bank of Anthos, com histórico novo: 15 a 25 commits assinados por pessoas da Kota, organizados por área, sem os autores originais e sem linha do tempo fabricada em detalhe. O Puca não cita commits como fonte **(nossa escolha)**.
+- **Código** do Bank of Anthos, com histórico novo: 15 a 25 commits assinados por pessoas da Kota, organizados por área, sem os autores originais e sem linha do tempo fabricada em detalhe. Puca não cita commits como fonte **(nossa escolha)**.
 - **`README.md`** da raiz: o que é a Kota, como subir o banco e rodar os testes, mapa dos serviços.
 - **`README.md` de cada serviço**: o que faz, time responsável, como rodar e testar, de quem depende.
 - **`CODEOWNERS`**: cada pasta ligada ao time responsável. Gerado do mapa da Kota.
@@ -96,7 +96,7 @@ O kit fica onde uma pessoa de verdade procuraria cada coisa: o que é de engenha
   6. Um ADR **rejeitado** (ex.: fila entre `ledgerwriter` e os leitores), porque empresa de verdade também tem esses.
 - **`docs/runbooks/`**: 2 ou 3 procedimentos (trocar a chave do JWT, `ledger-db` cheio, subir o banco do zero).
 - **Issues abertas com label de primeira tarefa**: 3 a 5 tarefas pequenas, cada uma com teste que falha antes e passa
-  depois. São o catálogo de primeira tarefa da Kota: O Puca escolhe conforme o perfil e o gestor aprova antes de a
+  depois. São o catálogo de primeira tarefa da Kota: Puca escolhe conforme o perfil e o gestor aprova antes de a
   pessoa começar (§4.4). Pelo menos uma no Livro-razão para cada perfil.
   A `main` fica sempre verde: cada issue aponta para a branch `tarefa/<n>`, com o teste que falha, e para a
   `solucao/<n>`, com ele passando **(nossa escolha)**.
@@ -123,9 +123,9 @@ empresa real tem.
 
 Com tudo documentado, o encaminhamento (§4.5) aparece por dois caminhos naturais:
 
-- **Caso pessoal**: "qual vai ser o meu bônus?", "posso tirar férias no 2º mês?". O Puca explica a regra geral com a
+- **Caso pessoal**: "qual vai ser o meu bônus?", "posso tirar férias no 2º mês?". Puca explica a regra geral com a
   fonte e leva o caso da pessoa ao RH ou ao gestor.
-- **O que nenhum documento cobre**: O Puca diz que não confirmou e leva a dúvida, com o que consultou, à buddy ou ao responsável.
+- **O que nenhum documento cobre**: Puca diz que não confirmou e leva a dúvida, com o que consultou, à buddy ou ao responsável.
 
 ## 5. Coerência
 
@@ -169,18 +169,18 @@ O jurado recebe dois links, na landing (#48) e no guia: o repo `kota-bank` e o N
 - **Slack da Kota**: workspace gratuito próprio, com canais dos times e destino do encaminhamento. O Slack conectado
   hoje ao MCP é o de uma empresa real e **não** pode receber nada do kit. Ver §7.1.
 - **Cópia do Notion**: depois de preencher, baixada pelo MCP para `kit/kota/notion/` no nosso repo. Serve para o check
-  de coerência e para o Puca ler rápido, sem depender da rede (a resposta nunca espera, nem o LLM nem a rede).
+  de coerência e para Puca ler rápido, sem depender da rede (a resposta nunca espera, nem o LLM nem a rede).
 
 ### 7.1. Slack pela API
 
 > Alinhamento com Joaquim em 2026-11-08.
 
 O Slack da Kota usa a **API do Slack direto**, com um **app do Slack e token de bot**, e não o MCP: o MCP fica preso a
-um workspace e age como a pessoa logada, e o servidor do Puca não consegue usar login de pessoa.
+um workspace e age como a pessoa logada, e o servidor de Puca não consegue usar login de pessoa.
 
 - **Preencher**: um script cria os canais (`conversations.create`) e posta o histórico (`chat.postMessage`). Com o
   escopo `chat:write.customize`, cada mensagem sai com nome e foto de uma pessoa da Kota, sem contas reais.
-- **Agir na demo (decidido na 0008, #13)**: o mesmo app é usado pelo servidor do Puca no encaminhamento ("agir num
+- **Agir na demo (decidido na 0008, #13)**: o mesmo app é usado pelo servidor de Puca no encaminhamento ("agir num
   sistema", §12.2 do `PRODUCT.md`). O Slack real complementa o simulado, que fica no `npm run dev`, como plano B e na
   aprovação do gestor.
 - **Pessoas da Kota não são membros reais**: o encaminhamento vai por mensagem direta do bot ao próprio jurado,
@@ -192,7 +192,7 @@ um workspace e age como a pessoa logada, e o servidor do Puca não consegue usar
 
 ### 7.2. Quem consome o kit
 
-Quem consome a cópia é o company brain (#26). Como o servidor do Puca acessa o Notion **na hora da demo** (token de
+Quem consome a cópia é o company brain (#26). Como o servidor de Puca acessa o Notion **na hora da demo** (token de
 integração, MCP local ou só a cópia) ficou decidido na 0008: só a cópia, sem token nem MCP na hora da sessão. O MCP
 hospedado do Notion entra com o login de uma pessoa e não serve para um servidor.
 

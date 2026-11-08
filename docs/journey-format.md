@@ -2,7 +2,7 @@
 
 A sessão no quadro é conduzida por uma **jornada** em JSON (`src/journey/data/*.journey.json`).
 O modelo segue a ideia de jornadas usada em agentes de demonstração por voz:
-**momentos** (capítulos) feitos de **passos** (cada fala ou ação do agente). A diferença do Puca é
+**momentos** (capítulos) feitos de **passos** (cada fala ou ação do agente). A diferença de Puca é
 uma vista nova, o **quadro**, que o agente monta enquanto explica.
 
 Tipos: [`src/journey/types.ts`](../src/journey/types.ts). Validação: [`src/journey/validate.ts`](../src/journey/validate.ts).
@@ -68,7 +68,7 @@ Jornada de exemplo: [`kota.journey.json`](../src/journey/data/kota.journey.json)
 | Campo | Para quê |
 |---|---|
 | `goal` | O que o passo quer alcançar (não é falado; não pode repetir dentro do momento). |
-| `line` | O que o agente fala. É uma orientação, não um texto decorado: com um LLM, o Puca adapta as palavras à conversa. |
+| `line` | O que o agente fala. É uma orientação, não um texto decorado: com um LLM, Puca adapta as palavras à conversa. |
 | `highlight` | Trecho da fala que fica destacado (fundo cinza) na legenda. |
 | `knowledge` | Contexto extra do passo, como o do momento. |
 | `actions` | Ações no quadro: antes da fala, ou no trecho marcado em `at` (tabela abaixo). |
@@ -94,7 +94,7 @@ só diz se o tema está entendido ou se vale rever, e atualiza a calibragem e a 
 ```
 
 - `tema`: um dos temas da calibragem (`empresa`, `rituais`, `pagamentos`, `mensageria`, `falhas`).
-- Num `select`, entendeu = tocou num dos `expect.nodes` **sem** precisar que o Puca revelasse a resposta.
+- Num `select`, entendeu = tocou num dos `expect.nodes` **sem** precisar que Puca revelasse a resposta.
 - Num `wait`, `replies` diz quais `suggested_replies` mostram que entendeu. Texto livre e voz valem pelo mesmo casamento de palavras
   das respostas sugeridas: enquanto a checagem espera, o que a pessoa diz vai inteiro para ela (não para o `knowledge`, que
   entregaria a resposta). Pergunta ("pode repetir?") e pedido de mudar de assunto continuam funcionando.
@@ -109,12 +109,12 @@ só diz se o tema está entendido ou se vale rever, e atualiza a calibragem e a 
 | `{ "type": "reveal", "targets": [ids] }` | Nós aparecem; arestas se desenham. |
 | `{ "type": "highlight", "targets": [ids], "tone": "focus" \| "warn" \| "ok" }` | Destaca e esmaece o resto. Sem cor: `ok` = contorno cheio e grosso com um visto; `warn` = contorno duplo cinza. |
 | `{ "type": "clear_highlight" }` | Volta tudo ao normal. |
-| `{ "type": "focus", "target": id \| null }` | Anel com a cor do Puca (arco-íris) no nó que ele está explicando; `null` tira. |
+| `{ "type": "focus", "target": id \| null }` | Anel com a cor de Puca (arco-íris) no nó que ele está explicando; `null` tira. |
 | `{ "type": "flow", "path": [ids de arestas] }` | Um pulso percorre o caminho. |
 | `{ "type": "card", "target": id }` / `{ "type": "close_card" }` | Abre ou fecha o cartão do nó. |
 | `{ "type": "reset" }` | Esconde tudo. |
 
-Qualquer ação aceita `at`: um trecho da `line` do passo. A ação acontece quando o Puca chega nesse trecho da fala,
+Qualquer ação aceita `at`: um trecho da `line` do passo. A ação acontece quando Puca chega nesse trecho da fala,
 para o quadro acompanhar a explicação; sem `at`, ela acontece antes da fala. O trecho precisa estar na `line`.
 
 ```jsonc
@@ -147,10 +147,10 @@ para o quadro acompanhar a explicação; sem `at`, ela acontece antes da fala. O
 
 Além das respostas sugeridas, a pessoa pode escrever qualquer coisa no chat a qualquer momento:
 
-- **Pedir para mudar de assunto** ("volta pro caminho da transação", "quero ver a primeira tarefa"): O Puca vai para o
+- **Pedir para mudar de assunto** ("volta pro caminho da transação", "quero ver a primeira tarefa"): Puca vai para o
   **início** do momento pedido. Não é preciso escrever transições para isso; os títulos e objetivos dos momentos são o
   que ela usa para se localizar, por isso precisam ser únicos.
-- **Perguntar algo** ("onde está o cálculo do MDR?"): O Puca responde com o `knowledge` do passo e do momento atuais
+- **Perguntar algo** ("onde está o cálculo do MDR?"): Puca responde com o `knowledge` do passo e do momento atuais
   (ou de outro momento da sessão) e continua de onde estava.
 - **Sem fonte confiável**: ela diz que não achou confirmado e anota a dúvida para a buddy, sem chutar.
 

@@ -1,4 +1,4 @@
-// Prova: a Puca desenha, marca e mostra imagem por cima de uma página real (GitHub), clica de verdade,
+// Prova: Puca desenha, marca e mostra imagem por cima de uma página real (GitHub), clica de verdade,
 // é interrompida no meio de uma sequência e percebe o clique da pessoa. Tudo pelo protocolo de depuração
 // do Chromium (webContents.debugger), sem permissão do macOS.
 const { app, BrowserWindow } = require("electron");
@@ -10,7 +10,7 @@ fs.mkdirSync(OUT, { recursive: true });
 const log = (...a) => console.log(`[${(performance.now() / 1000).toFixed(1)}s]`, ...a);
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// Camada da Puca injetada na página: não pega clique (pointer-events: none), coordenadas do documento.
+// Camada de Puca injetada na página: não pega clique (pointer-events: none), coordenadas do documento.
 const CAMADA = String.raw`
 window.__puca ??= (() => {
   const NS = "http://www.w3.org/2000/svg";
@@ -79,7 +79,7 @@ window.__puca ??= (() => {
   };
 })();`;
 
-// Imagem que a Puca mostra: um mini-mapa dos serviços (SVG inline).
+// Imagem que Puca mostra: um mini-mapa dos serviços (SVG inline).
 const MINI_MAPA = `<div style="font-weight:600;margin-bottom:6px">Onde o livro-razão entra</div>
 <svg width="262" height="96" viewBox="0 0 262 96" style="display:block">
   <g font-family="system-ui" font-size="11" text-anchor="middle">
@@ -103,13 +103,13 @@ app.whenReady().then(async () => {
   const cdp = (m, p = {}) => dbg.sendCommand(m, p);
   await cdp("Page.enable");
   await cdp("Runtime.enable");
-  await cdp("Page.setBypassCSP", { enabled: true }); // o navegador é nosso: a página não bloqueia a camada da Puca
+  await cdp("Page.setBypassCSP", { enabled: true }); // o navegador é nosso: a página não bloqueia a camada de Puca
   log("depurador conectado");
 
-  // Clique da pessoa: a página avisa o app por um binding. Cliques da Puca levam uma marca e são ignorados.
+  // Clique da pessoa: a página avisa o app por um binding. Cliques de Puca levam uma marca e são ignorados.
   await cdp("Runtime.addBinding", { name: "pucaViu" });
   dbg.on("message", (_e, metodo, p) => {
-    if (metodo === "Runtime.bindingCalled" && p.name === "pucaViu") log("👀 a Puca percebeu: a pessoa clicou em", JSON.parse(p.payload));
+    if (metodo === "Runtime.bindingCalled" && p.name === "pucaViu") log("👀 Puca percebeu: a pessoa clicou em", JSON.parse(p.payload));
   });
   const OUVIR = `if (!window.__ouvindo) { window.__ouvindo = true; document.addEventListener("click", (e) => {
     if (window.__pucaClicando) return; const a = e.target.closest("a, button");
@@ -136,7 +136,7 @@ app.whenReady().then(async () => {
   await new Promise((r) => w.webContents.once("did-finish-load", r));
   await espera(1500);
   await prepara();
-  log("camada da Puca injetada");
+  log("camada de Puca injetada");
 
   // Sequência 1: mostrar, marcar, explicar com imagem, clicar.
   const alvo = await js(`__puca.retangulo("README.md")`);
@@ -177,7 +177,7 @@ app.whenReady().then(async () => {
     await print("3-interrompida.png");
   }
 
-  // A pessoa clica num link da página (simulado com clique real de mouse, sem a marca da Puca).
+  // A pessoa clica num link da página (simulado com clique real de mouse, sem a marca de Puca).
   await js("__puca.limpar()");
   const link = await js(`(() => { const a = [...document.querySelectorAll("a")].find((x) => x.textContent.trim() === "Issues" && x.getBoundingClientRect().width > 0);
     if (!a) return null; a.scrollIntoView({ block: "center" }); return a.getBoundingClientRect().toJSON(); })()`);

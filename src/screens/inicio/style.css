@@ -1,6 +1,6 @@
 /* Início do Orbis no visual da landing (DESIGN.md): papel branco, tinta preta, fios de 1px,
    títulos em Creato Display. Estado pela marca (cheio, anel, tracejado, vazado), nunca pela cor.
-   A cor do Puca só na esfera do aviso, na câmera e nas partículas. */
+   A cor de Puca só na esfera do aviso, na câmera e nas partículas. */
 :root {
   --ink: var(--color-text);
   --paper: var(--color-surface);
@@ -72,7 +72,7 @@ body {
 }
 
 .brand__mark {
-  /* logo: as bolinhas do Puca (src/assets/orbis-logo.png) */
+  /* logo: as bolinhas de Puca (src/assets/orbis-logo.png) */
   display: block;
   flex: none;
   width: 26px;
@@ -122,10 +122,25 @@ body {
   border: 1.5px dashed var(--color-subtle);
 }
 
+/* ---- Ligar para o Puca: com a call desligada, o botão fica na página, embaixo do nome, e não flutua por cima
+   das ferramentas (cobria o campo de e-mail). Ligada, a câmera do Puca flutua como em toda tela. ---- */
+#puca-call .call-dock.is-ended {
+  position: static;
+  transform: none;
+  justify-items: start;
+  margin-top: 14px;
+}
+#puca-call .call-dock.is-ended .call-live {
+  display: none;
+}
+#puca-call .call-dock.is-ended .call-redial {
+  justify-self: start; /* preso à câmera ele centraliza; aqui alinha com o nome */
+}
+
 /* ---- Página ---- */
 .page {
   padding-top: clamp(32px, 4vw, 56px);
-  padding-bottom: 160px; /* espaço do botão do Puca */
+  padding-bottom: 160px; /* espaço do botão de Puca */
 }
 
 h2 {
@@ -310,7 +325,7 @@ h2 {
   transform: scale(0.98);
 }
 
-/* ---- Aviso do Puca ---- */
+/* ---- Aviso de Puca ---- */
 .notice {
   display: flex;
   align-items: center;

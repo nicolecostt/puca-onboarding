@@ -6,7 +6,7 @@ políticas) numa sessão guiada, visual e feita para cada pessoa.
 
 ## Como funciona
 
-1. **Call inicial:** O Puca conversa com a pessoa para entender o cargo, o time e o que ela já sabe.
+1. **Call inicial:** Puca conversa com a pessoa para entender o cargo, o time e o que ela já sabe.
 2. **Jornada:** com isso, monta um caminho próprio e pula o que a pessoa já domina.
 3. **Sessão no quadro:** explica falando enquanto desenha no quadro (sistemas, pessoas, decisões), e a pessoa
    interrompe e pergunta quando quiser, por voz ou chat.
@@ -19,7 +19,7 @@ Buddy, gestor e RH acompanham o progresso e as pendências sem precisar repetir 
 ## A Kota
 
 Na demo, a pessoa entra na **Kota**, um banco digital fictício com código que roda, ADRs, Notion e Slack de verdade.
-O kit da Kota é a fonte do Puca e a prova para quem avalia: tudo o que ele explica dá para conferir lá.
+O kit da Kota é a fonte de Puca e a prova para quem avalia: tudo o que ele explica dá para conferir lá.
 
 ## Instalar no Mac
 

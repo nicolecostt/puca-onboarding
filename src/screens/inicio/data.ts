@@ -36,7 +36,21 @@ export function tasksFor(
   tarefa: TarefaDoTime | null,
   nome: string | undefined,
   pedido: PedidoDeAprovacao | null,
+  sessaoFeita = true,
 ): Task[] {
+  // vindo da call inicial, a sessão no quadro é o que vem agora; o resto espera
+  if (!sessaoFeita) {
+    const depois = tasksFor(tarefa, nome, pedido).map((t) => ({ ...t, state: "next" as const }));
+    return [
+      {
+        title: "Primeira sessão no quadro",
+        detail: "Puca explica o seu time, os sistemas e as pessoas, montando o quadro enquanto fala.",
+        state: "now",
+        action: { label: "Começar a sessão", href: "../lesson/" },
+      },
+      ...depois,
+    ];
+  }
   const task: Task | null = tarefa ? {
     title: `Primeira tarefa: ${nome ?? tarefa.titulo}`,
     detail: pedido

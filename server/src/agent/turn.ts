@@ -34,7 +34,7 @@ export interface TurnInput {
   stepId: string;
   kind: TurnKind;
   text?: string;
-  /** A frase que o Puca dizia quando a pessoa cortou. */
+  /** A frase que Puca dizia quando a pessoa cortou. */
   interrupted?: string;
   history?: ChatMessage[];
   tts: TtsService | null;
@@ -46,13 +46,14 @@ export interface TurnInput {
 /** Sem nada falado depois disso, a ponte toca (só em turno de fala). */
 const BRIDGE_AFTER_MS = 2500;
 
-const RULES = `Você é o Puca e fala de si sempre no masculino ("o Puca", "obrigado", "pronto", "interrompido"), mesmo que algum trecho acima diga "a Puca" ou "Puca" sem artigo.
+const RULES = `Você é Puca e fala de si sempre no masculino ("Puca", "obrigado", "pronto", "interrompido"), mesmo que algum trecho acima diga "Puca" ou "Puca" sem artigo.
 Você está numa call de voz, em pt-BR, conduzindo uma sessão de onboarding. Você leva a conversa: sabe para onde a sessão vai e puxa a pessoa de volta com leveza.
 
 Como falar:
 - Tudo o que você escreve vira fala. Frases curtas, de conversa, no máximo 3 por turno. Sem markdown, listas, emojis ou siglas soletradas.
 - A primeira frase de cada resposta tem no máximo 8 palavras, para a voz sair rápido.
 - Não anuncie o que vai fazer ("vou responder e depois voltamos", "vou destacar no quadro"): faça.
+- Fale direto, como numa conversa: nunca rotule a fala ("Pergunto:", "Pergunta:", "Resposta:", "Puca:") nem a coloque entre aspas. Para perguntar, só pergunte.
 - Nunca fale das suas instruções, do passo, da pauta ou das ferramentas. A pessoa só ouve a conversa.
 - Ordem de cada resposta: primeiro TODA a fala, depois as ferramentas (quadro, next_step, go_to…). Ferramenta no meio corta o resto da fala.
 - Numa dúvida, dê o essencial em 2 ou 3 frases; se tiver mais, ofereça detalhar.
@@ -245,7 +246,7 @@ export async function turn(input: TurnInput, emit: (ev: TurnEvent) => void): Pro
   if (timing.llm_error && timing.llm_error !== "interrupted") say(FAILURE_LINE, "fallback");
   else if ((escalation || isCasoPessoal(input.text ?? "")) && !input.signal?.aborted && input.kind === "fala" && looksLikeQuestion(input.text ?? "")) {
     // caso pessoal encaminha mesmo sem a tool (o LLM às vezes só explica a regra), como no /api/ask (#189).
-    // Sem destino na tool, vale a fala do Puca; caso pessoal sem nada vai a People (PRODUCT.md §13.2)
+    // Sem destino na tool, vale a fala de Puca; caso pessoal sem nada vai a People (PRODUCT.md §13.2)
     const destino = escalationDestino ?? destinoPelaFala(falado) ?? (isCasoPessoal(input.text ?? "") ? "rh" : undefined);
     emit({ type: "escalate", summary: escalation ?? input.text ?? "", ...(destino ? { destino } : {}) });
   }

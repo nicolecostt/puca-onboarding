@@ -1,4 +1,4 @@
-// Navegador do Puca (decisão 0008, docs/stack.md §4, contrato "Computer use"): uma área da janela do Orbis com um
+// Navegador de Puca (decisão 0008, docs/stack.md §4, contrato "Computer use"): uma área da janela do Orbis com um
 // navegador de verdade, controlado pelo protocolo de depuração do Chromium. A sessão pede ações pelo IPC; elas rodam
 // numa fila serial que para quando a pessoa fala por cima.
 import { BrowserWindow, ipcMain, WebContentsView } from "electron";
@@ -58,7 +58,7 @@ export function ligarNavegador(win: BrowserWindow): void {
     wc.debugger.on("message", (_e, metodo, p: { frame?: { parentId?: string } }) => {
       if (metodo === "Page.frameStoppedLoading" || metodo === "Page.loadEventFired") carregou?.();
       // página nova: os desenhos da anterior somem. Navegação dentro do documento não limpa: o Notion reescreve a
-      // URL sozinho logo depois de carregar e apagaria a marca que o Puca acabou de fazer.
+      // URL sozinho logo depois de carregar e apagaria a marca que Puca acabou de fazer.
       if (metodo === "Page.frameNavigated" && !p.frame?.parentId) {
         void js("window.__puca?.limpar()").catch(() => {});
       }
@@ -154,7 +154,7 @@ export function ligarNavegador(win: BrowserWindow): void {
       v.setBounds(bounds);
       v.setVisible(true);
     };
-    void obter().then(aplicar).catch((e) => console.warn("navegador do Puca:", e));
+    void obter().then(aplicar).catch((e) => console.warn("navegador de Puca:", e));
   });
   ipcMain.on("orbis:navegador:esconder", () => view?.setVisible(false));
   ipcMain.on("orbis:navegador:cancelar", () => {

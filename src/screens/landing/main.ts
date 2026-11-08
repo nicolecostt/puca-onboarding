@@ -119,7 +119,7 @@ function cardFor(id: string): NodeCard | null {
 function mountBoard(): void {
   const canvas = qs<HTMLElement>(document, ".board__canvas");
   const field = (name: string) => qs<HTMLElement>(canvas, `[data-card="${name}"]`);
-  // marcar = true pinta o nó de preto (escolha da pessoa); no início o cartão só mostra o foco do Puca.
+  // marcar = true pinta o nó de preto (escolha da pessoa); no início o cartão só mostra o foco de Puca.
   const select = (id: string, marcar = true) => {
     const info = cardFor(id);
     if (!info) return;

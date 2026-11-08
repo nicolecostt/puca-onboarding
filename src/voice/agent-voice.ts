@@ -1,4 +1,4 @@
-// Voz do Puca na tela: fala com áudio do servidor (fila, um por vez), pergunta ao agente (ponte + LLM)
+// Voz de Puca na tela: fala com áudio do servidor (fila, um por vez), pergunta ao agente (ponte + LLM)
 // e microfone (Deepgram) com barge-in. Sem servidor ou sem chaves, cada parte desliga sozinha e a
 // tela segue como antes (legenda e chat).
 import type { DestinoDoEncaminhamento } from "../journey/encaminhamento-slack";
@@ -28,7 +28,7 @@ export interface TurnRequest {
   /** O perfil que a call inicial gravou (nome, cargo, time, gestor…); sem ele, o servidor usa o da demo. */
   profile?: Profile;
   history: { role: "user" | "assistant"; content: string }[];
-  /** A pessoa cortou o Puca: a frase que estava tocando. */
+  /** A pessoa cortou Puca: a frase que estava tocando. */
   interrupted?: { said: string };
 }
 
@@ -38,7 +38,7 @@ export interface CallRequest {
   text?: string;
   history: { role: "user" | "assistant"; content: string }[];
   interrupted?: { said: string };
-  /** Dados da admissão: o Puca confirma, não pergunta. */
+  /** Dados da admissão: Puca confirma, não pergunta. */
   admissao: { nome?: string; cargo?: string; time?: string; gestor?: string };
   /** O que já foi anotado nesta call. */
   anotado: Record<string, string>;
@@ -48,7 +48,7 @@ export interface CallRequest {
 
 export interface AskHandlers {
   /**
-   * Cada frase do Puca, na ordem: a ponte primeiro, depois o LLM. Chega antes de tocar: a legenda entra no `onStart` de
+   * Cada frase de Puca, na ordem: a ponte primeiro, depois o LLM. Chega antes de tocar: a legenda entra no `onStart` de
    * `play` e segue o `onWord`. Resolve quando terminou de falar.
    */
   onSpeak(text: string, play: (opts?: SpeakOptions) => Promise<void>): Promise<void>;
@@ -60,7 +60,7 @@ export interface AskHandlers {
   onCheck?(entendeu: boolean): void;
   /** Call inicial: o que a pessoa contou (chave da call → texto). */
   onAnswer?(key: string, value: string): void;
-  /** Call inicial: o Puca contou um assunto do onboarding cultural. */
+  /** Call inicial: Puca contou um assunto do onboarding cultural. */
   onCulture?(topic: string): void;
   /** Call inicial: acabou. */
   onDone?(): void;
@@ -97,13 +97,13 @@ export interface ListenHandlers {
   onFinal(text: string): void;
   /** Legenda ao vivo do que a pessoa está dizendo. */
   onCaption?(text: string): void;
-  /** A pessoa falou por cima do Puca: a fala já foi cortada; a tela decide o que fazer com o roteiro. */
+  /** A pessoa falou por cima de Puca: a fala já foi cortada; a tela decide o que fazer com o roteiro. */
   onBargeIn?(): void;
   /** O microfone ligou ("ouvindo") ou não vai ouvir (motivo). */
   onState?(state: MicState): void;
 }
 
-/** O que o Puca diz no chat quando o microfone não vai ouvir. */
+/** O que Puca diz no chat quando o microfone não vai ouvir. */
 export const MIC_AVISO: Record<Exclude<MicState, "ouvindo">, string> = {
   negado: "O microfone está bloqueado. Sigo pelo chat; para falar comigo, libere o microfone e recarregue a página.",
   "sem-microfone": "Não achei um microfone funcionando. Sigo pelo chat.",
@@ -141,7 +141,7 @@ export interface AgentVoice {
   readonly stt: boolean;
   /** Servidor com LLM: o LLM conduz a sessão (/api/turn). Sem ele, a sessão segue a jornada como roteiro. */
   readonly llm: boolean;
-  /** A frase do Puca tocando agora ("" se nenhuma). */
+  /** A frase de Puca tocando agora ("" se nenhuma). */
   readonly falando: string;
   /**
    * Precisa de um clique: o browser só libera áudio e microfone depois de um gesto. Desiste em ~1 s e devolve false
@@ -264,7 +264,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       onEvent: (ev) => {
         if (ev.type !== "caption" || paused) return;
         const c = ev.caption;
-        // Mic aberto enquanto o Puca fala: o eco dele é ignorado; fala nova da pessoa corta.
+        // Mic aberto enquanto Puca fala: o eco dele é ignorado; fala nova da pessoa corta.
         if (speaking) {
           const d = classifyBargeIn({ transcript: c.text, kind: c.kind, agentText: speaking });
           if (d.decision === "echo" || d.decision === "wait") return;

@@ -4,7 +4,7 @@
 /** Onde agir na página: pelo texto visível (sem diferenciar maiúscula nem acento) ou por seletor. Nunca coordenada. */
 export type Alvo = { texto: string; seletor?: string } | { seletor: string };
 
-/** Uma ação do Puca no navegador dele. Nenhuma publica nada em nome da pessoa. */
+/** Uma ação de Puca no navegador dele. Nenhuma publica nada em nome da pessoa. */
 export type AcaoDaPuca =
   | { tipo: "abrir"; url: string }
   | { tipo: "apontar" | "circular" | "marcar" | "rolar" | "clicar"; alvo: Alvo }

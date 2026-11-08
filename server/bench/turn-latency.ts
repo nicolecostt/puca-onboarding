@@ -1,4 +1,4 @@
-// Benchmark de turno: quanto a pessoa espera até o Puca começar a responder, por caminho.
+// Benchmark de turno: quanto a pessoa espera até Puca começar a responder, por caminho.
 // Usa a mesma ordem de decisão da tela (src/journey/route.ts). Caminhos locais rodam no browser
 // (aqui, medidos em processo); "ask" vai ao servidor por HTTP de verdade.
 // Uso: npm run bench:turn -- [--tts] [--label x] [--url https://orbis-puca.fly.dev] [--token <jwt>]
@@ -47,7 +47,7 @@ const script: { moment: string; step: string; text: string }[] = [
 interface Row {
   text: string;
   route: string;
-  /** Até o Puca começar a responder: decisão local, ou a ponte do /api/ask. */
+  /** Até Puca começar a responder: decisão local, ou a ponte do /api/ask. */
   first_response_ms: number;
   first_audio_byte_ms: number | null;
   llm_first_sentence_ms: number | null;
