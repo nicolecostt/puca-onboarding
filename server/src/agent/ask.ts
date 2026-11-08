@@ -68,7 +68,8 @@ export interface AskInput {
 }
 
 // O LLM às vezes admite que não confirmou sem chamar escalate_to_buddy: vale como encaminhamento.
-const NO_SOURCE = /não (consegui|consigo) confirmar|não (achei|tenho) (isso )?confirmad/i;
+// ... ou diz que encaminha ("Escalo para People", "Vou te encaminhar"): a Puca não pode prometer e não encaminhar.
+const NO_SOURCE = /não (consegui|consigo) confirmar|não (achei|tenho) (isso )?confirmad|\b(vou (te |lhe )?(encaminhar|escalar)|encaminho|escalo)\b/i;
 
 export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promise<AskTiming> {
   const t0 = performance.now();
