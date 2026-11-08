@@ -54,14 +54,14 @@ export interface ChatPanel {
 
 // Conversa de exemplo (tela de auxílio): a Puca usando o Slack da pessoa, com os passos que está fazendo
 const DEMO: ChatMessage[] = [
-  { from: "user", text: "Onde fica o README do terminal-config-api?" },
-  { from: "agent", text: "O Lucas mandou o link hoje no #time-terminais. Vou abrir o canal e te mostrar." },
+  { from: "user", text: "Onde fica o README do ledgerwriter?" },
+  { from: "agent", text: "A Beatriz mandou o link hoje no #livro-razao. Vou abrir o canal e te mostrar." },
   {
     from: "actions",
     steps: [
-      { name: "Abrir o #time-terminais", done: true },
+      { name: "Abrir o #livro-razao", done: true },
       { name: "Abrir o link do README", done: true },
-      { name: "Buscar “firmware” no Slack" },
+      { name: "Buscar “ledgerwriter” no Slack" },
     ],
   },
 ];

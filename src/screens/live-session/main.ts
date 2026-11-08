@@ -1,5 +1,5 @@
 // Tela de auxílio: barra de call, chat e câmera da Puca por cima de outra ferramenta.
-// A tela inteira imita o Slack (tema claro) com os dados da Tail; o conteúdo está no index.html.
+// A tela inteira imita o Slack (tema claro) com os dados da Kota; o conteúdo está no index.html.
 import "../../styles/base.css";
 import "./style.css";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";

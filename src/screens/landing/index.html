@@ -55,9 +55,9 @@
       </div>
 
       <div class="wrap">
-        <figure class="board" aria-label="Exemplo de quadro: o caminho de uma venda na Tail">
+        <figure class="board" aria-label="Exemplo de quadro: o caminho de uma transferência na Kota">
           <div class="board__bar">
-            <span>Sessão · O caminho de uma venda</span>
+            <span>Sessão · O caminho de uma transferência</span>
             <span class="board__hint">Clique num nó</span>
           </div>
           <div class="board__canvas">
@@ -66,10 +66,10 @@
               <path d="M49.5 30 L84 30" />
               <path d="M12 30 L12 76 L41.5 76" />
             </svg>
-            <button type="button" class="node" data-node="gateway" style="left:4%;top:20%"><small>serviço</small>pos-gateway</button>
-            <button type="button" class="node is-focus" data-node="topic" style="left:39.5%;top:20%;width:20%"><small>fila</small>transactions.authorized</button>
-            <button type="button" class="node node--box" data-node="settlement" style="left:75%;top:20%;width:18%"><small>caixa preta</small>settlement-worker</button>
-            <button type="button" class="node" data-node="authorizer" style="left:41.5%;top:66%"><small>serviço</small>authorizer</button>
+            <button type="button" class="node" data-node="frontend" style="left:4%;top:20%"><small>site</small>frontend</button>
+            <button type="button" class="node is-focus" data-node="ledgerwriter" style="left:39.5%;top:20%;width:20%"><small>serviço</small>ledgerwriter</button>
+            <button type="button" class="node" data-node="ledger-db" style="left:75%;top:20%;width:18%"><small>banco</small>ledger-db</button>
+            <button type="button" class="node" data-node="userservice" style="left:41.5%;top:66%"><small>serviço</small>userservice</button>
 
             <div class="card" aria-live="polite">
               <strong data-card="title"></strong>
@@ -80,7 +80,7 @@
           </div>
           <figcaption class="board__caption">
             <div class="orb" id="puca-orb" aria-hidden="true"></div>
-            <p>“Quando uma venda é aprovada, o pos-gateway publica na fila <b>transactions.authorized</b>. O settlement-worker lê dali. Quer ver o que acontece se falhar?”</p>
+            <p>“Quando o cliente transfere, o site manda a transação para o <b>ledgerwriter</b>. Ele confere o saldo e grava no ledger-db. Quer ver o que acontece se falhar?”</p>
           </figcaption>
         </figure>
       </div>
@@ -188,7 +188,7 @@
   <footer class="footer">
     <div class="wrap footer__row">
       <span class="brand"><img class="brand__mark" src="../../assets/orbis-logo.png" alt="" width="26" height="26">Orbis</span>
-      <span>Onboarding com a Puca · Tail é uma empresa fictícia</span>
+      <span>Onboarding com a Puca · a Kota é um banco fictício</span>
     </div>
   </footer>
 
