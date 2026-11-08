@@ -40,6 +40,7 @@ src/
     onboarding-call/     call inicial: a Puca conversa com a pessoa e grava a calibragem; no fim, abre as boas-vindas
     boas-vindas/         "Oi, {nome}": ir para o início ou refazer a call inicial
     inicio/              início do Orbis: progresso, perfil, tarefas, acessos e ligar para a Puca
+    rh/                  painel do RH: indicadores agregados das integrações e pendências (§5)
     lesson/              sessão no quadro: o quadro se monta junto com a fala
     live-session/        tela de auxílio: barra de call, chat e câmera por cima de uma tela
     primeira-tarefa/     página da primeira tarefa (estilo Notion): o que é, quem ajuda e a aprovação do gestor
