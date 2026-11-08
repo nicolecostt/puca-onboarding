@@ -143,6 +143,7 @@ function mountParticles(): void {
     speed: 0.004 + Math.random() * 0.012,
     drift: (Math.random() - 0.5) * 0.004,
     alpha: 0.25 + Math.random() * 0.5,
+    vis: 1,
   }));
   let w = 0;
   let h = 0;
@@ -158,7 +159,39 @@ function mountParticles(): void {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   };
 
+  // o que fica na frente das partículas: textos, botões, a esfera e o quadro.
+  // A partícula some ao passar por trás deles e reaparece do outro lado.
+  const OCCLUDERS =
+    "h1, h2, h3, p, dt, dd, .actions, .board, .skills, .puca__stage, .orb, .nav, .footer__row > *";
+  const PAD = 14;
+  const blockers: { l: number; t: number; r: number; b: number; round: boolean }[] = [];
+  const measure = () => {
+    blockers.length = 0;
+    document.querySelectorAll<HTMLElement>(OCCLUDERS).forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < -PAD || r.top > innerHeight + PAD || r.width === 0) return;
+      const round = el.classList.contains("puca__stage") || el.classList.contains("orb");
+      blockers.push({ l: r.left - PAD, t: r.top - PAD, r: r.right + PAD, b: r.bottom + PAD, round });
+    });
+  };
+  const hidden = (x: number, y: number) =>
+    blockers.some((k) => {
+      if (x < k.l || x > k.r || y < k.t || y > k.b) return false;
+      if (!k.round) return true;
+      const cx = (k.l + k.r) / 2;
+      const cy = (k.t + k.b) / 2;
+      const rad = (k.r - k.l) / 2;
+      return (x - cx) ** 2 + (y - cy) ** 2 < rad * rad;
+    });
+  let dirty = true;
+  addEventListener("scroll", () => (dirty = true), { passive: true });
+  addEventListener("resize", () => (dirty = true));
+
   const draw = (dt: number) => {
+    if (dirty) {
+      measure();
+      dirty = false;
+    }
     ctx.clearRect(0, 0, w, h);
     for (const d of dots) {
       d.y -= d.speed * dt;
@@ -168,7 +201,10 @@ function mountParticles(): void {
         d.y = 1.05;
         d.x = Math.random();
       }
-      ctx.fillStyle = `hsla(${d.hue}, 75%, 62%, ${d.alpha})`;
+      // apaga e acende suave ao entrar e sair de trás de um elemento
+      d.vis = Math.max(0, Math.min(1, d.vis + (hidden(d.x * w, d.y * h) ? -8 : 8) * Math.max(dt, 0.016)));
+      if (d.vis === 0) continue;
+      ctx.fillStyle = `hsla(${d.hue}, 75%, 62%, ${d.alpha * d.vis})`;
       ctx.beginPath();
       ctx.arc(d.x * w, d.y * h, d.r, 0, Math.PI * 2);
       ctx.fill();
