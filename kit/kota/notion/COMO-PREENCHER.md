@@ -18,7 +18,7 @@ Notion**: a próxima rodada desfaz, e o `check:kota` não vê a mudança.
   está conectado a outra conta, e nada do kit pode ir para lá.
 - **Ferramentas.** São as do MCP do Notion. No Claude Code têm o prefixo `mcp__claude_ai_Notion__` (por exemplo,
   `mcp__claude_ai_Notion__notion-fetch`) e precisam ser carregadas pelo `ToolSearch` antes do primeiro uso.
-- **Domínio público.** `dominio-pendente` (provisório). A URL pública de uma chave é
+- **Domínio público.** `lean-ptarmigan-dd2` (gerado pelo Notion; conferido pelo endpoint público getPublicPageData). A URL pública de uma chave é
   `https://<domínio>.notion.site/<id sem hífens>`. Para trocar o domínio, veja a seção "Trocar o domínio" no fim.
 - **Plano.** Os comandos abaixo rodam na raiz do repo. Este imprime a árvore, na ordem de criação, e as linhas das
   quatro databases:
@@ -151,11 +151,11 @@ com `notion-fetch` e `id: "notion://docs/notion-flavored-markdown-spec"`.
 
 ## Trocar o domínio
 
-O domínio público do workspace é escolhido na interface do Notion (Settings, Public pages). Depois de escolher,
+O domínio público do workspace é escolhido na interface do Notion (Settings, Sites). O endpoint público `https://www.notion.so/api/v3/getPublicPageData` devolve o domínio atual em `publicDomainName`. Depois de escolher,
 troque o domínio em todas as URLs, atualize a linha "Domínio público" deste arquivo e rode o `check:kota`:
 
 ```bash
-perl -pi -e 's#https://dominio-pendente\.notion\.site/#https://<domínio>.notion.site/#' kit/kota/notion/urls.json
+perl -pi -e 's#https://lean-ptarmigan-dd2\.notion\.site/#https://<domínio>.notion.site/#' kit/kota/notion/urls.json
 ```
 
 Publicar a raiz com as subpáginas (Share, Publish) é da tarefa N4. Até lá, as URLs do `urls.json` não abrem sem login.
