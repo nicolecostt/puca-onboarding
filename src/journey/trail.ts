@@ -33,7 +33,7 @@ export interface TrailEntry {
   tokens_estimated?: boolean;
 }
 
-/** Início e fim de uma sessão da aula (o `session` das entradas). */
+/** Início e fim de uma sessão (o `session` das entradas). */
 export interface TrailSession {
   session: string;
   started_at: string;
@@ -87,7 +87,7 @@ export function createTrail(store: KeyValueStore, opts: { now?: () => Date; sess
     },
     list: read,
     sessions: readSessions,
-    /** A aula começou. Recomeçar na mesma página mantém o início e reabre a sessão (apaga o fim). */
+    /** A sessão começou. Recomeçar na mesma página mantém o início e reabre a sessão (apaga o fim). */
     startSession(): void {
       const list = readSessions();
       if (list.some((s) => s.session === session)) {
@@ -96,7 +96,7 @@ export function createTrail(store: KeyValueStore, opts: { now?: () => Date; sess
       }
       writeSessions([...list, { session, started_at: now().toISOString(), ended_at: null }]);
     },
-    /** A call foi encerrada ou a aula terminou. */
+    /** A call foi encerrada ou a sessão terminou. */
     endSession(): void {
       writeSessions(readSessions().map((s) => (s.session === session ? { ...s, ended_at: now().toISOString() } : s)));
     },
@@ -154,7 +154,7 @@ export function summarizeSessions(entries: TrailEntry[], sessions: TrailSession[
  * porque as docs do nó não dizem quem cuida.
  */
 export function sourcesFor(route: Route, journey: Journey, moment: Moment | null): string[] {
-  if (route.kind === "knowledge") return [`Conhecimento da aula: ${moment?.title ?? journey.title}`];
+  if (route.kind === "knowledge") return [`Conhecimento da sessão: ${moment?.title ?? journey.title}`];
   if (route.kind !== "faq") return [];
   const info = journey.boards[route.faq.board]?.nodes.find((n) => n.id === route.faq.node)?.info;
   if (route.faq.intent === "why") return info?.adr ? [info.adr.id] : [];

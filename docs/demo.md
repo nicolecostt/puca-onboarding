@@ -13,7 +13,7 @@ npm run dev:server # API em :8787; precisa de server/.env (modelo em server/.env
 npm run dev        # http://localhost:5173
 ```
 
-Sem as chaves de voz no `server/.env`, a aula usa texto e a voz do browser. Sem o servidor, segue só com legenda e chat.
+Sem as chaves de voz no `server/.env`, a sessão usa texto e a voz do browser. Sem o servidor, segue só com legenda e chat.
 
 ## Fluxo da demo
 
@@ -24,13 +24,13 @@ Estado em 2026-11-07: **existe** (funciona, ainda que simulado), **parcial** ou 
 
 | # | Passo | Estado | Onde ver / o que precisa acontecer |
 |---|---|---|---|
-| 1 | Call inicial (onboarding cultural, cargo, time, conhecimentos, objetivos) | existe, simulada; falta o onboarding cultural (#57) | `/src/screens/onboarding-call/?perfil=ana` e `?perfil=bruno`; no fim, "Começar a aula →" leva à aula |
-| 2 | Jornada com objetivos e próximos passos | existe | na aula, o painel "Sua jornada" (canto de cima à esquerda): objetivo da pessoa, momentos marcados pela calibragem (aprender, revisar, já conhece, fora) e próximos passos; clicar num momento pula para ele. Com `?perfil=bruno`, "A Tail" fica fora e "Quando falha" é revisão |
-| 3 | Aula no quadro, com voz | existe | `/src/screens/lesson/?perfil=ana&auto=1` (institucional) e `?perfil=bruno&auto=1` (direto ao time); voz de verdade com `dev:server` e chaves |
+| 1 | Call inicial (onboarding cultural, cargo, time, conhecimentos, objetivos) | existe, simulada; falta o onboarding cultural (#57) | `/src/screens/onboarding-call/?perfil=ana` e `?perfil=bruno`; no fim, "Começar a sessão →" leva à sessão |
+| 2 | Jornada com objetivos e próximos passos | existe | na sessão, o painel "Sua jornada" (canto de cima à esquerda): objetivo da pessoa, momentos marcados pela calibragem (aprender, revisar, já conhece, fora) e próximos passos; clicar num momento pula para ele. Com `?perfil=bruno`, "A Tail" fica fora e "Quando falha" é revisão |
+| 3 | Sessão no quadro, com voz | existe | `/src/screens/lesson/?perfil=ana&auto=1` (institucional) e `?perfil=bruno&auto=1` (direto ao time); voz de verdade com `dev:server` e chaves |
 | 4 | Verificação de compreensão | parcial | passos `wait`/`select` da jornada: responder e tocar no nó certo |
 | 5 | Task | falta | — |
 | 6 | Progresso salvo | falta | hoje só o perfil, em `sessionStorage` |
-| 7 | Pergunta que muda o rumo | existe | na aula, por voz ou chat: pedir para mudar de assunto (pulo) ou perguntar; ordem em `src/journey/route.ts` |
+| 7 | Pergunta que muda o rumo | existe | na sessão, por voz ou chat: pedir para mudar de assunto (pulo) ou perguntar; ordem em `src/journey/route.ts` |
 | 8 | Dúvida que vira encaminhamento | existe, simulado | no momento "O caminho de uma transação", perguntar "quem cuida do tail-common?": a Puca diz que não há responsável confirmado e aparece "Encaminhado à Paula Nunes no Slack · Abrir Slack". No Slack, a Puca abre a DM da Paula, escreve a dúvida com o que consultou e o motivo, e envia; a Paula confirma. Com `dev:server`, uma pergunta sem fonte (ex.: "qual a política de home office do time?") também encaminha, pelo agente |
 | 9 | Tela de auxílio (computer use) | existe, simulada | `/src/screens/live-session/`: barra de call, chat, câmera e cursor da Puca no Slack; o cursor opera de verdade o envio do encaminhamento (passo 8) |
 
@@ -46,7 +46,7 @@ Do plano do time. Cada um vale quando o passo correspondente existir.
 - Perguntas diferentes das preparadas, e perguntas sem resposta na base (tem que cair no passo 8, nunca inventar).
 - Progresso e memória continuam numa sessão nova.
 - Instalação e uso em outro computador, seguindo só as instruções públicas.
-- Rastro: depois da aula, abrir `/src/screens/rastro/` (**tela só para a demo**). Cada fala aparece com o caminho, a resposta e a fonte, e "Baixar JSON" gera o arquivo para auditar.
+- Rastro: depois da sessão, abrir `/src/screens/rastro/` (**tela só para a demo**). Cada fala aparece com o caminho, a resposta e a fonte, e "Baixar JSON" gera o arquivo para auditar.
 - Custo da sessão (#52, só para auditar, não aparece na demo): no JSON baixado, `sessions` traz a duração, as falas, as perguntas ao agente e os tokens de cada sessão; no log do servidor (`npm run dev:server`), cada pergunta ao agente vira uma linha `"msg":"ask"` com o `timing`, inclusive as interrompidas.
 
 ## Ordem da apresentação
