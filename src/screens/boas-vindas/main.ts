@@ -5,6 +5,7 @@
 import "../../styles/base.css";
 import "./style.css";
 import { activeProfile } from "../../data";
+import { loadSavedProfile } from "../../journey/profile";
 import { preserveProfileLinks } from "../../lib/navigation";
 import { qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
@@ -16,6 +17,8 @@ if (new URLSearchParams(location.search).get("perfil")) {
   qs(document, "#title").textContent = `Oi, ${profile.nickname}.`;
   qs(document, "#who").textContent = profile.name;
 }
+// reabrir o app depois da call: o Início fica a um clique, sem refazer a call (revisão do #221)
+qs(document, "#go-inicio").hidden = !loadSavedProfile();
 montarEmailDoSlack(qs(document, ".home"));
 mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
   occluders: ".topbar__row > *, .home__title, .home__lead, .home__actions > *, .slack-email",

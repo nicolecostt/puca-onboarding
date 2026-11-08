@@ -320,7 +320,7 @@ async function main(): Promise<void> {
   render();
   if (!voice.llm) {
     chat.addMessage({ from: "agent", text: SEM_PUCA });
-    // sem a call, a pessoa não fica presa aqui: segue para a sessão com o perfil de exemplo de quem ela escolheu.
+    // sem a call, a pessoa não fica presa aqui: segue para a sessão com o perfil de exemplo do vínculo (o do ?perfil=, ou Ana).
     // A legenda fica com a primeira frase (o aviso inteiro está no chat), para o botão caber acima da barra da call.
     el.captionAgent.textContent = "Puca está fora do ar agora.";
     setAgent("offline");
