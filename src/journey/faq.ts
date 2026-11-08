@@ -23,7 +23,7 @@ export function buildFaqs(journey: Journey, profile: Profile): Faq[] {
   for (const [board, spec] of Object.entries(journey.boards)) {
     for (const n of spec.nodes) {
       const i = n.info;
-      if (!i) continue;
+      if (!i || (i.vinculo && i.vinculo !== profile?.vinculo)) continue; // nó do outro vínculo: não existe para esta pessoa
       const label = n.label.replace(/\n/g, " ");
       const base = { board, node: n.id, label };
       const focus: BoardAction[] = [{ type: "highlight", targets: [n.id], tone: "focus" }];

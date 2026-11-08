@@ -40,6 +40,7 @@ src/
     onboarding-call/     call inicial: o agente entrevista a pessoa e grava a calibragem
     lesson/              sessão no quadro: o quadro se monta junto com a fala
     live-session/        tela de auxílio: barra de call, chat e câmera por cima de uma tela
+    primeira-tarefa/     página da primeira tarefa (estilo Notion): o que é, quem ajuda e a aprovação do gestor
   components/            peças reutilizáveis (cada uma com .ts, .css e icons/)
     app-header/          topo do app: logo, empresa, etapas da jornada, pessoa
     whiteboard/          quadro da sessão (visual do Figma), desenhado a partir da jornada

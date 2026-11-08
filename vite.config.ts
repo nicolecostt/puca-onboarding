@@ -16,6 +16,7 @@ export default defineConfig({
         liveSession: page("./src/screens/live-session/index.html"),
         lesson: page("./src/screens/lesson/index.html"),
         rastro: page("./src/screens/rastro/index.html"),
+        primeiraTarefa: page("./src/screens/primeira-tarefa/index.html"),
         landing: page("./src/screens/landing/index.html"),
       },
     },

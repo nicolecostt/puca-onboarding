@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Primeira tarefa · Tail</title>
+<script>
+  // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
+  if (location.protocol === "file:") {
+    addEventListener("DOMContentLoaded", function () {
+      document.body.innerHTML =
+        '<div style="max-width:440px;margin:15vh auto;padding:24px;font:15px/1.6 system-ui,sans-serif;color:#171717;background:#fff;border:1px solid #e5e5e5;border-radius:12px">' +
+        "<strong>Esta página precisa do servidor do projeto.</strong><br>" +
+        "No terminal, na pasta do projeto, rode <code>npm run dev</code> e abra " +
+        '<a href="http://localhost:5173/">http://localhost:5173</a>.</div>';
+    });
+  }
+</script>
+</head>
+<body>
+  <!-- Página da tarefa no Notion da Tail (simulado, PRODUCT.md §4.4): a primeira tarefa que a Puca entregou e o estado da aprovação do gestor. -->
+  <main class="nt">
+    <nav class="nt__crumbs" aria-label="Caminho">Tail <span>/</span> Time Terminais <span>/</span> Primeiras tarefas</nav>
+    <article id="doc" class="nt__doc" hidden>
+      <h1 id="titulo" class="nt__title"></h1>
+      <div class="nt__props">
+        <p><span class="nt__key">Estado</span><span id="status" class="nt__chip"></span></p>
+        <p><span class="nt__key">Para</span><span id="pessoa"></span></p>
+        <p><span class="nt__key">Entregue por</span><span>Puca, na sessão</span></p>
+      </div>
+      <section><h2>Problema</h2><p id="problema"></p></section>
+      <section><h2>Por que importa</h2><p id="porque"></p></section>
+      <section><h2>Sistemas</h2><p id="sistemas"></p></section>
+      <section><h2>Onde ler</h2><p id="onde-ler"></p></section>
+      <section><h2>Quem ajuda</h2><p id="quem-ajuda"></p></section>
+      <p class="nt__foot">Tarefa do catálogo aprovado pelo time de Terminais.</p>
+    </article>
+    <p id="empty" class="nt__empty" hidden>Nenhuma tarefa entregue ainda. Ela aparece aqui quando a Puca apresentar a primeira tarefa na <a href="../lesson/">sessão</a>.</p>
+  </main>
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

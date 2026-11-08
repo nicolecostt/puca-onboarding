@@ -34,6 +34,10 @@ function checkBoard(name: string, b: unknown, errors: string[]): void {
     }
     if (ids.has(n.id)) errors.push(`quadro "${name}": nó "${n.id}" repetido`);
     ids.add(n.id);
+    const vinculo = isObj(n.info) ? n.info.vinculo : undefined;
+    if (vinculo !== undefined && vinculo !== "novo" && vinculo !== "transicao") {
+      errors.push(`quadro "${name}": nó "${n.id}" com info.vinculo "${String(vinculo)}" (use "novo" ou "transicao")`);
+    }
   }
   for (const e of b.edges as unknown[]) {
     if (!isObj(e) || !isStr(e.id) || !isStr(e.from) || !isStr(e.to)) {

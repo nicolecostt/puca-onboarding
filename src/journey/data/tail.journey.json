@@ -451,7 +451,28 @@
               "Sistemas: só o terminal-config-api (validação e testes)",
               "Onde ler: README do terminal-config-api",
               "Quem ajuda: Lucas Melo e Paula Nunes"
-            ]
+            ],
+            "vinculo": "novo"
+          },
+          "w": 190
+        },
+        {
+          "id": "task-dlq",
+          "label": "Primeira tarefa",
+          "sublabel": "retry e DLQ na publicação",
+          "kind": "task",
+          "x": 325.0,
+          "y": 488.4,
+          "info": {
+            "role": "Fazer a publicação de configuração tentar de novo e, se continuar falhando, ir para uma DLQ.",
+            "bullets": [
+              "Problema: se o terminal.config.updated fica fora do ar, a configuração publicada se perde sem aviso",
+              "Por que importa: a maquininha fica com a configuração antiga e ninguém sabe",
+              "Sistemas: terminal-config-api e terminal.config.updated",
+              "Onde ler: README do terminal-config-api",
+              "Quem ajuda: Lucas Melo e Paula Nunes"
+            ],
+            "vinculo": "transicao"
           },
           "w": 190
         }
@@ -583,6 +604,12 @@
         {
           "id": "e-task-cfg",
           "from": "task",
+          "to": "config-api",
+          "label": "mexe aqui"
+        },
+        {
+          "id": "e-task-dlq-cfg",
+          "from": "task-dlq",
           "to": "config-api",
           "label": "mexe aqui"
         }
@@ -1497,8 +1524,8 @@
       "steps": [
         {
           "id": "pt-tarefa",
-          "goal": "Apresentar a tarefa",
-          "line": "Para fechar a parte técnica, separei uma primeira tarefa que o time aprovou: validar a versão mínima de firmware antes de publicar uma configuração. O cartão explica o problema, por que importa e onde ler.",
+          "goal": "Anunciar a primeira tarefa",
+          "line": "Para fechar a parte técnica, separei uma primeira tarefa do catálogo que o time aprovou, pensada para o seu momento.",
           "actions": [
             {
               "type": "clear_highlight"
@@ -1514,7 +1541,25 @@
                 "e-cfg-pub",
                 "e-pub-cdn"
               ]
-            },
+            }
+          ],
+          "transitions": [
+            {
+              "to": {
+                "step": "pt-tarefa-transicao"
+              },
+              "if": {
+                "profile": "vinculo",
+                "eq": "transicao"
+              }
+            }
+          ]
+        },
+        {
+          "id": "pt-tarefa-novo",
+          "goal": "Apresentar a tarefa de quem é novo",
+          "line": "É validar a versão mínima de firmware antes de publicar uma configuração. O cartão explica o problema, por que importa e onde ler.",
+          "actions": [
             {
               "type": "reveal",
               "targets": [
@@ -1531,12 +1576,13 @@
               "target": "task",
               "at": "O cartão explica"
             }
-          ]
+          ],
+          "knowledge": "A tarefa mexe só no terminal-config-api: a validação da versão mínima de firmware e os testes. O README do terminal-config-api explica o fluxo de configuração das maquininhas. O Lucas Melo revisa a mudança."
         },
         {
           "id": "pt-escopo",
-          "goal": "Mostrar que a tarefa tem escopo pequeno",
-          "line": "Ela mexe só no terminal-config-api, então você não precisa entender o sistema inteiro para começar. Se travar, o Lucas e a Paula podem te ajudar.",
+          "goal": "Mostrar que a tarefa de quem é novo tem escopo pequeno",
+          "line": "Ela mexe só no terminal-config-api, então você não precisa entender o sistema inteiro. A Paula faz a primeira parte em par com você, e o Lucas revisa.",
           "actions": [
             {
               "type": "close_card"
@@ -1554,10 +1600,69 @@
               ],
               "tone": "ok"
             }
+          ],
+          "transitions": [
+            {
+              "to": {
+                "step": "pt-aprovacao"
+              }
+            }
           ]
+        },
+        {
+          "id": "pt-tarefa-transicao",
+          "goal": "Apresentar a tarefa de quem está em transição",
+          "line": "Como você já é da Tail, ela vai um pouco além: fazer a publicação de configuração tentar de novo e, se continuar falhando, ir para uma DLQ. O cartão explica.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "task-dlq",
+                "e-task-dlq-cfg"
+              ]
+            },
+            {
+              "type": "focus",
+              "target": "task-dlq"
+            },
+            {
+              "type": "card",
+              "target": "task-dlq",
+              "at": "O cartão explica"
+            }
+          ],
+          "knowledge": "A tarefa mexe no terminal-config-api e no terminal.config.updated: a publicação de configuração ganha retry e, esgotadas as tentativas, vai para uma DLQ. O README do terminal-config-api explica o fluxo de configuração das maquininhas. O Lucas Melo revisa a mudança."
+        },
+        {
+          "id": "pt-escopo-transicao",
+          "goal": "Mostrar onde a tarefa de quem está em transição mexe",
+          "line": "Ela mexe no terminal-config-api e no terminal.config.updated. Se travar, o Lucas e a Paula podem te ajudar.",
+          "actions": [
+            {
+              "type": "close_card"
+            },
+            {
+              "type": "focus",
+              "target": null
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "task-dlq",
+                "e-task-dlq-cfg",
+                "config-api"
+              ],
+              "tone": "ok"
+            }
+          ]
+        },
+        {
+          "id": "pt-aprovacao",
+          "goal": "Contar que a tarefa foi para o gestor aprovar",
+          "line": "Mandei a tarefa para {gestor} aprovar no Slack. Depois de aprovada, ela fica na página da tarefa, com tudo o que eu te mostrei."
         }
       ],
-      "knowledge": "A tarefa mexe só no terminal-config-api: a validação da versão mínima de firmware e os testes. O README do terminal-config-api explica o fluxo de configuração das maquininhas. O Lucas Melo revisa a mudança."
+      "knowledge": "A primeira tarefa sai do catálogo que o time aprovou: quem é novo recebe uma mais guiada, quem está em transição uma que vai um pouco além. A Puca manda a tarefa para o gestor aprovar no Slack; aprovada, ela fica na página da tarefa."
     },
     {
       "id": "encerramento",

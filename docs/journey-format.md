@@ -42,6 +42,11 @@ Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json)
 - `kind` diz o que o nó é: `frontend`, `service`, `db`, `external`, `queue`, `person`, `team`, `value`, `doc`, `task`. No quadro, `queue` vira pílula cinza com contorno preto; o resto, caixa desenhada.
 - Opcionais de desenho: `w` (largura; sem ela, sai do tamanho do rótulo), `look` (`"blackbox"` = caixa preta tracejada, `"dlq"` = fila de erro vermelha, tracejada), `note` (selo embaixo do nó). O rótulo aceita `\n` para quebrar linha.
 - `info` alimenta o **cartão do nó** (§4.3): função, time, responsável, fontes e ADR.
+- Nó `kind: "task"` é uma **primeira tarefa** do catálogo do time: `info.role` é o título e `info.bullets` são exatamente
+  `Problema: …`, `Por que importa: …`, `Sistemas: …`, `Onde ler: …` e `Quem ajuda: …`. Abrir o cartão dele na sessão
+  cria o pedido de aprovação ao gestor ([contratos](contratos.md#primeira-tarefa)).
+- `info.vinculo` (`"novo"` ou `"transicao"`, opcional): o nó só existe para esse vínculo. O FAQ e o agente no servidor
+  ignoram o nó para o outro vínculo. Use quando o quadro tem uma versão de um nó para cada perfil, como a primeira tarefa.
 - `owner_confirmed: false` faz o cartão dizer que não há responsável confirmado e indicar a buddy. É a regra de não inventar quem cuida de um sistema.
 - Arestas: `{ "id", "from", "to", "label"? }`. Ids de nós e arestas não podem se repetir no mesmo quadro.
   Opcionais: `style` (`"inferred"` tracejada cinza, `"retry"` tracejada vermelha), `path`/`head` (desenho exato da linha e da ponta em SVG; sem eles, a seta é calculada), `label_at` e `label_font` (`"hand"` ou `"mono"`), `evidence` (`{ "kind": "proven" | "inferred", "x", "y" }`: selo "✓ provado" ou "inferido").

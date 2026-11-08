@@ -14,6 +14,7 @@ import { buildFaqs } from "../../journey/faq";
 import { routeUtterance } from "../../journey/route";
 import { browserStore } from "../../journey/storage";
 import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
+import { createPedidos, PEDIDOS_KEY, tarefaDoPasso } from "../../journey/primeira-tarefa";
 import { createTrail, sourcesFor } from "../../journey/trail";
 import { createAgentVoice } from "../../voice/agent-voice";
 import { interpolate, interpolateDeep, resolveProfile } from "../../journey/profile";
@@ -84,6 +85,7 @@ async function main(): Promise<void> {
     voice: qs(document, "#voice"),
     forwardToast: qs(document, "#forward-toast"),
     forwardText: qs(document, "#forward-text"),
+    forwardLink: qs<HTMLAnchorElement>(document, "#forward-link"),
   };
   el.lessonName.textContent = journey.title;
 
@@ -107,6 +109,10 @@ async function main(): Promise<void> {
   // Encaminhamentos à buddy: a tela do Slack (src/screens/live-session/) envia.
   const outbox = createOutbox(browserStore());
   const buddy = buddyOf(journey);
+  // Primeira tarefa (§4.4 e §12.1, passo 5): o pedido de aprovação ao gestor; a tela do Slack envia e grava a aprovação.
+  const pedidos = createPedidos(browserStore());
+  let pedidoDaSessao: string | null = null;
+  const aprovacaoAvisada = new Set<string>();
   const history: { role: "user" | "assistant"; content: string }[] = [];
   const remember = (role: "user" | "assistant", content: string) => {
     history.push({ role, content });
@@ -226,15 +232,53 @@ async function main(): Promise<void> {
   }
 
   let toastTimer = 0;
-  /** Encaminha a dúvida à buddy (§4.5): guarda para o Slack, marca no rastro e avisa na sessão. */
-  function forward(entryId: string, f: { question: string; summary: string; reason: string }): void {
-    const created = outbox.add({ ...f, to: { name: buddy, role: "buddy" }, pessoa: profile.nome, consulted: consultedNow(), moment: currentMoment?.id ?? null });
-    trail.update(entryId, { forwarding_id: created.id });
-    el.forwardText.textContent = `Encaminhado à ${buddy} no Slack`;
+  /** Aviso no canto da sessão, com um link para a outra tela (Slack ou página da tarefa). */
+  function showToast(text: string, link: { href: string; target: string; label: string }): void {
+    el.forwardText.textContent = text;
+    el.forwardLink.href = link.href;
+    el.forwardLink.target = link.target;
+    el.forwardLink.textContent = link.label;
     el.forwardToast.hidden = false;
     clearTimeout(toastTimer);
     toastTimer = window.setTimeout(() => (el.forwardToast.hidden = true), 8000);
   }
+  const SLACK = { href: "../live-session/", target: "puca-slack", label: "Abrir Slack" };
+
+  /** Encaminha a dúvida à buddy (§4.5): guarda para o Slack, marca no rastro e avisa na sessão. */
+  function forward(entryId: string, f: { question: string; summary: string; reason: string }): void {
+    const created = outbox.add({ ...f, to: { name: buddy, role: "buddy" }, pessoa: profile.nome, consulted: consultedNow(), moment: currentMoment?.id ?? null });
+    trail.update(entryId, { forwarding_id: created.id });
+    showToast(`Encaminhado à ${buddy} no Slack`, SLACK);
+  }
+
+  /** O passo abriu o cartão de uma tarefa do catálogo: pede a aprovação do gestor (o Slack envia). */
+  function entregarTarefa(step: Step, momentId: string): void {
+    const tarefa = tarefaDoPasso(journey, step);
+    if (!tarefa) return;
+    const gestor = profile.gestor?.trim();
+    if (!gestor) {
+      console.warn("primeira tarefa: perfil sem gestor, o pedido de aprovação não foi criado");
+      return;
+    }
+    // a mesma pessoa, tarefa e sessão devolvem o pedido que já existe: recomeçar não pede de novo, página nova pede
+    const p = pedidos.add({ pessoa: profile.nome, gestor, tarefa, moment: momentId, sessao: trail.session });
+    pedidoDaSessao = p.id;
+    if (p.status === "aprovada") aprovacaoAvisada.add(p.id);
+    else showToast(`Pedido de aprovação enviado a ${gestor} no Slack`, SLACK);
+  }
+
+  // O gestor aprovou no Slack (outra aba): avisa uma vez, com o link para a página da tarefa.
+  addEventListener("storage", (e) => {
+    if (e.key !== PEDIDOS_KEY || !pedidoDaSessao || aprovacaoAvisada.has(pedidoDaSessao)) return;
+    const p = pedidos.list().find((x) => x.id === pedidoDaSessao);
+    if (p?.status !== "aprovada") return;
+    aprovacaoAvisada.add(p.id);
+    showToast(`${p.aprovada_por ?? p.gestor} aprovou a sua primeira tarefa`, {
+      href: `../primeira-tarefa/?id=${encodeURIComponent(p.id)}`,
+      target: "puca-tarefa",
+      label: "Ver tarefa",
+    });
+  });
 
   /** O agente pediu outro ponto da sessão: resposta do passo atual que leva lá, ou pulo de momento. */
   function goTo(target: string): void {
@@ -510,6 +554,7 @@ async function main(): Promise<void> {
     },
     onStep(s, m) {
       currentStep = s;
+      entregarTarefa(s, m.id);
       emit("journey:step", { id: s.id, moment: m.id });
     },
   };

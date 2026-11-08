@@ -134,6 +134,8 @@ export interface NodeInfo {
   adr?: NodeAdr;
   /** Linhas livres (ex.: detalhes da primeira tarefa). */
   bullets?: string[];
+  /** O nó só existe para esse vínculo: o FAQ e o agente ignoram o nó para o outro (ex.: a primeira tarefa de cada um). */
+  vinculo?: Vinculo;
 }
 
 export interface BoardNode {

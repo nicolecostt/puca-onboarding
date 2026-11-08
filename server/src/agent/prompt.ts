@@ -17,7 +17,9 @@ export interface TurnContext {
 export function visibleNodes(ctx: TurnContext): BoardNode[] {
   const mi = ctx.journey.moments.findIndex((m) => m.id === ctx.momentId);
   const view = effectiveViews(ctx.journey.moments)[mi];
-  return view?.mode === "board" ? ctx.journey.boards[view.board].nodes : [];
+  if (view?.mode !== "board") return [];
+  // nó do outro vínculo (ex.: a primeira tarefa de quem é novo, para quem está em transição) não existe para esta pessoa
+  return ctx.journey.boards[view.board].nodes.filter((n) => !n.info?.vinculo || n.info.vinculo === ctx.profile?.vinculo); // perfil inválido não pode travar a resposta (ask.tokens.test)
 }
 
 function nodeLine(n: BoardNode, p: Profile): string {

@@ -17,8 +17,10 @@ function fakeIO(replies: string[], clicks: string[] = []) {
     onCheck: (c) => checks.push(c),
     enterView: (v, fresh) => views.push(`${v.mode === "board" ? v.board : "logo"}${fresh ? "" : " (herdada)"}`),
     apply: (a) => actions.push(a),
-    say: async (t) => {
+    // ações com `at` chegam ao quadro pela fala (cues), não pelo apply
+    say: async (t, cues: SpeechCue[] = []) => {
       said.push(t);
+      for (const c of cues) actions.push(c.action);
     },
     listen: async () => {
       const r = replies.shift();
@@ -54,6 +56,24 @@ describe("runner", () => {
     expect(r.moments).toEqual(["boas-vindas", "seu-time", "pagamentos", "checagem", "primeira-tarefa", "encerramento"]);
     expect(r.steps).toContain("bv-transicao");
     expect(r.steps).not.toContain("bv-novo");
+  });
+
+  it("a primeira tarefa muda com o vínculo e termina pedindo a aprovação", async () => {
+    const aprovacao = "Mandei a tarefa para Marcos Vidal aprovar no Slack. Depois de aprovada, ela fica na página da tarefa, com tudo o que eu te mostrei.";
+    const pt = (steps: string[]) => steps.filter((s) => s.startsWith("pt-"));
+    const cards = (actions: BoardAction[]) => actions.flatMap((a) => (a.type === "card" ? [a.target] : []));
+
+    const ana = await run(DEMO_PROFILES.novo, ["Pode seguir", "Ficou claro", "Pode seguir", "Terminar por hoje"]);
+    expect(pt(ana.steps)).toEqual(["pt-tarefa", "pt-tarefa-novo", "pt-escopo", "pt-aprovacao"]);
+    expect(cards(ana.actions)).toContain("task");
+    expect(cards(ana.actions)).not.toContain("task-dlq");
+    expect(ana.said).toContain(aprovacao);
+
+    const bruno = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"]);
+    expect(pt(bruno.steps)).toEqual(["pt-tarefa", "pt-tarefa-transicao", "pt-escopo-transicao", "pt-aprovacao"]);
+    expect(cards(bruno.actions)).toContain("task-dlq");
+    expect(cards(bruno.actions)).not.toContain("task");
+    expect(bruno.said).toContain(aprovacao);
   });
 
   it("resposta sugerida leva ao aprofundamento, e texto livre também", async () => {

@@ -1,0 +1,78 @@
+/* Página da primeira tarefa no Notion da Tail (simulado): documento claro, uma coluna, propriedades no topo. */
+body {
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.nt {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.nt__crumbs {
+  margin-bottom: 40px;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.nt__crumbs span {
+  margin: 0 6px;
+  color: var(--color-faint);
+}
+
+.nt__title {
+  margin: 0 0 16px;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.nt__props {
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+}
+
+.nt__props p {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0;
+}
+
+.nt__key {
+  width: 120px;
+  flex: none;
+  color: var(--color-muted);
+}
+
+.nt__chip {
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.nt__chip.is-ok {
+  background: var(--color-success-bg);
+  color: var(--color-success-strong);
+}
+
+.nt__doc h2 {
+  margin: 24px 0 6px;
+  font-size: var(--text-lg);
+}
+
+.nt__doc section p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.nt__foot,
+.nt__empty {
+  margin-top: 40px;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}

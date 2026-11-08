@@ -1,6 +1,7 @@
 // Encaminhamento (PRODUCT.md §4.5 e §12.1, passo 4): quando a Puca não tem fonte confiável, a dúvida vai
 // para a buddy com o contexto pronto (o que a pessoa perguntou, o que a Puca já consultou e por que não
 // respondeu). A sessão cria; a tela do Slack (screens/live-session) envia. Formato em docs/contratos.md.
+import { pendentes, proximaTentativa } from "./claim-queue";
 import { normalize } from "./conditions";
 import { readJson, writeJson, type KeyValueStore } from "./storage";
 import type { Journey } from "./types";
@@ -33,7 +34,6 @@ export interface Forwarding {
 
 export const FORWARDING_KEY = "puca:encaminhamentos";
 const SAME_QUESTION_MS = 2 * 60_000;
-const STALE_CLAIM_MS = 30_000;
 
 export function createOutbox(store: KeyValueStore, opts: { now?: () => Date } = {}) {
   const now = opts.now ?? (() => new Date());
@@ -58,23 +58,14 @@ export function createOutbox(store: KeyValueStore, opts: { now?: () => Date } = 
     list: read,
     /** Para enviar: os pendentes e, para outra aba, os presos em "enviando" há mais de 30 s (aba fechada no meio). */
     pending(tab?: string): Forwarding[] {
-      const t = now().getTime();
-      return read().filter(
-        (f) =>
-          f.status === "pendente" ||
-          (tab !== undefined && f.status === "enviando" && f.claimed_by !== tab && t - Date.parse(f.claimed_at ?? f.at) > STALE_CLAIM_MS),
-      );
+      return pendentes(read(), now().getTime(), tab);
     },
     /**
      * Quanto falta (ms) para um envio preso em "enviando" por outra aba poder ser pego por esta; null se não há.
      * A tela agenda uma nova tentativa com isso: sem timer, o envio só voltaria com outro evento (#84).
      */
     nextRetryIn(tab: string): number | null {
-      const t = now().getTime();
-      const waits = read()
-        .filter((f) => f.status === "enviando" && f.claimed_by !== tab)
-        .map((f) => Math.max(0, STALE_CLAIM_MS - (t - Date.parse(f.claimed_at ?? f.at))));
-      return waits.length ? Math.min(...waits) : null;
+      return proximaTentativa(read(), now().getTime(), tab);
     },
     setStatus(id: string, status: ForwardingStatus): void {
       write(read().map((f) => (f.id === id ? { ...f, status } : f)));
