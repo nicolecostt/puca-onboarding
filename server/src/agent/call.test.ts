@@ -10,7 +10,7 @@ vi.mock("../llm", () => ({
     for (const ev of script) yield ev;
   },
 }));
-const { callTurn } = await import("./call");
+const { callTurn, CAMPOS_DA_CALL, CULTURA } = await import("./call");
 type CallEvent = Parameters<Parameters<typeof callTurn>[1]>[0];
 
 const tool = (name: string, args: unknown): LlmEvent => ({ type: "tool_call", name, args, raw: JSON.stringify(args) });
@@ -69,9 +69,19 @@ describe("callTurn", () => {
   });
 
   it("a tarefa de preparação fecha a call: sem end_call (o Haiku esqueceu), a call acaba igual", async () => {
+    // pauta coberta: tudo anotado (menos o que só vale para transição) e a cultura de quem é novo contada
+    const daTransicao = ["time_anterior", "aproveita", "diferencas"];
+    const anotado = Object.fromEntries(CAMPOS_DA_CALL.filter((k) => !daTransicao.includes(k)).map((k) => [k, k === "vinculo" ? "novo" : "x"]));
     script = [{ type: "text", text: "Antes da sessão, entre nos canais." }, tool("assign_task", { titulo: "Entrar nos canais", porque: "x", passos: [] })];
-    const evs = await run();
+    const evs = await run({ anotado, cultura: [...CULTURA.novo] });
     expect(evs.filter((e) => e.type === "done")).toEqual([{ type: "done" }]);
+  });
+
+  it("uma tarefa cedo fica gravada, mas não encerra a call enquanto falta pauta (revisão do #223)", async () => {
+    script = [{ type: "text", text: "Já entra no #livro-razao." }, tool("assign_task", { titulo: "Entrar no #livro-razao", porque: "x", passos: [] })];
+    const evs = await run({ anotado: { vinculo: "novo", time: "Livro-razão" } });
+    expect(evs.filter((e) => e.type === "tarefa")).toHaveLength(1);
+    expect(evs.some((e) => e.type === "done")).toBe(false);
   });
 
   it("vínculo anotado com acento ou em palavras vira o valor do contrato, igual ao cliente (revisão do #221)", async () => {

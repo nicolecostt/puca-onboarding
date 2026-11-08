@@ -99,19 +99,25 @@ Anotações:
 - O cultural está no "Ainda falta": intercale um assunto cultural a cada uma ou duas perguntas, e chame culture_told no turno em que contou.
 - Só chame end_call depois de cobrir a pauta (ou se a pessoa pedir para encerrar).`;
 
-export function callContext(input: CallInput): string {
-  const a = input.admissao;
-  const anotado = Object.entries(input.anotado).filter(([, v]) => v);
+/** O que ainda falta na pauta da call: campos sem anotação e assuntos culturais não contados. */
+export function faltaNaCall(anotado: CallInput["anotado"], cultura: string[]): string[] {
   // o time anterior e o que aproveita só valem para quem está mudando de time
   const daTransicao = new Set(["time_anterior", "aproveita", "diferencas"]);
   // a mesma leitura do cliente (vinculoFromAnswer): "transição" ou "mudando de time" também são transição (revisão do #221)
-  const transicao = !!input.anotado.vinculo && vinculoFromAnswer(input.anotado.vinculo) === "transicao";
-  const faltam: string[] = CAMPOS_DA_CALL.filter((k) => !input.anotado[k] && (transicao || !daTransicao.has(k)));
+  const transicao = !!anotado.vinculo && vinculoFromAnswer(anotado.vinculo) === "transicao";
+  const faltam: string[] = CAMPOS_DA_CALL.filter((k) => !anotado[k] && (transicao || !daTransicao.has(k)));
   // a cultura só entra depois de saber o vínculo (novo ouve a empresa; transição ouve o time)
-  if (input.anotado.vinculo) {
-    const temas = CULTURA[transicao ? "transicao" : "novo"].filter((t) => !input.cultura.includes(t));
+  if (anotado.vinculo) {
+    const temas = CULTURA[transicao ? "transicao" : "novo"].filter((t) => !cultura.includes(t));
     faltam.push(...temas.map((t) => `cultura:${t} (conte em um trecho curto e chame culture_told)`));
   }
+  return faltam;
+}
+
+export function callContext(input: CallInput): string {
+  const a = input.admissao;
+  const anotado = Object.entries(input.anotado).filter(([, v]) => v);
+  const faltam = faltaNaCall(input.anotado, input.cultura);
   return [
     `Admissão (confirme, não pergunte): ${a.nome ? `nome ${a.nome}, ` : ""}cargo ${a.cargo ?? "?"}, time ${a.time ?? "?"}, gestor ${a.gestor ?? "?"}.`,
     `Já anotado: ${anotado.length ? anotado.map(([k, v]) => `${k}=${v}`).join("; ") : "nada"}.`,
@@ -173,6 +179,10 @@ export async function callTurn(input: CallInput, emit: (ev: CallEvent) => void):
   const splitter = new SentenceSplitter();
   let spoke = false;
   let ended = false;
+  // o que este turno anotou e contou, para saber se a pauta fechou quando vier uma tarefa
+  const anotadoAgora: CallInput["anotado"] = { ...input.anotado };
+  const culturaAgora = [...input.cultura];
+  let tarefaPassada = false;
   let usage: { input: number; output: number } | null = null;
   let sentChars: number | null = null;
   let outChars = 0;
@@ -200,20 +210,24 @@ export async function callTurn(input: CallInput, emit: (ev: CallEvent) => void):
       if (ev.name === "answer" && CAMPOS_DA_CALL.includes(a.key as CampoDaCall) && a.value?.trim()) {
         // o vínculo sai já no valor do contrato ("novo" ou "transicao"), para tela e servidor lerem igual
         const value = a.key === "vinculo" ? vinculoFromAnswer(a.value) : a.value.trim().slice(0, 300);
+        anotadoAgora[a.key as CampoDaCall] = value;
         emit({ type: "answer", key: a.key as CampoDaCall, value });
       } else if (ev.name === "culture_told" && TEMAS_DE_CULTURA.includes((ev.args as { topic?: string }).topic ?? "")) {
+        culturaAgora.push((ev.args as { topic: string }).topic);
         emit({ type: "culture", topic: (ev.args as { topic: string }).topic });
       } else if (ev.name === "assign_task") {
         const tarefa = lerTarefaDoAgente(ev.args);
         if (tarefa) emit({ type: "tarefa", tarefa });
-        // a tarefa de preparação é o fechamento: sem end_call (o LLM esqueceu), a call acaba igual (revisão do #223)
-        ended = true;
+        tarefaPassada = true;
       } else if (ev.name === "end_call" && !ended) {
         ended = true;
       }
     }
     const rest = splitter.flush();
     if (rest) sentence(rest);
+    // a tarefa de preparação é o fechamento: sem end_call (o LLM esqueceu), a call acaba igual (revisão do #223).
+    // Só fecha com a pauta coberta; uma tarefa cedo fica gravada e a call segue.
+    if (tarefaPassada && faltaNaCall(anotadoAgora, culturaAgora).length === 0) ended = true;
   } catch {
     timing.llm_error = input.signal?.aborted ? "interrupted" : ac.signal.aborted ? "timeout" : "provider_error";
   } finally {
