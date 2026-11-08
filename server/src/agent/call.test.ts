@@ -29,6 +29,17 @@ describe("callTurn", () => {
     script = [];
   });
 
+  it("na fala, os trechos do brain entram no prompt; sem brain, só o Notion", async () => {
+    const brain = { buscar: () => [{ id: "adr:0004#decisao", titulo: "ADR · 4. Saldo com cache · Decisão", url: "u", texto: "O balancereader guarda o saldo em cache." }] };
+    script = [{ type: "text", text: "Pela ADR 4, o saldo fica em cache." }];
+    await run({ brain, text: "por que o saldo tem cache?" });
+    expect(sent.some((m) => m.role === "system" && m.content.includes("ADR · 4. Saldo com cache · Decisão: O balancereader guarda"))).toBe(true);
+    await run({ text: "por que o saldo tem cache?" });
+    expect(sent.some((m) => m.content.includes("Trechos do company brain"))).toBe(false);
+    await run({ brain, kind: "inicio", text: undefined });
+    expect(sent.some((m) => m.content.includes("Trechos do company brain"))).toBe(false);
+  });
+
   it("anota só chaves conhecidas, marca a cultura e só acaba com end_call", async () => {
     script = [
       { type: "text", text: "Prazer, Ju! Na Kota, cada centavo confere." },
