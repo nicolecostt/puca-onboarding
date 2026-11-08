@@ -1,0 +1,40 @@
+# Servidor da Puca no Fly.io: uma máquina sempre ligada (docs/stack.md §5, decisão 0006).
+# Chaves só por `fly secrets` (lista em docs/stack.md §13.3); aqui vai só o que é público.
+app = "orbis-puca"
+primary_region = "iad"
+
+[build]
+  dockerfile = "server/Dockerfile"
+
+[deploy]
+  # gera no Storage o áudio das falas previsíveis da jornada; o que já está no cache não custa nada
+  release_command = "tsx server/scripts/precompute.ts"
+
+[env]
+  PORT = "8787"
+  # sem SUPABASE_URL (fly secrets), o servidor não sobe: nunca fica aberto sem login
+  EXIGE_TOKEN = "1"
+  TTS_MODE = "ws"
+  ELEVENLABS_MODEL_ID = "eleven_flash_v2_5"
+  # travas diárias globais (docs/stack.md §5.3): passou, a rota cai no comportamento sem servidor
+  LIMITE_DIARIO_LLM = "1500"
+  LIMITE_DIARIO_TTS = "60000"
+  LIMITE_DIARIO_STT = "400"
+
+[http_service]
+  internal_port = 8787
+  force_https = true
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[http_service.checks]]
+  method = "GET"
+  path = "/api/health"
+  interval = "15s"
+  timeout = "3s"
+  grace_period = "10s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"

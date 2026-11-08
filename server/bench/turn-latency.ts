@@ -1,8 +1,10 @@
 // Benchmark de turno: quanto a pessoa espera até a Puca começar a responder, por caminho.
 // Usa a mesma ordem de decisão da tela (src/journey/route.ts). Caminhos locais rodam no browser
 // (aqui, medidos em processo); "ask" vai ao servidor por HTTP de verdade.
-// Uso: npm run bench:turn -- [--tts] [--label x]
+// Uso: npm run bench:turn -- [--tts] [--label x] [--url https://orbis-puca.fly.dev] [--token <jwt>]
 //   --tts mede também o 1º byte de áudio (gasta cota do ElevenLabs nas frases do LLM).
+//   --url mede um servidor já no ar (ex.: comparar regiões do Fly) em vez de subir um aqui; o token do Supabase
+//   vem de --token ou de PUCA_TOKEN.
 import { mkdirSync, writeFileSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import { fileURLToPath } from "node:url";
@@ -13,13 +15,17 @@ import { buildFaqs } from "../../src/journey/faq";
 import { DEMO_PROFILES } from "../../src/journey/profile";
 import { routeUtterance } from "../../src/journey/route";
 
-const { values } = parseArgs({ options: { tts: { type: "boolean", default: false }, label: { type: "string", default: "" } } });
+const { values } = parseArgs({
+  options: { tts: { type: "boolean", default: false }, label: { type: "string", default: "" }, url: { type: "string" }, token: { type: "string" } },
+});
 const journey = loadDemoJourney();
 const profile = DEMO_PROFILES.novo;
 const faqs = buildFaqs(journey, profile);
-const app = buildApp({ journey, tts: values.tts ? tryCreateTts() : null });
-await app.listen({ port: 0, host: "127.0.0.1" });
-const base = `http://127.0.0.1:${(app.server.address() as AddressInfo).port}`;
+const app = values.url ? null : buildApp({ journey, tts: values.tts ? tryCreateTts() : null, verificaToken: null });
+if (app) await app.listen({ port: 0, host: "127.0.0.1" });
+const base = app ? `http://127.0.0.1:${(app.server.address() as AddressInfo).port}` : values.url!.replace(/\/+$/, "");
+const token = values.token ?? process.env.PUCA_TOKEN;
+const auth: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
 // Falas reais de quem está numa sessão, cada uma no ponto da jornada onde costuma aparecer.
 const script: { moment: string; step: string; text: string }[] = [
@@ -68,8 +74,9 @@ for (const s of script) {
     rows.push({ text: s.text, route: route.kind, first_response_ms: Math.round(localMs * 100) / 100, first_audio_byte_ms: null, llm_first_sentence_ms: null, said });
   } else {
     const a0 = performance.now();
-    const res = await fetch(`${base}/api/ask`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: s.text, moment_id: s.moment, step_id: s.step, perfil: "novo" }) });
-    const reader = res.body!.pipeThrough(new TextDecoderStream()).getReader();
+    const res = await fetch(`${base}/api/ask`, { method: "POST", headers: { "Content-Type": "application/json", ...auth }, body: JSON.stringify({ text: s.text, moment_id: s.moment, step_id: s.step, perfil: "novo" }) });
+    if (!res.ok || !res.body) throw new Error(`/api/ask respondeu ${res.status}: ${await res.text()}`);
+    const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
     let buf = "";
     let first: number | null = null;
     let firstAudio: Promise<number | null> = Promise.resolve(null);
@@ -88,7 +95,7 @@ for (const s of script) {
           said.push(`[${ev.source}] ${ev.text}`);
           if (ev.source === "llm") llmFirst ??= performance.now() - a0;
           if (ev.audio_url && said.length === 1) {
-            firstAudio = fetch(base + ev.audio_url).then(async (r) => {
+            firstAudio = fetch(base + ev.audio_url, { headers: auth }).then(async (r) => {
               const rd = r.body!.getReader();
               await rd.read();
               void rd.cancel();
@@ -122,7 +129,7 @@ console.log("\nResumo:", JSON.stringify(summary, null, 2));
 const dir = fileURLToPath(new URL("./results/", import.meta.url));
 mkdirSync(dir, { recursive: true });
 const file = `${dir}turn-${new Date().toISOString().replace(/[:.]/g, "-")}${values.label ? `-${values.label}` : ""}.json`;
-writeFileSync(file, JSON.stringify({ at: new Date().toISOString(), summary, rows }, null, 2));
+writeFileSync(file, JSON.stringify({ at: new Date().toISOString(), url: values.url ?? "local", summary, rows }, null, 2));
 console.log(`Salvo em ${file}`);
-await app.close();
+await app?.close();
 process.exit(0);

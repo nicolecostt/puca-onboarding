@@ -365,6 +365,9 @@ primary_region = "iad"
 
 - **Região:** começar em `iad` (perto da Anthropic e da ElevenLabs) e medir `gru` (São Paulo) com `npm run bench:turn`
   rodado do Brasil. Fica a de menor p95 até o primeiro áudio. Trocar é `fly regions set`.
+  **Medido em 2026-11-08 (#49), de São Paulo, ficou `iad`:** primeiro áudio p50 de 460 ms contra 600–930 ms em `gru`
+  (o Storage do Supabase e a ElevenLabs estão nos EUA); ponte e primeira frase do LLM parecidas nas duas
+  (`server/bench/results/turn-2026-11-08T10-2*`).
 - **`server/Dockerfile`:** `node:22-slim`, `npm ci --omit=dev` mais `tsx`, `CMD ["npx", "tsx", "server/src/server.ts"]`.
   O índice do kit (§9) é gerado no build da imagem.
 - **Chaves:** `fly secrets set ANTHROPIC_API_KEY=… ELEVENLABS_API_KEY=… …` (lista na §13.3). Nunca no repo.
