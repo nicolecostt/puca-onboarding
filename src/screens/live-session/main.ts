@@ -11,6 +11,7 @@ import { createOutbox, FORWARDING_KEY, forwardingMessage } from "../../journey/f
 import { createPedidos, pedidoMessage, PEDIDOS_KEY, type PedidoDeAprovacao } from "../../journey/primeira-tarefa";
 import { browserStore } from "../../journey/storage";
 import { uid } from "../../journey/uid";
+import { drenar } from "./fila";
 import { clearComposer, findDm, openDm, postApprovalRequest, postMessage, typeInComposer } from "./slack-dm";
 
 const BUDDY_ACK = "Vi aqui, te respondo já.";
@@ -104,32 +105,41 @@ async function main(): Promise<void> {
     botoes.set(p.id, button);
   }
 
+  /** Pedidos que ainda esperam aprovação e não estão na tela (recarregou, ou um encaminhamento abriu outra DM): voltam com o botão. */
+  function restaurar(): void {
+    for (const p of pedidos.list()) {
+      if (p.status !== "aguardando" || botoes.get(p.id)?.isConnected) continue;
+      openDm(p.gestor);
+      mostrarPedido(p);
+    }
+  }
+
   async function drain(): Promise<void> {
     if (sending) return;
     sending = true;
     try {
-      for (let f = outbox.pending(tab)[0]; f; f = outbox.pending(tab)[0]) {
-        outbox.claim(f.id, tab);
-        // a outra aba pode ter pegado no mesmo instante: espera as duas escreverem e fica quem ganhou
-        await sleep(150);
-        if (outbox.ownerOf(f.id) !== tab) continue;
-        const text = forwardingMessage(f);
-        await escreverNaDm(f.to.name, text);
-        postMessage({ author: "Puca", avatar: "P", tone: "puca", text, time: now() });
-        outbox.setStatus(f.id, "enviado");
-        // a buddy confirma antes da próxima dúvida sair: a conversa fica na ordem
-        await sleep(3000);
-        postMessage({ author: f.to.name, avatar: initials(f.to.name), tone: "blue", text: BUDDY_ACK, time: now() });
-        outbox.setStatus(f.id, "confirmado");
-      }
-      for (let p = pedidos.pending(tab)[0]; p; p = pedidos.pending(tab)[0]) {
-        pedidos.claim(p.id, tab);
-        await sleep(150);
-        if (pedidos.ownerOf(p.id) !== tab) continue;
-        await escreverNaDm(p.gestor, pedidoMessage(p));
-        mostrarPedido(p);
-        pedidos.setStatus(p.id, "aguardando");
-      }
+      await drenar({
+        outbox,
+        pedidos,
+        tab,
+        esperar: sleep,
+        restaurar,
+        async encaminhar(f) {
+          const text = forwardingMessage(f);
+          await escreverNaDm(f.to.name, text);
+          postMessage({ author: "Puca", avatar: "P", tone: "puca", text, time: now() });
+          outbox.setStatus(f.id, "enviado");
+          // a buddy confirma antes da próxima dúvida sair: a conversa fica na ordem
+          await sleep(3000);
+          postMessage({ author: f.to.name, avatar: initials(f.to.name), tone: "blue", text: BUDDY_ACK, time: now() });
+          outbox.setStatus(f.id, "confirmado");
+        },
+        async pedir(p) {
+          await escreverNaDm(p.gestor, pedidoMessage(p));
+          mostrarPedido(p);
+          pedidos.setStatus(p.id, "aguardando");
+        },
+      });
     } finally {
       sending = false;
       scheduleRetry();
@@ -154,11 +164,7 @@ async function main(): Promise<void> {
   });
   await drain();
   // Recarregou com pedido já enviado e ainda sem resposta: a DM do gestor volta com o botão, sem animação.
-  for (const p of pedidos.list()) {
-    if (p.status !== "aguardando" || botoes.has(p.id)) continue;
-    openDm(p.gestor);
-    mostrarPedido(p);
-  }
+  restaurar();
 
   // Cursor da Puca mexendo no Slack (simulado): abre o canal, mostra o link do README,
   // passa pelo cartão e vai até a busca. Repete em laço; para enquanto a Puca envia um encaminhamento,
