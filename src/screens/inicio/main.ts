@@ -13,6 +13,7 @@ import { mountPucaDots } from "../../lib/puca-dots";
 import { company, profiles } from "../../data";
 import { resolveProfile } from "../../journey/profile";
 import { normalize } from "../../journey/conditions";
+import { lerEmailDoSlack, salvarEmailDoSlack } from "../../journey/slack-real";
 import { browserStore } from "../../journey/storage";
 import { loadJourney } from "../../journey/validate";
 import { routeUtterance, type Route } from "../../journey/route";
@@ -95,6 +96,22 @@ function renderTools(changed?: string): void {
     .join("");
 }
 renderTools();
+
+// E-mail do jurado no Slack da Kota: o encaminhamento sai por mensagem direta a ele (#129, src/journey/slack-real.ts)
+const slackForm = qs<HTMLFormElement>(document, "#slack-email");
+const slackInput = qs<HTMLInputElement>(document, "#slack-email-input");
+const slackStatus = qs(document, "#slack-email-status");
+slackInput.value = lerEmailDoSlack(browserStore()) ?? "";
+slackForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  salvarEmailDoSlack(browserStore(), slackInput.value);
+  const salvo = lerEmailDoSlack(browserStore());
+  slackStatus.textContent = salvo
+    ? "Pronto: as dúvidas que eu não souber vão por mensagem direta no Slack da Kota."
+    : slackInput.value.trim()
+      ? "Esse e-mail não parece válido. Sem ele, as dúvidas ficam só aqui no Orbis."
+      : "Sem e-mail: as dúvidas que eu não souber ficam só aqui no Orbis.";
+});
 
 // Puca confere os acessos ao abrir e avisa o que falta. Ela ainda não pede ao gestor de verdade (#104): não diz que pediu.
 let lastNotice = "";

@@ -37,6 +37,8 @@ export const env = {
     tts: limite("LIMITE_DIARIO_TTS"),
     stt: limite("LIMITE_DIARIO_STT"),
   },
+  /** Token do bot do app da Kota (#118): o encaminhamento no Slack real (#129). Vazio = a rota responde sem_slack. */
+  slackBotToken: process.env.SLACK_BOT_TOKEN ?? "",
   /** Origens aceitas pelo CORS: o app (Electron) e o Vite em dev. */
   corsOrigins: (process.env.CORS_ORIGINS ?? "app://orbis,http://localhost:5173").split(",").map((o) => o.trim()).filter(Boolean),
 };
