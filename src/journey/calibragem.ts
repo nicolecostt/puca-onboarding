@@ -14,7 +14,7 @@ export const CALIBRAGEM_TEMAS: Record<Tema, { nome: string; momentos: string[] }
   empresa: { nome: "A empresa e a cultura", momentos: ["empresa-e-cultura"] },
   rituais: { nome: "Rituais e pessoas do time", momentos: ["seu-time"] },
   pagamentos: { nome: "Pagamentos e o caminho de uma transação", momentos: ["pagamentos"] },
-  mensageria: { nome: "Mensageria (Kafka, filas)", momentos: ["pagamentos"] },
+  mensageria: { nome: "Mensageria (filas e eventos)", momentos: ["pagamentos"] },
   falhas: { nome: "Falhas: retry e fila de erro", momentos: ["falha"] },
 };
 

@@ -4,12 +4,12 @@ import { createOutbox, type Forwarding } from "../forwarding";
 import { enviarNoSlackReal, lerEmailDoSlack, salvarEmailDoSlack } from "../slack-real";
 import { memoryStore } from "../storage";
 
-const draft = (question = "Quem cuida do tail-common?"): Omit<Forwarding, "id" | "at" | "status"> => ({
-  to: { name: "Paula Nunes", role: "buddy" },
+const draft = (question = "Quem cuida do ledgermonolith?"): Omit<Forwarding, "id" | "at" | "status"> => ({
+  to: { name: "Beatriz Cavalcanti", role: "buddy" },
   pessoa: "Ana",
   question,
   summary: question,
-  consulted: ["ADR-012"],
+  consulted: ["ADR 6"],
   reason: "Não há responsável confirmado.",
   moment: "pagamentos",
 });
@@ -38,10 +38,10 @@ describe("enviarNoSlackReal", () => {
     expect(pedidos[0].corpo).toEqual({
       id: f.id,
       destino: "buddy",
-      para: "Paula Nunes",
-      pergunta: "Quem cuida do tail-common?",
-      resumo: "Quem cuida do tail-common?",
-      fontes_consultadas: ["ADR-012"],
+      para: "Beatriz Cavalcanti",
+      pergunta: "Quem cuida do ledgermonolith?",
+      resumo: "Quem cuida do ledgermonolith?",
+      fontes_consultadas: ["ADR 6"],
       motivo: "Não há responsável confirmado.",
       email: "jurado@exemplo.com",
     });
