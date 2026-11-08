@@ -26,7 +26,7 @@ export type Tema = "empresa" | "rituais" | "pagamentos" | "mensageria" | "falhas
 /** O que a pessoa já sabe do assunto. Não é nota: só o ponto de partida. */
 export type Nivel = "nao_conhece" | "ja_ouviu" | "usa" | "domina";
 
-/** alta = a pessoa disse com clareza; media = deduzido do que ela contou; baixa = palpite, confirmar na aula. */
+/** alta = a pessoa disse com clareza; media = deduzido do que ela contou; baixa = palpite, confirmar na sessão. */
 export type Certeza = "alta" | "media" | "baixa";
 
 export interface ItemCalibragem {
@@ -35,8 +35,8 @@ export interface ItemCalibragem {
   certeza: Certeza;
   /** A frase da pessoa que levou a essa conclusão (vazia quando foi deduzido). */
   evidencia: string;
-  /** call = respondeu na call · vinculo = deduzido de ser novo ou de transição · aula = atualizado na checagem. */
-  origem: "call" | "vinculo" | "aula";
+  /** call = respondeu na call · vinculo = deduzido de ser novo ou de transição · sessao = atualizado na checagem. */
+  origem: "call" | "vinculo" | "sessao";
 }
 
 /** O que a Puca concluiu na call inicial (CONTEXT.md: calibragem). Contrato em docs/contratos.md. */

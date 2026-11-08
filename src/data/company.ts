@@ -18,7 +18,7 @@ export const company: Company = {
 /** Etapas da jornada (topo das telas). */
 export const journey: JourneyStep[] = [
   { id: "access", label: "Acessos" },
-  { id: "lesson", label: "Aula" },
+  { id: "lesson", label: "Sessão" },
   { id: "first-ticket", label: "Primeiro ticket" },
   { id: "ready", label: "Pronto para contribuir" },
 ];

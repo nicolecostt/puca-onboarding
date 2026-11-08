@@ -44,7 +44,7 @@ describe("runner", () => {
     expect(r.moments).toEqual(["boas-vindas", "empresa-e-cultura", "seu-time", "pagamentos", "checagem", "primeira-tarefa", "encerramento"]);
     expect(r.steps).toContain("bv-novo");
     expect(r.steps).not.toContain("bv-transicao");
-    expect(r.said[0]).toBe("Oi, Ana! Agora que eu já te conheço um pouco, vamos para a sua primeira aula.");
+    expect(r.said[0]).toBe("Oi, Ana! Agora que eu já te conheço um pouco, vamos para a sua primeira sessão.");
   });
 
   it("quem está mudando de time pula a parte institucional", async () => {

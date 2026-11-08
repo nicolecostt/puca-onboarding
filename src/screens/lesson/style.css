@@ -1,4 +1,4 @@
-/* Aula no quadro (Figma: "03 · Aula no quadro — o wow").
+/* Sessão no quadro (Figma: "03 · Aula no quadro — o wow").
    O quadro ocupa a tela toda abaixo do cabeçalho; os cartões flutuam por cima. */
 body {
   overflow: hidden;
@@ -69,7 +69,7 @@ body {
 }
 
 
-/* ---- Título da aula (topo, centro): abraça o conteúdo ---- */
+/* ---- Título da sessão (topo, centro): abraça o conteúdo ---- */
 .lesson-title {
   position: absolute;
   left: 50%;

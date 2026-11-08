@@ -67,7 +67,7 @@ function itemPerguntado(tema: Tema, resposta: string | undefined, experiencia: s
   if (exp && has(exp, TEMA_PALAVRAS[tema] ?? [])) {
     return { tema, nivel: "usa", certeza: "media", evidencia: experiencia!.trim(), origem: "call" };
   }
-  // não deu para saber: nível do meio, para a aula confirmar na checagem
+  // não deu para saber: nível do meio, para a sessão confirmar na checagem
   return { tema, nivel: "ja_ouviu", certeza: "baixa", evidencia: resposta?.trim() ?? "", origem: "call" };
 }
 

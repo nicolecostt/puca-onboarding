@@ -17,7 +17,7 @@ import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem"
 
 // ---- Roteiro ----
 // A Puca confirma os dados da admissão (não pergunta o que a empresa já sabe) e gasta a conversa com o que
-// só a pessoa pode contar: experiência, o que já sabe de cada tema da aula e os objetivos. Quem está
+// só a pessoa pode contar: experiência, o que já sabe de cada tema da sessão e os objetivos. Quem está
 // mudando de time ganha perguntas sobre o time anterior. No fim, as respostas viram a calibragem.
 type FieldKey =
   | "nome" | "vinculo" | "confirma" | "cargo" | "time" | "gestor"
@@ -292,14 +292,14 @@ async function main(): Promise<void> {
   state.done = true;
   setAgent("done");
 
-  // Entrega o perfil e a calibragem para a aula no quadro e mostra o caminho até ela.
+  // Entrega o perfil e a calibragem para a sessão no quadro e mostra o caminho até ela.
   const perfil = profileFromAnswers(answers);
   saveProfile(perfil);
   saveCalibragem(calibragemFromAnswers(perfil, answers));
   const next = document.createElement("a");
   next.className = "caption__next";
   next.href = "../lesson/";
-  next.textContent = "Começar a aula →";
+  next.textContent = "Começar a sessão →";
   el.captionHint.after(next);
 }
 

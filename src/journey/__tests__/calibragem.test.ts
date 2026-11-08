@@ -35,7 +35,7 @@ describe("calibragemFromAnswers", () => {
     expect(itemDoTema(c, "mensageria")).toMatchObject({ nivel: "usa", certeza: "media" });
   });
 
-  it("sem nada, fica no nível do meio com certeza baixa (para a aula confirmar)", () => {
+  it("sem nada, fica no nível do meio com certeza baixa (para a sessão confirmar)", () => {
     const c = calibragemFromAnswers(DEMO_PROFILES.novo, {});
     expect(itemDoTema(c, "falhas")).toMatchObject({ nivel: "ja_ouviu", certeza: "baixa" });
   });
@@ -48,7 +48,7 @@ describe("calibragemFromAnswers", () => {
 });
 
 describe("calibragens da demo", () => {
-  it("Ana e Bruno saem diferentes nos temas da aula", () => {
+  it("Ana e Bruno saem diferentes nos temas da sessão", () => {
     const nivel = (v: "novo" | "transicao", t: Tema) => itemDoTema(DEMO_CALIBRAGENS[v], t)?.nivel;
     expect(nivel("transicao", "mensageria")).toBe("usa");
     expect(nivel("novo", "mensageria")).toBe("ja_ouviu");
