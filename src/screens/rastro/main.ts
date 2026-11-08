@@ -63,7 +63,8 @@ qs(document, "#download").addEventListener("click", () => {
   const url = URL.createObjectURL(new Blob([trail.exportJson()], { type: "application/json" }));
   const a = Object.assign(document.createElement("a"), { href: url, download: "rastro-puca.json" });
   a.click();
-  URL.revokeObjectURL(url);
+  // Safari e Firefox cancelam o download se a URL some no mesmo tique do clique
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
 qs(document, "#clear").addEventListener("click", () => {
   trail.clear();
