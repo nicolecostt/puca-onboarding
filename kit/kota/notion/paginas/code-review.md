@@ -4,7 +4,7 @@ Toda mudança no [kota-bank](https://github.com/JucaGF/kota-bank) entra na `main
 
 ## Quem revisa
 
-O arquivo `CODEOWNERS` do repositório mostra o time dono de cada pasta, com o tech lead e o gestor desse time. Alguém do time dono revisa o PR. O time dono de cada pasta também está na database [Sistemas](notion:sistemas).
+O arquivo `CODEOWNERS` do repositório traz, para cada pasta, os e-mails do tech lead e do gestor do time dono dela. A linha de `docs/adr/` traz os e-mails dos quatro tech leads. Alguém do time dono revisa o PR. O time dono de cada pasta também está na database [Sistemas](notion:sistemas).
 
 Mudança no que outro time usa pede também a revisão desse time. Mudar o formato do token do login, por exemplo, mexe na validação em Python e em Java, como mostra o [ADR 2](https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0002-jwt-assinado-pelo-userservice-e-validado-em-cada-servico.md). Nesse caso, Contas, Canais e Livro-razão revisam.
 

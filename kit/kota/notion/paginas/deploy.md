@@ -23,7 +23,7 @@ Um aviso no #livro-razao, por exemplo, fica assim: "Deploy do ledgerwriter hoje 
 
 ## Quando fazer
 
-Deploy em produção só em dia útil, começando entre 10h e 16h. Na sexta depois do meio-dia e na véspera de feriado, não. Assim, a hora de acompanhamento ainda cai no horário comercial, e se algo der errado o time está por perto para resolver. Fora dessa janela, só correção de incidente, com o plantão e o tech lead do time sabendo.
+Deploy em produção só em dia útil, começando entre 10h e 16h. Na sexta depois do meio-dia e na véspera de feriado, não. O horário comercial da Kota vai das 9h às 18h. Um deploy que começa às 16h tem a hora de acompanhamento até as 17h, ainda dentro dele, e se algo der errado o time está por perto para resolver. Fora dessa janela, só correção de incidente, com o plantão e o tech lead do time sabendo.
 
 ## Quando algo dá errado
 
