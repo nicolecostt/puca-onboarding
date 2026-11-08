@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel do RH · Orbis</title>
+<meta name="theme-color" content="#ffffff">
+<script>
+  // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
+  if (location.protocol === "file:") {
+    addEventListener("DOMContentLoaded", function () {
+      document.body.innerHTML =
+        '<div style="max-width:440px;margin:15vh auto;padding:24px;font:15px/1.6 system-ui,sans-serif;color:#171717;background:#fff;border:1px solid #e5e5e5;border-radius:12px">' +
+        "<strong>Esta página precisa do servidor do projeto.</strong><br>" +
+        "No terminal, na pasta do projeto, rode <code>npm run dev</code> e abra " +
+        '<a href="http://localhost:5173/">http://localhost:5173</a>.</div>';
+    });
+  }
+</script>
+</head>
+<body>
+  <!-- Painel do RH (PRODUCT.md §5): indicadores agregados do processo de integração. Nada aqui avalia a pessoa. -->
+  <header class="topbar">
+    <div class="wrap topbar__row">
+      <a class="brand" href="../landing/" aria-label="Orbis, início">
+        <img class="brand__mark" src="../../assets/orbis-logo.png" alt="" width="26" height="26">
+        <span class="brand__name">Orbis</span>
+        <span class="brand__tag" id="company"></span>
+      </a>
+      <span class="me"><span class="me__text"><span class="me__name" id="me-name"></span><span class="me__role" id="me-role"></span></span><span class="avatar" id="me-initials" aria-hidden="true"></span></span>
+    </div>
+  </header>
+
+  <main class="wrap page">
+    <div class="head">
+      <div>
+        <p class="head__eyebrow">Painel do RH · últimos 90 dias</p>
+        <h1 class="head__title">Integrações</h1>
+      </div>
+      <div class="filter" role="tablist" aria-label="Vínculo">
+        <span class="filter__thumb" aria-hidden="true"></span>
+        <button role="tab" class="filter__btn" data-vinculo="todos" aria-selected="true">Todas</button>
+        <button role="tab" class="filter__btn" data-vinculo="novo" aria-selected="false">Novos</button>
+        <button role="tab" class="filter__btn" data-vinculo="transicao" aria-selected="false">Em transição</button>
+      </div>
+    </div>
+
+    <!-- Indicadores principais -->
+    <section class="kpis" aria-label="Indicadores" id="kpis"></section>
+    <section class="stats" aria-label="Mais indicadores" id="stats"></section>
+
+    <div class="grid">
+      <!-- Pessoas em integração: etapa e pendências, sem nota -->
+      <section class="people" aria-labelledby="people-title">
+        <div class="section-head">
+          <h2 id="people-title">Pessoas em integração</h2>
+          <span class="section-head__note" id="people-count"></span>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Pessoa</th>
+              <th scope="col">Vínculo</th>
+              <th scope="col">Etapa</th>
+              <th scope="col" class="num">Dia</th>
+              <th scope="col">Pendências</th>
+              <th scope="col">Buddy</th>
+            </tr>
+          </thead>
+          <tbody id="people"></tbody>
+        </table>
+
+        <!-- Etapas obrigatórias: quantas pessoas já concluíram cada uma -->
+        <div class="section-head section-head--gap">
+          <h2 id="steps-title">Etapas obrigatórias</h2>
+          <span class="section-head__note">pessoas que já concluíram</span>
+        </div>
+        <ol class="steps" id="steps" aria-labelledby="steps-title"></ol>
+      </section>
+
+      <aside class="side">
+        <section aria-labelledby="pend-title">
+          <div class="section-head">
+            <h2 id="pend-title">Pendências administrativas</h2>
+          </div>
+          <ul class="pend" id="pend"></ul>
+        </section>
+
+        <section aria-labelledby="topics-title">
+          <div class="section-head">
+            <h2 id="topics-title">Assuntos que mais geram dúvida</h2>
+          </div>
+          <ol class="bars" id="topics"></ol>
+          <p class="side__note">Contagem de perguntas por momento da sessão. O texto das perguntas não aparece aqui.</p>
+        </section>
+
+        <section aria-labelledby="fb-title">
+          <div class="section-head">
+            <h2 id="fb-title">Feedback da integração</h2>
+            <span class="section-head__note" id="fb-n"></span>
+          </div>
+          <div class="fb" id="fb"></div>
+        </section>
+      </aside>
+    </div>
+
+    <footer class="privacy">
+      <span class="privacy__orb" id="privacy-orb" aria-hidden="true"></span>
+      <p>Estes números descrevem o processo de integração, não o desempenho das pessoas. Ninguém é avaliado por eles, e as conversas com a Puca não aparecem aqui. <span id="live-note"></span></p>
+    </footer>
+  </main>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

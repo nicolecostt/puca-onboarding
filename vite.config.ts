@@ -20,6 +20,7 @@ export default defineConfig({
         landing: page("./src/screens/landing/index.html"),
         boasVindas: page("./src/screens/boas-vindas/index.html"),
         inicio: page("./src/screens/inicio/index.html"),
+        rh: page("./src/screens/rh/index.html"),
       },
     },
   },

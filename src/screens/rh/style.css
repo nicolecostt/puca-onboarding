@@ -1,0 +1,709 @@
+/* Painel do RH no visual do Orbis (DESIGN.md): papel branco, tinta preta, fios de 1px, números e títulos em
+   Creato Display. Estado pela marca (cheio, anel, tracejado), nunca pela cor. A cor da Puca só nas bolinhas do rodapé. */
+:root {
+  --ink: var(--color-text);
+  --paper: var(--color-surface);
+  --grey: var(--color-muted);
+  --rule: var(--color-border);
+  --side: 32px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 1680px;
+  margin-inline: auto;
+  padding-inline: var(--side);
+}
+
+/* ---- Topo ---- */
+.topbar {
+  border-bottom: 1px solid var(--rule);
+}
+.topbar__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+.brand__mark {
+  display: block;
+  flex: none;
+  width: 26px;
+  height: 26px;
+}
+.brand__tag {
+  height: 22px;
+  margin-left: 6px;
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--grey);
+}
+.me {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.me__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.me__name {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 17px;
+}
+.me__role {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--grey);
+}
+.avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ---- Cabeçalho da página ---- */
+.page {
+  padding-top: 32px;
+  padding-bottom: 48px;
+}
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--ink);
+}
+.head__eyebrow {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--grey);
+}
+.head__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+/* filtro por vínculo: pílulas; a escolhida em tinta cheia */
+.filter {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-pill);
+}
+.filter__btn {
+  all: unset;
+  box-sizing: border-box;
+  height: 30px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--grey);
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+.filter__btn:hover {
+  color: var(--ink);
+}
+.filter__btn {
+  position: relative;
+  z-index: 1;
+}
+.filter__btn[aria-selected="true"] {
+  color: var(--paper);
+}
+/* pílula preta que desliza até a opção escolhida (posição e largura vêm do main.ts) */
+.filter__thumb {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  height: 30px;
+  width: var(--thumb-w, 0);
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  transform: translateX(var(--thumb-x, 0));
+  transition: transform 0.35s var(--ease-out), width 0.35s var(--ease-out);
+}
+.filter.is-instant .filter__thumb {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .filter__thumb {
+    transition: none;
+  }
+}
+.filter__btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ---- Indicadores principais: números grandes separados por fios ---- */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-bottom: 1px solid var(--rule);
+}
+.kpi {
+  padding: 24px 24px 26px;
+  border-left: 1px solid var(--rule);
+}
+.kpi:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.kpi p {
+  margin: 0;
+}
+.kpi__label {
+  font-size: 13px;
+  font-weight: 500;
+}
+.kpi__value {
+  margin-top: 14px !important;
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.kpi__unit {
+  margin-left: 6px;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+  color: var(--grey);
+}
+.kpi__note {
+  margin-top: 10px !important;
+  font-size: 13px;
+  color: var(--grey);
+}
+
+/* ---- Mais indicadores: uma linha de números menores ---- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-bottom: 1px solid var(--rule);
+}
+.stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 24px;
+  border-left: 1px solid var(--rule);
+}
+.stat:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.stat__label {
+  font-size: 13px;
+  color: var(--grey);
+}
+.stat__value {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Pessoas e lateral ---- */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 48px;
+  padding-top: 36px;
+}
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.section-head__note {
+  font-size: 13px;
+  color: var(--grey);
+}
+
+/* tabela de pessoas */
+/* a tabela passa 12px de cada lado, para o cinza do hover não terminar colado no avatar;
+   o primeiro e o último campo devolvem esse espaço, e o texto continua alinhado com o resto */
+.table {
+  width: calc(100% + 24px);
+  margin-inline: -12px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.table th:first-child,
+.table td:first-child {
+  padding-left: 12px;
+}
+.table th:last-child,
+.table td:last-child {
+  padding-right: 12px;
+}
+.table th,
+.table td {
+  padding: 12px 12px 12px 0;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  font-weight: 400;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.table thead th {
+  padding-top: 0;
+  padding-bottom: 10px;
+  border-bottom-color: var(--ink);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--grey);
+}
+.table .num {
+  text-align: right;
+  padding-right: 24px;
+  font-variant-numeric: tabular-nums;
+}
+.table tbody tr:hover {
+  background: var(--color-surface-muted);
+}
+.who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.avatar--row {
+  width: 30px;
+  height: 30px;
+  font-size: 11px;
+}
+.who__text {
+  display: flex;
+  flex-direction: column;
+}
+.who__name {
+  font-size: 14px;
+  font-weight: 500;
+}
+.who__sub {
+  font-size: 12px;
+  color: var(--grey);
+}
+
+/* etapa: quatro segmentos (feito cheio, atual meio, a seguir vazio) e o nome da etapa */
+.stage {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.segs {
+  display: inline-flex;
+  gap: 3px;
+}
+.seg {
+  width: 16px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--rule);
+}
+.seg.is-done {
+  background: var(--ink);
+}
+.seg.is-now {
+  background: linear-gradient(to right, var(--ink) 50%, var(--rule) 50%);
+}
+
+/* pendências: anel tracejado quando há, visto cheio quando está em dia */
+.pendc {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.pendc.is-ok {
+  color: var(--grey);
+}
+.mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+.mark--open {
+  border: 1.5px dashed var(--ink);
+}
+.mark--ok {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* etapas obrigatórias: uma bolinha por pessoa (cheia = concluiu, vazada = ainda não) */
+.section-head--gap {
+  margin-top: 40px;
+}
+.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--ink);
+}
+.step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 64px;
+  align-items: center;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 13px;
+}
+.step__label {
+  font-weight: 500;
+}
+.step__so {
+  font-weight: 400;
+  color: var(--grey);
+}
+.step__dots {
+  display: inline-flex;
+  gap: 5px;
+}
+.step__dots i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+}
+.step__dots i.is-done {
+  background: var(--ink);
+}
+.step__n {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* lateral */
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+.side__note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+.pend {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--ink);
+}
+.pend__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "label n" "who n";
+  column-gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.pend__label {
+  grid-area: label;
+  font-size: 13px;
+  font-weight: 500;
+}
+.pend__who {
+  grid-area: who;
+  font-size: 12px;
+  color: var(--grey);
+}
+.pend__n {
+  grid-area: n;
+  align-self: center;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.pend__empty {
+  padding: 10px 0;
+  font-size: 13px;
+  color: var(--grey);
+}
+
+/* dúvidas por momento: barras finas em tinta */
+.bars {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--ink);
+}
+.bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 28px;
+  grid-template-areas: "label n" "track n";
+  column-gap: 12px;
+  row-gap: 6px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.bar__label {
+  grid-area: label;
+  font-size: 13px;
+}
+.bar__track {
+  grid-area: track;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--rule);
+  overflow: hidden;
+}
+.bar__track i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--ink);
+  transform-origin: left;
+  animation: bar-in 0.6s var(--ease-out) both;
+}
+.bar__n {
+  grid-area: n;
+  align-self: center;
+  text-align: right;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+@keyframes bar-in {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* feedback: uma barra dividida (tinta, cinza, tracejado) e a legenda */
+.fb__bar {
+  display: flex;
+  gap: 3px;
+  height: 10px;
+}
+.fb__bar i {
+  border-radius: 3px;
+}
+.is-pro {
+  background: var(--ink);
+}
+.is-neu {
+  background: var(--color-subtle);
+}
+.is-det {
+  border: 1.5px dashed var(--ink);
+}
+.fb__legend {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 13px;
+}
+.fb__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.fb__legend b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.fb__key {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+/* ---- Rodapé: o que estes números são (e o que não são) ---- */
+.privacy {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 48px;
+  padding: 16px 18px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-xl);
+}
+.privacy p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.privacy__orb {
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 36px;
+}
+
+/* ---- Telas menores ---- */
+@media (max-width: 1180px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .side {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 36px;
+  }
+}
+@media (max-width: 900px) {
+  .kpis,
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .kpi:nth-child(3),
+  .stat:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .kpi:nth-child(n + 3) {
+    border-top: 1px solid var(--rule);
+  }
+  .stat:nth-child(n + 3) {
+    border-top: 1px solid var(--rule);
+  }
+  /* a tabela vira lista: some vínculo, dia e buddy */
+  .table thead {
+    display: none;
+  }
+  .table td:nth-child(2),
+  .table td:nth-child(4),
+  .table td:nth-child(6) {
+    display: none;
+  }
+  .table tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .table th,
+  .table td,
+  .table th:first-child,
+  .table td:first-child,
+  .table th:last-child,
+  .table td:last-child {
+    padding: 0;
+    border: 0;
+  }
+  .table tr {
+    padding-inline: 12px;
+  }
+  .table tr > td:nth-child(3) {
+    grid-column: 1;
+  }
+}
+@media (max-width: 560px) {
+  :root {
+    --side: 16px;
+  }
+  .step {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .step__dots {
+    display: none;
+  }
+  .brand__name,
+  .brand__tag,
+  .me__text {
+    display: none;
+  }
+  .head__title {
+    font-size: 32px;
+  }
+  .kpi {
+    padding: 18px 12px 20px;
+  }
+  .kpi__value {
+    font-size: 38px;
+  }
+  .stat {
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px;
+  }
+  .filter {
+    width: 100%;
+  }
+  .filter__btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bar__track i {
+    animation: none;
+  }
+}
