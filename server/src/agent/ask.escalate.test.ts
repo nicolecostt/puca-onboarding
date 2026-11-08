@@ -20,6 +20,7 @@ vi.mock("../llm", () => ({
 }));
 const { ask } = await import("./ask");
 const { buildTools } = await import("./prompt");
+const { destinoPelaFala } = await import("./ask");
 type AskEvent = Parameters<Parameters<typeof ask>[1]>[0];
 
 const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/kota.journey.json", import.meta.url), "utf8")));
@@ -70,6 +71,26 @@ describe("ask: encaminhamento", () => {
       { type: "done", finishReason: "stop" },
     ];
     expect(escalations(await run())).toEqual([{ type: "escalate", summary: "x" }]);
+  });
+
+  it("sem a tool, o texto do LLM manda falar com People ou com o gestor: o destino segue o texto", async () => {
+    const casos = [
+      { fala: "Não consegui confirmar informações sobre bônus. Recomendo que converse com o gestor ou com a equipe de People (RH).", destino: "rh" },
+      { fala: "Não consegui confirmar isso. Fale com sua gestora sobre o contrato.", destino: "gestor" },
+    ];
+    for (const c of casos) {
+      script = [{ type: "text", text: c.fala }, { type: "done", finishReason: "stop" }];
+      expect(escalations(await run())).toEqual([{ type: "escalate", summary: QUESTION, destino: c.destino }]);
+    }
+  });
+
+  it("a tool com destino vence o texto", async () => {
+    script = [
+      { type: "text", text: "Não consegui confirmar. Fale com People. " },
+      { type: "tool_call", name: "escalate_to_buddy", args: { summary: "Bônus", destino: "gestor" }, raw: "" },
+      { type: "done", finishReason: "stop" },
+    ];
+    expect(escalations(await run())).toEqual([{ type: "escalate", summary: "Bônus", destino: "gestor" }]);
   });
 
   it("o LLM só diz que não confirmou: escalate com a pergunta como resumo", async () => {
@@ -141,5 +162,14 @@ describe("escalate_to_buddy: o que o LLM recebe", () => {
     const params = tool.function.parameters as { properties: Record<string, { enum?: string[] }>; required: string[] };
     expect(params.properties.destino.enum).toEqual(["buddy", "gestor", "rh"]);
     expect(params.required).toEqual(["summary"]);
+  });
+});
+
+describe("destinoPelaFala", () => {
+  it("a fala cita a buddy: fica a buddy, mesmo citando o gestor", () => {
+    expect(destinoPelaFala("Não consegui confirmar. Pergunte à sua buddy ou ao gestor.")).toBeUndefined();
+  });
+  it("palavra que só contém rh ou gestor não conta", () => {
+    expect(destinoPelaFala("O gestorservice não está nas docs, nem o ahrhh.")).toBeUndefined();
   });
 });

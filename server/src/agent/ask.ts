@@ -15,6 +15,14 @@ import { SentenceSplitter } from "./sentences";
 export type SpeakSource = "bridge" | "llm" | "fallback";
 const DESTINOS: readonly DestinoDoEncaminhamento[] = ["buddy", "gestor", "rh"];
 
+/** Destino que a própria fala do LLM indicou: People/RH, ou o gestor; senão, nenhum (a buddy). */
+export function destinoPelaFala(fala: string): DestinoDoEncaminhamento | undefined {
+  if (/\bbuddy\b/i.test(fala)) return undefined; // citou a buddy: ela é o destino padrão
+  if (/\b(people|rh)\b/i.test(fala)) return "rh";
+  if (/\bgestor(a|es)?\b/i.test(fala)) return "gestor";
+  return undefined;
+}
+
 export type LlmFailure = "timeout" | "interrupted" | "provider_error" | "refusal" | "empty_response";
 
 export type AskEvent =
@@ -92,10 +100,12 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
     escalationSummary = summary;
     escalationDestino = destino;
   };
+  let falado = "";
   const sentence = (s: string) => {
     timing.llm_first_sentence_ms ??= ms();
     spoke = true;
     say(s, "llm");
+    falado += ` ${s}`;
     // só marca: se o LLM chamar escalate_to_buddy logo depois, vale o resumo dele
     if (NO_SOURCE.test(s)) saidNoSource = true;
   };
@@ -159,8 +169,11 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   if (timing.llm_error && timing.llm_error !== "interrupted") {
     say(FAILURE_LINE, "fallback");
   } else if (!input.signal?.aborted && looksLikeQuestion(input.text)) {
-    if (escalationSummary) emit({ type: "escalate", summary: escalationSummary, ...(escalationDestino ? { destino: escalationDestino } : {}) });
-    else if (saidNoSource) emit({ type: "escalate", summary: input.text });
+    // sem destino na tool, vale o que a Puca acabou de dizer ("fale com People", "com sua gestora"): fala e mensagem batem
+    const destino = escalationDestino ?? destinoPelaFala(falado);
+    const comDestino = destino ? { destino } : {};
+    if (escalationSummary) emit({ type: "escalate", summary: escalationSummary, ...comDestino });
+    else if (saidNoSource) emit({ type: "escalate", summary: input.text, ...comDestino });
   }
   timing.total_ms = ms();
   emit({ type: "timing", timing });
