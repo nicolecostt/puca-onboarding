@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -50,6 +50,14 @@ describe("CLI", () => {
     const r = rodar(saida);
     expect(r.status).toBe(0);
     expect(readFileSync(saida, "utf8")).toBe(gerarCodeowners(mapa));
+  });
+
+  it("grava com o nome pedido mesmo se já há o arquivo com outra caixa, em disco que não diferencia", () => {
+    const pasta = join(mkdtempSync(join(tmpdir(), "kota-codeowners-")), ".github");
+    mkdirSync(pasta);
+    writeFileSync(join(pasta, "codeowners"), "velho");
+    expect(rodar(join(pasta, "CODEOWNERS")).status).toBe(0);
+    expect(readdirSync(pasta)).toContain("CODEOWNERS");
   });
 
   it("sem caminho de saída, falha e diz como usar", () => {

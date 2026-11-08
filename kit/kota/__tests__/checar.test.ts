@@ -63,6 +63,21 @@ describe("regra codeowners", () => {
     expect(regraCodeowners.checar({ ...ctx, repo })).toEqual([expect.stringMatching(/\.github\/CODEOWNERS difere do gerado/)]);
   });
 
+  it("acusa CODEOWNERS com outra caixa no caminho, como o GitHub, mesmo em disco que não diferencia", () => {
+    for (const [pasta, arquivo] of [[".github", "codeowners"], [".GITHUB", "CODEOWNERS"]]) {
+      const repo = pastaTemp();
+      mkdirSync(join(repo, pasta));
+      writeFileSync(join(repo, pasta, arquivo), gerarCodeowners(mapa));
+      expect(regraCodeowners.checar({ ...ctx, repo })).toEqual([expect.stringMatching(/\.github\/CODEOWNERS não existe/)]);
+    }
+  });
+
+  it("acusa CODEOWNERS que é pasta sem lançar", () => {
+    const repo = pastaTemp();
+    mkdirSync(join(repo, ".github", "CODEOWNERS"), { recursive: true });
+    expect(regraCodeowners.checar({ ...ctx, repo })).toEqual([expect.stringMatching(/\.github\/CODEOWNERS não existe/)]);
+  });
+
   it("aceita o CODEOWNERS igual ao gerado do mapa", () => {
     const repo = pastaTemp();
     gravarCodeowners(repo, gerarCodeowners(mapa));

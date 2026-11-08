@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { pathToFileURL } from "node:url";
 import { mapa } from "../mapa";
@@ -27,6 +27,8 @@ function main() {
     process.exit(1);
   }
   mkdirSync(dirname(saida), { recursive: true });
+  // Em disco que não diferencia maiúsculas, gravar por cima mantém o nome antigo (codeowners), que o GitHub ignora.
+  rmSync(saida, { force: true });
   writeFileSync(saida, gerarCodeowners(mapa));
   console.log(`CODEOWNERS gravado em ${saida}`);
 }
