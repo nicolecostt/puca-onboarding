@@ -13,7 +13,9 @@
 body {
   background: var(--paper);
   color: var(--ink);
-  overflow: hidden;
+  /* fala longa de Puca: a página rola em vez de esconder o fim da conversa atrás da barra de call */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 ::selection {
@@ -109,7 +111,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center; /* mais alto que a tela: começa do topo, sem cortar */
   gap: 20px;
   max-width: 1280px;
   min-height: calc(100vh - 65px);
@@ -301,6 +303,7 @@ body {
 .caption__hint {
   font-size: 14px;
   color: var(--grey);
+  scroll-margin-bottom: 120px; /* ao rolar até ele, fica acima da barra de call */
 }
 
 /* ---- Fim da call: a conversa e os controles saem, e a página estoura para a tela inicial ---- */

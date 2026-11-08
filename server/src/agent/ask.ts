@@ -6,7 +6,7 @@ import { randomUUID } from "node:crypto";
 import { detectIntent } from "../../../src/journey/conditions";
 import { looksLikeQuestion } from "../../../src/journey/forwarding";
 import type { BoardAction, Journey, Profile } from "../../../src/journey/types";
-import type { Brain } from "../brain/brain";
+import type { Brain, Trecho } from "../brain/brain";
 import type { TtsService } from "../voice/tts/service";
 import { streamChat, type ChatMessage } from "../llm";
 import { FAILURE_LINE, pickBridge } from "./bridges";
@@ -92,6 +92,44 @@ const PROMETEU = /\b(vou (te |lhe )?(encaminhar|escalar)|encaminho|escalo)\b/i;
 const CASO_PESSOAL = /\b(meu|minha|meus|minhas)\s+(?:\S+\s+)?(bonus|salario|ferias|promocao|avaliacao|desempenho|aumento|plr)\b/;
 export function isCasoPessoal(text: string): boolean {
   return CASO_PESSOAL.test(text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase());
+}
+
+// Marcas internas no resumo do encaminhamento (vai para a buddy): [f2], [f2][f3], (f2), (fonte 3), f2 e "f2, f3 e f4".
+// Marca de citação (colchete ou parêntese) vira o título entre parênteses, ou some se o título já está no resumo;
+// lista solta vira os títulos no próprio texto. Trecho que não existe some.
+const REF_RESUMO = "(?:f(?:onte)?\\s*)?\\d+";
+const SEP_RESUMO = "(?:\\s*,\\s*(?:(?:e|ou)\\s+)?|\\s+(?:e|ou)\\s+)";
+const MARCA_RESUMO = new RegExp(
+  `(\\s*)(?:\\[\\s*${REF_RESUMO}(?:(?:${SEP_RESUMO}|\\s*\\]\\s*\\[\\s*)${REF_RESUMO})*\\s*\\]` +
+    `|\\(\\s*(?:f(?:onte)?\\s*)\\d+(?:${SEP_RESUMO}${REF_RESUMO})*\\s*\\))` +
+    `|\\b(f(?:onte)?\\s*\\d+(?:${SEP_RESUMO}f(?:onte)?\\s*\\d+)*)\\b`,
+  "gi",
+);
+export function limparResumo(resumo: string, trechos: Trecho[]): string {
+  const ditos = new Set<string>();
+  const titulos = (marca: string) => {
+    const novos: string[] = [];
+    for (const n of marca.match(/\d+/g) ?? []) {
+      const t = trechos[Number(n) - 1]?.titulo;
+      if (t && !novos.includes(t)) novos.push(t);
+    }
+    return novos;
+  };
+  const juntar = (ts: string[]) => (ts.length > 1 ? `${ts.slice(0, -1).join(", ")} e ${ts.at(-1)}` : ts.join(""));
+  return resumo
+    .replace(MARCA_RESUMO, (m, espaco: string | undefined, solta: string | undefined) => {
+      if (solta !== undefined) {
+        const ts = titulos(solta);
+        ts.forEach((t) => ditos.add(t));
+        return ts.length ? juntar(ts) : "";
+      }
+      const ts = titulos(m).filter((t) => !ditos.has(t));
+      ts.forEach((t) => ditos.add(t));
+      return ts.length ? `${espaco ?? ""}(${juntar(ts)})` : "";
+    })
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }
 
 export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promise<AskTiming> {
@@ -202,15 +240,20 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
     .map((t) => ({ titulo: t.titulo, url: t.url }))
     .filter((f, i, all) => all.findIndex((g) => g.titulo === f.titulo && g.url === f.url) === i);
   if (fontes.length) emit({ type: "fontes", fontes });
+  // respondeu com trecho citado e não é caso pessoal: o escalate_to_buddy do modelo ("ela pode querer mais detalhes")
+  // é ignorado, porque a Puca não avisou ninguém. "Não consegui confirmar" e caso pessoal continuam encaminhando.
+  const pessoal = isCasoPessoal(input.text);
+  const respondeuComFonte = fontes.length > 0 && !pessoal && !saidNoSource;
+  const resumo = escalationSummary && !respondeuComFonte ? limparResumo(escalationSummary, trechos) || input.text : null;
   if (timing.llm_error && timing.llm_error !== "interrupted") {
     say(FAILURE_LINE, "fallback");
   } else if (!input.signal?.aborted && looksLikeQuestion(input.text)) {
     // sem destino na tool, vale o que Puca acabou de dizer ("fale com People", "com sua gestora"): fala e mensagem
     // batem; caso pessoal sem destino nenhum vai a People (PRODUCT.md §13.2)
-    const destino = escalationDestino ?? destinoPelaFala(falado) ?? (isCasoPessoal(input.text) ? "rh" : undefined);
+    const destino = escalationDestino ?? destinoPelaFala(falado) ?? (pessoal ? "rh" : undefined);
     const comDestino = destino ? { destino } : {};
-    if (escalationSummary) emit({ type: "escalate", summary: escalationSummary, ...comDestino });
-    else if (saidNoSource || (prometeu && citados.size === 0) || isCasoPessoal(input.text)) emit({ type: "escalate", summary: input.text, ...comDestino });
+    if (resumo) emit({ type: "escalate", summary: resumo, ...comDestino });
+    else if (saidNoSource || (prometeu && citados.size === 0) || pessoal) emit({ type: "escalate", summary: input.text, ...comDestino });
   }
   timing.total_ms = ms();
   emit({ type: "timing", timing });

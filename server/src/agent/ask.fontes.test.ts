@@ -14,7 +14,7 @@ vi.mock("../llm", () => ({
     for (const ev of script) yield ev;
   },
 }));
-const { ask, isCasoPessoal } = await import("./ask");
+const { ask, isCasoPessoal, limparResumo } = await import("./ask");
 type AskEvent = Parameters<Parameters<typeof ask>[1]>[0];
 
 const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/kota.journey.json", import.meta.url), "utf8")));
@@ -164,5 +164,92 @@ describe("isCasoPessoal", () => {
     expect(isCasoPessoal("como funciona o bônus?")).toBe(false);
     expect(isCasoPessoal("quem é o meu gestor?")).toBe(false);
     expect(isCasoPessoal("qual a política de férias?")).toBe(false);
+  });
+});
+
+// Encaminhamento do modelo só vale sem fonte citada ou em caso pessoal; o resumo vai sem marcas internas.
+describe("ask: escalate do modelo com fonte", () => {
+  const escalar = (summary: string): LlmEvent => ({ type: "tool_call", name: "escalate_to_buddy", args: { summary }, raw: "" });
+  const escalates = (evs: AskEvent[]) => evs.filter((e) => e.type === "escalate");
+
+  beforeEach(() => {
+    script = [];
+    achados = [trecho];
+  });
+
+  it("deploy: respondeu com [f1] e chamou escalate_to_buddy numa pergunta não pessoal: sem escalate, com fonte", async () => {
+    script = [
+      { type: "text", text: "O PR entra na main com CI verde [f1]." },
+      escalar("Ana perguntou do deploy. Ela pode querer detalhes práticos."),
+      { type: "done", finishReason: "stop" },
+    ];
+    const evs = await run("como funciona o deploy na Kota?");
+    expect(falas(evs)).toEqual(["O PR entra na main com CI verde."]);
+    expect(evs.some((e) => e.type === "fontes")).toBe(true);
+    expect(escalates(evs)).toEqual([]);
+  });
+
+  it("caso pessoal com [f1] e escalate do modelo: encaminha, com o resumo do modelo", async () => {
+    const bonus: Trecho = { id: "f1", titulo: "Bônus · Visão geral", url: "https://exemplo.notion.site/bonus", texto: "A PLR é paga uma vez por ano." };
+    achados = [bonus];
+    script = [{ type: "text", text: "A PLR é paga uma vez por ano [f1]." }, escalar("Bônus da Ana, caso individual"), { type: "done", finishReason: "stop" }];
+    expect(escalates(await run("qual vai ser o meu bônus?"))).toEqual([{ type: "escalate", summary: "Bônus da Ana, caso individual", destino: "rh" }]);
+  });
+
+  it("sem citação e com escalate do modelo: encaminha", async () => {
+    script = [{ type: "text", text: "Não achei nada sobre isso." }, escalar("Dúvida sobre a rotação de plantão"), { type: "done", finishReason: "stop" }];
+    expect(escalates(await run("como é a rotação de plantão?"))).toEqual([{ type: "escalate", summary: "Dúvida sobre a rotação de plantão" }]);
+  });
+
+  it("citou uma fonte que não existe ([f9]) e chamou escalate: conta como sem fonte, encaminha", async () => {
+    script = [{ type: "text", text: "É do time de plataforma [f9]." }, escalar("Quem cuida do plantão"), { type: "done", finishReason: "stop" }];
+    expect(escalates(await run("quem cuida do plantão?"))).toEqual([{ type: "escalate", summary: "Quem cuida do plantão" }]);
+  });
+
+  it("citou fonte mas disse que não confirmou: o encaminhamento continua valendo", async () => {
+    script = [{ type: "text", text: "O CI roda sempre [f1]. Não consegui confirmar o prazo da homologação." }, escalar("Prazo da homologação"), { type: "done", finishReason: "stop" }];
+    expect(escalates(await run("e a homologação, quanto demora?"))).toEqual([{ type: "escalate", summary: "Prazo da homologação" }]);
+  });
+
+  it("resumo do escalate sai sem marcas: os títulos no lugar de f1 e f2", async () => {
+    const f2: Trecho = { id: "f2", titulo: "Code review · Aprovação", url: "https://exemplo.notion.site/code-review", texto: "Duas aprovações." };
+    achados = [trecho, f2];
+    script = [{ type: "text", text: "Não achei o prazo." }, escalar("Respondi com os trechos f1 e f2 [f1]"), { type: "done", finishReason: "stop" }];
+    // sem citação o escalate vale; o resumo vira os dois títulos e a marca repetida some
+    expect(escalates(await run("quanto demora o deploy?"))).toEqual([
+      { type: "escalate", summary: `Respondi com os trechos ${trecho.titulo} e ${f2.titulo}` },
+    ]);
+  });
+
+  it("caso pessoal: o resumo do modelo também sai limpo", async () => {
+    const bonus: Trecho = { id: "f1", titulo: "Bônus · Quem recebe", url: "https://exemplo.notion.site/bonus", texto: "Proporcional aos meses." };
+    achados = [bonus];
+    script = [{ type: "text", text: "É proporcional aos meses [f1]." }, escalar("Ana quer saber o bônus [f1]. Regra geral em (f1)."), { type: "done", finishReason: "stop" }];
+    const [esc] = escalates(await run("qual vai ser o meu bônus?"));
+    expect(esc).toEqual({ type: "escalate", summary: "Ana quer saber o bônus (Bônus · Quem recebe). Regra geral em.", destino: "rh" });
+  });
+});
+
+describe("limparResumo", () => {
+  const ts: Trecho[] = [
+    { id: "f1", titulo: "Deploy · Visão geral", url: "u1", texto: "" },
+    { id: "f2", titulo: "Deploy · Quando fazer", url: "u2", texto: "" },
+    { id: "f3", titulo: "Bônus · Quem recebe", url: "u3", texto: "" },
+  ];
+
+  it("lista solta (\"f1, f2 e f3\") vira os títulos", () => {
+    expect(limparResumo("Respondi com f1, f2 e f3.", ts)).toBe("Respondi com Deploy · Visão geral, Deploy · Quando fazer e Bônus · Quem recebe.");
+  });
+
+  it("[fN], [fN][fM], (fN), [fonte N] e [N] viram o título entre parênteses, uma vez só", () => {
+    expect(limparResumo("Regra geral [f3][f2].", ts)).toBe("Regra geral (Bônus · Quem recebe e Deploy · Quando fazer).");
+    expect(limparResumo("Sai pelo CI (f1) e pelo review [fonte 2], de novo [1] e [f1, f2].", ts)).toBe(
+      "Sai pelo CI (Deploy · Visão geral) e pelo review (Deploy · Quando fazer), de novo e.",
+    );
+  });
+
+  it("trecho que não existe some, sem deixar marca nem espaço sobrando", () => {
+    expect(limparResumo("Veja f9 e [f8] agora", ts)).toBe("Veja e agora");
+    expect(limparResumo("Resumo sem marcas, com (3 pessoas) e 2024.", ts)).toBe("Resumo sem marcas, com (3 pessoas) e 2024.");
   });
 });

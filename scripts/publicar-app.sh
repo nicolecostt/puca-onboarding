@@ -42,7 +42,12 @@ gh release create "$TAG" \
   release/Orbis-mac-arm64.zip release/Orbis-mac-arm64.zip.sha256 \
   release/Orbis-mac-x64.zip release/Orbis-mac-x64.zip.sha256 \
   --verify-tag --latest --title "Orbis $TAG" \
-  --notes "App para Mac do Orbis $VERSAO. Instalar ou atualizar: veja a seção \"Instalar no Mac\" do README ou https://theorbis.app."
+  --notes "App para Mac do Orbis $VERSAO. Instalar ou atualizar: veja a seção \"Instalar no Mac\" do README ou https://theorbis.app." || {
+  # sem Release, a tag sozinha só atrapalha: apaga, para rodar de novo com a mesma versão
+  git push -q "$REMOTO" ":refs/tags/$TAG" || true
+  git tag -d "$TAG" >/dev/null
+  falhar "o Release não foi criado; a tag $TAG foi apagada. Rode de novo com a mesma versão."
+}
 
 echo "Pronto: Orbis $VERSAO publicado. Para atualizar um Mac, rode de novo:"
 echo "  curl -fsSL https://raw.githubusercontent.com/nicolecostt/puca-onboarding/main/scripts/instalar.sh | bash"
