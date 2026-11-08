@@ -373,8 +373,11 @@ primary_region = "iad"
 - **`server/Dockerfile`:** `node:22-slim`, `npm ci --omit=dev` mais `tsx`, `CMD ["npx", "tsx", "server/src/server.ts"]`.
   O índice do kit (§9) é gerado no build da imagem.
 - **Chaves:** `fly secrets set ANTHROPIC_API_KEY=… ELEVENLABS_API_KEY=… …` (lista na §13.3). Nunca no repo.
-- **Deploy:** `fly deploy` manual no começo; depois um workflow na `main` que roda `npm run check` e `fly deploy`
-  **(proposta)**.
+- **Deploy:** automático (#205). A cada push na `main` que muda o que entra na imagem (`server/`, `kit/kota/`,
+  `src/data`, `src/journey`, `src/lib`, `src/voice`, `package*.json`, `tsconfig.json`, `fly.toml`), o workflow
+  `.github/workflows/deploy-servidor.yml` roda `npm run check` e `fly deploy`, um por vez. Também roda à mão
+  (Actions → Deploy do servidor → Run workflow). Usa o segredo `FLY_API_TOKEN` do repositório, um token de deploy
+  só deste app (`fly tokens create deploy -a orbis-puca`).
 
 ### 5.3. O que entra no servidor
 
