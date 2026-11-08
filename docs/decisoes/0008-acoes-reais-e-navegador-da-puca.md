@@ -39,3 +39,5 @@ Desenho completo: [`docs/stack.md`](../stack.md) §4 e §10.
   `users:read.email`; `channels:manage` só para o script que preenche os canais, #118).
 - Apps nativos (Slack desktop, editor, terminal) e ver a tela por print ficam fora do MVP.
 - `npm run dev` no navegador comum continua com o computer use simulado.
+- Telas: a `live-session` reserva a área do navegador da Puca, com barra de call, chat e câmera em volta e nunca por
+  cima (regra no `CLAUDE.md`, cobrada pela skill `nova-tela` e pelo `revisor`).
