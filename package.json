@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "main": "dist-desktop/main.cjs",
-  "description": "Orbis: a Puca conduz o onboarding por voz",
+  "description": "Orbis: Puca conduz o onboarding por voz",
   "author": "Orbis",
   "scripts": {
     "dev": "vite",
@@ -30,6 +30,7 @@
     "check:kota": "tsx kit/kota/checar/cli.ts",
     "kota:marca": "tsx kit/kota/marca/cli.ts",
     "kota:readme-raiz": "tsx kit/kota/gerar/readme-raiz.ts",
+    "kota:publicar": "tsx kit/kota/historia/publicar.ts",
     "contas-demo": "tsx server/scripts/contas-demo.ts"
   },
   "devDependencies": {

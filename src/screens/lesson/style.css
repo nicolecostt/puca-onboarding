@@ -5,12 +5,12 @@ body {
   overflow: hidden;
   background: var(--color-surface);
 }
-/* A página tem três faixas: título no topo, quadro no meio e a fala da Puca embaixo.
+/* A página tem três faixas: título no topo, quadro no meio e a fala de Puca embaixo.
    O pontilhado é da página inteira, então o quadro não tem borda: só fica longe da legenda. */
 .lesson {
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --top: 64px; /* título da sessão */
-  --bottom: 172px; /* fala da Puca e respostas */
+  --bottom: 172px; /* fala de Puca e respostas */
   position: relative;
   height: calc(100vh - 56px);
   background-color: var(--color-surface);
@@ -21,7 +21,7 @@ body {
   position: absolute;
   inset: var(--top) 24px var(--bottom);
 }
-/* com a câmera da Puca no canto, o quadro não passa por baixo dela */
+/* com a câmera de Puca no canto, o quadro não passa por baixo dela */
 body.has-agent-cam:not(.is-call-off) .lesson__board {
   right: 300px;
 }
@@ -140,8 +140,8 @@ body.has-agent-cam:not(.is-call-off) .lesson__board {
   border-radius: var(--radius-pill); /* acompanha a curva da pílula */
 }
 
-/* ---- Fala da Puca (embaixo, centro), no modelo da call inicial ----
-   Sem caixa: as bolinhas da Puca em cima, a fala centrada em Creato Display, cada palavra entrando
+/* ---- Fala de Puca (embaixo, centro), no modelo da call inicial ----
+   Sem caixa: as bolinhas de Puca em cima, a fala centrada em Creato Display, cada palavra entrando
    com um leve desfoque. Um véu branco por baixo separa a fala do quadro. */
 .caption {
   position: absolute;
@@ -173,7 +173,7 @@ body.has-agent-cam:not(.is-call-off) .lesson__board {
   height: 38px;
   margin-bottom: 2px;
 }
-/* as bolinhas só aparecem quando a Puca começa a falar */
+/* as bolinhas só aparecem quando Puca começa a falar */
 .caption__orb {
   transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
 }
@@ -322,7 +322,7 @@ body.has-agent-cam:not(.is-call-off) .lesson__board {
 }
 
 /* ---- Telas menores: tira o que é secundário ---- */
-/* com os controles presos na câmera, a câmera já mostra se a Puca fala: as ondas saem */
+/* com os controles presos na câmera, a câmera já mostra se Puca fala: as ondas saem */
 body.has-attached-callbar .voice {
   display: none;
 }

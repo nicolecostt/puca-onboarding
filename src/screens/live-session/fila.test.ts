@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import demo from "../../journey/data/tail.journey.json";
+import demo from "../../journey/data/kota.journey.json";
 import { createOutbox, type Forwarding } from "../../journey/forwarding";
 import { createPedidos, tarefaDoNo } from "../../journey/primeira-tarefa";
 import { memoryStore } from "../../journey/storage";
@@ -7,10 +7,10 @@ import { loadJourney } from "../../journey/validate";
 import { drenar } from "./fila";
 
 const journey = loadJourney(demo);
-const taskDlq = Object.values(journey.boards).flatMap((b) => b.nodes).find((n) => n.id === "task-dlq")!;
+const task403 = Object.values(journey.boards).flatMap((b) => b.nodes).find((n) => n.id === "task-403")!;
 
 const duvida = (question: string): Omit<Forwarding, "id" | "at" | "status"> => ({
-  to: { name: "Paula Nunes", role: "buddy" },
+  to: { name: "Beatriz Cavalcanti", role: "buddy" },
   pessoa: "Bruno",
   question,
   summary: question,
@@ -41,9 +41,9 @@ function montar() {
 }
 
 describe("drenar (fila do Slack)", () => {
-  it("encaminhamento criado enquanto a Puca digita o pedido também sai", async () => {
+  it("encaminhamento criado enquanto Puca digita o pedido também sai", async () => {
     const t = montar();
-    t.pedidos.add({ pessoa: "Bruno", gestor: "Marcos Vidal", tarefa: tarefaDoNo(taskDlq)!, moment: "primeira-tarefa" });
+    t.pedidos.add({ pessoa: "Bruno", gestor: "Natália Brandão", tarefa: tarefaDoNo(task403)!, moment: "primeira-tarefa" });
     await drenar({
       ...t.opts,
       encaminhar: async (f) => {
@@ -52,17 +52,17 @@ describe("drenar (fila do Slack)", () => {
       },
       pedir: async (p) => {
         t.feitos.push(`pediu: ${p.tarefa.no}`);
-        // a pessoa pergunta algo sem fonte enquanto a Puca ainda digita o pedido
-        t.outbox.add(duvida("Quem cuida do tail-common?"));
+        // a pessoa pergunta algo sem fonte enquanto Puca ainda digita o pedido
+        t.outbox.add(duvida("Quando o ledgermonolith sai do repositório?"));
         t.pedidos.setStatus(p.id, "aguardando");
       },
     });
-    expect(t.feitos).toEqual(["pediu: task-dlq", "encaminhou: Quem cuida do tail-common?"]);
+    expect(t.feitos).toEqual(["pediu: task-403", "encaminhou: Quando o ledgermonolith sai do repositório?"]);
   });
 
   it("depois de um encaminhamento, a DM do gestor volta com o pedido que espera aprovação", async () => {
     const t = montar();
-    t.outbox.add(duvida("Quem cuida do tail-common?"));
+    t.outbox.add(duvida("Quando o ledgermonolith sai do repositório?"));
     await drenar({
       ...t.opts,
       encaminhar: async (f) => t.outbox.setStatus(f.id, "confirmado"),
@@ -73,7 +73,7 @@ describe("drenar (fila do Slack)", () => {
 
   it("sem encaminhamento, não mexe na DM do gestor", async () => {
     const t = montar();
-    t.pedidos.add({ pessoa: "Bruno", gestor: "Marcos Vidal", tarefa: tarefaDoNo(taskDlq)!, moment: "primeira-tarefa" });
+    t.pedidos.add({ pessoa: "Bruno", gestor: "Natália Brandão", tarefa: tarefaDoNo(task403)!, moment: "primeira-tarefa" });
     await drenar({
       ...t.opts,
       encaminhar: async () => {},
@@ -84,7 +84,7 @@ describe("drenar (fila do Slack)", () => {
 
   it("item que outra aba pegou no mesmo instante fica com ela", async () => {
     const t = montar();
-    const f = t.outbox.add(duvida("Quem cuida do tail-common?"));
+    const f = t.outbox.add(duvida("Quando o ledgermonolith sai do repositório?"));
     const encaminhados: string[] = [];
     await drenar({
       ...t.opts,

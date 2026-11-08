@@ -1,5 +1,5 @@
 // Tela só para a demo (#51): lista o rastro guardado neste navegador pela sessão e baixa em JSON.
-// Não faz parte do produto; serve para mostrar à banca que dá para auditar o que a Puca fez e por quê.
+// Não faz parte do produto; serve para mostrar à banca que dá para auditar o que Puca fez e por quê.
 import "../../styles/base.css";
 import "./style.css";
 import { createOutbox, FORWARDING_KEY } from "../../journey/forwarding";
@@ -53,7 +53,7 @@ function row(e: TrailEntry, sent: Map<string, string>): HTMLTableRowElement {
 
 function render(): void {
   const list = trail.list();
-  const sent = new Map(outbox.list().map((f) => [f.id, `→ ${f.to.name} (${f.status})`]));
+  const sent = new Map(outbox.list().map((f) => [f.id, `→ ${f.to.name} (${f.status}${f.slack_link ? ", no Slack da Kota" : ""})`]));
   rows.replaceChildren(...list.map((e) => row(e, sent)).reverse()); // mais recente primeiro
   table.hidden = !list.length;
   empty.hidden = !!list.length;

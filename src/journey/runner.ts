@@ -65,7 +65,7 @@ export function createRunner(journey: Journey, profile: Profile, io: RunnerIO, o
     io.onMoment?.(m, mi);
   }
 
-  /** Passo "select": tenta até acertar ou esgotar as tentativas. Entendeu = acertou sem a Puca revelar. */
+  /** Passo "select": tenta até acertar ou esgotar as tentativas. Entendeu = acertou sem Puca revelar. */
   async function runSelect(step: Step): Promise<{ entendeu: boolean; tentativas: number; resposta: string }> {
     const expect = step.expect!;
     const retries = expect.retries ?? 1;

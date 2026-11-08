@@ -1,4 +1,4 @@
-// Benchmark de turno: quanto a pessoa espera até a Puca começar a responder, por caminho.
+// Benchmark de turno: quanto a pessoa espera até Puca começar a responder, por caminho.
 // Usa a mesma ordem de decisão da tela (src/journey/route.ts). Caminhos locais rodam no browser
 // (aqui, medidos em processo); "ask" vai ao servidor por HTTP de verdade.
 // Uso: npm run bench:turn -- [--tts] [--label x] [--url https://orbis-puca.fly.dev] [--token <jwt>]
@@ -33,9 +33,9 @@ const script: { moment: string; step: string; text: string }[] = [
   { moment: "empresa-e-cultura", step: "ec-pergunta", text: "pode seguir" },
   { moment: "seu-time", step: "st-pergunta", text: "Qual a diferença entre gestor e buddy?" },
   { moment: "seu-time", step: "st-pergunta", text: "beleza, ficou claro" },
-  { moment: "pagamentos", step: "pg-pergunta", text: "E se a liquidação falhar?" },
-  { moment: "pagamentos", step: "pg-pergunta", text: "Quem cuida do authorizer?" },
-  { moment: "pagamentos", step: "pg-pergunta", text: "me explica o settlement-worker" },
+  { moment: "pagamentos", step: "pg-pergunta", text: "E se o balancereader cair?" },
+  { moment: "pagamentos", step: "pg-pergunta", text: "Quem cuida do balancereader?" },
+  { moment: "pagamentos", step: "pg-pergunta", text: "me explica o ledgerwriter" },
   { moment: "pagamentos", step: "pg-pergunta", text: "quero ver a primeira tarefa" },
   { moment: "pagamentos", step: "pg-pergunta", text: "e se der ruim na hora de cobrar o cartão, o que rola?" },
   { moment: "pagamentos", step: "pg-pergunta", text: "Quanto ganha um engenheiro pleno aqui?" },
@@ -47,7 +47,7 @@ const script: { moment: string; step: string; text: string }[] = [
 interface Row {
   text: string;
   route: string;
-  /** Até a Puca começar a responder: decisão local, ou a ponte do /api/ask. */
+  /** Até Puca começar a responder: decisão local, ou a ponte do /api/ask. */
   first_response_ms: number;
   first_audio_byte_ms: number | null;
   llm_first_sentence_ms: number | null;

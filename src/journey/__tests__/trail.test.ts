@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import demo from "../data/tail.journey.json";
+import demo from "../data/kota.journey.json";
 import { buildFaqs } from "../faq";
 import { DEMO_PROFILES } from "../profile";
 import type { Route } from "../route";
@@ -76,6 +76,14 @@ describe("createTrail", () => {
     expect(eb.answer).toBe("");
   });
 
+  it("update grava o link do encaminhamento no Slack da Kota (#129)", () => {
+    const trail = createTrail(memoryStore());
+    const e = trail.record(entry("quem cuida do tail-common?"));
+    trail.update(e.id, { forwarding_id: "f1", forwarding_link: "https://kota.slack.com/archives/D1/p12" });
+    expect(trail.list()[0]).toMatchObject({ forwarding_id: "f1", forwarding_link: "https://kota.slack.com/archives/D1/p12" });
+    expect(JSON.parse(trail.exportJson()).entries[0].forwarding_link).toBe("https://kota.slack.com/archives/D1/p12");
+  });
+
   it("exportJson devolve o resumo das sessões e as falas", () => {
     const trail = createTrail(memoryStore());
     trail.startSession();
@@ -102,7 +110,7 @@ describe("custo da sessão (#52)", () => {
     b.startSession();
     const p1 = a.record(entry("p1"));
     const p2 = a.record(entry("p2"));
-    a.record({ ...entry("quem cuida do authorizer?"), route: "faq" });
+    a.record({ ...entry("quem cuida do balancereader?"), route: "faq" });
     a.update(p1.id, { llm_ms: 1200, tokens_in: 800, tokens_out: 40, tokens_estimated: false });
     a.update(p2.id, { llm_ms: 1800, tokens_in: 900, tokens_out: 60, tokens_estimated: false });
     const pb = b.record(entry("outra sessão"));
@@ -207,15 +215,15 @@ describe("sourcesFor", () => {
   const faq = (node: string, intent: string): Route => ({ kind: "faq", faq: faqs.find((f) => f.node === node && f.intent === intent)! });
 
   it("o que é: títulos das docs do nó", () => {
-    expect(sourcesFor(faq("authorizer", "what"), journey, pagamentos)).toEqual(["ADR-019 · Cálculo de MDR por plano", "fees/mdr.go"]);
+    expect(sourcesFor(faq("balancereader", "what"), journey, pagamentos)).toEqual(["ADR 4 · Saldo e extrato com cache em memória, lidos do livro-razão", "README do balancereader"]);
   });
 
   it("por que existe: só o ADR, nunca as outras docs do nó", () => {
-    expect(sourcesFor(faq("gateway", "why"), journey, pagamentos)).toEqual(["ADR-012"]);
+    expect(sourcesFor(faq("ledgerwriter", "why"), journey, pagamentos)).toEqual(["ADR-0001"]);
   });
 
   it("quem cuida: sem fonte, porque as docs do nó não dizem quem cuida", () => {
-    expect(sourcesFor(faq("authorizer", "owner"), journey, pagamentos)).toEqual([]);
+    expect(sourcesFor(faq("balancereader", "owner"), journey, pagamentos)).toEqual([]);
   });
 
   it("responsável não confirmado: sem fonte", () => {
@@ -232,7 +240,7 @@ describe("sourcesFor", () => {
     const routes: Route[] = [
       { kind: "jump", moment: pagamentos },
       { kind: "reply", reply: "Pode seguir" },
-      { kind: "select", node: "authorizer" },
+      { kind: "select", node: "balancereader" },
       { kind: "ask" },
     ];
     for (const r of routes) expect(sourcesFor(r, journey, pagamentos)).toEqual([]);

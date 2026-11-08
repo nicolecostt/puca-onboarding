@@ -1,4 +1,4 @@
-// Rastro das decisões da Puca (PRODUCT.md §12.2): cada fala da pessoa, o caminho que a Puca escolheu
+// Rastro das decisões de Puca (PRODUCT.md §12.2): cada fala da pessoa, o caminho que Puca escolheu
 // (journey/route.ts), o que respondeu e de qual fonte. Fica no navegador; a tela de demo `rastro/`
 // mostra e baixa em JSON. Formato em docs/contratos.md.
 import type { Route } from "./route";
@@ -16,7 +16,7 @@ export interface TrailEntry {
   from: "chat" | "voz";
   utterance: string;
   route: TrailRoute;
-  /** O que a Puca disse (no ask, as frases juntas; "" se foi interrompida antes de falar). */
+  /** O que Puca disse (no ask, as frases juntas; "" se foi interrompida antes de falar). */
   answer: string;
   /** Títulos das fontes usadas; [] quando não houve. */
   sources: string[];
@@ -24,6 +24,8 @@ export interface TrailEntry {
   step: string | null;
   /** A fala virou encaminhamento (journey/forwarding.ts). */
   forwarding_id?: string;
+  /** Link da mensagem no Slack da Kota, quando o encaminhamento saiu de verdade pelo servidor (#129). */
+  forwarding_link?: string;
   /** Tempo da resposta do agente, em ms (route "ask"), medido no navegador. */
   ms?: number;
   /** Custo (#52), copiado do `timing` do servidor: tempo total do pedido e tokens do LLM. */
@@ -84,7 +86,7 @@ export function createTrail(store: KeyValueStore, opts: { now?: () => Date; sess
       write([...read(), entry]);
       return entry;
     },
-    update(id: string, patch: Partial<Pick<TrailEntry, "answer" | "sources" | "forwarding_id" | "ms" | "llm_ms" | "llm_error" | "tokens_in" | "tokens_out" | "tokens_estimated">>): void {
+    update(id: string, patch: Partial<Pick<TrailEntry, "answer" | "sources" | "forwarding_id" | "forwarding_link" | "ms" | "llm_ms" | "llm_error" | "tokens_in" | "tokens_out" | "tokens_estimated">>): void {
       write(read().map((e) => (e.id === id ? { ...e, ...patch } : e)));
     },
     list: read,
@@ -151,7 +153,7 @@ export function summarizeSessions(entries: TrailEntry[], sessions: TrailSession[
 
 /**
  * Fontes que sustentam a resposta de um caminho (vazio quando a resposta não veio de fonte).
- * Só entra o que diz o que a Puca respondeu, para o jurado achar no kit (PRODUCT.md §13.2):
+ * Só entra o que diz o que Puca respondeu, para o jurado achar no kit (PRODUCT.md §13.2):
  * "o que é" vem das docs do nó, "por que existe" vem do ADR, e "quem cuida" fica sem fonte,
  * porque as docs do nó não dizem quem cuida.
  */

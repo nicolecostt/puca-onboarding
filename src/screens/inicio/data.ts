@@ -1,4 +1,4 @@
-// Dados sintéticos do início para a demo (mundo fictício da Tail): ferramentas do time, acessos e tarefas.
+// Dados sintéticos do início para a demo (mundo fictício da Kota): ferramentas do time, acessos e tarefas.
 // Só esta tela usa. A primeira tarefa vem do catálogo da jornada, escolhida pelo vínculo da pessoa (tarefaDaPessoa).
 import type { TarefaDoTime } from "../../journey/primeira-tarefa";
 
@@ -12,13 +12,13 @@ export interface Tool {
   status: AccessStatus;
 }
 
-/** Ferramentas do time Terminais. A que está "missing" a Puca percebe ao abrir o início e pede ao gestor. */
+/** Ferramentas do time de Livro-razão. A que está "missing" Puca percebe ao abrir o início e pede ao gestor. */
 export const TOOLS: Tool[] = [
-  { id: "github", name: "GitHub", use: "Código do terminal-config-api", status: "ok" },
-  { id: "slack", name: "Slack", use: "Canal #time-terminais", status: "ok" },
-  { id: "jira", name: "Jira", use: "Tickets do time", status: "ok" },
-  { id: "grafana", name: "Grafana", use: "Painéis das maquininhas", status: "pending" },
-  { id: "kafka", name: "Kafka UI", use: "Fila terminal.config.updated", status: "missing" },
+  { id: "github", name: "GitHub", use: "Código do kota-bank", status: "ok" },
+  { id: "slack", name: "Slack", use: "Canal #livro-razao", status: "ok" },
+  { id: "notion", name: "Notion", use: "Jeito de trabalhar e RFCs", status: "ok" },
+  { id: "docker", name: "Docker", use: "Subir o banco na sua máquina", status: "pending" },
+  { id: "producao", name: "Ambiente de produção", use: "Sistemas do Livro-razão", status: "missing" },
 ];
 
 export type TaskState = "done" | "now" | "next";
@@ -33,15 +33,15 @@ export interface Task {
 /** Tarefas do início. A primeira tarefa é a do vínculo da pessoa; sem tarefa no catálogo, a linha não aparece. */
 export function tasksFor(tarefa: TarefaDoTime | null, nome: string | undefined): Task[] {
   return [
-    { title: "Call inicial com a Puca", detail: "A Puca já sabe o que você conhece e o que quer aprender.", state: "done" },
+    { title: "Call inicial com Puca", detail: "Puca já sabe o que você conhece e o que quer aprender.", state: "done" },
     {
       title: "Sua primeira sessão",
-      detail: "O caminho de uma transação, quando falha e quem cuida de cada parte.",
+      detail: "O caminho de uma transferência, quando falha e quem cuida de cada parte.",
       state: "now",
       action: { label: "Começar a sessão", href: "../lesson/" },
     },
     ...(tarefa ? [{ title: `Primeira tarefa: ${nome ?? tarefa.titulo}`, detail: tarefa.problema, state: "next" as const }] : []),
-    { title: "Dar oi no #time-terminais", detail: "Se apresentar para o time no canal do Slack.", state: "next" },
+    { title: "Dar oi no #livro-razao", detail: "Se apresentar para o time no canal do Slack.", state: "next" },
   ];
 }
 

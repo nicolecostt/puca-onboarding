@@ -1,17 +1,17 @@
 import { describe, expect, it } from "vitest";
-import demo from "../data/tail.journey.json";
+import demo from "../data/kota.journey.json";
 import { buddyOf, createOutbox, FORWARDING_KEY, forwardingMessage, type Forwarding } from "../forwarding";
 import { memoryStore } from "../storage";
 import { loadJourney } from "../validate";
 
 const journey = loadJourney(demo);
 const draft = (question: string): Omit<Forwarding, "id" | "at" | "status"> => ({
-  to: { name: "Paula Nunes", role: "buddy" },
+  to: { name: "Beatriz Cavalcanti", role: "buddy" },
   pessoa: "Ana",
   question,
   summary: question,
-  consulted: ["ADR-012", "README do pos-gateway"],
-  reason: "Não há responsável confirmado para o tail-common nas fontes da Tail.",
+  consulted: ["ADR-0001", "README do ledgermonolith"],
+  reason: "Nenhuma fonte da Kota diz quando o ledgermonolith sai do repositório.",
   moment: "pagamentos",
 });
 
@@ -24,7 +24,7 @@ function clock(start = Date.parse("2026-11-07T22:00:00Z")) {
 describe("createOutbox", () => {
   it("encaminhamento novo fica pendente", () => {
     const out = createOutbox(memoryStore());
-    const f = out.add(draft("Quem cuida do tail-common?"));
+    const f = out.add(draft("Quando o ledgermonolith sai do repositório?"));
     expect(f.status).toBe("pendente");
     expect(out.pending().map((p) => p.id)).toEqual([f.id]);
   });
@@ -32,13 +32,13 @@ describe("createOutbox", () => {
   it("a mesma dúvida em menos de 2 minutos não vira dois encaminhamentos", () => {
     const c = clock();
     const out = createOutbox(memoryStore(), { now: c.now });
-    const a = out.add(draft("Quem cuida do tail-common?"));
+    const a = out.add(draft("Quando o ledgermonolith sai do repositório?"));
     c.advance(30_000);
-    const b = out.add(draft("  quem CUIDA do tail-common  "));
+    const b = out.add(draft("  quando o LEDGERMONOLITH sai do repositório  "));
     expect(b.id).toBe(a.id);
     expect(out.list()).toHaveLength(1);
     c.advance(3 * 60_000);
-    out.add(draft("Quem cuida do tail-common?"));
+    out.add(draft("Quando o ledgermonolith sai do repositório?"));
     expect(out.list()).toHaveLength(2);
   });
 
@@ -57,16 +57,16 @@ describe("createOutbox", () => {
 
   it("encaminhamento malformado é descartado e não quebra o add", () => {
     const store = memoryStore();
-    const valido = { ...draft("Quem cuida do tail-common?"), id: "ok", at: "2026-11-08T05:00:00.000Z", status: "pendente" };
+    const valido = { ...draft("Quando o ledgermonolith sai do repositório?"), id: "ok", at: "2026-11-08T05:00:00.000Z", status: "pendente" };
     store.setItem(FORWARDING_KEY, JSON.stringify([null, { id: "sem-pergunta" }, valido]));
     const out = createOutbox(store);
     expect(() => out.add(draft("Qual a política de home office?"))).not.toThrow();
-    expect(out.list().map((f) => f.question)).toEqual(["Quem cuida do tail-common?", "Qual a política de home office?"]);
+    expect(out.list().map((f) => f.question)).toEqual(["Quando o ledgermonolith sai do repositório?", "Qual a política de home office?"]);
   });
 
   it("encaminhamento antigo sem consulted continua na lista e a mensagem do slack sai", () => {
     const store = memoryStore();
-    const { consulted: _, ...antigo } = { ...draft("Quem cuida do tail-common?"), id: "velho", at: "2026-11-08T05:00:00.000Z", status: "pendente" };
+    const { consulted: _, ...antigo } = { ...draft("Quando o ledgermonolith sai do repositório?"), id: "velho", at: "2026-11-08T05:00:00.000Z", status: "pendente" };
     store.setItem(FORWARDING_KEY, JSON.stringify([antigo]));
     const [f] = createOutbox(store).list();
     expect(f.id).toBe("velho");
@@ -76,7 +76,7 @@ describe("createOutbox", () => {
 
 describe("buddyOf", () => {
   it("a buddy vem do nó buddy da jornada", () => {
-    expect(buddyOf(journey)).toBe("Paula Nunes");
+    expect(buddyOf(journey)).toBe("Beatriz Cavalcanti");
   });
 
   it("jornada sem nó buddy: 'sua buddy'", () => {
@@ -85,14 +85,14 @@ describe("buddyOf", () => {
 });
 
 describe("forwardingMessage", () => {
-  const f: Forwarding = { ...draft("Quem cuida do tail-common?"), id: "1", at: "2026-11-07T22:00:00Z", status: "pendente" };
+  const f: Forwarding = { ...draft("Quando o ledgermonolith sai do repositório?"), id: "1", at: "2026-11-07T22:00:00Z", status: "pendente" };
 
   it("leva a pessoa, a dúvida, o que foi consultado e o motivo", () => {
     const msg = forwardingMessage(f);
-    expect(msg).toContain("Oi, Paula Nunes!");
-    expect(msg).toContain('Pergunta de Ana na sessão: "Quem cuida do tail-common?"');
-    expect(msg).toContain("ADR-012; README do pos-gateway");
-    expect(msg).toContain("Não há responsável confirmado para o tail-common nas fontes da Tail.");
+    expect(msg).toContain("Oi, Beatriz Cavalcanti!");
+    expect(msg).toContain('Pergunta de Ana na sessão: "Quando o ledgermonolith sai do repositório?"');
+    expect(msg).toContain("ADR-0001; README do ledgermonolith");
+    expect(msg).toContain("Nenhuma fonte da Kota diz quando o ledgermonolith sai do repositório.");
   });
 
   it("sem nada consultado, diz que não achou fonte", () => {
@@ -100,8 +100,8 @@ describe("forwardingMessage", () => {
   });
 
   it("não supõe o gênero da pessoa nem da buddy (#86)", () => {
-    const msg = forwardingMessage({ ...f, pessoa: "Bruno", to: { name: "Lucas Prado", role: "buddy" } });
-    expect(msg).toContain('Pergunta de Bruno na sessão: "Quem cuida do tail-common?"');
+    const msg = forwardingMessage({ ...f, pessoa: "Bruno", to: { name: "Igor Valadares", role: "buddy" } });
+    expect(msg).toContain('Pergunta de Bruno na sessão: "Quando o ledgermonolith sai do repositório?"');
     expect(msg).not.toMatch(/\b(A|O) Bruno\b/);
     expect(msg).not.toMatch(/\b(ela|ele)\b/);
   });
@@ -109,7 +109,7 @@ describe("forwardingMessage", () => {
   it("sem nome da pessoa, não sai 'A você perguntou' (#66)", () => {
     for (const pessoa of ["você", "", "  "]) {
       const msg = forwardingMessage({ ...f, pessoa });
-      expect(msg).toContain('A pessoa que estou acompanhando perguntou na sessão: "Quem cuida do tail-common?"');
+      expect(msg).toContain('A pessoa que estou acompanhando perguntou na sessão: "Quando o ledgermonolith sai do repositório?"');
       expect(msg).not.toMatch(/você perguntou|de você/i);
     }
   });

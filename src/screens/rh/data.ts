@@ -2,6 +2,7 @@
 // Só esta tela usa. Tudo aqui descreve o PROCESSO de integração (etapas, pendências, tempo até os marcos),
 // nunca o desempenho da pessoa: não há nota, avaliação nem produtividade (§5, privacidade e confiança).
 import type { Vinculo } from "../../journey/types";
+import { mapa } from "../../../kit/kota/mapa";
 import { profiles } from "../../data";
 
 /** Etapas da integração, na ordem (as mesmas do progresso no início). */
@@ -12,7 +13,7 @@ export const OBRIGATORIAS = [
   { id: "contrato", label: "Contrato e documentos", so: null },
   { id: "cultura", label: "Onboarding cultural", so: "novo" },
   { id: "acessos", label: "Acessos das ferramentas", so: null },
-  { id: "sessao", label: "Primeira sessão com a Puca", so: null },
+  { id: "sessao", label: "Primeira sessão com Puca", so: null },
   { id: "tarefa", label: "Primeira tarefa aprovada", so: null },
 ] as const;
 export type Obrigatoria = (typeof OBRIGATORIAS)[number]["id"];
@@ -42,52 +43,23 @@ export interface Integracao {
   buddy: string;
 }
 
-export const RH_PESSOA = { nome: "Renata Alves", papel: "Pessoas e cultura" };
+// As integrações são as dos dois perfis do mapa da Kota: ninguém fora do mapa aparece no painel.
+const people = mapa.pessoas.find((p) => p.area === "people")!;
+const livroRazao = mapa.times.find((t) => t.id === "livro-razao")!;
+const buddy = mapa.pessoas.find((p) => p.id === livroRazao.buddies[0])!.nome;
+
+export const RH_PESSOA = { nome: people.nome, papel: people.cargo };
 
 export const INTEGRACOES: Integracao[] = [
   {
-    nome: profiles.ana.name, cargo: profiles.ana.role, time: "Terminais", vinculo: "novo", dia: 3, etapa: 1,
-    feitas: ["contrato", "cultura", "acessos"], pendencias: [{ label: "Acesso ao Kafka UI", quem: "Gestor" }],
-    sessoes: 1, encaminhamentosAbertos: 1, buddy: "Paula Nunes",
+    nome: profiles.ana.name, cargo: profiles.ana.role, time: profiles.ana.toTeam, vinculo: "novo", dia: 3, etapa: 1,
+    feitas: ["contrato", "cultura", "acessos"], pendencias: [{ label: "Acesso a produção do Livro-razão", quem: "Gestor" }],
+    sessoes: 1, encaminhamentosAbertos: 1, buddy,
   },
   {
-    nome: profiles.bruno.name, cargo: profiles.bruno.role, time: "Terminais", vinculo: "transicao", dia: 2, etapa: 1,
-    feitas: ["contrato", "acessos"], pendencias: [{ label: "Acesso ao Grafana", quem: "TI" }],
-    sessoes: 1, encaminhamentosAbertos: 0, buddy: "Paula Nunes",
-  },
-  {
-    nome: "Camila Rocha", cargo: "Analista de dados", time: "Liquidação", vinculo: "novo", dia: 9, etapa: 2,
-    feitas: ["contrato", "cultura", "acessos", "sessao"], pendencias: [],
-    sessoes: 3, encaminhamentosAbertos: 1, buddy: "Rafael Lins",
-  },
-  {
-    nome: "Davi Moreira", cargo: "Engenheiro de software", time: "Autorização", vinculo: "novo", dia: 16, etapa: 3,
-    feitas: ["contrato", "cultura", "acessos", "sessao", "tarefa"], pendencias: [],
-    sessoes: 5, encaminhamentosAbertos: 0, diasAtePrimeiraTarefa: 11, buddy: "Júlia Paiva",
-  },
-  {
-    nome: "Elisa Fonseca", cargo: "Engenheira de plataforma", time: "Terminais", vinculo: "transicao", dia: 7, etapa: 3,
-    feitas: ["contrato", "acessos", "sessao", "tarefa"], pendencias: [],
-    sessoes: 2, encaminhamentosAbertos: 0, diasAtePrimeiraTarefa: 5, buddy: "Lucas Melo",
-  },
-  {
-    nome: "Felipe Araújo", cargo: "Engenheiro de software", time: "Liquidação", vinculo: "novo", dia: 1, etapa: 0,
-    feitas: ["contrato"], pendencias: [
-      { label: "Exame admissional", quem: "RH" },
-      { label: "Acesso ao GitHub", quem: "TI" },
-      { label: "Acesso ao Kafka UI", quem: "Gestor" },
-    ],
-    sessoes: 0, encaminhamentosAbertos: 0, buddy: "Carla Mendes",
-  },
-  {
-    nome: "Gabriela Lima", cargo: "Engenheira de software", time: "Autorização", vinculo: "transicao", dia: 12, etapa: 2,
-    feitas: ["contrato", "acessos", "sessao"], pendencias: [{ label: "Aprovação da primeira tarefa", quem: "Gestor" }],
-    sessoes: 4, encaminhamentosAbertos: 2, buddy: "Diego Ramos",
-  },
-  {
-    nome: "Heitor Prado", cargo: "Analista de suporte", time: "Terminais", vinculo: "novo", dia: 21, etapa: 3,
-    feitas: ["contrato", "cultura", "acessos", "sessao", "tarefa"], pendencias: [],
-    sessoes: 6, encaminhamentosAbertos: 0, diasAtePrimeiraTarefa: 14, buddy: "Paula Nunes",
+    nome: profiles.bruno.name, cargo: profiles.bruno.role, time: profiles.bruno.toTeam, vinculo: "transicao", dia: 2, etapa: 1,
+    feitas: ["contrato", "acessos"], pendencias: [{ label: "Entrar na escala de plantão do Livro-razão", quem: "Gestor" }],
+    sessoes: 1, encaminhamentosAbertos: 0, buddy,
   },
 ];
 

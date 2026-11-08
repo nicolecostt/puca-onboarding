@@ -1,5 +1,5 @@
-// Encaminhamento (PRODUCT.md §4.5 e §12.1, passo 4): quando a Puca não tem fonte confiável, a dúvida vai
-// para a buddy com o contexto pronto (o que a pessoa perguntou, o que a Puca já consultou e por que não
+// Encaminhamento (PRODUCT.md §4.5 e §12.1, passo 4): quando Puca não tem fonte confiável, a dúvida vai
+// para a buddy com o contexto pronto (o que a pessoa perguntou, o que Puca já consultou e por que não
 // respondeu). A sessão cria; a tela do Slack (screens/live-session) envia. Formato em docs/contratos.md.
 import { pendentes, proximaTentativa } from "./claim-queue";
 import { normalize } from "./conditions";
@@ -20,9 +20,9 @@ export interface Forwarding {
   question: string;
   /** Resumo do agente, ou a própria pergunta. */
   summary: string;
-  /** Fontes que a Puca consultou antes de desistir. */
+  /** Fontes que Puca consultou antes de desistir. */
   consulted: string[];
-  /** Por que a Puca não respondeu. */
+  /** Por que Puca não respondeu. */
   reason: string;
   moment: string | null;
   status: ForwardingStatus;
@@ -30,6 +30,8 @@ export interface Forwarding {
   claimed_by?: string;
   /** Quando a aba pegou o envio (ISO). Passados 30 s sem enviar, outra aba pode pegar. */
   claimed_at?: string;
+  /** Link da mensagem no Slack da Kota, quando o servidor enviou de verdade (#129). */
+  slack_link?: string;
 }
 
 export const FORWARDING_KEY = "puca:encaminhamentos";
@@ -79,6 +81,10 @@ export function createOutbox(store: KeyValueStore, opts: { now?: () => Date } = 
     claim(id: string, tab: string): void {
       write(read().map((f) => (f.id === id ? { ...f, status: "enviando" as const, claimed_by: tab, claimed_at: now().toISOString() } : f)));
     },
+    /** O servidor enviou no Slack da Kota (#129): fica "enviado", com o link, e o Slack simulado não envia de novo. */
+    marcarNoSlack(id: string, link: string): void {
+      write(read().map((f) => (f.id === id ? { ...f, status: "enviado" as const, slack_link: link } : f)));
+    },
     ownerOf(id: string): string | undefined {
       return read().find((f) => f.id === id)?.claimed_by;
     },
@@ -95,7 +101,7 @@ export function buddyOf(journey: Journey): string {
   return node?.label.replace(/\n/g, " ") ?? "sua buddy";
 }
 
-/** Texto da mensagem que a Puca manda para a buddy no Slack. Não supõe o gênero de ninguém. */
+/** Texto da mensagem que Puca manda para a buddy no Slack. Não supõe o gênero de ninguém. */
 export function forwardingMessage(f: Forwarding): string {
   // sem nome, profile.nome vira "você" (journey/profile.ts)
   const nome = f.pessoa.trim();

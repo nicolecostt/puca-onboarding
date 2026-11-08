@@ -100,7 +100,7 @@ async function ouvindo() {
   return { voice, estados, falas };
 }
 
-describe("microfone da Puca", () => {
+describe("microfone de Puca", () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
@@ -170,7 +170,7 @@ describe("uma resposta por vez", () => {
     const { fetch } = navegador();
     const voice = await createAgentVoice();
     const h = { onSpeak: async () => {}, onAction: () => {}, onGoTo: () => {} };
-    const req = { text: "e o settlement?", moment_id: "m", step_id: "s", perfil: "novo" as const, history: [] };
+    const req = { text: "e o balancereader?", moment_id: "m", step_id: "s", perfil: "novo" as const, history: [] };
     const primeira = voice.ask(req, h);
     await new Promise((r) => setTimeout(r, 0));
     void voice.ask({ ...req, text: "e o ledger?" }, h);

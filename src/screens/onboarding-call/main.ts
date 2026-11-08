@@ -1,4 +1,4 @@
-// Call inicial: a Puca se apresenta, confirma os dados da admissão e levanta o que a pessoa já sabe e
+// Call inicial: Puca se apresenta, confirma os dados da admissão e levanta o que a pessoa já sabe e
 // o que ela quer (a calibragem), como numa conversa.
 // Por enquanto a conversa é simulada (roteiro abaixo). A pessoa pode responder
 // "por voz" (resposta de exemplo depois de alguns segundos) ou digitando no chat.
@@ -17,7 +17,7 @@ import { profileFromAnswers, saveProfile, vinculoFromAnswer } from "../../journe
 import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem";
 
 // ---- Roteiro ----
-// A Puca confirma os dados da admissão (não pergunta o que a empresa já sabe) e gasta a conversa com o que
+// Puca confirma os dados da admissão (não pergunta o que a empresa já sabe) e gasta a conversa com o que
 // só a pessoa pode contar: experiência, o que já sabe de cada tema da sessão e os objetivos. Quem está
 // mudando de time ganha perguntas sobre o time anterior. No fim, as respostas viram a calibragem.
 type FieldKey =
@@ -50,7 +50,7 @@ const FIELDS: Field[] = [
   {
     key: "nome",
     question: () =>
-      "Oi! Eu sou a Puca, e vou te acompanhar na sua primeira semana. Antes de começar, quero te conhecer um pouco. Como você prefere ser chamado?",
+      "Oi! Eu sou Puca, e vou te acompanhar na sua primeira semana. Antes de começar, quero te conhecer um pouco. Como você prefere ser chamado?",
     sample: profile.nickname,
   },
   {
@@ -88,7 +88,7 @@ const FIELDS: Field[] = [
   },
   {
     key: "pagamentos",
-    question: () => "Agora sobre o que a gente vai ver junto. Você já trabalhou com pagamentos, tipo cartão e maquininha?",
+    question: () => "Agora sobre o que a gente vai ver junto. Você já trabalhou com banco, tipo transferência, saldo e extrato?",
     sample: sample.pagamentos ?? "",
   },
   { key: "mensageria", question: () => "E com mensageria, tipo Kafka ou filas?", sample: sample.mensageria ?? "" },
@@ -156,7 +156,7 @@ async function main(): Promise<void> {
   let agentState: AgentState = "idle";
   let pendingAnswer: ((text: string) => void) | null = null; // resposta da pergunta atual pelo chat
 
-  // partículas da Puca no fundo, atrás do texto, da esfera, do chat e da barra de call
+  // partículas de Puca no fundo, atrás do texto, da esfera, do chat e da barra de call
   mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
     occluders: ".topbar__row > *, .agent__orb, .agent__meta, .caption > *, .chat-panel, .call-dock",
     round: ".agent__orb",
@@ -166,7 +166,7 @@ async function main(): Promise<void> {
   const chat = mountChatPanel({ title: "Transcrição da call", messages: [] });
   mountCallBar({ chat });
 
-  // Visual da Puca (teste local). Sem ele, fica o círculo neutro.
+  // Visual de Puca (teste local). Sem ele, fica o círculo neutro.
   let visual: AgentVisual | null = null;
   const factory = await loadAgentVisual();
   if (factory) {
@@ -203,7 +203,7 @@ async function main(): Promise<void> {
       shown === "listening" && state.muted
         ? "Seu microfone está mudo. Responda pelo chat."
         : shown === "ended"
-          ? "Use “Ligar para a Puca” para continuar de onde parou."
+          ? "Use “Ligar para Puca” para continuar de onde parou."
           : "";
   }
 
