@@ -22,12 +22,15 @@ Exemplo válido de `TrailEntry` (uma fala da pessoa e o que a Puca fez com ela):
 ```json
 {
   "id": "7f0c…", "at": "2026-11-07T22:10:03.120Z", "session": "a91e…",
-  "from": "chat", "utterance": "Quem cuida do authorizer?", "route": "faq",
-  "answer": "Quem cuida do authorizer é Júlia Paiva, do time Autorização.",
+  "from": "chat", "utterance": "O que é o authorizer?", "route": "faq",
+  "answer": "authorizer: decide se a transação é aprovada e calcula o MDR, a taxa cobrada do lojista.",
   "sources": ["ADR-019 · Cálculo de MDR por plano", "fees/mdr.go"],
   "moment": "pagamentos", "step": "pg-pergunta"
 }
 ```
+
+`sources` só lista o que sustenta a resposta, para o jurado achar no kit (PRODUCT.md §13.2): "o que é" traz as docs do nó,
+"por que existe" traz só o ADR, e "quem cuida" fica `[]`, porque as docs do nó não dizem quem cuida.
 
 `forwarding_id` aparece quando a fala virou encaminhamento; `ms` é o tempo da resposta do agente (`route: "ask"`).
 

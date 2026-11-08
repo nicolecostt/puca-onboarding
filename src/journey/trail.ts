@@ -3,6 +3,7 @@
 // mostra e baixa em JSON. Formato em docs/contratos.md.
 import type { Route } from "./route";
 import { readJson, writeJson, type KeyValueStore } from "./storage";
+import { uid } from "./uid";
 import type { Journey, Moment } from "./types";
 
 export type TrailRoute = Route["kind"];
@@ -32,7 +33,7 @@ const MAX_ENTRIES = 500;
 
 export function createTrail(store: KeyValueStore, opts: { now?: () => Date; session?: string } = {}) {
   const now = opts.now ?? (() => new Date());
-  const session = opts.session ?? crypto.randomUUID();
+  const session = opts.session ?? uid();
   const read = (): TrailEntry[] => {
     const v = readJson<unknown>(store, TRAIL_KEY, []);
     return Array.isArray(v) ? (v as TrailEntry[]) : [];
@@ -41,7 +42,7 @@ export function createTrail(store: KeyValueStore, opts: { now?: () => Date; sess
 
   return {
     record(e: Omit<TrailEntry, "id" | "at" | "session">): TrailEntry {
-      const entry: TrailEntry = { ...e, id: crypto.randomUUID(), at: now().toISOString(), session };
+      const entry: TrailEntry = { ...e, id: uid(), at: now().toISOString(), session };
       write([...read(), entry]);
       return entry;
     },
@@ -60,11 +61,17 @@ export function createTrail(store: KeyValueStore, opts: { now?: () => Date; sess
 
 export type Trail = ReturnType<typeof createTrail>;
 
-/** Fontes que sustentam a resposta de um caminho (vazio quando a resposta não veio de fonte). */
+/**
+ * Fontes que sustentam a resposta de um caminho (vazio quando a resposta não veio de fonte).
+ * Só entra o que diz o que a Puca respondeu, para o jurado achar no kit (PRODUCT.md §13.2):
+ * "o que é" vem das docs do nó, "por que existe" vem do ADR, e "quem cuida" fica sem fonte,
+ * porque as docs do nó não dizem quem cuida.
+ */
 export function sourcesFor(route: Route, journey: Journey, moment: Moment | null): string[] {
   if (route.kind === "knowledge") return [`Conhecimento da aula: ${moment?.title ?? journey.title}`];
   if (route.kind !== "faq") return [];
   const info = journey.boards[route.faq.board]?.nodes.find((n) => n.id === route.faq.node)?.info;
-  const titles = [...(info?.docs ?? []).map((d) => d.title), ...(info?.adr ? [info.adr.id] : [])];
-  return [...new Set(titles)];
+  if (route.faq.intent === "why") return info?.adr ? [info.adr.id] : [];
+  if (route.faq.intent === "what") return [...new Set((info?.docs ?? []).map((d) => d.title))];
+  return [];
 }
