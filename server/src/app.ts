@@ -2,6 +2,8 @@
 // A tela guarda onde a sessão está; o LLM conduz cada turno pelo /api/turn (decisão 0012), e o /api/ask fica
 // para o roteiro (plano B, sem LLM).
 // Contrato "API do servidor" em docs/contratos.md: token do Supabase, limites por pessoa, travas diárias e CORS.
+import { falaValida } from "../../src/journey/conversas";
+import { resumirConversa } from "./agent/resumo";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import cors from "@fastify/cors";
@@ -91,6 +93,7 @@ export interface BuildAppOptions {
   knowledge?: string;
   /** Para testes: substitui a geração do token do Deepgram. */
   mintSttToken?: typeof mintSttToken;
+  streamResumo?: NonNullable<Parameters<typeof resumirConversa>[2]>;
   /** Company brain; padrão: carregado do kit da Kota em process.cwd() (sem kit, sobe sem brain). */
   brain?: Brain;
   /** Encaminhamento no Slack da Kota (#129); null = sem Slack. Padrão: pelo SLACK_BOT_TOKEN do ambiente. */
@@ -265,6 +268,34 @@ export function buildApp(opts: BuildAppOptions = {}) {
       );
       reply.raw.end();
       req.log.info({ kind, pessoa: req.pessoa?.id, timing }, "call");
+    });
+
+    api.post<{ Body: { falas?: unknown } }>("/api/conversas/resumo", {
+      bodyLimit: 256 * 1024,
+      config: POR_MINUTO(6),
+      errorHandler(error, _req, reply) {
+        if (error.statusCode === 400) return reply.status(400).send({ error: "falas_invalidas" });
+        if (error.statusCode === 413) return reply.status(413).send({ error: "corpo_grande_demais" });
+        return reply.send(error);
+      },
+    }, async (req, reply) => {
+      const falas = req.body?.falas;
+      if (!Array.isArray(falas) || !falas.length || !falas.every(falaValida)) {
+        return reply.status(400).send({ error: "falas_invalidas" });
+      }
+      if (!opts.streamResumo && !process.env.ANTHROPIC_API_KEY) {
+        return reply.status(503).send({ error: "resumo_indisponivel" });
+      }
+      if (!trava.llm.usa()) return reply.status(503).send({ error: "limite_diario" });
+      const cancelamento = new AbortController();
+      reply.raw.once("close", () => cancelamento.abort());
+      try {
+        const signal = AbortSignal.any([cancelamento.signal, AbortSignal.timeout(20000)]);
+        const topicos = await resumirConversa(falas.map(({ role, content }) => ({ role, content })), signal, opts.streamResumo);
+        return { topicos };
+      } catch {
+        return reply.status(503).send({ error: "resumo_indisponivel" });
+      }
     });
 
     api.post("/api/voice/token", { config: POR_MINUTO(20) }, async (_req, reply) => {

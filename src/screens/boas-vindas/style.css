@@ -188,3 +188,51 @@ body {
     display: none;
   }
 }
+
+/* ---- E-mail do Slack da Kota, antes da primeira sessão (#209); o mesmo campo fica no Início ---- */
+.slack-email {
+  width: 100%;
+  max-width: 440px;
+  margin-top: 36px;
+}
+
+.slack-email__label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.slack-email__label span {
+  font-weight: 400;
+  color: var(--grey);
+}
+
+.slack-email__hint {
+  margin: 2px 0 10px;
+  font-size: 13px;
+  color: var(--grey);
+}
+
+.slack-email__input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.slack-email__input:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.slack-email__status {
+  min-height: 18px;
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--grey);
+}

@@ -3,6 +3,7 @@
 // ou tocando no quadro. O perfil vem da call inicial (sem ela, a sessão manda para as boas-vindas);
 // ?perfil=ana|bruno (ou novo|transicao)
 // força um perfil da demo; ?auto=1 responde sozinho, para apresentar sem mexer no mouse.
+import { avisarFalhaAoSalvarConversa, criarRegistro } from "../../journey/conversas";
 import "../../styles/base.css";
 import "./style.css";
 import demo from "../../journey/data/kota.journey.json";
@@ -154,6 +155,12 @@ async function main(): Promise<void> {
   const tarefaDaSessao = tarefaDaPessoa(journey, profile);
   let pedidoDaSessao: string | null = null;
   const aprovacaoAvisada = new Set<string>();
+  let registro = criarRegistro("sessao");
+  let sessaoConcluida = false;
+  function salvarConversa(): void {
+    if (!registro.salvar(profile)) avisarFalhaAoSalvarConversa();
+  }
+
   const history: { role: "user" | "assistant"; content: string }[] = [];
   const remember = (role: "user" | "assistant", content: string) => {
     history.push({ role, content });
@@ -241,9 +248,11 @@ async function main(): Promise<void> {
       el.replies.replaceChildren();
       if (!running) return void start(); // "Recomeçar a sessão"
       chat.addMessage({ from: "user", text });
+      registro.anotar("user", text);
       return void falaNaConversa(text, "chat");
     }
     if (!pending || pending.kind !== "reply" || paused || ended) return;
+    if (from === "chip") registro.anotar("user", text);
     const p = pending;
     pending = null;
     el.replies.replaceChildren();
@@ -324,6 +333,7 @@ async function main(): Promise<void> {
       el.captionUser.textContent = "";
       el.captionAgent.innerHTML = captionWords(text);
       chat.addMessage({ from: "agent", text });
+      registro.anotar("assistant", text);
       remember("assistant", text);
     };
     await play({
@@ -445,6 +455,7 @@ async function main(): Promise<void> {
   async function handleUtterance(text: string, from: "chat" | "voz"): Promise<void> {
     text = text.trim();
     if (!text || paused || ended) return;
+    registro.anotar("user", text);
     if (conversa && running) {
       if (from === "voz") {
         el.captionUser.textContent = text;
@@ -717,14 +728,26 @@ async function main(): Promise<void> {
     await turno("inicio");
   }
 
+  function liberarInicio(): void {
+    brand.href = homeHref;
+    brand.setAttribute("aria-label", "Orbis, início");
+  }
+
+  function concluirSessao(): void {
+    sessaoConcluida = true;
+    salvarConversa();
+    completeSession(profile);
+    liberarInicio();
+  }
+
   function fimDaConversa(): void {
+    concluirSessao();
     running = false;
     trail.endSession();
     journeyPanel.setProgress(visitados, null);
     setAgent("done");
     el.moment.textContent = "sessão completa";
     showReplies(["Recomeçar a sessão"]);
-    el.hint.textContent = "Fim da sessão.";
   }
 
   document.addEventListener("chatpanel:send", (e) => void handleUtterance(e.detail.text, "chat"));
@@ -748,6 +771,8 @@ async function main(): Promise<void> {
     ended = true;
     tomarAVez(); // corta a voz; a fala do passo que estava tocando volta quando a call voltar
     voice.stopListening(); // e o microfone desliga (para de mandar áudio ao STT)
+    salvarConversa();
+    liberarInicio();
     trail.endSession();
     clock.setEnded(true);
     cam.hide();
@@ -822,11 +847,15 @@ async function main(): Promise<void> {
     // Até onde a fala já chegou (em caracteres): move a legenda e dispara as ações marcadas com `at`.
     const ends = [...text.matchAll(/\S+/g)].map((m) => m.index + m[0].length);
     let spoken = 0;
+    let atualizarFala: ((texto: string) => void) | undefined;
     let next = 0;
     el.captionAgent.innerHTML = captionWords(text, highlight);
     const advance = (to: number) => {
       if (to <= spoken) return;
       spoken = to;
+      const trecho = text.slice(0, spoken);
+      if (atualizarFala) atualizarFala(trecho);
+      else atualizarFala = registro.anotar("assistant", trecho);
       revealWords(el.captionAgent, spoken);
       while (next < cues.length && cues[next].at < spoken) io.apply(cues[next++].action);
     };
@@ -984,6 +1013,10 @@ async function main(): Promise<void> {
 
   // ---- Rodar / recomeçar ----
   async function start(): Promise<void> {
+    if (sessaoConcluida) {
+      registro = criarRegistro("sessao");
+      sessaoConcluida = false;
+    }
     iniciando = true;
     clock.cancel(); // derruba esperas da execução anterior
     pending?.reject(new Cancelled());
@@ -1009,11 +1042,7 @@ async function main(): Promise<void> {
       puloPendente = null;
       if (pulo) pularPara(pulo);
       const result = await run;
-      if (result.ended === "done") {
-        completeSession(profile);
-        brand.href = homeHref;
-        brand.setAttribute("aria-label", "Orbis, início");
-      }
+      if (result.ended === "done") concluirSessao();
       running = false;
       trail.endSession();
       journeyPanel.setProgress(visitados, null);
