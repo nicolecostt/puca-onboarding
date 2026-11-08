@@ -15,7 +15,7 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask`, `/api/voice/token` | `src/voice/agent-voice.ts`, `screens/lesson` | `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
-| Rastro (decisões da Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo), custo #52, painel #19 (só totais e encaminhamentos, nunca `utterance` nem `answer`: §5) | `__tests__/trail.test.ts` |
+| Rastro (decisões da Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19 (só totais e encaminhamentos, nunca `utterance` nem `answer`: §5) | `__tests__/trail.test.ts` |
 | Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` | `screens/lesson` (cria), `screens/live-session` (envia no Slack), rastro (`forwarding_id`) | `__tests__/forwarding.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
 | Visual da Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `src/lib/puca-sphere.ts` | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
@@ -171,6 +171,20 @@ Tempo e tokens de cada sessão, para o time auditar a demo (#52, PRODUCT.md §12
   ```
 - **Log do servidor:** uma linha por `/api/ask`, com `msg: "ask"`, `moment`, `step` e o `timing`, inclusive quando a
   pessoa interrompe e o navegador não recebe o `timing`. Nunca leva o texto da pessoa.
+- **Rastro** (`src/journey/trail.ts`): a entrada de uma fala que foi ao agente ganha `llm_ms` (o `total_ms` do servidor)
+  e `tokens_in`, `tokens_out` e `tokens_estimated`, copiados do `timing`. Sem esses campos, a pergunta não foi medida no
+  navegador (a pessoa interrompeu); o log do servidor tem o número.
+- **Sessão** (`TrailSession`, chave `puca:sessoes` no `localStorage`): `{ session, started_at, ended_at }`, com o mesmo
+  `session` das entradas. A aula grava o início quando começa (recomeçar na mesma página mantém o início) e o fim
+  quando a call é encerrada ou a aula termina. "Limpar", na tela de rastro, apaga as falas e as sessões.
+- **JSON baixado** na tela de rastro (`exportJson()`), ⚠️ **quebra só no arquivo baixado**: era a lista de entradas,
+  agora é `{ "sessions": SessionSummary[], "entries": TrailEntry[] }`. O resumo é calculado por `summarizeSessions`;
+  a duração vai do início ao fim da sessão, ou até a última fala se ela não terminou.
+  ```json
+  { "session": "a91e…", "started_at": "2026-11-07T22:00:00.000Z", "ended_at": "2026-11-07T22:14:30.000Z",
+    "duration_ms": 870000, "utterances": 6, "llm_calls": 2, "llm_calls_unmeasured": 1, "llm_ms": 3561,
+    "tokens_in": 1676, "tokens_out": 18, "tokens_estimated": false }
+  ```
 
 ## Ao mudar um contrato
 
