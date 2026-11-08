@@ -1,5 +1,5 @@
 // Câmera do quadro: onde o quadro (em px do Figma) aparece na tela. Um ponto do quadro p vai para a tela em
-// p · escala + (x, y). A tela infinita é só isso: a pessoa e o Puca mexem na câmera, nunca nos nós.
+// p · escala + (x, y). A tela infinita é só isso: a pessoa e Puca mexem na câmera, nunca nos nós.
 
 export interface Camera {
   x: number;

@@ -1,4 +1,4 @@
-# Servidor do Puca no Fly.io (docs/stack.md §5.2). Build a partir da raiz do repo: o servidor usa src/journey e src/voice.
+# Servidor de Puca no Fly.io (docs/stack.md §5.2). Build a partir da raiz do repo: o servidor usa src/journey e src/voice.
 FROM node:22-slim
 WORKDIR /app
 ENV NODE_ENV=production

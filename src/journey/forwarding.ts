@@ -1,5 +1,5 @@
-// Encaminhamento (PRODUCT.md §4.5 e §12.1, passo 4): quando o Puca não tem fonte confiável, a dúvida vai
-// para a buddy com o contexto pronto (o que a pessoa perguntou, o que o Puca já consultou e por que não
+// Encaminhamento (PRODUCT.md §4.5 e §12.1, passo 4): quando Puca não tem fonte confiável, a dúvida vai
+// para a buddy com o contexto pronto (o que a pessoa perguntou, o que Puca já consultou e por que não
 // respondeu). A sessão cria; a tela do Slack (screens/live-session) envia. Formato em docs/contratos.md.
 import { pendentes, proximaTentativa } from "./claim-queue";
 import { normalize } from "./conditions";
@@ -21,9 +21,9 @@ export interface Forwarding {
   question: string;
   /** Resumo do agente, ou a própria pergunta. */
   summary: string;
-  /** Fontes que o Puca consultou antes de desistir. */
+  /** Fontes que Puca consultou antes de desistir. */
   consulted: string[];
-  /** Por que o Puca não respondeu. */
+  /** Por que Puca não respondeu. */
   reason: string;
   moment: string | null;
   status: ForwardingStatus;
@@ -101,7 +101,7 @@ export function destinatario(destino: DestinoDoEncaminhamento | undefined, nomes
   return { name: nomes.buddy, role: "buddy" };
 }
 
-/** Por que o Puca não respondeu, pelo destino: verdade nos dois casos, sem afirmar que é caso pessoal. */
+/** Por que Puca não respondeu, pelo destino: verdade nos dois casos, sem afirmar que é caso pessoal. */
 export function motivoDoEncaminhamento(destino: DestinoDoEncaminhamento | undefined): string {
   if (destino === "rh") return "Quem responde isso é People, não as fontes que eu tenho.";
   if (destino === "gestor") return "Quem responde isso é a gestão do seu time, não as fontes que eu tenho.";
@@ -116,7 +116,7 @@ export function buddyOf(journey: Journey): string {
   return node?.label.replace(/\n/g, " ") ?? "sua buddy";
 }
 
-/** Texto da mensagem que o Puca manda para a buddy no Slack. Não supõe o gênero de ninguém. */
+/** Texto da mensagem que Puca manda para a buddy no Slack. Não supõe o gênero de ninguém. */
 export function forwardingMessage(f: Forwarding): string {
   // sem nome, profile.nome vira "você" (journey/profile.ts)
   const nome = f.pessoa.trim();

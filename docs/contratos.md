@@ -15,16 +15,16 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask` (eventos SSE `speak`, `action`, `go_to`, `escalate`, `fontes` e `timing`), `/api/turn` ([turno](#turno-da-sessão)), `/api/call` ([call inicial](#call-inicial)), `/api/voice/token`, `/api/encaminhamentos`; token do Supabase, limites e CORS — [seção abaixo](#api-do-servidor) | `src/voice/agent-voice.ts`, `src/voice/pcm-player.ts`, `screens/lesson`, `server/bench/turn-latency.ts` | `server/src/app.test.ts`, `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
-| Rastro (decisões do Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
+| Rastro (decisões de Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
 | Company brain | `server/src/brain/brain.ts` (`Trecho`, `Brain`). O brain mínimo lê as páginas do Notion e o mapa do kit da Kota, busca em memória, e a resposta do `/api/ask` cita `[fN]`, que vira o evento `fontes` (título e URL) | `server/src/agent/ask.ts`, rastro (`sources` da entrada `ask`, em `screens/lesson`) | `server/src/brain/brain.test.ts`, `server/src/agent/ask.fontes.test.ts` |
-| Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` (`{ summary, destino? }`, também no `TurnEvent` de `server/src/agent/turn.ts`: o destino vem da tool `escalate_to_buddy`; sem ele, da fala do Puca ("People", "gestor"); caso pessoal sem nada vai a `"rh"`; sem destino no evento, a buddy. `Forwarding.to.role` segue o destino, #125) | `screens/lesson` (cria e pede o envio no Slack da Kota pelo servidor, `src/journey/slack-real.ts`), `screens/live-session` (envia no Slack simulado o que ficou pendente), rastro (`forwarding_id`, `forwarding_link`), `screens/rh` (conta os abertos pelo `status`); envio real: [seção abaixo](#encaminhamento-no-slack-da-kota) | `__tests__/forwarding.test.ts`, `__tests__/slack-real.test.ts`, `server/src/slack/encaminhar.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
+| Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` (`{ summary, destino? }`, também no `TurnEvent` de `server/src/agent/turn.ts`: o destino vem da tool `escalate_to_buddy`; sem ele, da fala de Puca ("People", "gestor"); caso pessoal sem nada vai a `"rh"`; sem destino no evento, a buddy. `Forwarding.to.role` segue o destino, #125) | `screens/lesson` (cria e pede o envio no Slack da Kota pelo servidor, `src/journey/slack-real.ts`), `screens/live-session` (envia no Slack simulado o que ficou pendente), rastro (`forwarding_id`, `forwarding_link`), `screens/rh` (conta os abertos pelo `status`); envio real: [seção abaixo](#encaminhamento-no-slack-da-kota) | `__tests__/forwarding.test.ts`, `__tests__/slack-real.test.ts`, `server/src/slack/encaminhar.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
 | Primeira tarefa | `src/journey/primeira-tarefa.ts` (`TarefaDoTime`, `PedidoDeAprovacao`, chave `puca:primeiras-tarefas` no `localStorage`) e os nós `kind: "task"` da jornada — [seção abaixo](#primeira-tarefa) | `screens/lesson` (cria o pedido quando o cartão da tarefa abre), `screens/live-session` (pede a aprovação ao gestor no Slack e grava a aprovação), `screens/primeira-tarefa` (página da tarefa), `screens/rh` (conta pessoas com pedido não aprovado, por `status` e `pessoa`) | `__tests__/primeira-tarefa.test.ts`, `screens/primeira-tarefa/pagina.test.ts` |
 | App para Mac (`window.orbis`) | `desktop/preload.ts` + `src/orbis.d.ts` — [seção abaixo](#app-para-mac) | telas que testam `if (window.orbis)` | `tsc` |
 | Computer use (`window.orbis.navegador`) | `src/lib/orbis.ts` (`AcaoDaPuca`, `ResultadoDaFila`, `OrbisNavegador`) + ação `navegador` da jornada em `src/journey/types.ts` — [seção abaixo](#computer-use) | `desktop/navegador/` (executa), `screens/lesson` (palco do navegador), quem escreve jornadas | `__tests__/validate.test.ts`, `desktop/navegador/*.test.ts`, `tsc` |
-| Visual do Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
+| Visual de Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
 
-Exemplo válido de `TrailEntry` (uma fala da pessoa e o que o Puca fez com ela):
+Exemplo válido de `TrailEntry` (uma fala da pessoa e o que Puca fez com ela):
 
 ```json
 {
@@ -114,7 +114,7 @@ O brain mínimo (`server/src/brain/brain.ts`) sobe com o servidor: lê as págin
 parte em trechos (`Trecho` = `{ id, titulo, url, texto }`) e busca em memória. A fala que cai no `/api/ask` ganha os
 melhores trechos no prompt como `[f1]`, `[f2]`…; o modelo cita `[fN]` na resposta, o servidor tira a marca da fala e
 manda o evento SSE `fontes` no fim do turno, depois dos `speak` e antes do `escalate` e do `timing` (o encaminhamento leva as fontes consultadas). A marca também pode vir como `[1]`, `(f2)` ou `[fonte 3]`: sai da fala do mesmo jeito. Trecho abaixo do corte de relevância não entra no prompt; sem trecho
-relevante, o Puca diz que não confirmou e encaminha. Aditivo: cliente antigo ignora o evento.
+relevante, Puca diz que não confirmou e encaminha. Aditivo: cliente antigo ignora o evento.
 
 ```
 data: {"type":"fontes","fontes":[{"titulo":"Deploy · Do merge à produção","url":"https://…notion.site/deploy"}]}
@@ -123,9 +123,9 @@ data: {"type":"fontes","fontes":[{"titulo":"Deploy · Do merge à produção","u
 O app guarda cada fonte no rastro como `"<título> · <url>"` (`sources` da entrada `ask`). Sem `fontes`, `sources` fica
 como estava.
 
-Caso pessoal da pessoa ("qual vai ser o meu bônus?", férias, salário, avaliação, promoção): o Puca explica a regra
+Caso pessoal da pessoa ("qual vai ser o meu bônus?", férias, salário, avaliação, promoção): Puca explica a regra
 geral com a fonte e o servidor emite `escalate` (resumo = a fala) se o modelo não chamou `escalate_to_buddy`.
-Pergunta não pessoal respondida com fonte citada não encaminha: o `escalate_to_buddy` do modelo é ignorado (a Puca não
+Pergunta não pessoal respondida com fonte citada não encaminha: o `escalate_to_buddy` do modelo é ignorado (Puca não
 avisou a pessoa), a não ser que a fala diga que não confirmou. O resumo do `escalate` sai sem marcas internas: `[fN]`,
 `(fN)` e `fN` viram o título do trecho (ou somem se o trecho não existe).
 
@@ -145,7 +145,7 @@ interface PedidoDeEncaminhamento {
   pergunta: string;
   resumo: string;
   fontes_consultadas: string[];     // títulos, como em Forwarding.consulted
-  motivo: string;                   // por que o Puca não respondeu (Forwarding.reason)
+  motivo: string;                   // por que Puca não respondeu (Forwarding.reason)
   email?: string;                   // e-mail do jurado no Slack da Kota; sem ele, nada é postado
 }
 // 200
@@ -184,7 +184,7 @@ O app Electron (decisão 0004, `docs/stack.md` §3, #158) abre o mesmo front por
 interface Orbis {
   /** Versão do app (a do package.json), ex.: "0.1.0". */
   versao: string;
-  /** Navegador do Puca: ver "Computer use" abaixo. */
+  /** Navegador de Puca: ver "Computer use" abaixo. */
   navegador?: OrbisNavegador;
 }
 declare global { interface Window { orbis?: Orbis } }
@@ -200,8 +200,8 @@ No app para Mac, perfil, calibragem e conclusão da sessão usam `localStorage` 
 
 ## Computer use
 
-O navegador do Puca (decisão 0008, `docs/stack.md` §4, #123): uma área da sessão com um navegador de verdade dentro do
-app, onde o Puca abre o mundo da Kota e aponta, circula, marca e clica no ritmo da fala. Só existe no app; sem
+O navegador de Puca (decisão 0008, `docs/stack.md` §4, #123): uma área da sessão com um navegador de verdade dentro do
+app, onde Puca abre o mundo da Kota e aponta, circula, marca e clica no ritmo da fala. Só existe no app; sem
 `window.orbis.navegador` (`npm run dev` no navegador comum), a ação `navegador` da jornada é ignorada e o simulado segue.
 
 ```ts
@@ -235,7 +235,7 @@ Exemplo válido de ação num passo:
 
 ## Calibragem
 
-O que o Puca concluiu na call inicial sobre o que a pessoa já sabe e o que ela quer (glossário: **calibragem**).
+O que Puca concluiu na call inicial sobre o que a pessoa já sabe e o que ela quer (glossário: **calibragem**).
 A call inicial grava no fim da conversa; quem lê usa `resolveCalibragem(location.search)`
 (`?perfil=` → calibragem salva pela call → demo do Bruno), no mesmo padrão do perfil.
 Enquanto a sua parte não lê de verdade, use `DEMO_CALIBRAGENS.novo` (Ana) e `DEMO_CALIBRAGENS.transicao` (Bruno) como mock.
@@ -285,21 +285,21 @@ e sem os campos da transição.
 
 ## Turno da sessão
 
-O LLM conduz a sessão (decisão 0012): cada turno, do Puca ou da pessoa, é um `POST /api/turn` que responde em SSE,
+O LLM conduz a sessão (decisão 0012): cada turno, de Puca ou da pessoa, é um `POST /api/turn` que responde em SSE,
 com os mesmos eventos do `/api/ask` e mais três. A tela guarda onde a sessão está (momento e passo) e o histórico; o
 servidor não guarda estado. Sem servidor, sem LLM (`/api/health` com `llm: false`) ou com a trava esgotada, a tela
 segue a jornada como roteiro, pela `route.ts`.
 
 - **Entrada** (`TurnRequest` em `src/voice/agent-voice.ts`):
-  - `kind`: `inicio` (abre a sessão), `seguir` (o Puca segue a pauta no passo atual), `fala` (a pessoa falou ou
-    escreveu; vem com `text`) ou `silencio` (o Puca perguntou e ninguém respondeu).
+  - `kind`: `inicio` (abre a sessão), `seguir` (Puca segue a pauta no passo atual), `fala` (a pessoa falou ou
+    escreveu; vem com `text`) ou `silencio` (Puca perguntou e ninguém respondeu).
   - `moment_id`, `step_id`: onde a sessão está. `perfil`: o vínculo; `profile` (opcional): o perfil que a call
-    inicial gravou, para o Puca chamar a pessoa pelo nome (sem ele, vale o perfil de demo do vínculo).
+    inicial gravou, para Puca chamar a pessoa pelo nome (sem ele, vale o perfil de demo do vínculo).
   - `history`: até 12 falas já ditas (`user`/`assistant`), da mais antiga à mais nova, sem a deste turno.
-  - `interrupted` (opcional): a pessoa cortou o Puca; `said` é a frase que estava tocando.
+  - `interrupted` (opcional): a pessoa cortou Puca; `said` é a frase que estava tocando.
 - **Saída** (`TurnEvent` em `server/src/agent/turn.ts`): `speak`, `action` (qualquer ação do quadro, com ids que
   existem na jornada), `escalate` e `timing`, como no `/api/ask`, e:
-  - `next_step`: o Puca terminou o passo; a tela vai ao próximo pela transição da jornada (`nextPosition` em
+  - `next_step`: Puca terminou o passo; a tela vai ao próximo pela transição da jornada (`nextPosition` em
     `src/journey/pauta.ts`) e pede outro turno `seguir`.
   - `go_to` com `target` = `moment:<id>`: pulo para o início do momento; a tela pede um turno `seguir` lá.
   - `check` com `entendeu`: resultado da checagem do passo atual (vira `onCheck`, como no motor).
@@ -334,7 +334,7 @@ são perguntas norteadoras (em `server/src/agent/call.ts`), e o LLM faz os follo
 (empresa para quem é novo, time para quem está mudando de time).
 
 - **Entrada** (`CallRequest` em `src/voice/agent-voice.ts`): `kind` (`inicio`, `fala` com `text`, `silencio`),
-  `history` (até 16 falas), `interrupted` opcional (como no turno), `admissao` (`cargo`, `time`, `gestor`: o Puca
+  `history` (até 16 falas), `interrupted` opcional (como no turno), `admissao` (`cargo`, `time`, `gestor`: Puca
   confirma, não pergunta), `anotado` (o que já foi anotado, chave → texto) e `cultura` (assuntos culturais já contados).
 - **Saída** (`CallEvent` em `server/src/agent/call.ts`): `speak` e `timing` como no turno, e:
   - `answer` com `key` (as chaves de `profileFromAnswers` e `calibragemFromAnswers`: `nome`, `vinculo`, `cargo`,
@@ -360,9 +360,9 @@ data: {"type":"timing","timing":{"first_speak_ms":700,"llm_first_token_ms":680,"
 
 ## Voz ↔ quadro
 
-Cada ação do quadro acontece na palavra em que o Puca fala dela (PRODUCT.md §4.1: o quadro é construído progressivamente).
+Cada ação do quadro acontece na palavra em que Puca fala dela (PRODUCT.md §4.1: o quadro é construído progressivamente).
 
-- **Na jornada:** qualquer ação de `actions` aceita `at`, um trecho da `line` do passo. A ação sai quando o Puca chega
+- **Na jornada:** qualquer ação de `actions` aceita `at`, um trecho da `line` do passo. A ação sai quando Puca chega
   nesse trecho; sem `at`, sai antes da fala (como sempre foi). O validador exige que o trecho exista na fala.
   ```json
   { "type": "reveal", "targets": ["valor-dono", "m-dono"], "at": "dono do problema" }
@@ -462,7 +462,7 @@ ele é, para o FAQ e o agente não falarem da tarefa do outro perfil:
 `Problema: …` · `Por que importa: …` · `Sistemas: …` · `Onde ler: …` · `Quem ajuda: …`
 
 Quando o cartão de um nó `task` abre, a sessão cria um **pedido de aprovação** para o gestor. A tela do Slack pega o pedido,
-O Puca escreve na DM do gestor, e o gestor aprova com um clique. A página da tarefa e a sessão escutam o evento `storage`.
+Puca escreve na DM do gestor, e o gestor aprova com um clique. A página da tarefa e a sessão escutam o evento `storage`.
 
 - Status: `pendente` (a sessão criou) → `enviando` (uma aba do Slack pegou; `claimed_by`/`claimed_at`, com a mesma regra de 30 s
   do encaminhamento) → `aguardando` (mensagem enviada na DM do gestor) → `aprovada` (o gestor clicou; `aprovada_por` e `aprovada_em`).

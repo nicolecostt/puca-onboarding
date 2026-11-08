@@ -1,4 +1,4 @@
-// Sessão no quadro: o Puca conduz a jornada (src/journey/data/*.journey.json) e monta o quadro
+// Sessão no quadro: Puca conduz a jornada (src/journey/data/*.journey.json) e monta o quadro
 // do Figma (components/whiteboard) enquanto explica. Conversa simulada: a pessoa responde pelas respostas sugeridas, pelo chat
 // ou tocando no quadro. O perfil vem da escolha antes da call e da call inicial (sem nenhum dos dois, a sessão pede a
 // escolha); ?perfil=ana|bruno (ou novo|transicao)
@@ -107,7 +107,7 @@ async function main(): Promise<void> {
   const journey = loadJourney(demo);
   const auto = new URLSearchParams(location.search).get("auto") === "1";
   const resolved = resolveProfile(location.search);
-  // ninguém escolheu com quem entra na Kota (sessão aberta direto, sem a escolha nem a call): pede antes de o Puca falar
+  // ninguém escolheu com quem entra na Kota (sessão aberta direto, sem a escolha nem a call): pede antes de Puca falar
   if (resolved.source === "demo") return pedirEscolha();
   const profile = resolved.profile;
 
@@ -139,14 +139,14 @@ async function main(): Promise<void> {
     forwardLink: qs<HTMLAnchorElement>(document, "#forward-link"),
   };
   el.lessonName.textContent = journey.title;
-  // navegador do Puca (só no app para Mac); sem window.orbis, palco é null e a sessão segue igual
+  // navegador de Puca (só no app para Mac); sem window.orbis, palco é null e a sessão segue igual
   const navegadorHost = qs(document, "#navegador-host");
   const palco = montarPalcoNavegador(navegadorHost, qs(document, "#palco-abas"), el.boardHost, window.orbis?.navegador);
-  mountPucaDots(qs(document, "#caption-orb")); // o Puca na legenda: as bolinhas dele se mexendo
+  mountPucaDots(qs(document, "#caption-orb")); // Puca na legenda: as bolinhas dele se mexendo
 
   const clock = createClock();
   const chat = mountChatPanel({ title: "Transcrição da sessão", messages: [] });
-  // o Puca aparece na "câmera" do canto, como numa videochamada; os controles ficam presos embaixo dela
+  // Puca aparece na "câmera" do canto, como numa videochamada; os controles ficam presos embaixo dela
   const cam = mountAgentCam({ name: journey.agent.name, visual: await loadAgentVisual() });
   const bar = mountCallBar({ chat, attachTo: cam }); // sem status: a legenda já mostra o que está acontecendo
   // Jornada da pessoa: a calibragem da call inicial marca cada momento (aprender, revisar, fora) e o painel mostra.
@@ -212,7 +212,7 @@ async function main(): Promise<void> {
     const off = paused || ended;
     const voice = off ? "paused" : agentState === "speaking" ? "talk" : "listen";
     el.voice.dataset.state = voice;
-    el.voice.setAttribute("aria-label", ended ? "Sessão encerrada" : paused ? "O Puca pausado" : voice === "talk" ? "O Puca falando" : micOk ? "O Puca ouvindo" : "O Puca esperando pelo chat");
+    el.voice.setAttribute("aria-label", ended ? "Sessão encerrada" : paused ? "Puca pausado" : voice === "talk" ? "Puca falando" : micOk ? "Puca ouvindo" : "Puca esperando pelo chat");
     el.liveDot.classList.toggle("is-off", off);
     cam.setPaused(off);
     if (!off) cam.setState(CAM_STATE[agentState]);
@@ -288,7 +288,7 @@ async function main(): Promise<void> {
     pickNode(id, label);
   }
 
-  /** Interrompe o que o Puca está fazendo (fala, espera de resposta ou de clique) para pular de momento. */
+  /** Interrompe o que Puca está fazendo (fala, espera de resposta ou de clique) para pular de momento. */
   function interrupt(): void {
     clock.interrupt();
     encerrarVez(); // a fala que esperava a vez cai no Cancelled do pulo
@@ -300,7 +300,7 @@ async function main(): Promise<void> {
   }
 
   // ---- A vez de falar ----
-  // A pessoa toma a vez quando fala por cima do Puca ou manda uma pergunta: a fala do passo para, o Puca responde e
+  // A pessoa toma a vez quando fala por cima de Puca ou manda uma pergunta: a fala do passo para, Puca responde e
   // depois repete a fala cortada. `vez` existe enquanto uma fala do passo espera a pessoa ser atendida.
   let falando = false; // uma fala do passo está tocando agora
   let atendendo = 0; // falas da pessoa sendo respondidas agora
@@ -321,7 +321,7 @@ async function main(): Promise<void> {
     v?.resolve();
   }
 
-  /** Espera a pessoa ser atendida; sem fala completa em 4 s de call ativa, foi um barulho e o Puca retoma. */
+  /** Espera a pessoa ser atendida; sem fala completa em 4 s de call ativa, foi um barulho e Puca retoma. */
   async function esperarAVez(): Promise<void> {
     const v = vez;
     if (!v) return;
@@ -353,7 +353,7 @@ async function main(): Promise<void> {
     if (shown) revealWords(el.captionAgent, text.length);
   }
 
-  /** Fontes que o Puca tinha à mão: as do quadro na tela e o conhecimento do momento. */
+  /** Fontes que Puca tinha à mão: as do quadro na tela e o conhecimento do momento. */
   function consultedNow(): string[] {
     const nodes = currentBoard ? (journey.boards[currentBoard]?.nodes ?? []) : [];
     const docs = nodes.flatMap((n) => [...(n.info?.docs ?? []).map((d) => d.title), ...(n.info?.adr ? [n.info.adr.id] : [])]);
@@ -428,7 +428,7 @@ async function main(): Promise<void> {
   }
 
   /** Pulo pedido pela pessoa (chat, voz ou clique no painel "Sua jornada"): vai ao início do momento. */
-  /** Pula para o início do momento; devolve o que o Puca disse (null se o pulo não aconteceu). */
+  /** Pula para o início do momento; devolve o que Puca disse (null se o pulo não aconteceu). */
   function pularPara(m: Moment): string | null {
     if (ended) return null;
     const line = `Claro, vamos para ${m.title.toLowerCase()}.`;
@@ -502,7 +502,7 @@ async function main(): Promise<void> {
       moment: currentMoment?.id ?? null,
       step: currentStep?.id ?? null,
     });
-    // resposta sugerida e clique no quadro só respondem o passo; o resto o Puca responde, então a pessoa toma a vez
+    // resposta sugerida e clique no quadro só respondem o passo; o resto Puca responde, então a pessoa toma a vez
     if (route.kind !== "reply" && route.kind !== "select") tomarAVez();
     switch (route.kind) {
       case "jump": {
@@ -525,7 +525,7 @@ async function main(): Promise<void> {
           // a tarefa não diz isso: não chuta, encaminha à buddy com o motivo (§4.5)
           const line = "Isso não está na tarefa, então não quero chutar. Já encaminhei a sua pergunta no Slack.";
           trail.update(entry.id, { answer: line });
-          // a tarefa foi o que o Puca consultou (§4.5: o encaminhamento leva o que já foi consultado)
+          // a tarefa foi o que Puca consultou (§4.5: o encaminhamento leva o que já foi consultado)
           const daTarefa = tarefaDaSessao ? [`Primeira tarefa · ${tarefaDaSessao.titulo}`] : [];
           forward(entry.id, { question: text, summary: text, reason: r.motivo, consulted: daTarefa });
           return speakAside(line);
@@ -585,7 +585,7 @@ async function main(): Promise<void> {
       ));
     // gravado mesmo se a pessoa interrompeu: fica a resposta parcial
     if (asked) return trail.update(entry.id, { answer: said.join(" "), ms: Math.round(performance.now() - t0) });
-    // numa checagem só chega aqui pergunta (resposta vai pela rota): não conta como resposta, o Puca repete a pergunta
+    // numa checagem só chega aqui pergunta (resposta vai pela rota): não conta como resposta, Puca repete a pergunta
     if (pending?.kind === "reply" && currentStep?.check) {
       const line = `Sem problema, repito: ${interpolate(currentStep.line, profile)}`;
       trail.update(entry.id, { answer: line });
@@ -601,13 +601,13 @@ async function main(): Promise<void> {
   }
 
   // ---- Conversa (decisão 0012): o LLM conduz cada turno e a jornada é a pauta ----
-  // A tela guarda onde a sessão está; cada turno (/api/turn) diz o que o Puca fala e se o passo acabou.
+  // A tela guarda onde a sessão está; cada turno (/api/turn) diz o que Puca fala e se o passo acabou.
   const views = effectiveViews(journey.moments);
   let pos: Posicao = { moment: 0, step: 0 };
   let turnoAtual = 0; // um turno novo (a pessoa falou, pulo) faz o anterior parar de decidir
   let silencio = 0;
   let checagemDoPasso: ResultadoDaChecagem | null = null;
-  let fraseAtual = ""; // a frase do Puca tocando agora
+  let fraseAtual = ""; // a frase de Puca tocando agora
   let cortada = ""; // a frase que a pessoa cortou falando por cima
 
   type Movimento = { tipo: "passo"; reply?: string } | { tipo: "momento"; id: string };
@@ -630,7 +630,7 @@ async function main(): Promise<void> {
     board?.setSelectable(s.decision === "select");
   }
 
-  /** Um turno da sessão. Turno do Puca que fecha o passo leva ao próximo e pede outro; senão, espera a pessoa. */
+  /** Um turno da sessão. Turno de Puca que fecha o passo leva ao próximo e pede outro; senão, espera a pessoa. */
   async function turno(kind: TurnRequest["kind"], text?: string, interrupted?: string, entryId?: string): Promise<void> {
     const meu = ++turnoAtual;
     clearTimeout(silencio);
@@ -676,7 +676,7 @@ async function main(): Promise<void> {
     if (entryId) trail.update(entryId, { answer: said.join(" ") });
     if (meu !== turnoAtual || ended) return; // a pessoa falou ou pulou: outro turno decide
     if (!ok) {
-      // sem servidor ao abrir: a sessão segue como roteiro; no meio dela, o Puca avisa e espera
+      // sem servidor ao abrir: a sessão segue como roteiro; no meio dela, Puca avisa e espera
       if (kind === "inicio") {
         conversa = false;
         return void start();
@@ -684,7 +684,7 @@ async function main(): Promise<void> {
       await speakAside("Perdi a conexão para pensar agora. Pode repetir?");
       return setAgent("listening");
     }
-    // rede de segurança: passo que não espera resposta e turno do Puca sem pergunta seguem a pauta
+    // rede de segurança: passo que não espera resposta e turno de Puca sem pergunta seguem a pauta
     const esperaResposta = s.decision === "wait" || s.decision === "select" || !!s.check;
     if (!movimento && (kind === "inicio" || kind === "seguir") && !esperaResposta && !said.at(-1)?.trim().endsWith("?")) movimento = { tipo: "passo" };
     if (movimento?.tipo === "passo") {
@@ -702,11 +702,11 @@ async function main(): Promise<void> {
       }
     }
     setAgent(s.decision === "select" ? "choosing" : "listening");
-    // ninguém respondeu: o Puca pergunta de novo ou segue (uma vez por espera)
+    // ninguém respondeu: Puca pergunta de novo ou segue (uma vez por espera)
     if (kind !== "silencio") silencio = window.setTimeout(() => meu === turnoAtual && !paused && !ended && void turno("silencio"), 15000);
   }
 
-  /** Fala da pessoa na conversa: corta o Puca e vira um turno, levando a frase que ela cortou. */
+  /** Fala da pessoa na conversa: corta Puca e vira um turno, levando a frase que ela cortou. */
   async function falaNaConversa(text: string, from: "chat" | "voz"): Promise<void> {
     const interrompida = cortada || fraseAtual;
     cortada = "";
@@ -768,7 +768,7 @@ async function main(): Promise<void> {
     clock.setEnded(true);
     cam.hide();
     render();
-    // nesta tela não há "Ligar para o Puca" no canto: a call some e um botão no centro retoma a sessão
+    // nesta tela não há "Ligar para Puca" no canto: a call some e um botão no centro retoma a sessão
     document.body.classList.add("is-call-off");
     showGate("Voltar para a sessão", () => {
       document.body.classList.remove("is-call-off");
@@ -785,10 +785,10 @@ async function main(): Promise<void> {
     ouvir();
     encerrarVez(); // a fala cortada pelo encerramento volta já, sem esperar
     render();
-    if (conversa && running) void turno("seguir"); // na conversa, o Puca retoma o passo onde estava
+    if (conversa && running) void turno("seguir"); // na conversa, Puca retoma o passo onde estava
   });
 
-  /** Liga o microfone (de novo, ao retomar a call). Se não der, o Puca avisa no chat e a conversa segue por ele. */
+  /** Liga o microfone (de novo, ao retomar a call). Se não der, Puca avisa no chat e a conversa segue por ele. */
   function ouvir(): void {
     void voice.listen({
       onFinal: (t) => void handleUtterance(t, "voz"),
@@ -888,8 +888,8 @@ async function main(): Promise<void> {
       falando = false;
       finished = true;
       // fala cortada ou áudio que falhou: o quadro chega ao estado final do passo. Num pulo, a legenda
-      // já é a resposta do pulo; com a pessoa tomando a vez, a legenda para onde o Puca parou: só as ações que faltavam,
-      // e as do navegador não (a pessoa falou por cima, o Puca para de mexer na página).
+      // já é a resposta do pulo; com a pessoa tomando a vez, a legenda para onde Puca parou: só as ações que faltavam,
+      // e as do navegador não (a pessoa falou por cima, Puca para de mexer na página).
       if (cut() || vez) {
         for (const a of acoesQueAindaValem(cues, next)) io.apply(a);
         next = cues.length;

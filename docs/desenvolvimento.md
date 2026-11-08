@@ -40,7 +40,7 @@ num Mac do GitHub e, se passar, publica a versão `0.2.<n>`. Nada sai sozinho a 
 
 ```
 index.html               lista das telas (página inicial do npm run dev)
-DESIGN.md                sistema visual: preto, branco e a cor do Puca; tipos, componentes e regras
+DESIGN.md                sistema visual: preto, branco e a cor de Puca; tipos, componentes e regras
 docs/
   journey-format.md      formato da jornada (momentos, passos, quadro, transições)
 src/
@@ -54,10 +54,10 @@ src/
     profiles.ts          os dois perfis: ?perfil=bruno (transição) | ?perfil=ana (recém-contratada)
     lessons/             sessões do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css
-    landing/             apresentação do Orbis e do Puca (só preto, branco e a cor do Puca)
-    onboarding-call/     call inicial: O Puca conversa com a pessoa e grava a calibragem; no fim, abre as boas-vindas
+    landing/             apresentação do Orbis e de Puca (só preto, branco e a cor de Puca)
+    onboarding-call/     call inicial: Puca conversa com a pessoa e grava a calibragem; no fim, abre as boas-vindas
     boas-vindas/         "Oi, {nome}": ir para o início ou refazer a call inicial
-    inicio/              início do Orbis: progresso, perfil, tarefas, acessos e ligar para o Puca
+    inicio/              início do Orbis: progresso, perfil, tarefas, acessos e ligar para Puca
     rh/                  painel do RH: indicadores agregados das integrações e pendências (§5)
     lesson/              sessão no quadro: o quadro se monta junto com a fala
     live-session/        tela de auxílio: barra de call, chat e câmera por cima de uma tela
@@ -68,7 +68,7 @@ src/
     call-bar/            barra de call flutuante (Figma: "Session control bar")
     chat-panel/          chat flutuante (Figma: "Chat (floating window)")
     agent-cam/           "câmera" do agente no canto da tela
-    agent-cursor/        cursor do Puca (seta + "Puca") mexendo na tela, por enquanto simulado
+    agent-cursor/        cursor de Puca (seta + "Puca") mexendo na tela, por enquanto simulado
     journey-panel/       painel "Sua jornada" da sessão: objetivo, momentos marcados pela calibragem e próximos passos
     escolha-perfil/      os dois cartões da escolha do perfil (nas boas-vindas e por cima da sessão quando ninguém escolheu)
   journey/               jornada da sessão em JSON: tipos, validador, motor, perfil, calibragem, jornada da pessoa e intenções (pulo, perguntas)
@@ -81,7 +81,7 @@ src/
 desktop/                 app para Mac (Electron): janela, app://orbis, microfone, ícone e empacotamento (docs/stack.md §3)
 kit/kota/                kit da Kota (docs/kit-da-kota.md): o mapa (pessoas, times, sistemas, ADRs e RFCs), os
                          geradores do CODEOWNERS e dos READMEs de serviço e o check:kota (npm run check:kota -- --repo <checkout do Kota>)
-sandbox/                 testes locais, fora do git (ex.: visual do Puca)
+sandbox/                 testes locais, fora do git (ex.: visual de Puca)
 ```
 
 ## Mudar o visual
@@ -103,7 +103,7 @@ npm run dev          # abre a lista de telas → "Sessão no quadro" → "Começ
 npm run dev:fly      # só o front: o Vite repassa /api para o servidor do Fly, sem dev:server nem server/.env
 npm run precompute -- --only pontes   # pré-gera áudio (pontes|faq|roteiro; --dry mostra o custo em caracteres)
 npm run bench:llm    # latência do LLM por modelo/config → server/bench/results/
-npm run bench:turn   # tempo até o Puca começar a responder, por caminho (--tts mede o áudio também)
+npm run bench:turn   # tempo até Puca começar a responder, por caminho (--tts mede o áudio também)
 ```
 
 Regra: a sessão nunca fica muda (decisão 0012). Com LLM no servidor, cada turno vai ao `/api/turn` e o LLM conduz,
@@ -145,25 +145,25 @@ const call = mountCallBar({ status: "Agente falando…", chat });
 document.addEventListener("callbar:pause", (e) => console.log(e.detail.on));
 ```
 
-## Visual do Puca
+## Visual de Puca
 
-O Puca aparece como uma esfera de pontos com uma faixa em onda, sem rosto (`src/lib/puca-sphere.ts`),
+Puca aparece como uma esfera de pontos com uma faixa em onda, sem rosto (`src/lib/puca-sphere.ts`),
 carregada por `loadAgentVisual()` em todas as telas: landing, call inicial, sessão e tela de auxílio. Ela inclina na direção
 do mouse, os pontos perto do cursor crescem e um clique solta uma ondulação. Os estados `idle`/`think`/`talk`
 mudam a velocidade e a forma da onda. A faixa é um arco-íris metálico gerado no canvas; a cor dos pontos de fundo fica em `tokens.css` (`--puca-sphere-dot`) e o arco-íris usado fora da esfera em `--puca-holo-stops`. A esfera só anima quando está na tela. Se o visual não carregar, fica um círculo neutro.
 
 ## Sessão no quadro
 
-A tela `src/screens/lesson/` roda a jornada em JSON (`src/journey/data/kota.journey.json`): O Puca fala, o quadro
+A tela `src/screens/lesson/` roda a jornada em JSON (`src/journey/data/kota.journey.json`): Puca fala, o quadro
 (`src/components/whiteboard/`) vai se montando e a pessoa responde pelas respostas sugeridas, pelo chat ou tocando no quadro.
-Pelo chat ela também pode pedir para mudar de assunto ou fazer perguntas, que o Puca responde com o conhecimento da sessão.
+Pelo chat ela também pode pedir para mudar de assunto ou fazer perguntas, que Puca responde com o conhecimento da sessão.
 A conversa ainda é simulada (sem LLM nem voz); o motor (`src/journey/runner.ts`) não depende da tela.
 
 O quadro é uma tela infinita, como no Excalidraw (`src/components/whiteboard/camera.ts`): roda ou dois dedos no trackpad
 movem; `⌘`/`ctrl` + roda ou pinça dão zoom no cursor; arrastar o fundo, espaço + arrastar ou o botão do meio também
 movem. Os controles no canto do quadro (−, zoom, +, Ajustar) e os atalhos `Shift 1` (ver tudo) e `⌘ 0` (100%) fazem o
 resto. Clicar num nó continua abrindo o cartão e valendo como toque na checagem; o clique que encerra um arraste não
-conta. Se a pessoa afastar o quadro e o Puca falar de algo fora da tela, o quadro centra no que ele está mostrando.
+conta. Se a pessoa afastar o quadro e Puca falar de algo fora da tela, o quadro centra no que ele está mostrando.
 
 - O perfil vem da escolha nas boas-vindas (dois cartões, que mandam `?perfil=` para a call) e da call inicial, que o
   salva (`onboardingStore()`: `localStorage` no app para Mac, `sessionStorage` no navegador); no fim da call, o app abre

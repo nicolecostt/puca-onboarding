@@ -83,7 +83,7 @@ const CITACAO = new RegExp(
 
 // O LLM às vezes admite que não confirmou sem chamar escalate_to_buddy: vale como encaminhamento.
 const NO_SOURCE = /não (consegui|consigo) confirmar|não (achei|tenho) (isso )?confirmad/i;
-// O Puca diz que encaminha ("Escalo para People", "Vou te encaminhar") sem chamar a tool: não pode prometer e não
+// Puca diz que encaminha ("Escalo para People", "Vou te encaminhar") sem chamar a tool: não pode prometer e não
 // encaminhar. Só vale sem fonte citada: "Vou te encaminhar para a página de férias [f1]" é levar a uma página.
 const PROMETEU = /\b(vou (te |lhe )?(encaminhar|escalar)|encaminho|escalo)\b/i;
 
@@ -241,14 +241,14 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
     .filter((f, i, all) => all.findIndex((g) => g.titulo === f.titulo && g.url === f.url) === i);
   if (fontes.length) emit({ type: "fontes", fontes });
   // respondeu com trecho citado e não é caso pessoal: o escalate_to_buddy do modelo ("ela pode querer mais detalhes")
-  // é ignorado, porque a Puca não avisou ninguém. "Não consegui confirmar" e caso pessoal continuam encaminhando.
+  // é ignorado, porque Puca não avisou ninguém. "Não consegui confirmar" e caso pessoal continuam encaminhando.
   const pessoal = isCasoPessoal(input.text);
   const respondeuComFonte = fontes.length > 0 && !pessoal && !saidNoSource;
   const resumo = escalationSummary && !respondeuComFonte ? limparResumo(escalationSummary, trechos) || input.text : null;
   if (timing.llm_error && timing.llm_error !== "interrupted") {
     say(FAILURE_LINE, "fallback");
   } else if (!input.signal?.aborted && looksLikeQuestion(input.text)) {
-    // sem destino na tool, vale o que o Puca acabou de dizer ("fale com People", "com sua gestora"): fala e mensagem
+    // sem destino na tool, vale o que Puca acabou de dizer ("fale com People", "com sua gestora"): fala e mensagem
     // batem; caso pessoal sem destino nenhum vai a People (PRODUCT.md §13.2)
     const destino = escalationDestino ?? destinoPelaFala(falado) ?? (pessoal ? "rh" : undefined);
     const comDestino = destino ? { destino } : {};
