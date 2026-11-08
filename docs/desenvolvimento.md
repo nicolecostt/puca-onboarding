@@ -18,6 +18,22 @@ npm run check      # typecheck + testes + base do sistema + harness + build (o q
 
 Trabalhando com agentes de programação (Claude Code, Codex…): regras do time em [`AGENTS.md`](../AGENTS.md).
 
+## App para Mac
+
+Decisão 0004, `docs/stack.md` §3. O app (`desktop/`) abre o mesmo front por `app://orbis/`; no build, o front chama o
+servidor do Fly pelo `VITE_API_URL`.
+
+```bash
+npm run dev:fly       # terminal 1: o front, usando o servidor do Fly
+npm run dev:app       # terminal 2: o app Electron abrindo o Vite
+npm run build:app     # Orbis-mac-arm64.zip e Orbis-mac-x64.zip em release/
+```
+
+Em `npm run dev:app`, o macOS pede o microfone em nome do terminal que abriu o app (no VS Code, libere o Visual Studio
+Code em Ajustes → Privacidade e Segurança → Microfone). Release: uma tag `v*` (ex.: `git tag v0.1.0 && git push origin v0.1.0`)
+roda o workflow `Release do app`, que publica os `.zip` e as somas. Testar o instalador sem Release: sirva `release/`
+(`python3 -m http.server 8000`) e rode `ORBIS_BASE_URL=http://localhost:8000 bash scripts/instalar.sh`.
+
 ## Estrutura
 
 ```
@@ -59,6 +75,7 @@ src/
     draggable.ts         arrastar elementos fixos pela tela
     agent-visual.ts      contrato do visual do agente + carregador opcional
     dom.ts               utilitários de DOM
+desktop/                 app para Mac (Electron): janela, app://orbis, microfone, ícone e empacotamento (docs/stack.md §3)
 kit/kota/                kit da Kota (docs/kit-da-kota.md): o mapa (pessoas, times, sistemas, ADRs e RFCs), os
                          geradores do CODEOWNERS e dos READMEs de serviço e o check:kota (npm run check:kota -- --repo <checkout do Kota>)
 sandbox/                 testes locais, fora do git (ex.: visual da Puca)

@@ -21,6 +21,18 @@ Buddy, gestor e RH acompanham o progresso e as pendências sem precisar repetir 
 Na demo, a pessoa entra na **Kota**, um banco digital fictício com código que roda, ADRs, Notion e Slack de verdade.
 O kit da Kota é a fonte da Puca e a prova para quem avalia: tudo o que ela explica dá para conferir lá.
 
+## Instalar no Mac
+
+Mac com chip Apple ou Intel. Não pede senha: instala em `~/Applications/Orbis.app` e abre.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/nicolecostt/puca-onboarding/main/scripts/instalar.sh | bash
+```
+
+O app não é notarizado pela Apple: é assinado com assinatura própria, e o [script](scripts/instalar.sh) confere a soma
+SHA-256 publicada no Release antes de instalar. Para remover o app e os dados locais, rode o mesmo comando com
+`| bash -s -- --desinstalar`.
+
 ## Rodar
 
 ```bash
