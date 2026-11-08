@@ -11,11 +11,15 @@ describe("limparFala", () => {
     expect(limparFala("Puca: Oi, Ana!")).toBe("Oi, Ana!");
     expect(limparFala('Pergunto: "Como prefere que eu te chame?"')).toBe("Como prefere que eu te chame?");
     expect(limparFala("O Puca — Pronto, seguimos.")).toBe("Pronto, seguimos.");
+    expect(limparFala('Pergunto: "Como prefere que eu te chame"?')).toBe("Como prefere que eu te chame?");
   });
   it("não mexe em fala normal, nem em dois-pontos no meio da frase", () => {
     expect(limparFala("Perguntei ao time: eles usam Kafka.")).toBe("Perguntei ao time: eles usam Kafka.");
     expect(limparFala("A regra é simples: retry três vezes.")).toBe("A regra é simples: retry três vezes.");
     expect(limparFala('Ela disse "oi" para você.')).toBe('Ela disse "oi" para você.');
+    expect(limparFala("Pergunta-chave é o deploy.")).toBe("Pergunta-chave é o deploy.");
+    expect(limparFala("Fala-se muito disso.")).toBe("Fala-se muito disso.");
+    expect(limparFala("Pergunta: 'API' é o quê?")).toBe("'API' é o quê?");
   });
 });
 

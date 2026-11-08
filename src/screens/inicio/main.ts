@@ -274,7 +274,7 @@ function renderHome(): void {
         case "knowledge":
           return route.text;
         case "jump":
-          return `Você pode rever isso em “${route.moment.title}”. É só clicar em Rever sessão.`;
+          return `Você pode rever isso em “${route.moment.title}”. É só clicar em ${sessaoFeita ? "Rever sessão" : "Começar sessão"}.`;
         case "tarefa":
           return route.resposta.kind === "sem_fonte"
             ? `A tarefa não diz isso. Pergunta para ${buddy}, sua buddy, no Slack.`
@@ -300,12 +300,14 @@ function renderHome(): void {
           : "Você já tem acesso a todas as ferramentas do time.";
       }
       if (/sessao|aula|quadro|comecar/.test(q)) {
-        return "Em Rever sessão, você pode voltar ao caminho de uma transação e aos momentos do quadro.";
+        return sessaoFeita
+          ? "Em Rever sessão, você pode voltar ao caminho de uma transação e aos momentos do quadro."
+          : "Em Começar sessão, eu te mostro no quadro o caminho de uma transação e o seu time.";
       }
       if (/buddy|beatriz/.test(q)) return `Sua buddy é ${buddy}. Ela te acompanha nas primeiras semanas.`;
       if (/gestor|natalia|natália|chefe/.test(q)) return `Seu gestor é ${gestor}, do time ${time}.`;
       if (/^(oi|ola|bom dia|boa tarde|boa noite)\b|obrigad/.test(q)) return "Estou por aqui. Pode perguntar sobre seus acessos, suas tarefas ou o time.";
-      return `Isso eu não tenho confirmado aqui no início. Você pode rever o quadro ou perguntar para ${buddy}, sua buddy, no Slack.`;
+      return `Isso eu não tenho confirmado aqui no início. Você pode ${sessaoFeita ? "rever o quadro" : "começar a sessão"} ou perguntar para ${buddy}, sua buddy, no Slack.`;
     }
   }
 
