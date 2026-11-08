@@ -115,7 +115,7 @@ Colar a saída dos Steps 5 a 7 no PR e na #112.
 
 Valores fixados:
 
-- **Remover (uma vez só, com `git rm` no Step 6, nunca dentro do script):** `iac/`, `extras/`, `src/components/`, `kubernetes-manifests/`, `docs/`, `.github/`, `Makefile`, `skaffold*.yaml`, e em qualquer pasta `k8s/`, `skaffold.yaml`, `cloudbuild.yaml`. Depois do merge do R2, `docs/` e `.github/` passam a ter arquivos da Kota (ADRs, CI, `CODEOWNERS`).
+- **Remover (uma vez só, com `git rm` no Step 6, nunca dentro do script):** `iac/`, `extras/`, `src/components/`, `kubernetes-manifests/`, `docs/` menos `docs/adr/` e `docs/runbooks/` (são da Kota e podem chegar à oficina antes do Step 6), `.github/`, `Makefile`, `skaffold*.yaml`, e em qualquer pasta `k8s/`, `skaffold.yaml`, `cloudbuild.yaml`. Depois do merge do R2, `.github/` passa a ter arquivos da Kota (CI, `CODEOWNERS`).
 - **Renomear pastas Java:** `.../java/anthos/samples/bankofanthos/` → `.../java/br/com/kota/` (main e test).
 - **Substituir, nesta ordem, em arquivos de texto:** `anthos.samples.bankofanthos` → `br.com.kota`; `CymbalBank` → `Kota`; `Bank of Anthos` → `Kota`; `BankOfAnthos` → `Kota`; `bank-of-anthos` → `kota-bank`; `bankofanthos` → `kota`; `CYMBAL` → `KOTA`; `Cymbal` → `Kota`; `cymbal` → `kota`. Renomear `cymbal.svg` → `kota.svg` e `cymbal.css` → `kota.css`.
 - **Nunca tocar:** `LICENSE`, linhas com `Copyright` e `Google LLC`, arquivos binários.
@@ -162,7 +162,7 @@ git commit -m "feat(kit): troca e detector da marca de origem no código da kota
 Run:
 ```bash
 git -C ../kota-bank-oficina switch -c feat/marca-kota
-(cd ../kota-bank-oficina && git rm -rq iac extras src/components kubernetes-manifests docs .github Makefile skaffold*.yaml \
+(cd ../kota-bank-oficina && git rm -rq iac extras src/components kubernetes-manifests $(git ls-files docs | grep -vE '^docs/(adr|runbooks)/') .github Makefile skaffold*.yaml \
   $(git ls-files '*/k8s/*' '*/skaffold.yaml' '*/cloudbuild.yaml'))
 npm run kota:marca -- ../kota-bank-oficina
 ```
@@ -171,6 +171,8 @@ Expected: relatório com cerca de 200 arquivos alterados e a lista do que sobrou
 - [ ] **Step 7: Resolver o que sobrou e trocar o logo**
 
 À mão, só o que `acharMarca` ainda lista. `src/frontend/static/img/kota.svg` vira o logo da Kota (wordmark simples em SVG) e `favicon.png` é trocado.
+
+A troca leva a senha de demo `bankofanthos` a `kota` no `docker-compose.yml` e no `scripts/verificar-local.sh`, mas o `DEFAULT_PASSHASH` de `src/accounts/accounts-db/initdb/1-load-testdata.sh` continua sendo o bcrypt de `bankofanthos` (conferido). Gere o hash da senha nova nesse arquivo, ou o login da fumaça falha.
 
 Run: `npm run check:kota -- --repo ../kota-bank-oficina` e, na oficina, `scripts/testar.sh && scripts/verificar-local.sh`
 Expected: regra `marca` sem erro, testes verdes, fumaça verde com `MARCA=Kota` (o padrão).

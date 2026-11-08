@@ -3,14 +3,16 @@
 // uma fala-ponte (áudio em cache); o LLM responde atrás dela, frase a frase.
 import { randomUUID } from "node:crypto";
 import { detectIntent } from "../../../src/journey/conditions";
+import { looksLikeQuestion } from "../../../src/journey/forwarding";
 import type { BoardAction, Journey, Profile } from "../../../src/journey/types";
 import type { TtsService } from "../voice/tts/service";
 import { streamChat, type ChatMessage } from "../llm";
-import { FALLBACK_LINE, pickBridge } from "./bridges";
+import { FAILURE_LINE, pickBridge } from "./bridges";
 import { buildMessages, buildTools, visibleNodes } from "./prompt";
 import { SentenceSplitter } from "./sentences";
 
 export type SpeakSource = "bridge" | "llm" | "fallback";
+export type LlmFailure = "timeout" | "interrupted" | "provider_error" | "refusal" | "empty_response";
 
 export type AskEvent =
   | { type: "speak"; id: string; text: string; audio_url: string | null; source: SpeakSource }
@@ -27,7 +29,7 @@ export interface AskTiming {
   llm_first_token_ms: number | null;
   llm_first_sentence_ms: number | null;
   total_ms: number;
-  llm_error: string | null;
+  llm_error: LlmFailure | null;
   /** Tokens de entrada e de saída da chamada ao LLM (null quando nada foi consumido: o provedor recusou antes de responder). */
   tokens_in: number | null;
   tokens_out: number | null;
@@ -78,13 +80,10 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   const splitter = new SentenceSplitter();
   let spoke = false;
   let wentTo = false;
-  let escalated = false;
+  let escalationSummary: string | null = null;
   let saidNoSource = false;
-  const escalate = (summary: string) => {
-    if (escalated) return;
-    escalated = true;
-    emit({ type: "escalate", summary });
-  };
+  let refused = false;
+  const escalate = (summary: string) => { escalationSummary ??= summary; };
   const sentence = (s: string) => {
     timing.llm_first_sentence_ms ??= ms();
     spoke = true;
@@ -109,6 +108,7 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
       if (ev.type === "tool_call") outChars += ev.raw.length;
       if (ev.type === "text" || ev.type === "tool_call") timing.llm_first_token_ms ??= ms();
       if (ev.type === "text") splitter.push(ev.text).forEach(sentence);
+      if (ev.type === "done" && ev.finishReason === "refusal") refused = true;
       if (ev.type !== "tool_call") continue;
       const a = ev.args as { targets?: string[]; target?: string } | null;
       if (ev.name === "highlight" && Array.isArray(a?.targets)) {
@@ -127,7 +127,7 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
     const rest = splitter.flush();
     if (rest) sentence(rest);
   } catch (e) {
-    timing.llm_error = ac.signal.aborted ? "timeout_or_cancel" : ((e as { code?: string }).code ?? String(e).slice(0, 80));
+    timing.llm_error = input.signal?.aborted ? "interrupted" : ac.signal.aborted ? "timeout" : "provider_error";
   } finally {
     clearTimeout(timer);
   }
@@ -142,10 +142,15 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
     timing.tokens_in = estimateTokens(sentChars ?? 0);
     timing.tokens_out = estimateTokens(outChars);
   }
-  if (saidNoSource) escalate(input.text);
-  if (!spoke && !wentTo && !input.signal?.aborted) {
-    say(FALLBACK_LINE, "fallback");
-    escalate(input.text);
+  if (refused) timing.llm_error = "refusal";
+  if (input.signal?.aborted && !timing.llm_error) timing.llm_error = "interrupted";
+  const empty = !spoke && !wentTo && !escalationSummary && !input.signal?.aborted && !timing.llm_error;
+  if (empty) timing.llm_error = "empty_response";
+  if (timing.llm_error && timing.llm_error !== "interrupted") {
+    say(FAILURE_LINE, "fallback");
+  } else if (!input.signal?.aborted && looksLikeQuestion(input.text)) {
+    if (escalationSummary) emit({ type: "escalate", summary: escalationSummary });
+    else if (saidNoSource) emit({ type: "escalate", summary: input.text });
   }
   timing.total_ms = ms();
   emit({ type: "timing", timing });

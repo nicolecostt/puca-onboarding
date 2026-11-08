@@ -96,7 +96,7 @@ Preço único em reais para o mundo simplifica o exercício e ignora país, moed
 
 `1,40 mi × 20% × 0,25 × R$ 900 ≈ R$ 63 mi/ano`
 
-> **Corrigido em 2026-11-07:** a pesquisa usava 1,44 mi de "profissionais CLT", sem fonte localizada. A base agora é a Brasscom ([Monitor de Empregos e Salários](https://brasscom.org.br/wp-content/uploads/2024/04/BRI2-2024-001-Monitor-de-Empregos-e-Salarios-2024-04-v10-versao-SITE.pdf), a partir de RAIS/CAGED): 1.403.318 profissionais de software, serviços de TI e TI interna em fev/2024. Essa conta inclui todos os vínculos, não só CLT. Como a base não é subconjunto da global (ocupações e anos diferentes), o SAM não é um recorte rigoroso do TAM.
+> **Corrigido em 2026-11-07:** a pesquisa usava 1,44 mi de "profissionais CLT", sem fonte localizada. A base agora é a Brasscom ([Monitor de Empregos e Salários](https://brasscom.org.br/wp-content/uploads/2024/04/BRI2-2024-001-Monitor-de-Empregos-e-Salarios-2024-04-v10-versao-SITE.pdf) e [comunicado da Brasscom](https://brasscom.org.br/macrossetor-de-tic-ultrapassa-206-mi-de-trabalhadores-em-fevereiro-de-2024/), com dados de RAIS/CAGED): 1.403.318 pessoas empregadas nos segmentos de software, serviços de TIC e TI in-house em fev/2024. Esse total setorial é um proxy amplo, não uma contagem de desenvolvedores nem de pessoas elegíveis para a Puca. Como a base não é subconjunto da global (ocupações e anos diferentes), o SAM não é um recorte rigoroso do TAM.
 
 ### 6.3. SOM (24 meses)
 
@@ -178,7 +178,7 @@ Sustentam o problema, não o resultado da Puca. Pesquisas de fornecedor têm int
 | F16 | [Santos et al., revisão sistemática, arXiv 2024](https://arxiv.org/abs/2408.15989) | 32 estudos de soluções de software para onboarding em projetos de software; barreiras ainda não cobertas | Não comprova falta de concorrentes comerciais |
 | F17 | [Brynjolfsson, Li e Raymond, QJE 2025](https://academic.oup.com/qje/article/140/2/889/7990658) (140(2):889–942) | Assistente de IA para 5.172 agentes de atendimento: +15% de problemas resolvidos por hora, com ganho maior para quem tem menos experiência | Atendimento não é engenharia; não usar os 14% e 5.179 da versão NBER de 2023 junto |
 | M1 | SlashData, [tendências de 2025](https://www.slashdata.co/post/global-developer-population-trends-2025-how-many-developers-are-there) e [Developer Population](https://www.slashdata.co/developer-population) | Início de 2025: 47,2 mi de desenvolvedores no total, dos quais 36,5 mi profissionais. 3º tri de 2025: 48,4 mi no total (sem recorte de profissionais) | Base do TAM; estimativa por modelo, não censo. Outras casas usam outras definições (IDC, Evans Data): não misturar |
-| M2 | Brasscom, [Monitor de Empregos e Salários, abr/2024](https://brasscom.org.br/wp-content/uploads/2024/04/BRI2-2024-001-Monitor-de-Empregos-e-Salarios-2024-04-v10-versao-SITE.pdf) (RAIS/CAGED) | 1.403.318 profissionais de software, serviços de TI e TI interna em fev/2024 | Base do SAM; todos os vínculos, não só CLT |
+| M2 | Brasscom, [Monitor de Empregos e Salários, abr/2024](https://brasscom.org.br/wp-content/uploads/2024/04/BRI2-2024-001-Monitor-de-Empregos-e-Salarios-2024-04-v10-versao-SITE.pdf) e [comunicado de abr/2024](https://brasscom.org.br/macrossetor-de-tic-ultrapassa-206-mi-de-trabalhadores-em-fevereiro-de-2024/) (RAIS/CAGED) | 1.403.318 pessoas empregadas nos segmentos de software, serviços de TIC e TI in-house em fev/2024 | Proxy setorial amplo para o SAM; não conta especificamente desenvolvedores ou pessoas elegíveis para a Puca |
 
 ### 10.1. Frases proibidas
 

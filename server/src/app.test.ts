@@ -93,6 +93,16 @@ describe("limite por pessoa", () => {
   });
 });
 
+describe("limite por IP (sem token)", () => {
+  it("conta pelo Fly-Client-IP: trocar o X-Forwarded-For não zera o limite", async () => {
+    const app = buildApp({ journey, tts: null, verificaToken: null, mintSttToken });
+    const req = (i: number) => app.inject({ method: "POST", url: "/api/voice/token", headers: { "fly-client-ip": "1.2.3.4", "x-forwarded-for": `9.9.9.${i}` } });
+    for (let i = 0; i < 20; i++) expect((await req(i)).statusCode).toBe(200);
+    expect((await req(99)).statusCode).toBe(429);
+    await app.close();
+  });
+});
+
 describe("travas diárias", () => {
   it("LLM: passou do limite do dia, /api/ask responde 503 limite_diario sem chamar o LLM", async () => {
     const app = buildApp({ journey, tts: null, verificaToken: null, limiteDiario: { llm: 0 } });
