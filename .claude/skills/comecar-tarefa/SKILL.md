@@ -25,7 +25,7 @@ Tarefa: $ARGUMENTS
    Se a branch já tem PR aberto e falta só levá-lo até integrar, siga pela skill `acompanhar-pr`.
 3. **Base do sistema e contexto mínimo.** Leia o **sumário** do `PRODUCT.md` e a(s) seção(ões) que a tarefa toca
    (cenário, funcionalidade, prioridade ou limite do hackathon). Confira se a issue bate com elas. Depois, só o que a tarefa toca:
-   - tela ou componente → o `main.ts`/`.ts` dele e a seção do `README.md`;
+   - tela ou componente → o `main.ts`/`.ts` dele e a seção de `docs/desenvolvimento.md`;
    - jornada ou sessão → `docs/journey-format.md` (e use a skill `nova-jornada`);
    - voz ou servidor → `src/voice/`, `server/src/app.ts` e a regra da `src/journey/route.ts` (a resposta nunca espera o LLM);
    - decisões já tomadas → títulos em `docs/decisoes/`.

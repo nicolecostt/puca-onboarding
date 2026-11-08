@@ -88,7 +88,7 @@ const FIELDS: Field[] = [
   },
   {
     key: "pagamentos",
-    question: () => "Agora sobre o que a gente vai ver junto. Você já trabalhou com pagamentos, tipo cartão e maquininha?",
+    question: () => "Agora sobre o que a gente vai ver junto. Você já trabalhou com banco, tipo transferência, saldo e extrato?",
     sample: sample.pagamentos ?? "",
   },
   { key: "mensageria", question: () => "E com mensageria, tipo Kafka ou filas?", sample: sample.mensageria ?? "" },

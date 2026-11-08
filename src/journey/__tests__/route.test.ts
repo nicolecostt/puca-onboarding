@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import demo from "../data/tail.journey.json";
+import demo from "../data/kota.journey.json";
 import { buildFaqs } from "../faq";
 import { tarefaDaPessoa } from "../primeira-tarefa";
 import { DEMO_PROFILES } from "../profile";
@@ -40,20 +40,23 @@ describe("routeUtterance", () => {
 
 describe("routeUtterance: FAQ antes da knowledge", () => {
   it("quem cuida do nó vai para o FAQ, não para uma frase solta da knowledge", () => {
-    const r = routeUtterance("Quem cuida do authorizer?", ctx);
+    const r = routeUtterance("Quem cuida do balancereader?", ctx);
     expect(r.kind).toBe("faq");
-    if (r.kind === "faq") expect(r.faq).toMatchObject({ node: "authorizer", intent: "owner" });
+    if (r.kind === "faq") expect(r.faq).toMatchObject({ node: "balancereader", intent: "owner" });
   });
 });
 
 describe("routeUtterance: dono não confirmado vira encaminhamento", () => {
-  it("quem cuida do tail-common cai no FAQ marcado como não confirmado", () => {
-    const r = routeUtterance("Quem cuida do tail-common?", ctx);
-    expect(r).toMatchObject({ kind: "faq", faq: { node: "common", intent: "owner", unconfirmed: true } });
+  it("nó sem responsável confirmado cai no FAQ marcado como não confirmado", () => {
+    const pagamentos = journey.boards.pagamentos;
+    const semDono = { ...journey, boards: { ...journey.boards, pagamentos: { ...pagamentos, nodes: pagamentos.nodes.map((n) =>
+      n.id === "monolito" ? { ...n, info: { ...n.info, owner_confirmed: false } } : n) } } };
+    const r = routeUtterance("Quem cuida do ledgermonolith?", { ...ctx, journey: semDono, faqs: buildFaqs(semDono, DEMO_PROFILES.novo) });
+    expect(r).toMatchObject({ kind: "faq", faq: { node: "monolito", intent: "owner", unconfirmed: true } });
   });
 
   it("dono confirmado não fica marcado", () => {
-    const r = routeUtterance("Quem cuida do authorizer?", ctx);
+    const r = routeUtterance("Quem cuida do balancereader?", ctx);
     expect(r.kind === "faq" && r.faq.unconfirmed).toBeFalsy();
   });
 });
@@ -64,17 +67,17 @@ describe("routeUtterance: checagem por resposta", () => {
   const cctx: RouteContext = { ...ctx, moment: falha, step: checa, waiting: { kind: "reply", replies: checa.suggested_replies ?? [], check: true } };
 
   it("resposta livre vai inteira ao motor, sem passar pelo conhecimento que entregaria a resposta", () => {
-    for (const t of ["para a dlq", "acho que se perde", "não sei"]) expect(routeUtterance(t, cctx)).toEqual({ kind: "reply", reply: t });
+    for (const t of ["acho que some", "acho que grava assim mesmo", "não sei"]) expect(routeUtterance(t, cctx)).toEqual({ kind: "reply", reply: t });
   });
 
   it("pergunta e pulo continuam funcionando durante a checagem", () => {
     expect(routeUtterance("pode repetir a pergunta?", cctx).kind).not.toBe("reply");
-    expect(routeUtterance("o que é a dlq", cctx).kind).not.toBe("reply");
+    expect(routeUtterance("o que é o balancereader", cctx).kind).not.toBe("reply");
     expect(routeUtterance("quero ver a primeira tarefa", cctx).kind).toBe("jump");
   });
 
   it("fora de uma checagem, nada muda: a mesma fala vai ao conhecimento", () => {
-    expect(routeUtterance("para a dlq", { ...cctx, waiting: { kind: "reply", replies: checa.suggested_replies ?? [] } }).kind).toBe("knowledge");
+    expect(routeUtterance("fila entre o ledgerwriter e os leitores", { ...cctx, waiting: { kind: "reply", replies: checa.suggested_replies ?? [] } }).kind).toBe("knowledge");
   });
 });
 
@@ -130,7 +133,7 @@ describe("routeUtterance: dúvida da primeira tarefa (#79)", () => {
     }
     expect(routeUtterance("quem aprova a tarefa?", pctx).kind).toBe("knowledge");
     // o passo que apresenta a tarefa do outro vínculo (a da Ana) não responde pelo Bruno
-    expect(routeUtterance("e o firmware da tarefa?", pctx)).toMatchObject({ kind: "tarefa", resposta: { kind: "sem_fonte" } });
+    expect(routeUtterance("e o TransactionValidator da tarefa?", pctx)).toMatchObject({ kind: "tarefa", resposta: { kind: "sem_fonte" } });
     // de outro momento, a pergunta de aprovação também acha o conhecimento do momento da tarefa
     expect(routeUtterance("quem aprova a tarefa?", { ...tctx, waiting: null }).kind).toBe("knowledge");
   });

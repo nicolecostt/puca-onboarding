@@ -691,6 +691,7 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
 | `SUPABASE_SERVICE_ROLE_KEY` | servidor (Storage, idempotência dos encaminhamentos) | não |
 | `LIMITE_DIARIO_LLM`, `LIMITE_DIARIO_TTS`, `LIMITE_DIARIO_STT` | servidor | — |
 | `VITE_API_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | app (no build) | sim |
+| `API_TARGET` | só o `npm run dev` no navegador: para onde o Vite repassa `/api` (padrão `http://localhost:8787`; `npm run dev:fly` usa o Fly) | sim |
 
 `FEATHERLESS_API_KEY`, `FEATHERLESS_BASE_URL` e `LLM_MODEL` saem quando o cliente da Anthropic estiver na `main`.
 
@@ -710,8 +711,8 @@ Cada mudança vai pelo caminho certo, num PR próprio:
 | Progresso e memória: tabelas do Supabase e fila local | `docs/contratos.md` | skill `contrato` |
 | Perfil e calibragem saem do `sessionStorage` para o `localStorage` | linhas "Perfil" e "Calibragem" de `docs/contratos.md`, `docs/journey-format.md` | skill `contrato`, com a #18 |
 | Primeira tarefa: a aprovação do gestor continua no Slack simulado; se um dia for para o Slack real, muda o contrato | linha "Primeira tarefa" de `docs/contratos.md` | skill `contrato`, quando for o caso |
-| Featherless sai; a chave obrigatória passa a ser a da Anthropic | `README.md` (seção do servidor), `server/.env.example` | na #128 |
-| Como rodar o app, o servidor e o deploy | `README.md`, `docs/demo.md` | no PR de cada parte |
+| Featherless sai; a chave obrigatória passa a ser a da Anthropic | `docs/desenvolvimento.md` (seção do servidor), `server/.env.example` | na #128 |
+| Como rodar o app, o servidor e o deploy | `docs/desenvolvimento.md`, `docs/demo.md` | no PR de cada parte |
 
 ---
 

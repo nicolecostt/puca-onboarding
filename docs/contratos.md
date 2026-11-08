@@ -18,6 +18,7 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | Rastro (decisões da Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
 | Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` | `screens/lesson` (cria), `screens/live-session` (envia no Slack), rastro (`forwarding_id`), `screens/rh` (conta os abertos pelo `status`) | `__tests__/forwarding.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
 | Primeira tarefa | `src/journey/primeira-tarefa.ts` (`TarefaDoTime`, `PedidoDeAprovacao`, chave `puca:primeiras-tarefas` no `localStorage`) e os nós `kind: "task"` da jornada — [seção abaixo](#primeira-tarefa) | `screens/lesson` (cria o pedido quando o cartão da tarefa abre), `screens/live-session` (pede a aprovação ao gestor no Slack e grava a aprovação), `screens/primeira-tarefa` (página da tarefa), `screens/rh` (conta pessoas com pedido não aprovado, por `status` e `pessoa`) | `__tests__/primeira-tarefa.test.ts`, `screens/primeira-tarefa/pagina.test.ts` |
+| App para Mac (`window.orbis`) | `desktop/preload.ts` + `src/orbis.d.ts` — [seção abaixo](#app-para-mac) | telas que testam `if (window.orbis)`; a #123 acrescenta `navegador` | `tsc` |
 | Visual da Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
 
@@ -26,9 +27,9 @@ Exemplo válido de `TrailEntry` (uma fala da pessoa e o que a Puca fez com ela):
 ```json
 {
   "id": "7f0c…", "at": "2026-11-07T22:10:03.120Z", "session": "a91e…",
-  "from": "chat", "utterance": "O que é o authorizer?", "route": "faq",
-  "answer": "authorizer: decide se a transação é aprovada e calcula o MDR, a taxa cobrada do lojista.",
-  "sources": ["ADR-019 · Cálculo de MDR por plano", "fees/mdr.go"],
+  "from": "chat", "utterance": "O que é o balancereader?", "route": "faq",
+  "answer": "balancereader: responde o saldo de cada conta, de um cache em memória mantido em dia pela leitura do livro-razão.",
+  "sources": ["ADR 4 · Saldo e extrato com cache em memória, lidos do livro-razão", "README do balancereader"],
   "moment": "pagamentos", "step": "pg-pergunta"
 }
 ```
@@ -43,10 +44,10 @@ Exemplo válido de `Forwarding` (status: `pendente` → `enviando` → `enviado`
 ```json
 {
   "id": "c2d1…", "at": "2026-11-07T22:14:10.000Z",
-  "to": { "name": "Paula Nunes", "role": "buddy" },
-  "pessoa": "Ana", "question": "Quem cuida do tail-common?", "summary": "Quem cuida do tail-common?",
-  "consulted": ["ADR-012", "README do pos-gateway"],
-  "reason": "Não há responsável confirmado para o tail-common nas fontes da Tail.",
+  "to": { "name": "Beatriz Cavalcanti", "role": "buddy" },
+  "pessoa": "Ana", "question": "Qual vai ser o meu bônus?", "summary": "Qual vai ser o meu bônus?",
+  "consulted": [],
+  "reason": "Estava sem acesso ao agente e não achei isso na sessão.",
   "moment": "pagamentos", "status": "pendente"
 }
 ```
@@ -68,6 +69,9 @@ escreve o formato aqui (tipo + um exemplo válido) **antes** de implementar; o o
 O servidor no Fly (`https://orbis-puca.fly.dev`, decisão 0006, `docs/stack.md` §5) e o local (`npm run dev:server`)
 respondem as mesmas rotas. O que muda é o que cada requisição precisa levar:
 
+- **Endereço:** o front monta toda URL do servidor com `apiUrl(caminho)` de `src/voice/api.ts`, que põe na frente o
+  `VITE_API_URL` do build. Vazio (o `npm run dev`): caminho relativo, e o Vite repassa `/api` ao servidor local. No app
+  para Mac: `https://orbis-puca.fly.dev`. Vale também para o `audio_url` que o servidor devolve (`/api/tts/<id>`).
 - **Token:** toda rota, menos `GET /api/health`, exige `Authorization: Bearer <access_token do Supabase>`. O servidor
   confere a assinatura pelo JWKS do projeto, o emissor (`<SUPABASE_URL>/auth/v1`) e a audiência (`authenticated`), e
   usa o `sub` como id da pessoa. Vale para o áudio também: `GET /api/tts/:id` e `/words` levam o mesmo cabeçalho.
@@ -98,7 +102,27 @@ POST /api/ask HTTP/1.1
 Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6Ii4uLiJ9…
 Content-Type: application/json
 
-{"text":"Quem cuida do authorizer?","moment_id":"pagamentos","step_id":"pg-pergunta","perfil":"novo"}
+{"text":"Quem cuida do balancereader?","moment_id":"pagamentos","step_id":"pg-pergunta","perfil":"novo"}
+```
+
+## App para Mac
+
+O app Electron (decisão 0004, `docs/stack.md` §3, #158) abre o mesmo front por `app://orbis/` e expõe ao front só
+`window.orbis`. No navegador comum (`npm run dev`) ele não existe, e a tela segue com o simulado.
+
+```ts
+interface Orbis {
+  /** Versão do app (a do package.json), ex.: "0.1.0". */
+  versao: string;
+  // a #123 acrescenta `navegador` (docs/stack.md §3.2): mostrar, esconder, executar, cancelar, aoAgirAPessoa
+}
+declare global { interface Window { orbis?: Orbis } }
+```
+
+Exemplo de uso numa tela:
+
+```ts
+if (window.orbis) console.log(`Orbis ${window.orbis.versao}`); // no app
 ```
 
 ## Calibragem
@@ -119,7 +143,7 @@ Enquanto a sua parte não lê de verdade, use `DEMO_CALIBRAGENS.novo` (Ana) e `D
   - `entendeu`: nível pelo menos `usa`, certeza `alta`, evidência = o que a pessoa respondeu ou tocou.
   - `rever`: o nível **não muda** (não é nota); a certeza vira `alta` e o tema fica marcado para rever.
   ```json
-  { "tema": "falhas", "nivel": "usa", "certeza": "alta", "evidencia": "Para a settlement.dlq", "origem": "sessao", "checagem": "entendeu" }
+  { "tema": "falhas", "nivel": "usa", "certeza": "alta", "evidencia": "É recusada, sem gravar nada", "origem": "sessao", "checagem": "entendeu" }
   ```
 - **Resultado no motor**: `RunnerIO.onCheck?(r)`, com `r = { tema, passo, entendeu, tentativas, resposta }`
   (`resposta` é o texto dito ou o id do nó tocado). Formato da checagem na jornada em `journey-format.md`.
@@ -130,20 +154,20 @@ Exemplo (Bruno, transição; saída de `DEMO_CALIBRAGENS.transicao`):
 ```json
 {
   "versao": 1,
-  "perfil": { "nome": "Bruno", "cargo": "Engenheiro de backend", "time": "Terminais", "gestor": "Marcos Vidal",
+  "perfil": { "nome": "Bruno", "cargo": "Engenheiro de software pleno", "time": "Livro-razão", "gestor": "Natália Brandão",
               "ferramentas": "GitHub, Slack e Jira", "aprender": "Vendo o desenho primeiro", "vinculo": "transicao" },
-  "experiencia": "No Antifraude eu cuidava dos consumidores Kafka que analisam as transações",
-  "objetivos": ["Entender o caminho da transação e fazer minha primeira mudança no terminal-config sozinho"],
+  "experiencia": "Em Contas eu cuidava do login e do JWT no userservice",
+  "objetivos": ["Entender o caminho de uma transferência e fazer minha primeira mudança no livro-razão sozinho"],
   "conhecimentos": [
     { "tema": "empresa",    "nivel": "usa",         "certeza": "alta",  "evidencia": "", "origem": "vinculo" },
     { "tema": "rituais",    "nivel": "nao_conhece", "certeza": "media", "evidencia": "", "origem": "vinculo" },
-    { "tema": "pagamentos", "nivel": "ja_ouviu",    "certeza": "alta",  "evidencia": "Um pouco, pelo lado da fraude, mas adquirência eu não conheço", "origem": "call" },
-    { "tema": "mensageria", "nivel": "usa",         "certeza": "alta",  "evidencia": "Sim, uso Kafka todo dia", "origem": "call" },
-    { "tema": "falhas",     "nivel": "usa",         "certeza": "alta",  "evidencia": "Já, a gente tinha retry e DLQ nos consumidores", "origem": "call" }
+    { "tema": "pagamentos", "nivel": "ja_ouviu",    "certeza": "alta",  "evidencia": "Pouco, só pelo lado do login; transferência e saldo eu não conheço", "origem": "call" },
+    { "tema": "mensageria", "nivel": "usa",         "certeza": "alta",  "evidencia": "Sim, usei filas no emprego anterior", "origem": "call" },
+    { "tema": "falhas",     "nivel": "usa",         "certeza": "alta",  "evidencia": "Já, no emprego anterior a gente tinha retry e DLQ nos consumidores", "origem": "call" }
   ],
-  "time_anterior": "Antifraude",
-  "aproveita": "Kafka e o jeito de investigar uma transação com problema",
-  "diferencas": "A parte de terminais e configuração, e o time é todo novo pra mim",
+  "time_anterior": "Contas",
+  "aproveita": "JWT e o jeito de investigar um login com problema",
+  "diferencas": "Saldo e extrato, Java no lugar de Python, e o time é todo novo pra mim",
   "atualizada_em": "2026-11-09T12:00:00.000Z"
 }
 ```
@@ -198,16 +222,16 @@ Exemplo (Bruno, transição; saída de `montarJornadaDaPessoa(journey, DEMO_CALI
 ```json
 {
   "versao": 1,
-  "objetivos": ["Entender o caminho da transação e fazer minha primeira mudança no terminal-config sozinho"],
+  "objetivos": ["Entender o caminho de uma transferência e fazer minha primeira mudança no livro-razão sozinho"],
   "momentos": [
     { "id": "boas-vindas", "titulo": "Boas-vindas", "objetivo": "Cumprimentar e explicar o roteiro da sessão conforme o momento da pessoa",
       "estado": "aprender", "motivo": "", "temas": [] },
-    { "id": "empresa-e-cultura", "titulo": "A Tail", "objetivo": "Apresentar missão, valores e áreas da empresa",
-      "estado": "fora", "motivo": "Você já é da Tail: a sessão vai direto ao seu time.", "temas": ["empresa"] },
-    { "id": "pagamentos", "titulo": "O caminho de uma transação", "objetivo": "Mostrar o caminho de uma transação da maquininha até a liquidação",
-      "estado": "aprender", "motivo": "Você disse: “Um pouco, pelo lado da fraude, mas adquirência eu não conheço”", "temas": ["pagamentos", "mensageria"] },
-    { "id": "falha", "titulo": "Quando falha", "objetivo": "Explicar o caminho de erro e o que ainda não está confirmado",
-      "estado": "revisar", "motivo": "Você disse: “Já, a gente tinha retry e DLQ nos consumidores”", "temas": ["falhas"] }
+    { "id": "empresa-e-cultura", "titulo": "A Kota", "objetivo": "Apresentar missão, valores e áreas da empresa",
+      "estado": "fora", "motivo": "Você já é da Kota: a sessão vai direto ao seu time.", "temas": ["empresa"] },
+    { "id": "pagamentos", "titulo": "O caminho de uma transferência", "objetivo": "Mostrar o caminho de uma transferência do site até o livro-razão",
+      "estado": "aprender", "motivo": "Você disse: “Pouco, só pelo lado do login; transferência e saldo eu não conheço”", "temas": ["pagamentos", "mensageria"] },
+    { "id": "falha", "titulo": "Quando falha", "objetivo": "Explicar o caminho de erro e as decisões que o explicam",
+      "estado": "revisar", "motivo": "Você disse: “Já, no emprego anterior a gente tinha retry e DLQ nos consumidores”", "temas": ["falhas"] }
   ]
 }
 ```
@@ -269,16 +293,16 @@ Exemplo válido de `PedidoDeAprovacao`:
 ```json
 {
   "id": "5b7e…", "at": "2026-11-08T14:30:00.000Z",
-  "pessoa": "Bruno", "gestor": "Marcos Vidal",
+  "pessoa": "Bruno", "gestor": "Natália Brandão",
   "tarefa": {
-    "no": "task-dlq", "titulo": "Fazer a publicação de configuração tentar de novo e, se continuar falhando, ir para uma DLQ.",
-    "problema": "se o terminal.config.updated fica fora do ar, a configuração publicada se perde sem aviso",
-    "porque": "a maquininha fica com a configuração antiga e ninguém sabe",
-    "sistemas": "terminal-config-api e terminal.config.updated", "onde_ler": "README do terminal-config-api",
-    "quem_ajuda": "Lucas Melo e Paula Nunes"
+    "no": "task-403", "titulo": "Extrato de outra conta responde 403 no transactionhistory",
+    "problema": "pedir o extrato de outra conta com um token válido responde 401, como se faltasse login",
+    "porque": "401 quer dizer token inválido; com o token certo e a conta errada, o certo é 403, e quem investiga um erro procura no lugar certo",
+    "sistemas": "só o transactionhistory (o TransactionHistoryController e os testes dele)", "onde_ler": "ADR 2 e README do transactionhistory",
+    "quem_ajuda": "Beatriz Cavalcanti e Thiago Nakamura"
   },
   "moment": "primeira-tarefa", "sessao": "a91e…", "status": "aprovada",
-  "aprovada_por": "Marcos Vidal", "aprovada_em": "2026-11-08T14:31:12.000Z"
+  "aprovada_por": "Natália Brandão", "aprovada_em": "2026-11-08T14:31:12.000Z"
 }
 ```
 
@@ -288,4 +312,4 @@ Exemplo válido de `PedidoDeAprovacao`:
 2. **Quebra** (renomear, remover, mudar significado): ajuste todos os usos no mesmo PR, escreva
    `⚠️ quebra contrato` no título ou no começo da descrição do PR e avise o time.
 3. Formato novo da jornada exige: tipo em `types.ts`, regra em `validate.ts`, teste, seção em `journey-format.md`
-   e a demo (`tail.journey.json`) continuando válida.
+   e a demo (`kota.journey.json`) continuando válida.

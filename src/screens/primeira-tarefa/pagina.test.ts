@@ -6,15 +6,15 @@ const pedido = (id: string, at: string, extra: Partial<PedidoDeAprovacao> = {}):
   id,
   at,
   pessoa: "Bruno",
-  gestor: "Marcos Vidal",
+  gestor: "Natália Brandão",
   tarefa: {
-    no: "task-dlq",
-    titulo: "Fazer a publicação de configuração tentar de novo.",
-    problema: "a configuração se perde",
-    porque: "a maquininha fica desatualizada",
-    sistemas: "terminal-config-api e terminal.config.updated",
-    onde_ler: "README do terminal-config-api",
-    quem_ajuda: "Lucas Melo e Paula Nunes",
+    no: "task-403",
+    titulo: "Extrato de outra conta responde 403 no transactionhistory",
+    problema: "o extrato de outra conta responde 401",
+    porque: "401 quer dizer token inválido",
+    sistemas: "só o transactionhistory",
+    onde_ler: "ADR 2 e README do transactionhistory",
+    quem_ajuda: "Beatriz Cavalcanti e Thiago Nakamura",
   },
   moment: "primeira-tarefa",
   status: "aguardando",
@@ -47,13 +47,13 @@ describe("pedidoDaPagina", () => {
 
 describe("statusDaPagina", () => {
   it("antes de o Slack enviar e enquanto espera, mostra quem aprova", () => {
-    expect(statusDaPagina(pedido("a", "2026-11-08T14:00:00Z", { status: "pendente" }))).toBe("Aguardando aprovação de Marcos Vidal");
-    expect(statusDaPagina(pedido("a", "2026-11-08T14:00:00Z", { status: "enviando" }))).toBe("Aguardando aprovação de Marcos Vidal");
-    expect(statusDaPagina(pedido("a", "2026-11-08T14:00:00Z"))).toBe("Aguardando aprovação de Marcos Vidal");
+    expect(statusDaPagina(pedido("a", "2026-11-08T14:00:00Z", { status: "pendente" }))).toBe("Aguardando aprovação de Natália Brandão");
+    expect(statusDaPagina(pedido("a", "2026-11-08T14:00:00Z", { status: "enviando" }))).toBe("Aguardando aprovação de Natália Brandão");
+    expect(statusDaPagina(pedido("a", "2026-11-08T14:00:00Z"))).toBe("Aguardando aprovação de Natália Brandão");
   });
 
   it("aprovada mostra quem aprovou e quando", () => {
-    const p = pedido("a", "2026-11-08T14:00:00Z", { status: "aprovada", aprovada_por: "Marcos Vidal", aprovada_em: "2026-11-08T17:32:00Z" });
-    expect(statusDaPagina(p)).toMatch(/^Aprovada por Marcos Vidal em \d{2}\/\d{2}, \d{1,2}h\d{2}$/);
+    const p = pedido("a", "2026-11-08T14:00:00Z", { status: "aprovada", aprovada_por: "Natália Brandão", aprovada_em: "2026-11-08T17:32:00Z" });
+    expect(statusDaPagina(p)).toMatch(/^Aprovada por Natália Brandão em \d{2}\/\d{2}, \d{1,2}h\d{2}$/);
   });
 });

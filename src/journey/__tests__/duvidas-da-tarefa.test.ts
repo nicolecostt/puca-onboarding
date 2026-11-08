@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import demo from "../data/tail.journey.json";
+import demo from "../data/kota.journey.json";
 import { respostaSobreTarefa } from "../duvidas-da-tarefa";
 import { tarefaDaPessoa, tarefaDoNo } from "../primeira-tarefa";
 import { DEMO_PROFILES } from "../profile";
@@ -8,13 +8,13 @@ import { loadJourney } from "../validate";
 
 const journey = loadJourney(demo);
 const no = (id: string) => Object.values(journey.boards).flatMap((b) => b.nodes).find((n) => n.id === id)!;
-// o esperado sai dos campos da tarefa, não de texto da Tail: os testes sobrevivem à troca pela Kota (#109)
-const bruno = tarefaDoNo(no("task-dlq"))!;
+// o esperado sai dos campos da tarefa, não de texto da jornada: os testes sobrevivem a uma troca de conteúdo (#109)
+const bruno = tarefaDoNo(no("task-403"))!;
 
 describe("tarefaDaPessoa", () => {
   it("tarefaDaPessoa escolhe pelo vínculo", () => {
     expect(tarefaDaPessoa(journey, DEMO_PROFILES.novo)?.no).toBe("task");
-    expect(tarefaDaPessoa(journey, DEMO_PROFILES.transicao)?.no).toBe("task-dlq");
+    expect(tarefaDaPessoa(journey, DEMO_PROFILES.transicao)?.no).toBe("task-403");
   });
 
   it("sem tarefa para o vínculo, devolve null", () => {
@@ -28,7 +28,7 @@ describe("tarefaDaPessoa", () => {
   it("um nó task sem vínculo vale para qualquer pessoa", () => {
     const umaSo = structuredClone(journey) as Journey;
     for (const b of Object.values(umaSo.boards)) {
-      b.nodes = b.nodes.filter((n) => n.id !== "task-dlq").map((n) => (n.id === "task" ? { ...n, info: { ...n.info, vinculo: undefined } } : n));
+      b.nodes = b.nodes.filter((n) => n.id !== "task-403").map((n) => (n.id === "task" ? { ...n, info: { ...n.info, vinculo: undefined } } : n));
     }
     expect(tarefaDaPessoa(umaSo, DEMO_PROFILES.transicao)?.no).toBe("task");
   });
@@ -84,20 +84,20 @@ describe("respostaSobreTarefa", () => {
   });
 
   it("'qual é a X da tarefa' não responde o resumo (revisão, I3)", () => {
-    for (const fala of ["qual é a linguagem da tarefa?", "qual é a data de entrega da tarefa?", "o que é a dlq da tarefa?", "qual a parte mais importante da tarefa?"]) {
+    for (const fala of ["qual é a linguagem da tarefa?", "qual é a data de entrega da tarefa?", "o que é o cache da tarefa?", "qual a parte mais importante da tarefa?"]) {
       expect(respostaSobreTarefa(fala, bruno, true), fala).toMatchObject({ kind: "sem_fonte" });
     }
   });
 
   it("fala sobre tarefas em geral não é sobre a tarefa da pessoa (revisão, I4)", () => {
-    for (const fala of ["quais tarefas o time faz?", "como o time divide as tarefas?", "como abro um ticket de incidente?", "o que acontece com a task na dlq?"]) {
+    for (const fala of ["quais tarefas o time faz?", "como o time divide as tarefas?", "como abro um ticket de incidente?", "o que acontece com a task no cache?"]) {
       expect(respostaSobreTarefa(fala, bruno, true), fala).toBeNull();
       expect(respostaSobreTarefa(fala, bruno, false), fala).toBeNull();
     }
   });
 
   it("fala que não cita a tarefa devolve null", () => {
-    for (const fala of ["por onde começo?", "quem cuida do authorizer?"]) expect(respostaSobreTarefa(fala, bruno, true), fala).toBeNull();
+    for (const fala of ["por onde começo?", "quem cuida do balancereader?"]) expect(respostaSobreTarefa(fala, bruno, true), fala).toBeNull();
   });
 
   it("antes de apresentar, não adianta a tarefa", () => {

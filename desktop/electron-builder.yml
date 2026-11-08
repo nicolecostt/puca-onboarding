@@ -1,0 +1,24 @@
+# Empacotamento do app para Mac (docs/stack.md §3.4). Rodar com `npm run build:app`.
+appId: com.orbis.app
+productName: Orbis
+copyright: Orbis
+directories:
+  output: release
+  buildResources: desktop/build
+# O app só precisa do front (dist/) e do processo do Electron (dist-desktop/): o resto do repo e o node_modules ficam fora.
+files:
+  - dist/**
+  - dist-desktop/**
+  - package.json
+  - "!node_modules/**"
+npmRebuild: false
+artifactName: Orbis-mac-${arch}.${ext}
+mac:
+  target: zip
+  category: public.app-category.productivity
+  icon: desktop/build/icon.png
+  # Sem conta da Apple: o afterPack assina com assinatura própria (ad hoc). Sem isso o Mac com chip Apple não abre.
+  identity: null
+  extendInfo:
+    NSMicrophoneUsageDescription: A Puca usa o microfone para conversar com você.
+afterPack: desktop/assinar.cjs
