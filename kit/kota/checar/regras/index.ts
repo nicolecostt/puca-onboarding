@@ -5,5 +5,6 @@ import { regraMapa } from "./mapa";
 import { regraMarca } from "./marca";
 import { regraNotionUrls } from "./notion-urls";
 import { regrasPaginas } from "./paginas";
+import { regraSegredos } from "./segredos";
 
-export const regras: Regra[] = [regraMapa, regraCodeowners, regraAdrs, regraNotionUrls, ...regrasPaginas, regraMarca];
+export const regras: Regra[] = [regraMapa, regraCodeowners, regraAdrs, regraNotionUrls, ...regrasPaginas, regraMarca, regraSegredos];
