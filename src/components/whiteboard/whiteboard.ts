@@ -146,6 +146,11 @@ export function mountWhiteboard(parent: HTMLElement, lesson: WhiteboardSpec): Wh
   }
   const resize = new ResizeObserver(fit);
   resize.observe(root);
+  // a fonte à mão muda a largura dos nós: mede de novo quando as fontes terminam de carregar
+  void document.fonts?.ready.then(() => {
+    content = null;
+    fit();
+  });
 
   // ---- detalhes ao clicar num nó ----
   function closePop(): void {
