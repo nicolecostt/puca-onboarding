@@ -2,9 +2,11 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { checarKota } from "../checar/checar";
 import type { ContextoKota } from "../checar/contexto";
+import { regras } from "../checar/regras";
 import { regraNotionUrls } from "../checar/regras/notion-urls";
-import { criarRegraPaginas } from "../checar/regras/paginas";
+import { criarRegrasPaginas } from "../checar/regras/paginas";
 import { mapa } from "../mapa";
 import { ARVORE, linhasDatabase } from "../notion/arvore";
 import { resolverLinks } from "../notion/links";
@@ -125,10 +127,11 @@ describe("resolverLinks", () => {
     expect(() => resolverLinks("[x](notion:constructor)", urls)).toThrow(/notion:constructor sem URL/));
 });
 
-describe("regra paginas", () => {
+describe("regras das páginas", () => {
   // As páginas que os grupos N3a a N3e escrevem; a comece-aqui é da C5.
+  const N3A = ["quem-somos", "rituais", "code-review", "deploy", "incidentes", "de-rfc-a-adr", "comunicacao"];
   const OBRIGATORIAS = [
-    "quem-somos", "rituais", "code-review", "deploy", "incidentes", "de-rfc-a-adr", "comunicacao",
+    ...N3A,
     "rfc-1", "rfc-2", "rfc-3",
     "seguranca-e-acesso", "dados-de-cliente-e-lgpd", "ferias", "home-office", "despesas", "papeis-buddy-gestor-rh",
     "ciclo-de-desempenho", "trilha-de-carreira", "promocao", "bonus", "revisao-salarial",
@@ -140,7 +143,7 @@ describe("regra paginas", () => {
     for (const [chave, md] of Object.entries(paginas)) writeFileSync(join(pasta, `${chave}.md`), md);
     return pasta;
   };
-  const checar = (pasta: string, c: ContextoKota = ctx) => criarRegraPaginas(pasta).checar(c);
+  const checar = (pasta: string, c: ContextoKota = ctx) => checarKota(c, criarRegrasPaginas(pasta)).erros;
 
   it("aceita e-mails do mapa e dos aliases e links para chaves da árvore, sem exigir comece-aqui", () =>
     expect(checar(pastaCom({
@@ -169,8 +172,22 @@ describe("regra paginas", () => {
     rmSync(join(pasta, "rfc-2.md"));
     const erros = checar(pasta);
     expect(erros).toHaveLength(2);
-    expect(erros).toEqual(expect.arrayContaining([expect.stringMatching(/\bbonus\.md/), expect.stringMatching(/\brfc-2\.md/)]));
+    expect(erros).toEqual(expect.arrayContaining([
+      expect.stringMatching(/^\[paginas-escritas\] .*\bbonus\.md/), expect.stringMatching(/^\[paginas-escritas\] .*\brfc-2\.md/),
+    ]));
   });
+
+  it("com só as páginas de um grupo, a regra paginas acusa só o conteúdo e as que faltam saem na paginas-escritas", () => {
+    const pasta = pastaTemp();
+    for (const chave of N3A) writeFileSync(join(pasta, `${chave}.md`), "# Página\n");
+    writeFileSync(join(pasta, "deploy.md"), "Plantão: fulano@kota.example");
+    const erros = checar(pasta);
+    expect(erros.filter((e) => e.startsWith("[paginas] "))).toEqual([expect.stringMatching(/deploy\.md.*fulano@kota\.example/)]);
+    expect(erros.filter((e) => e.startsWith("[paginas-escritas] "))).toHaveLength(17);
+  });
+
+  it("sem --repo, o check:kota avisa que os links do kota-bank nas páginas não foram conferidos", () =>
+    expect(checarKota(ctx, regras).pulas).toContain("paginas-repo: sem --repo"));
 
   it("pasta que ainda não existe: acusa cada página que falta, sem lançar", () =>
     expect(checar(join(pastaTemp(), "paginas"))).toHaveLength(24));
@@ -199,8 +216,8 @@ describe("regra paginas", () => {
     const erros = checar(pasta, { ...ctx, repo });
     expect(erros).toHaveLength(2);
     expect(erros).toEqual(expect.arrayContaining([
-      expect.stringMatching(/rfc-3\.md.*docs\/adr\/0009-nada\.md/),
-      expect.stringMatching(/rfc-3\.md.*src\/Ledger\/balancereader/),
+      expect.stringMatching(/^\[paginas-repo\] .*rfc-3\.md.*docs\/adr\/0009-nada\.md/),
+      expect.stringMatching(/^\[paginas-repo\] .*rfc-3\.md.*src\/Ledger\/balancereader/),
     ]));
     expect(checar(pasta)).toEqual([]);
   });
