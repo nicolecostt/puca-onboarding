@@ -1,9 +1,10 @@
+import { escopoDoPerfil } from "./profile";
 import type { Profile } from "./types";
 import { onboardingStore, readJson, writeJson, type KeyValueStore } from "./storage";
 
 // Progresso da sessão no quadro, no mesmo escopo de armazenamento da call inicial.
 function key(profile: Profile): string {
-  return `puca:sessao-concluida:${JSON.stringify([profile.vinculo, profile.nome, profile.time, profile.cargo])}`;
+  return `puca:sessao-concluida:${escopoDoPerfil(profile)}`;
 }
 
 export function sessionCompleted(profile: Profile, store?: KeyValueStore): boolean {

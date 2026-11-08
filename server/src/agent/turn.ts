@@ -72,6 +72,10 @@ A pauta:
 - Se você foi interrompido, não repita o que estava dizendo: reaja ao que a pessoa disse.
 - Turno "silencio": a pessoa não respondeu. Pergunte de forma curta se ela quer seguir; se o passo não depende da resposta, siga com next_step.
 
+Navegador:
+- Você tem um navegador na tela da pessoa e abre ADRs, READMEs, o código dos serviços e as páginas do Notion da Kota com mostrar_no_navegador. Nunca diga que não tem acesso ao GitHub, ao código ou ao Notion.
+- Quando a pessoa pedir para ver o código, um ADR, um README ou uma página, ou quando mostrar a fonte ajudar, chame mostrar_no_navegador com a fonte e fale sobre o que ela vai ver.
+
 Fontes:
 - Use só a pauta, os nós do quadro e o Notion da Kota abaixo. O Notion inteiro já está aqui: você já leu tudo, não existe busca. Procure a resposta nele antes de dizer que não sabe. Quando a resposta vem do Notion, diga de qual página ("pela página de Home office…").
 - Se não estiver em nenhuma fonte, diga que não conseguiu confirmar e chame escalate_to_buddy com um resumo da dúvida. Nunca invente.
@@ -140,6 +144,24 @@ export function buildTurnMessages(input: TurnInput, moment: Moment, step: Step):
   return [...system, ...history, { role: "user", content: context }];
 }
 
+/** Fontes do kit que o Puca pode abrir no navegador: as dos nós da jornada, a pasta de código de cada serviço e o repositório. */
+export function fontesDoNavegador(j: Journey): { titulo: string; url: string }[] {
+  const fontes = new Map<string, string>([["Repositório kota-bank", "https://github.com/JucaGF/kota-bank"]]);
+  for (const b of Object.values(j.boards)) {
+    for (const n of b.nodes) {
+      for (const d of n.info?.docs ?? []) {
+        if (!d.url || !/^https:\/\/(github\.com\/JucaGF\/kota-bank(\/|$)|lean-ptarmigan-dd2\.notion\.site\/)/.test(d.url)) continue;
+        fontes.set(d.title, d.url);
+        // README de um serviço: a pasta dele é o código
+        const pasta = d.url.match(/^(https:\/\/github\.com\/JucaGF\/kota-bank)\/blob\/main\/(src\/.+)\/README\.md$/);
+        const servico = d.title.match(/^README do (.+)$/)?.[1];
+        if (pasta && servico) fontes.set(`Código do ${servico}`, `${pasta[1]}/tree/main/${pasta[2]}`);
+      }
+    }
+  }
+  return [...fontes].map(([titulo, url]) => ({ titulo, url }));
+}
+
 /** Ferramentas fixas da jornada (ids de todos os quadros e momentos): mudar por turno quebraria o cache. */
 export function buildTurnTools(j: Journey): ToolSpec[] {
   const nodeIds = [...new Set(Object.values(j.boards).flatMap((b) => b.nodes.map((n) => n.id)))];
@@ -155,6 +177,12 @@ export function buildTurnTools(j: Journey): ToolSpec[] {
     fn("highlight", "Destaca nós do quadro enquanto fala deles.", { targets: nodes }, ["targets"]),
     fn("reveal", "Mostra nós do quadro que ainda não apareceram.", { targets: nodes }, ["targets"]),
     fn("open_card", "Abre o cartão de um nó (função, dono, docs, ADR).", { target: { type: "string", enum: nodeIds } }, ["target"]),
+    fn(
+      "mostrar_no_navegador",
+      "Abre uma fonte da Kota (ADR, README, código de um serviço, página do Notion) no navegador do Puca, na tela da pessoa.",
+      { fonte: { type: "string", enum: fontesDoNavegador(j).map((f) => f.titulo) } },
+      ["fonte"],
+    ),
     fn(
       "escalate_to_buddy",
       "Encaminha a dúvida quando não há fonte confiável: à buddy, ou, no caso pessoal (salário, bônus, contrato), ao gestor ou a People (rh).",
@@ -222,6 +250,10 @@ export async function turn(input: TurnInput, emit: (ev: TurnEvent) => void): Pro
         emit({ type: "action", action: ev.name === "highlight" ? { type: "highlight", targets, tone: "focus" } : { type: "reveal", targets } });
       } else if (ev.name === "open_card" && a.target && onBoard.has(a.target)) {
         emit({ type: "action", action: { type: "card", target: a.target } });
+      } else if (ev.name === "mostrar_no_navegador") {
+        // o modelo escolhe pelo título; a URL sai do kit, nunca do modelo
+        const fonte = fontesDoNavegador(input.journey).find((f) => f.titulo === (a as { fonte?: unknown }).fonte);
+        if (fonte) emit({ type: "action", action: { type: "navegador", acao: { tipo: "abrir", url: fonte.url } } });
       } else if (ev.name === "record_check" && typeof a.entendeu === "boolean") {
         emit({ type: "check", entendeu: a.entendeu });
       } else if (ev.name === "escalate_to_buddy") {

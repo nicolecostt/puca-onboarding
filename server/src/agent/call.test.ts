@@ -73,4 +73,19 @@ describe("callTurn", () => {
     const evs = await run();
     expect(evs.filter((e) => e.type === "done")).toEqual([{ type: "done" }]);
   });
+
+  it("vínculo anotado com acento ou em palavras vira o valor do contrato, igual ao cliente (revisão do #221)", async () => {
+    script = [tool("answer", { key: "vinculo", value: "transição" }), tool("answer", { key: "vinculo", value: "estou mudando de time" }), tool("answer", { key: "vinculo", value: "primeira vez" })];
+    const evs = await run();
+    expect(evs.filter((e) => e.type === "answer").map((e) => e.type === "answer" && e.value)).toEqual(["transicao", "transicao", "novo"]);
+  });
+
+  it("anotado com 'transição' (acento) segue a pauta de transição: pergunta o time anterior e conta a cultura do time", async () => {
+    script = [{ type: "text", text: "Oi." }];
+    await run({ anotado: { vinculo: "transição" } });
+    const ctx = sent.at(-1)!.content;
+    expect(ctx).toContain("time_anterior");
+    expect(ctx).toContain("cultura:rituais_do_time");
+    expect(ctx).not.toContain("cultura:missao");
+  });
 });

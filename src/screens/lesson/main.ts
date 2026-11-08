@@ -1,8 +1,9 @@
 // Sessão no quadro: Puca conduz a jornada (src/journey/data/*.journey.json) e monta o quadro
 // do Figma (components/whiteboard) enquanto explica. Conversa simulada: a pessoa responde pelas respostas sugeridas, pelo chat
-// ou tocando no quadro. O perfil vem da escolha antes da call e da call inicial (sem nenhum dos dois, a sessão pede a
-// escolha); ?perfil=ana|bruno (ou novo|transicao)
+// ou tocando no quadro. O perfil vem da call inicial (sem ela, a sessão manda para as boas-vindas);
+// ?perfil=ana|bruno (ou novo|transicao)
 // força um perfil da demo; ?auto=1 responde sozinho, para apresentar sem mexer no mouse.
+import { avisarFalhaAoSalvarConversa, criarRegistro } from "../../journey/conversas";
 import "../../styles/base.css";
 import "./style.css";
 import demo from "../../journey/data/kota.journey.json";
@@ -31,8 +32,6 @@ import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
 import { mountAgentCam } from "../../components/agent-cam/agent-cam";
 import { mountJourneyPanel } from "../../components/journey-panel/journey-panel";
-import { mountEscolhaPerfil } from "../../components/escolha-perfil/escolha-perfil";
-import { escolherPerfil } from "../../journey/escolha";
 import { loadAgentVisual, type AgentVisualState } from "../../lib/agent-visual";
 import { mountPucaDots } from "../../lib/puca-dots";
 import { screenHref } from "../../lib/navigation";
@@ -91,26 +90,12 @@ function revealWords(host: HTMLElement, spoken: number): void {
   }
 }
 
-/** Escolha do perfil por cima da sessão: grava a escolha (perfil e calibragem da pessoa) e abre a sessão de novo. */
-function pedirEscolha(): void {
-  const portao = document.createElement("div");
-  portao.className = "escolha-portao";
-  document.body.appendChild(portao);
-  mountEscolhaPerfil(portao, {
-    titulo: "Antes de começar: com quem você entra na Kota?",
-    aoEscolher(vinculo) {
-      escolherPerfil(vinculo);
-      location.reload();
-    },
-  });
-}
-
 async function main(): Promise<void> {
   const journey = loadJourney(demo);
   const auto = new URLSearchParams(location.search).get("auto") === "1";
   const resolved = resolveProfile(location.search);
-  // ninguém escolheu com quem entra na Kota (sessão aberta direto, sem a escolha nem a call): pede antes de Puca falar
-  if (resolved.source === "demo") return pedirEscolha();
+  // sessão aberta direto, sem a call nem ?perfil=: quem entra na Kota sai da call inicial, que começa nas boas-vindas
+  if (resolved.source === "demo") return location.replace(screenHref("../boas-vindas/"));
   const profile = resolved.profile;
 
   // ---- Montagem da tela ----
@@ -143,6 +128,7 @@ async function main(): Promise<void> {
   el.lessonName.textContent = journey.title;
   // navegador de Puca (só no app para Mac); sem window.orbis, palco é null e a sessão segue igual
   const navegadorHost = qs(document, "#navegador-host");
+  let navegadorPedido = false; // o Puca abriu uma fonte no navegador neste passo (pedido da pessoa)
   const palco = montarPalcoNavegador(navegadorHost, qs(document, "#palco-abas"), el.boardHost, window.orbis?.navegador);
   mountPucaDots(qs(document, "#caption-orb")); // Puca na legenda: as bolinhas dele se mexendo
 
@@ -172,6 +158,12 @@ async function main(): Promise<void> {
   const tarefaDaSessao = tarefaDaPessoa(journey, profile);
   let pedidoDaSessao: string | null = null;
   const aprovacaoAvisada = new Set<string>();
+  let registro = criarRegistro("sessao");
+  let sessaoConcluida = false;
+  function salvarConversa(): void {
+    if (!registro.salvar(profile)) avisarFalhaAoSalvarConversa();
+  }
+
   const history: { role: "user" | "assistant"; content: string }[] = [];
   const remember = (role: "user" | "assistant", content: string) => {
     history.push({ role, content });
@@ -259,9 +251,11 @@ async function main(): Promise<void> {
       el.replies.replaceChildren();
       if (!running) return void start(); // "Recomeçar a sessão"
       chat.addMessage({ from: "user", text });
+      registro.anotar("user", text);
       return void falaNaConversa(text, "chat");
     }
     if (!pending || pending.kind !== "reply" || paused || ended) return;
+    if (from === "chip") registro.anotar("user", text);
     const p = pending;
     pending = null;
     el.replies.replaceChildren();
@@ -342,6 +336,7 @@ async function main(): Promise<void> {
       el.captionUser.textContent = "";
       el.captionAgent.innerHTML = captionWords(text);
       chat.addMessage({ from: "agent", text });
+      registro.anotar("assistant", text);
       remember("assistant", text);
     };
     await play({
@@ -474,6 +469,7 @@ async function main(): Promise<void> {
   async function handleUtterance(text: string, from: "chat" | "voz"): Promise<void> {
     text = text.trim();
     if (!text || paused || ended) return;
+    registro.anotar("user", text);
     if (conversa && running) {
       if (from === "voz") {
         el.captionUser.textContent = text;
@@ -747,14 +743,26 @@ async function main(): Promise<void> {
     await turno("inicio");
   }
 
+  function liberarInicio(): void {
+    brand.href = homeHref;
+    brand.setAttribute("aria-label", "Orbis, início");
+  }
+
+  function concluirSessao(): void {
+    sessaoConcluida = true;
+    salvarConversa();
+    completeSession(profile);
+    liberarInicio();
+  }
+
   function fimDaConversa(): void {
+    concluirSessao();
     running = false;
     trail.endSession();
     journeyPanel.setProgress(visitados, null);
     setAgent("done");
     el.moment.textContent = "sessão completa";
     showReplies(["Recomeçar a sessão"]);
-    el.hint.textContent = "Fim da sessão.";
   }
 
   document.addEventListener("chatpanel:send", (e) => void handleUtterance(e.detail.text, "chat"));
@@ -778,6 +786,8 @@ async function main(): Promise<void> {
     ended = true;
     tomarAVez(); // corta a voz; a fala do passo que estava tocando volta quando a call voltar
     voice.stopListening(); // e o microfone desliga (para de mandar áudio ao STT)
+    salvarConversa();
+    liberarInicio();
     trail.endSession();
     clock.setEnded(true);
     cam.hide();
@@ -852,11 +862,15 @@ async function main(): Promise<void> {
     // Até onde a fala já chegou (em caracteres): move a legenda e dispara as ações marcadas com `at`.
     const ends = [...text.matchAll(/\S+/g)].map((m) => m.index + m[0].length);
     let spoken = 0;
+    let atualizarFala: ((texto: string) => void) | undefined;
     let next = 0;
     el.captionAgent.innerHTML = captionWords(text, highlight);
     const advance = (to: number) => {
       if (to <= spoken) return;
       spoken = to;
+      const trecho = text.slice(0, spoken);
+      if (atualizarFala) atualizarFala(trecho);
+      else atualizarFala = registro.anotar("assistant", trecho);
       revealWords(el.captionAgent, spoken);
       while (next < cues.length && cues[next].at < spoken) io.apply(cues[next++].action);
     };
@@ -928,10 +942,11 @@ async function main(): Promise<void> {
     apply(a) {
       if (a.type === "navegador") {
         palco?.executar(a.acao); // vale em qualquer vista, até sem quadro
+        navegadorPedido = true; // fica na tela até o próximo passo, mesmo que o turno também mexa no quadro
         return;
       }
       // passo sem navegador: o palco volta ao quadro, para a pessoa ver o que a ação mexe
-      if (!currentStep?.actions?.some((x) => x.type === "navegador")) palco?.mostrarQuadro();
+      if (!navegadorPedido && !currentStep?.actions?.some((x) => x.type === "navegador")) palco?.mostrarQuadro();
       if (!board) return;
       switch (a.type) {
         case "reveal": return board.reveal(a.targets);
@@ -993,6 +1008,7 @@ async function main(): Promise<void> {
     },
     onStep(s, m) {
       currentStep = s;
+      navegadorPedido = false;
       entregarTarefa(s, m.id);
       emit("journey:step", { id: s.id, moment: m.id });
     },
@@ -1014,6 +1030,10 @@ async function main(): Promise<void> {
 
   // ---- Rodar / recomeçar ----
   async function start(): Promise<void> {
+    if (sessaoConcluida) {
+      registro = criarRegistro("sessao");
+      sessaoConcluida = false;
+    }
     iniciando = true;
     clock.cancel(); // derruba esperas da execução anterior
     pending?.reject(new Cancelled());
@@ -1039,11 +1059,7 @@ async function main(): Promise<void> {
       puloPendente = null;
       if (pulo) pularPara(pulo);
       const result = await run;
-      if (result.ended === "done") {
-        completeSession(profile);
-        brand.href = homeHref;
-        brand.setAttribute("aria-label", "Orbis, início");
-      }
+      if (result.ended === "done") concluirSessao();
       running = false;
       trail.endSession();
       journeyPanel.setProgress(visitados, null);

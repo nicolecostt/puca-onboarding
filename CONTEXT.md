@@ -151,7 +151,7 @@ O que acompanha o kit para o jurado: quem ele é na história, como escolher o p
 _Avoid_: manual, tutorial
 
 **Jurado**:
-Quem avalia o Orbis no hackathon. Vive a pessoa: escolhe o perfil e passa pela jornada.
+Quem avalia o Orbis no hackathon. Vive a pessoa: diz na call inicial se é novo ou está mudando de time e passa pela jornada.
 _Avoid_: avaliador, juiz
 
 ## Negócio

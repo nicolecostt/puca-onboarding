@@ -1,7 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { DEMO_CALIBRAGENS, resolveCalibragem } from "../calibragem";
-import { ID_DO_VINCULO, escolherPerfil } from "../escolha";
+import { DEMO_CALIBRAGENS, resolveCalibragem, saveCalibragem } from "../calibragem";
 import { DEMO_PROFILES, loadSavedProfile, profileFromAnswers, resolveProfile, saveProfile } from "../profile";
+import type { Vinculo } from "../types";
+
+/** O que o fim da call (ou a saída sem LLM) grava: perfil e calibragem da pessoa. */
+function gravar(vinculo: Vinculo): void {
+  saveProfile(DEMO_PROFILES[vinculo]);
+  saveCalibragem(DEMO_CALIBRAGENS[vinculo]);
+}
 
 /** Storage de mentira no lugar do sessionStorage (navegador) e do localStorage (app para Mac): onboardingStore(). */
 function instalarStorage(): Map<string, string> {
@@ -21,7 +27,7 @@ function instalarStorage(): Map<string, string> {
   return dados;
 }
 
-describe("escolha do perfil", () => {
+describe("perfil salvo depois da call", () => {
   let dados: Map<string, string>;
   beforeEach(() => {
     dados = instalarStorage();
@@ -31,24 +37,24 @@ describe("escolha do perfil", () => {
     Reflect.deleteProperty(globalThis, "sessionStorage");
   });
 
-  it("a escolha por cima da sessão fica salva e a sessão abre com ela", () => {
-    escolherPerfil("novo");
+  it("o perfil gravado fica salvo e a sessão abre com ele", () => {
+    gravar("novo");
     expect(dados.has("puca:profile")).toBe(true);
     expect(loadSavedProfile()).toEqual(DEMO_PROFILES.novo);
     expect(resolveProfile("")).toEqual({ profile: DEMO_PROFILES.novo, source: "entrevista" });
   });
 
-  it("sem escolha nem ?perfil=, a sessão sabe que ninguém escolheu", () => {
+  it("sem call nem ?perfil=, a sessão sabe que ninguém passou pela call", () => {
     expect(resolveProfile("").source).toBe("demo");
   });
 
-  it("?perfil= vence o perfil escolhido", () => {
-    escolherPerfil("novo");
+  it("?perfil= vence o perfil salvo", () => {
+    gravar("novo");
     expect(resolveProfile("?perfil=bruno").profile).toEqual(DEMO_PROFILES.transicao);
   });
 
-  it("a escolha leva a calibragem da mesma pessoa", () => {
-    escolherPerfil("novo");
+  it("o perfil salvo leva a calibragem da mesma pessoa", () => {
+    gravar("novo");
     expect(resolveCalibragem("").calibragem).toEqual(JSON.parse(JSON.stringify(DEMO_CALIBRAGENS.novo)));
   });
 
@@ -56,20 +62,15 @@ describe("escolha do perfil", () => {
     saveProfile(DEMO_PROFILES.novo);
     expect(resolveCalibragem("").calibragem).toEqual(DEMO_CALIBRAGENS.novo);
   });
-
-  it("cada vínculo é um perfil da demo", () => {
-    expect(ID_DO_VINCULO).toEqual({ novo: "ana", transicao: "bruno" });
-    expect(escolherPerfil("transicao")).toEqual(DEMO_PROFILES.transicao);
-  });
 });
 
-describe("call inicial depois da escolha", () => {
-  it("o vínculo escolhido vence a resposta livre", () => {
+describe("call inicial com o vínculo já conhecido (?perfil=)", () => {
+  it("o vínculo conhecido vence a resposta livre", () => {
     expect(profileFromAnswers({ nome: "Ana", vinculo: "estou mudando de time" }, "novo").vinculo).toBe("novo");
     expect(profileFromAnswers({ nome: "Bruno" }, "transicao").vinculo).toBe("transicao");
   });
 
-  it("sem escolha, o vínculo continua vindo da resposta", () => {
+  it("sem ?perfil=, o vínculo vem da resposta na call", () => {
     expect(profileFromAnswers({ nome: "Bruno", vinculo: "estou mudando de time" }).vinculo).toBe("transicao");
   });
 });

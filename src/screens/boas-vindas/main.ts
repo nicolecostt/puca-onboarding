@@ -1,33 +1,26 @@
-// Entrada do Orbis: a call inicial começa nas boas-vindas. Na primeira abertura, a pessoa escolhe com quem entra na
-// Kota (PRODUCT.md §13.1): Ana, entrando na empresa, ou Bruno, mudando de time. A escolha vai para a call como
-// ?perfil= (a call usa a admissão dessa pessoa e não pergunta de novo o vínculo); o perfil só fica salvo no fim da call.
+// Entrada do Orbis: o app sempre abre aqui (boas-vindas → call inicial → Início → sessão); perfil salvo de outra vez
+// não pula a call. Quem entra (Ana, entrando na Kota, ou Bruno, mudando de time; PRODUCT.md §13.1) Puca descobre na
+// call. O link de apresentação (?perfil=ana|bruno) cumprimenta a pessoa e leva o vínculo já anotado para a call.
+// O e-mail do Slack da Kota (#209) fica aqui, antes da primeira sessão.
 import "../../styles/base.css";
 import "./style.css";
 import { activeProfile } from "../../data";
-import { mountEscolhaPerfil } from "../../components/escolha-perfil/escolha-perfil";
-import { ID_DO_VINCULO } from "../../journey/escolha";
+import { loadSavedProfile } from "../../journey/profile";
 import { preserveProfileLinks } from "../../lib/navigation";
 import { qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
+import { montarEmailDoSlack } from "./email-slack";
 
-// O app sempre abre aqui: boas-vindas → call inicial → Início → sessão. Perfil salvo de outra vez não pula a entrevista.
 if (new URLSearchParams(location.search).get("perfil")) {
-  // perfil já escolhido no endereço (link de apresentação): cumprimenta e vai direto para a call
   preserveProfileLinks();
   const profile = activeProfile("ana");
   qs(document, "#title").textContent = `Oi, ${profile.nickname}.`;
   qs(document, "#who").textContent = profile.name;
-  particulas(".topbar__row > *, .home__title, .home__lead, .home__actions > *");
-} else {
-  const home = qs(document, ".home");
-  home.classList.add("home--escolha");
-  home.replaceChildren();
-  mountEscolhaPerfil(home, {
-    aoEscolher: (vinculo) => location.assign(`./?perfil=${ID_DO_VINCULO[vinculo]}`), // escolha → welcome → call
-  });
-  particulas(".topbar__row > *, .escolha__titulo, .escolha__texto, .escolha__cartao");
 }
-
-function particulas(occluders: string): void {
-  mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), { occluders, max: 40 });
-}
+// reabrir o app depois da call: o Início fica a um clique, sem refazer a call (revisão do #221)
+qs(document, "#go-inicio").hidden = !loadSavedProfile();
+montarEmailDoSlack(qs(document, ".home"));
+mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
+  occluders: ".topbar__row > *, .home__title, .home__lead, .home__actions > *, .slack-email",
+  max: 40,
+});

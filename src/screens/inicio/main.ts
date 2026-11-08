@@ -3,6 +3,7 @@
 // No canto, "Ligar para Puca" abre a câmera dele, com voz e chat; cada fala passa por journey/route.ts.
 import "../../styles/base.css";
 import "./style.css";
+import { montarConversas } from "./conversas";
 import { preserveProfileLinks, screenHref } from "../../lib/navigation";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
@@ -29,7 +30,7 @@ import { TOOLS, tasksFor, type AccessStatus, type TaskState, type Tool } from ".
 // ---- Quem é a pessoa: o que a call inicial salvou (ou o ?perfil=), completado pelo perfil da demo do mesmo vínculo ----
 const { profile, source } = resolveProfile(location.search);
 
-// Sem perfil nenhum, as boas-vindas pedem a escolha. Vindo da call inicial, o Início abre antes da sessão e leva a ela.
+// Sem perfil nenhum, a pessoa vai para as boas-vindas e a call inicial. Vindo da call inicial, o Início abre antes da sessão e leva a ela.
 const sessaoFeita = sessionCompleted(profile);
 if (source === "demo") {
   location.replace(screenHref("../boas-vindas/"));
@@ -40,6 +41,7 @@ if (source === "demo") {
 function renderHome(): void {
   preserveProfileLinks();
   qs(document, "main").removeAttribute("hidden");
+  montarConversas(qs(document, "#conversas"), profile);
   if (!sessaoFeita) {
     const link = document.querySelector<HTMLAnchorElement>('.orbis-link[href^="../lesson/"]');
     if (link) link.textContent = "Começar sessão";

@@ -396,7 +396,7 @@ body.is-call-off .agent-cam,
 body.is-call-off .call-dock {
   display: none;
 }
-/* o botão do centro é a única coisa a fazer: a legenda e a abertura (que ficam no mesmo lugar) saem, o quadro esmaece */
+/* Ao encerrar, a legenda e a abertura saem e o quadro esmaece. */
 body.is-call-off .caption,
 body.is-call-off .opening {
   visibility: hidden;
@@ -439,16 +439,4 @@ body.is-call-off .lesson__board {
 .forward-toast a {
   color: var(--color-ink);
   font-weight: 600;
-}
-
-/* ---- Escolha do perfil por cima da sessão (ninguém escolheu antes): components/escolha-perfil ---- */
-.escolha-portao {
-  position: fixed;
-  inset: 0;
-  z-index: 1001; /* acima da barra de call, da câmera e do chat */
-  display: grid;
-  place-items: center;
-  padding: 24px 16px;
-  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  backdrop-filter: blur(6px);
 }
