@@ -11,7 +11,7 @@ o que não estiver no código, numa issue, num PR ou nestes docs, os outros agen
 - Formato da jornada: [`docs/journey-format.md`](docs/journey-format.md).
 - Como rodar e a estrutura de pastas: [`README.md`](README.md).
 - Contratos entre partes do sistema: [`docs/contratos.md`](docs/contratos.md).
-- Decisões técnicas: [`docs/decisoes/`](docs/decisoes/).
+- Decisões técnicas: [`docs/decisoes/`](docs/decisoes/). Stack e guia de implementação: [`docs/stack.md`](docs/stack.md).
 - Roteiro e testes da demo: [`docs/demo.md`](docs/demo.md).
 - Tarefas: GitHub Issues, por label (`app`, `voz`, `company-brain`, `demo`, `teste`, `negocio`, `acesso`).
 
@@ -51,7 +51,11 @@ Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o
 ## Regras do projeto
 
 - A resposta nunca espera o LLM. Toda fala passa por `src/journey/route.ts`, do caminho mais barato ao mais caro; o LLM é o último.
-- A sessão (`src/screens/lesson/`) conduz a jornada no browser; o servidor só dá voz e LLM.
+- A sessão (`src/screens/lesson/`) conduz a jornada no app; o servidor dá voz, LLM e as ações nos sistemas da Kota
+  (Slack, GitHub), sem guardar estado de sessão: o que precisa durar vai para o Supabase ([`docs/stack.md`](docs/stack.md) §5).
+- Telas rodam no app para Mac (Electron, decisões 0004 e 0008). A `live-session` é a casa do navegador da Puca, que fica
+  por cima do HTML: barra de call, chat e câmera vão **em volta** da área dele, nunca por cima. Recurso do app só com
+  `window.orbis`; sem ele (`npm run dev` no navegador), a tela segue com o simulado ([`docs/stack.md`](docs/stack.md) §3.2 e §4.2).
 - Sem fonte confiável, a Puca diz que não confirmou e encaminha para a buddy. Nunca inventar responsável por um sistema.
 - Textos de interface, comentários e docs em português.
 - Framework, banco, serviço externo ou mudança de stack: registre a decisão em `docs/decisoes/` antes de implementar.

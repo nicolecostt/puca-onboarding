@@ -22,7 +22,8 @@ PRs, CI, base do sistema depois do merge). Se não passou, rode você. Esses fat
    `vite.config.ts`/`index.html`; jornada de demo inválida; fala nova fora de `src/journey/route.ts` ou esperando o LLM.
 3. **Regras do produto e do repo:** a Puca inventando fonte ou responsável (§4.3), privacidade do painel (§5), limites
    do hackathon, chave de API no browser, segredo ou `.env` no diff, `sandbox/` ou `dist/` commitados, cor/fonte solta
-   em vez das variáveis de `src/styles/tokens.css`.
+   em vez das variáveis de `src/styles/tokens.css`; tela que põe controle por cima da área do navegador da Puca na
+   `live-session` ou que usa `window.orbis` sem o caminho simulado do `npm run dev` (`docs/stack.md` §4.2).
 4. **Base do sistema:** `PRODUCT.md`/`CONTEXT.md` fora do padrão (o `pr-check` já valida depois do merge) ou texto
    novo com termo que o glossário manda evitar.
 

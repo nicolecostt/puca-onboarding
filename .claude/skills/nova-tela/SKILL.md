@@ -29,6 +29,17 @@ Pedido: $ARGUMENTS
    Isso é contrato: veja a skill `contrato`.
 4. Atualize a árvore de `src/components/` no `README.md`.
 
+## No app para Mac
+
+As telas rodam dentro do app Electron ([`docs/stack.md`](../../../docs/stack.md) §3 e §4, decisão 0008).
+
+- Recurso do app (navegador da Puca, microfone do sistema) só com `if (window.orbis)`. Sem ele, no `npm run dev` do
+  navegador, a tela continua funcionando com o simulado de hoje.
+- O navegador da Puca é desenhado **por cima** do HTML do Orbis. Tela que mostra o navegador (a `live-session`) reserva
+  uma área para ele, mede com `getBoundingClientRect` + `ResizeObserver` e chama `window.orbis.navegador.mostrar(bounds)`.
+  Barra de call, chat e câmera ficam em volta dessa área, nunca por cima.
+- O que a Puca desenha sobre um site (cursor, círculo, cartão) fica na camada do app, não no front.
+
 ## Regras de visual
 
 - Cores, fontes, raios e sombras só por variáveis de `src/styles/tokens.css`. Valor novo entra lá, não solto no CSS.
