@@ -3,6 +3,7 @@
 // No canto, "Ligar para Puca" abre a câmera dele, com voz e chat; cada fala passa por journey/route.ts.
 import "../../styles/base.css";
 import "./style.css";
+import { montarConversas } from "./conversas";
 import { preserveProfileLinks, screenHref } from "../../lib/navigation";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
@@ -40,6 +41,7 @@ if (source === "demo") {
 function renderHome(): void {
   preserveProfileLinks();
   qs(document, "main").removeAttribute("hidden");
+  montarConversas(qs(document, "#conversas"), profile);
   if (!sessaoFeita) {
     const link = document.querySelector<HTMLAnchorElement>('.orbis-link[href^="../lesson/"]');
     if (link) link.textContent = "Começar sessão";

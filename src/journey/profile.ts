@@ -71,6 +71,11 @@ export function loadSavedProfile(): Profile | null {
   }
 }
 
+/** Identifica o mesmo perfil nos registros locais de andamento e conversas. */
+export function escopoDoPerfil(profile: Profile): string {
+  return JSON.stringify([profile.vinculo, profile.nome, profile.time, profile.cargo]);
+}
+
 /** ?perfil= aceita o vínculo (novo | transicao) ou o perfil da demo (ana | bruno). */
 const URL_PROFILES: Record<string, Vinculo> = { novo: "novo", transicao: "transicao", ana: "novo", bruno: "transicao" };
 
