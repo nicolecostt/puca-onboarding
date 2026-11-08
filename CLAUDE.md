@@ -1,6 +1,6 @@
 # Instruções para agentes
 
-Front do Orbis + servidor do Puca (agente de onboarding por voz). Vite + TypeScript sem framework; servidor Fastify sem estado em `server/`.
+Front do Orbis + servidor de Puca (agente de onboarding por voz). Vite + TypeScript sem framework; servidor Fastify sem estado em `server/`.
 
 Somos 4 pessoas, cada uma com seu agente, e todo mundo mexe um pouco em tudo. Sessões não compartilham memória:
 o que não estiver no código, numa issue, num PR ou nestes docs, os outros agentes não sabem.
@@ -49,18 +49,36 @@ O critério de tudo é a demo: call inicial → jornada → sessão no quadro �
 mais uma pergunta que muda o rumo e uma dúvida que vira encaminhamento ([`docs/demo.md`](docs/demo.md)).
 Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o fluxo. Label `se-der-tempo` fica por último.
 
+### Reta final (08/11: implementação até 12:00, submissão às 13:00)
+
+O hook `scripts/reta-final.sh` diz a cada mensagem quanto falta e a fase (`[reta-final]`). Até a submissão, estas regras
+valem por cima do resto deste arquivo e das skills (decisão 0010). Git seguro, segredos e os guardas de merge continuam.
+
+- **Só o fluxo da demo.** Trabalhe só no que faz um passo de [`docs/demo.md`](docs/demo.md) funcionar ou deixar de quebrar.
+  Polimento, refatoração, `se-der-tempo` e doc que não é da demo ficam para depois.
+- **Decida e siga.** Sem pergunta que dá para resolver sozinho: escolha o caminho mais simples que funciona e diga no fim
+  o que escolheu. Pergunte só se muda o que a demo mostra ou se for destrutivo.
+- **Simulado vale.** Se o real (API externa, app, integração) não fecha a tempo, mantenha o fluxo de pé com dado fixo ou
+  o simulado que já existe, e diga isso no PR.
+- **Cerimônia mínima:** em `comecar-tarefa`, leia só o que a tarefa toca; lacuna fora do escopo vira uma linha no PR, não
+  issue (item 4); `docs/decisoes/` só se mudar a stack; no meio do trabalho, `npm run typecheck` e o teste do que mudou,
+  `npm run check` só antes do PR; `acompanhar-pr` em segundo plano, sem travar a próxima tarefa.
+- **Travou 15 min no mesmo problema?** Pare, diga o que tentou e proponha cortar ou simular.
+- **Paralelize** tarefas independentes (subagentes, `claude -w <nome>`). Respostas curtas: o que mudou, o que rodou, o que falta.
+- **Depois das 12:00:** nada de feature; só correção de bug que quebra a demo e a skill `checar-demo` depois de cada merge.
+
 ## Regras do projeto
 
 - A sessão nunca fica muda. O LLM conduz cada turno (`/api/turn`, decisão 0010) com a jornada como pauta, e a ponte
   cobre a espera; sem servidor, sem LLM ou com a trava esgotada, a sessão segue a jornada como roteiro pela `src/journey/route.ts`.
 - A sessão (`src/screens/lesson/`) guarda onde a jornada está no app; o servidor dá voz, LLM e as ações nos sistemas da Kota
   (Slack, GitHub), sem guardar estado de sessão: o que precisa durar vai para o Supabase ([`docs/stack.md`](docs/stack.md) §5).
-- Telas rodam no app para Mac (Electron, decisões 0004 e 0008). A `live-session` é a casa do navegador do Puca, que fica
+- Telas rodam no app para Mac (Electron, decisões 0004 e 0008). A `live-session` é a casa do navegador de Puca, que fica
   por cima do HTML: barra de call, chat e câmera vão **em volta** da área dele, nunca por cima (vale para o navegador
   de verdade; o Slack simulado de hoje continua com os controles por cima e não sai). Recurso do app só com
   `window.orbis`, depois de o formato estar em `docs/contratos.md`; sem ele (`npm run dev` no navegador), a tela segue
   com o simulado ([`docs/stack.md`](docs/stack.md) §3.2 e §4.2).
-- Sem fonte confiável, o Puca diz que não confirmou e encaminha para a buddy. Nunca inventar responsável por um sistema.
+- Sem fonte confiável, Puca diz que não confirmou e encaminha para a buddy. Nunca inventar responsável por um sistema.
 - Textos de interface, comentários e docs em português.
 - Framework, banco, serviço externo ou mudança de stack: registre a decisão em `docs/decisoes/` antes de implementar.
 

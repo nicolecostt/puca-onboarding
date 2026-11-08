@@ -1,0 +1,29 @@
+# Release do app para Mac (docs/stack.md §3.4): cada tag v* gera os dois .zip e as somas e publica no GitHub.
+name: Release do app
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  mac:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:app
+      - name: Publicar o Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            release/Orbis-mac-arm64.zip release/Orbis-mac-arm64.zip.sha256 \
+            release/Orbis-mac-x64.zip release/Orbis-mac-x64.zip.sha256 \
+            --title "Orbis $GITHUB_REF_NAME" --notes "Instalar: veja a seção App para Mac do README."

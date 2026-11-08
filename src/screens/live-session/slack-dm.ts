@@ -1,4 +1,4 @@
-// Mexe no Slack simulado da Tail como o Puca mexeria no de verdade (computer use, #21): abre a DM,
+// Mexe no Slack simulado da Kota como Puca mexeria no de verdade (computer use, #21): abre a DM,
 // digita no campo de mensagem e envia. Todo texto entra por textContent: a fala da pessoa nunca vira HTML.
 import type { AgentCursor } from "../../components/agent-cursor/agent-cursor";
 
@@ -28,7 +28,7 @@ export function openDm(name: string): void {
     const h2 = document.createElement("h2");
     h2.textContent = name;
     const p = document.createElement("p");
-    p.textContent = `Esta é a sua conversa com ${name}. O Puca escreve aqui quando precisa de ajuda com uma dúvida ou de uma aprovação.`;
+    p.textContent = `Esta é a sua conversa com ${name}. Puca escreve aqui quando precisa de ajuda com uma dúvida ou de uma aprovação.`;
     intro.append(h2, p);
     feed.replaceChildren(intro);
   }
@@ -79,7 +79,7 @@ export function postMessage(m: { author: string; avatar: string; tone: "blue" | 
   return body;
 }
 
-/** Pedido de aprovação do Puca: a mensagem, o link para a página da tarefa e o botão que o gestor clica. */
+/** Pedido de aprovação de Puca: a mensagem, o link para a página da tarefa e o botão que o gestor clica. */
 export function postApprovalRequest(m: { text: string; time: string; link: string; onApprove: () => void }): HTMLButtonElement {
   const body = postMessage({ author: "Puca", avatar: "P", tone: "puca", text: m.text, time: m.time });
   const actions = document.createElement("div");

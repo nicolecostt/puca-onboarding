@@ -1,6 +1,6 @@
 // Início do Orbis: progresso no topo, perfil, tarefas (à esquerda) e ferramentas com o estado de cada acesso
-// (à direita). Ao abrir, o Puca confere os acessos e avisa o que falta (o pedido ao gestor ainda é simulado, #104).
-// No canto, "Ligar para o Puca" abre a câmera dele, com voz e chat; cada fala passa por journey/route.ts.
+// (à direita). Ao abrir, Puca confere os acessos e avisa o que falta (o pedido ao gestor ainda é simulado, #104).
+// No canto, "Ligar para Puca" abre a câmera dela, com voz e chat; cada fala passa por journey/route.ts.
 import "../../styles/base.css";
 import "./style.css";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
@@ -13,13 +13,14 @@ import { mountPucaDots } from "../../lib/puca-dots";
 import { company, profiles } from "../../data";
 import { resolveProfile } from "../../journey/profile";
 import { normalize } from "../../journey/conditions";
+import { lerEmailDoSlack, salvarEmailDoSlack } from "../../journey/slack-real";
 import { browserStore } from "../../journey/storage";
 import { loadJourney } from "../../journey/validate";
 import { routeUtterance, type Route } from "../../journey/route";
 import { buildFaqs } from "../../journey/faq";
 import { createTrail } from "../../journey/trail";
 import { tarefaDaPessoa } from "../../journey/primeira-tarefa";
-import demoJourney from "../../journey/data/tail.journey.json";
+import demoJourney from "../../journey/data/kota.journey.json";
 import { createAgentVoice, MIC_AVISO } from "../../voice/agent-voice";
 import { TOOLS, TRAIL, tasksFor, type AccessStatus, type TaskState, type Tool } from "./data";
 
@@ -96,7 +97,23 @@ function renderTools(changed?: string): void {
 }
 renderTools();
 
-// O Puca confere os acessos ao abrir e avisa o que falta. Ele ainda não pede ao gestor de verdade (#104): não diz que pediu.
+// E-mail do jurado no Slack da Kota: o encaminhamento sai por mensagem direta a ele (#129, src/journey/slack-real.ts)
+const slackForm = qs<HTMLFormElement>(document, "#slack-email");
+const slackInput = qs<HTMLInputElement>(document, "#slack-email-input");
+const slackStatus = qs(document, "#slack-email-status");
+slackInput.value = lerEmailDoSlack(browserStore()) ?? "";
+slackForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  salvarEmailDoSlack(browserStore(), slackInput.value);
+  const salvo = lerEmailDoSlack(browserStore());
+  slackStatus.textContent = salvo
+    ? "Pronto: as dúvidas que eu não souber vão por mensagem direta no Slack da Kota."
+    : slackInput.value.trim()
+      ? "Esse e-mail não parece válido. Sem ele, as dúvidas ficam só aqui no Orbis."
+      : "Sem e-mail: as dúvidas que eu não souber ficam só aqui no Orbis.";
+});
+
+// Puca confere os acessos ao abrir e avisa o que falta. Ela ainda não pede ao gestor de verdade (#104): não diz que pediu.
 let lastNotice = "";
 function checkAccess(): void {
   const missing = tools.filter((t) => t.status === "missing");
@@ -125,7 +142,7 @@ async function main(): Promise<void> {
   const chat = mountChatPanel({ title: "Puca", messages: [] });
   const cam = mountAgentCam({ name: "Puca", visual: factory });
   const bar = mountCallBar({ chat, attachTo: cam });
-  // começa desligada: no canto fica só "Ligar para o Puca"
+  // começa desligada: no canto fica só "Ligar para Puca"
   cam.hide();
   bar.end();
 
@@ -206,7 +223,7 @@ async function main(): Promise<void> {
     else voice.resume();
   });
 
-  /** Resposta do Puca no início, pelo caminho que a rota escolheu. O que é da sessão (FAQ do quadro, conhecimento,
+  /** Resposta de Puca no início, pelo caminho que a rota escolheu. O que é da sessão (FAQ do quadro, conhecimento,
    *  pulo, primeira tarefa) vem da jornada; o "ask" fica com o que esta tela sabe (acessos, tarefas, pessoas).
    *  Sem fonte, não inventa e não encaminha daqui: indica a sessão e a buddy. */
   function answer(question: string, route: Route): string {
@@ -244,8 +261,8 @@ async function main(): Promise<void> {
     if (/sessao|aula|quadro|comecar/.test(q)) {
       return "Sua primeira sessão mostra o caminho de uma transação, o que acontece quando falha e quem cuida de cada parte. É só clicar em Começar a sessão.";
     }
-    if (/buddy|paula/.test(q)) return `Sua buddy é ${buddy}. Ela te acompanha nas primeiras semanas.`;
-    if (/gestor|marcos|chefe/.test(q)) return `Seu gestor é ${gestor}, do time ${time}.`;
+    if (/buddy|beatriz/.test(q)) return `Sua buddy é ${buddy}. Ela te acompanha nas primeiras semanas.`;
+    if (/gestor|natalia|natália|chefe/.test(q)) return `Seu gestor é ${gestor}, do time ${time}.`;
     if (/^(oi|ola|bom dia|boa tarde|boa noite)\b|obrigad/.test(q)) return "Estou por aqui. Pode perguntar sobre seus acessos, suas tarefas ou o time.";
     return `Isso eu não tenho confirmado aqui no início. Na sua primeira sessão eu vejo com você; se não estiver lá, pergunta para ${buddy}, sua buddy, no Slack.`;
   }

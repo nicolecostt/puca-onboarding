@@ -24,7 +24,7 @@ declare global {
     "journey:step": CustomEvent<{ id: string; moment: string }>;
     /** Painel "Sua jornada": a pessoa clicou num momento (a tela pula para o início dele). */
     "journeypanel:pick": CustomEvent<{ id: string }>;
-    /** A câmera do Puca mudou de lugar ou de visibilidade (a barra presa nela acompanha). */
+    /** A câmera de Puca mudou de lugar ou de visibilidade (a barra presa nela acompanha). */
     "agentcam:move": CustomEvent<{ rect: DOMRect; visible: boolean }>;
   }
 }

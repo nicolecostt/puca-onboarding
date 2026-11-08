@@ -27,7 +27,7 @@ export interface CallBarOptions {
   parent?: HTMLElement;
   /** false = barra fixa no lugar padrão, sem arrastar (padrão: true). */
   draggable?: boolean;
-  /** Prende a barra embaixo da câmera do Puca, compacta e da largura dela. Arrastar a câmera leva as duas. */
+  /** Prende a barra embaixo da câmera de Puca, compacta e da largura dela. Arrastar a câmera leva as duas. */
   attachTo?: AgentCam;
 }
 
@@ -69,9 +69,9 @@ export function mountCallBar(opts: CallBarOptions = {}): CallBar {
         </button>
       </div>
     </div>
-    <button class="call-redial" data-act="start" aria-label="Ligar para o Puca" tabindex="-1">
+    <button class="call-redial" data-act="start" aria-label="Ligar para Puca" tabindex="-1">
       <span class="call-redial__icon">${PHONE_SVG}</span>
-      <span class="call-redial__label">Ligar para o Puca</span>
+      <span class="call-redial__label">Ligar para Puca</span>
     </button>`;
   (opts.parent ?? document.body).appendChild(dock);
 

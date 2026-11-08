@@ -4,6 +4,7 @@
 import type { BoardAction, Profile } from "../journey/types";
 import { classifyBargeIn } from "./barge-in";
 import { startMic, type Mic } from "./mic";
+import { apiUrl } from "./api";
 import { PcmPlayer } from "./pcm-player";
 import { createSttSession, type SttSession } from "./stt-session";
 import type { WordTiming } from "./types";
@@ -147,7 +148,7 @@ export interface AgentVoice {
 }
 
 export async function createAgentVoice(): Promise<AgentVoice> {
-  const health = await fetch("/api/health")
+  const health = await fetch(apiUrl("/api/health"))
     .then((r) => (r.ok ? r.json() : null))
     .catch(() => null);
   const tts = !!health?.tts;
@@ -177,7 +178,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
 
   /** Busca os tempos das palavras de um áudio do servidor; [] se não vierem. */
   function wordsOf(id: string): Promise<WordTiming[]> {
-    return fetch(`/api/tts/${id}/words`)
+    return fetch(apiUrl(`/api/tts/${id}/words`))
       .then((r) => (r.ok ? r.json() : { words: [] }))
       .then((b: { words?: WordTiming[] }) => b.words ?? [])
       .catch(() => []);
@@ -217,7 +218,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
   }
 
   async function speakAudio(text: string, withWords: boolean): Promise<Audio> {
-    const r = await fetch("/api/speak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
+    const r = await fetch(apiUrl("/api/speak"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
     if (!r.ok) throw new Error(`speak HTTP ${r.status}`);
     const { id, audio_url } = (await r.json()) as { id: string; audio_url: string };
     return { audio_url, words: withWords ? wordsOf(id) : undefined };
@@ -227,7 +228,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
   async function openSession(h: ListenHandlers): Promise<void> {
     const s = createSttSession({
       getToken: async () => {
-        const r = await fetch("/api/voice/token", { method: "POST" });
+        const r = await fetch(apiUrl("/api/voice/token"), { method: "POST" });
         if (!r.ok) throw new Error("microfone indisponível");
         return r.json();
       },
@@ -335,7 +336,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       askAbort = ac;
       let res: Response;
       try {
-        res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req), signal: ac.signal });
+        res = await fetch(apiUrl(url), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req), signal: ac.signal });
       } catch {
         return false;
       }

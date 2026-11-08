@@ -1,4 +1,4 @@
-// Partículas coloridas do Puca no fundo da página: os pontos da esfera soltos, subindo devagar.
+// Partículas coloridas de Puca no fundo da página: os pontos da esfera soltos, subindo devagar.
 // Ficam atrás de tudo: somem ao passar por trás dos elementos que o seletor `occluders` aponta
 // (textos, botões, a esfera…) e reaparecem do outro lado. Usadas na landing e nas telas do app.
 

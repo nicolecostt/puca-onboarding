@@ -1,5 +1,5 @@
 /* Landing do Orbis: cartaz suíço. Grade de 12 colunas, preto no branco, fios de 1px.
-   A única cor é a do Puca (--puca-holo-stops e a esfera), em poucos pontos. */
+   A única cor é a de Puca (--puca-holo-stops e a esfera), em poucos pontos. */
 :root {
   --ink: var(--color-text);
   --paper: var(--color-surface);
@@ -78,7 +78,7 @@ h3 {
   top: 12px;
 }
 
-/* ---- Partículas do Puca no fundo da página ---- */
+/* ---- Partículas de Puca no fundo da página ---- */
 .particles {
   position: fixed;
   inset: 0;
@@ -126,7 +126,7 @@ main,
 }
 
 .brand__mark {
-  /* logo: as bolinhas do Puca (src/assets/orbis-logo.png) */
+  /* logo: as bolinhas de Puca (src/assets/orbis-logo.png) */
   display: block;
   flex: none;
   width: 26px;
@@ -342,7 +342,7 @@ main,
   color: var(--dim);
 }
 
-/* foco do Puca: o único anel colorido */
+/* foco de Puca: o único anel colorido */
 .node.is-focus::after {
   content: "";
   position: absolute;
@@ -421,7 +421,7 @@ main,
   border-radius: 50%;
 }
 
-/* ---- O Puca ---- */
+/* ---- Puca ---- */
 .puca {
   padding-top: clamp(96px, 12vw, 168px);
 }
@@ -603,6 +603,119 @@ main,
   color: var(--grey);
 }
 
+/* ---- Instalar ---- */
+.install {
+  padding-top: clamp(96px, 12vw, 168px);
+  scroll-margin-top: 72px;
+}
+
+.install__intro {
+  grid-column: 1 / span 5;
+}
+
+.install__title {
+  font-size: clamp(32px, 3.6vw, 52px);
+  line-height: 1.04;
+}
+
+.install__intro p {
+  margin: 20px 0 0;
+  max-width: 40ch;
+  color: var(--grey);
+}
+
+.install__steps {
+  grid-column: 7 / span 6;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: passo;
+  border-top: 1px solid var(--ink);
+}
+
+.step {
+  position: relative;
+  padding: 22px 0 22px 44px;
+  border-bottom: 1px solid var(--rule);
+  counter-increment: passo;
+}
+
+.step::before {
+  content: counter(passo);
+  position: absolute;
+  left: 0;
+  top: 22px;
+  font-family: var(--font-display);
+  font-size: 19px;
+  color: var(--dim);
+}
+
+.step h3 {
+  font-size: 19px;
+}
+
+.step p {
+  margin: 8px 0 0;
+  color: var(--grey);
+}
+
+.step .actions {
+  margin-top: 8px;
+  gap: 0 24px;
+}
+
+.cmd {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 10px 10px 10px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+}
+
+.cmd__text {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.cmd__copy {
+  flex: none;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.step code:not(.cmd__text),
+.install__note code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+kbd {
+  padding: 1px 6px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.9em;
+}
+
+.install__note {
+  grid-column: 7 / span 6;
+  margin: 24px 0 0;
+  font-size: 13px;
+  color: var(--grey);
+}
+
+.install__note a {
+  color: var(--ink);
+}
+
 /* ---- Fechamento ---- */
 .close {
   position: relative;
@@ -678,8 +791,14 @@ main,
     grid-column: 1 / -1;
     margin-bottom: 40px;
   }
-  .rows {
+  .rows,
+  .install__intro,
+  .install__steps,
+  .install__note {
     grid-column: 1 / -1;
+  }
+  .install__intro {
+    margin-bottom: 40px;
   }
   .who__col,
   .who__col:nth-of-type(1),
@@ -712,6 +831,13 @@ main,
   .row {
     grid-template-columns: 1fr;
     gap: 6px;
+  }
+  .cmd {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cmd__copy {
+    justify-content: center;
   }
   .who__col,
   .who__col:nth-of-type(1),

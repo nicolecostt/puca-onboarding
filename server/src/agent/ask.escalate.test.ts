@@ -21,7 +21,7 @@ vi.mock("../llm", () => ({
 const { ask } = await import("./ask");
 type AskEvent = Parameters<Parameters<typeof ask>[1]>[0];
 
-const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/tail.journey.json", import.meta.url), "utf8")));
+const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/kota.journey.json", import.meta.url), "utf8")));
 const QUESTION = "Qual a política de home office do time?";
 
 async function run(): Promise<AskEvent[]> {
@@ -58,7 +58,7 @@ describe("ask: encaminhamento", () => {
   });
 
   it("resposta com fonte: nenhum encaminhamento", async () => {
-    script = [{ type: "text", text: "O authorizer calcula o MDR, segundo o ADR-019." }, { type: "done", finishReason: "stop" }];
+    script = [{ type: "text", text: "O balancereader responde o saldo do cache, segundo o ADR-0004." }, { type: "done", finishReason: "stop" }];
     expect(escalations(await run())).toEqual([]);
   });
 

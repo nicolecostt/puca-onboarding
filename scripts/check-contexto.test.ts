@@ -9,7 +9,7 @@ const secoes = "## 1. Visão\n\ntexto\n\n## 2. Encaixe: o desafio\n\n### 2.1. Pr
 describe("slug", () => {
   it("segue a âncora do GitHub (acentos ficam, pontuação sai, travessão vira dois hífens)", () => {
     expect(slug("10.2. Incorporação de respostas à base — opcional no hackathon")).toBe("102-incorporação-de-respostas-à-base--opcional-no-hackathon");
-    expect(slug("12. Encaixe no Desafio Tako: o Puca")).toBe("12-encaixe-no-desafio-tako-o-puca");
+    expect(slug("12. Encaixe no Desafio Tako: Puca")).toBe("12-encaixe-no-desafio-tako-puca");
   });
 });
 

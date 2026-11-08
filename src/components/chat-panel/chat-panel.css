@@ -119,7 +119,7 @@
 .chat-msg p {
   margin: 0;
 }
-/* o Puca: texto corrido com o nome em cima */
+/* Puca: texto corrido com o nome em cima */
 .chat-msg--agent::before {
   content: "Puca";
   display: block;

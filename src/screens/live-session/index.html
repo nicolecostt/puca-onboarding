@@ -18,11 +18,11 @@
 </script>
 </head>
 <body>
-  <!-- Imitação do Slack (tema claro) com os dados da Tail: a tela onde o Puca ajuda.
-       Barra de call, chat e câmera do Puca flutuam por cima (main.ts). -->
-  <!-- O Puca no controle da tela: borda na cor dele em volta e um aviso no topo (somem quando a call acaba) -->
+  <!-- Imitação do Slack (tema claro) com os dados da Kota: a tela onde Puca ajuda.
+       Barra de call, chat e câmera de Puca flutuam por cima (main.ts). -->
+  <!-- Puca no controle da tela: borda na cor dela em volta e um aviso no topo (somem quando a call acaba) -->
   <div class="cu-frame" aria-hidden="true"></div>
-  <p class="cu-pill" role="status"><span class="cu-pill__dots" id="cu-dots" aria-hidden="true"></span>O Puca está usando o seu Slack</p>
+  <p class="cu-pill" role="status"><span class="cu-pill__dots" id="cu-dots" aria-hidden="true"></span>Puca está usando o seu Slack</p>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
       <symbol id="i-back" viewBox="0 0 20 20"><path d="M16 10H4m5-5-5 5 5 5"/></symbol>
@@ -71,7 +71,7 @@
     </defs>
   </svg>
 
-  <main class="sk" aria-label="Slack da Tail (simulação)">
+  <main class="sk" aria-label="Slack da Kota (simulação)">
     <!-- ---- Topo ---- -->
     <header class="sk-top">
       <div class="sk-top__nav">
@@ -94,13 +94,13 @@
       <span class="sk-rail__item"><span class="sk-rail__btn"><svg class="ic"><use href="#i-agents"/></svg></span>Agentes e ferra-<br>mentas</span>
       <span class="sk-rail__round sk-rail__push"><svg class="ic"><use href="#i-plus"/></svg></span>
       <span class="sk-rail__round"><svg class="ic"><use href="#i-moon"/></svg></span>
-      <span class="sk-rail__me">BT<i></i></span>
+      <span class="sk-rail__me">BS<i></i></span>
     </nav>
 
     <!-- ---- Lateral ---- -->
     <aside class="sk-side">
       <header class="sk-side__head">
-        <strong>Tail</strong><svg class="ic ic--sm"><use href="#i-chev"/></svg>
+        <strong>Kota</strong><svg class="ic ic--sm"><use href="#i-chev"/></svg>
         <span class="sk-side__tools"><svg class="ic"><use href="#i-gear"/></svg><svg class="ic"><use href="#i-compose"/></svg></span>
       </header>
       <div class="sk-side__scroll">
@@ -119,19 +119,18 @@
         </ul>
         <ul class="sk-list sk-list--chans">
           <li class="sk-list__section"><svg class="ic"><use href="#i-hashbox"/></svg>Canais</li>
-          <li class="sk-ch"><b>#</b>deploys</li>
-          <li class="sk-ch"><b>#</b>engenharia</li>
-          <li class="sk-ch"><b>#</b>decisões-técnicas</li>
-          <li class="sk-ch is-hover"><b>#</b>incidentes</li>
-          <li class="sk-ch"><b>#</b>plantão</li>
-          <li class="sk-ch is-current"><b>#</b>time-terminais</li>
-          <li class="sk-ch is-unread"><b>#</b>social</li>
-          <li class="sk-ch"><b>#</b>toda-a-empresa-tail</li>
+          <li class="sk-ch"><b>#</b>contas</li>
+          <li class="sk-ch is-hover"><b>#</b>contas-ajuda</li>
+          <li class="sk-ch is-unread"><b>#</b>geral</li>
+          <li class="sk-ch is-current"><b>#</b>livro-razao</li>
+          <li class="sk-ch"><b>#</b>livro-razao-ajuda</li>
+          <li class="sk-ch"><b>#</b>people</li>
+          <li class="sk-ch"><b>#</b>plataforma-ajuda</li>
           <li class="sk-ch sk-ch--add"><b>+</b>Adicionar canais</li>
           <li class="sk-list__section"><svg class="ic"><use href="#i-dms"/></svg>Mensagens diretas</li>
-          <li class="sk-dm"><span class="sk-av sk-av--xs sk-av--blue">P<i></i></span>Paula Nunes <em>convidou você</em></li>
-          <li class="sk-dm"><span class="sk-av sk-av--xs sk-av--ghost"><svg class="ic"><use href="#i-person"/></svg><i class="is-off"></i></span>lucas.melo</li>
-          <li class="sk-dm"><span class="sk-av sk-av--xs sk-av--pink"><svg class="ic"><use href="#i-person"/></svg><i></i></span>Marcos Vidal</li>
+          <li class="sk-dm"><span class="sk-av sk-av--xs sk-av--blue">B<i></i></span>Beatriz Cavalcanti <em>convidou você</em></li>
+          <li class="sk-dm"><span class="sk-av sk-av--xs sk-av--ghost"><svg class="ic"><use href="#i-person"/></svg><i class="is-off"></i></span>Thiago Nakamura</li>
+          <li class="sk-dm"><span class="sk-av sk-av--xs sk-av--pink"><svg class="ic"><use href="#i-person"/></svg><i></i></span>Natália Brandão</li>
         </ul>
       </div>
     </aside>
@@ -140,9 +139,9 @@
     <section class="sk-chan">
       <header class="sk-chan__head">
         <svg class="ic sk-chan__star"><use href="#i-star"/></svg>
-        <h1 class="sk-chan__name"># time-terminais</h1>
+        <h1 class="sk-chan__name"># livro-razao</h1>
         <span class="sk-chan__tools">
-          <span><svg class="ic"><use href="#i-person"/></svg>7</span>
+          <span><svg class="ic"><use href="#i-person"/></svg>6</span>
           <span><svg class="ic"><use href="#i-huddle"/></svg>Círculo<svg class="ic ic--sm"><use href="#i-chev"/></svg></span>
           <svg class="ic"><use href="#i-bell-off"/></svg>
           <svg class="ic"><use href="#i-search"/></svg>
@@ -157,8 +156,8 @@
 
       <div class="sk-feed">
         <div class="sk-intro">
-          <h2># time-terminais</h2>
-          <p><span class="sk-mention">@Marcos Vidal</span> criou este canal hoje. Este é o início do canal <strong># time-terminais</strong>. O canal é para tudo relacionado a #time-terminais. Organize reuniões, compartilhe documentos e tome decisões em conjunto com a equipe. (<a>Editar descrição</a>)</p>
+          <h2># livro-razao</h2>
+          <p><span class="sk-mention">@Natália Brandão</span> criou este canal. Este é o início do canal <strong># livro-razao</strong>. O time de Livro-razão conversa aqui; as dúvidas de outros times vão no #livro-razao-ajuda. (<a>Editar descrição</a>)</p>
           <div class="sk-intro__btns">
             <span><svg class="ic"><use href="#i-person-add"/></svg>Adicionar pessoas ao canal</span>
             <span><svg class="ic"><use href="#i-template"/></svg>Escolher modelo</span>
@@ -167,17 +166,17 @@
 
         <div class="sk-day"><span>Hoje<svg class="ic ic--sm"><use href="#i-chev"/></svg></span></div>
 
-        <p class="sk-join"><svg class="ic"><use href="#i-join"/></svg>Lucas Melo e 3 outras pessoas entraram em #time-terminais. <span>9h20</span></p>
+        <p class="sk-join"><svg class="ic"><use href="#i-join"/></svg>Beatriz Cavalcanti e 3 outras pessoas entraram em #livro-razao. <span>9h20</span></p>
 
         <article class="sk-msg">
-          <span class="sk-av sk-av--blue sk-av--lg">L</span>
+          <span class="sk-av sk-av--blue sk-av--lg">B</span>
           <div class="sk-msg__body">
-            <p class="sk-msg__meta"><strong>Lucas Melo</strong><span>9h32</span></p>
-            <p><a class="sk-link"><svg class="ic ic--sm"><use href="#i-link"/></svg>github.com/tail/terminal-config-api#readme</a></p>
+            <p class="sk-msg__meta"><strong>Beatriz Cavalcanti</strong><span>9h32</span></p>
+            <p><a class="sk-link"><svg class="ic ic--sm"><use href="#i-link"/></svg>github.com/JucaGF/kota-bank/tree/main/src/ledger/ledgerwriter#readme</a></p>
             <div class="sk-unfurl">
               <div>
-                <strong>terminal-config-api — README</strong>
-                <p>Configuração das maquininhas TailPOS: como uma mudança chega até a CDN</p>
+                <strong>ledgerwriter — README</strong>
+                <p>Valida e grava as transações no livro-razão</p>
                 <p class="sk-unfurl__src"><span class="sk-unfurl__logo" aria-hidden="true"></span>GitHub</p>
               </div>
               <div class="sk-unfurl__thumb" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
@@ -195,7 +194,7 @@
           <i class="sk-vsep"></i>
           <svg class="ic"><use href="#i-quote"/></svg><svg class="ic"><use href="#i-code"/></svg><svg class="ic"><use href="#i-codeblock"/></svg><svg class="ic"><use href="#i-strikeblock"/></svg>
         </div>
-        <p class="sk-composer__input">Enviar mensagem para #time-terminais</p>
+        <p class="sk-composer__input">Enviar mensagem para #livro-razao</p>
         <div class="sk-composer__actions">
           <span class="sk-composer__plus"><svg class="ic"><use href="#i-plus"/></svg></span>
           <b class="aa">Aa</b><svg class="ic"><use href="#i-emoji"/></svg><svg class="ic"><use href="#i-at"/></svg>
