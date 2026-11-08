@@ -8,7 +8,8 @@ import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
 import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../lib/agent-visual";
 import { emit } from "../../lib/events";
-import { qs } from "../../lib/dom";
+import { esc, qs } from "../../lib/dom";
+import { mountPucaParticles } from "../../lib/puca-particles";
 import { activeProfile, company } from "../../data";
 import { callAnswers } from "../../data/call-answers";
 import { normalize } from "../../journey/conditions";
@@ -104,6 +105,9 @@ const FIELDS: Field[] = [
   },
 ];
 
+/** Boas-vindas, aberta no fim da call; de lá a pessoa acessa a plataforma ou refaz a call. */
+const HOME_URL = "../boas-vindas/";
+
 const OUTRO = (a: Answers) =>
   `Perfeito, ${a.nome}. Já tenho o que preciso. Vou montar sua primeira semana com o time ${a.time} e te mostro em seguida.`;
 
@@ -151,6 +155,13 @@ async function main(): Promise<void> {
   const state = { paused: false, ended: false, muted: false, seconds: 0, done: false };
   let agentState: AgentState = "idle";
   let pendingAnswer: ((text: string) => void) | null = null; // resposta da pergunta atual pelo chat
+
+  // partículas da Puca no fundo, atrás do texto, da esfera, do chat e da barra de call
+  mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
+    occluders: ".topbar__row > *, .agent__orb, .agent__meta, .caption > *, .chat-panel, .call-dock",
+    round: ".agent__orb",
+    max: 40,
+  });
 
   const chat = mountChatPanel({ title: "Transcrição da call", messages: [] });
   mountCallBar({ chat });
@@ -223,11 +234,14 @@ async function main(): Promise<void> {
   async function say(text: string): Promise<void> {
     setAgent("speaking");
     el.captionUser.textContent = "";
-    const words = text.split(" ");
-    el.captionAgent.textContent = "";
-    for (let i = 0; i < words.length; i++) {
-      el.captionAgent.textContent = words.slice(0, i + 1).join(" ");
-      await wait(140);
+    // a frase entra inteira e invisível (o texto não pula de linha); cada palavra aparece suave, em sequência
+    el.captionAgent.innerHTML = text
+      .split(" ")
+      .map((w) => `<span class="word">${esc(w)}</span>`)
+      .join(" ");
+    for (const word of el.captionAgent.querySelectorAll(".word")) {
+      word.classList.add("is-in");
+      await wait(95);
     }
     chat.addMessage({ from: "agent", text });
     await wait(300);
@@ -292,15 +306,19 @@ async function main(): Promise<void> {
   state.done = true;
   setAgent("done");
 
-  // Entrega o perfil e a calibragem para a sessão no quadro e mostra o caminho até ela.
+  // Entrega o perfil e a calibragem para a sessão no quadro e sai da call para as boas-vindas.
   const perfil = profileFromAnswers(answers);
   saveProfile(perfil);
   saveCalibragem(calibragemFromAnswers(perfil, answers));
-  const next = document.createElement("a");
-  next.className = "caption__next";
-  next.href = "../lesson/";
-  next.textContent = "Começar a sessão →";
-  el.captionHint.after(next);
+  await wait(1400);
+  leaveToHome();
+}
+
+/** Fim da call: a conversa e os controles somem (style.css, body.is-leaving) e a página
+ *  "estoura" para as boas-vindas (view transition, boas-vindas/style.css). */
+function leaveToHome(): void {
+  document.body.classList.add("is-leaving");
+  window.setTimeout(() => location.assign(HOME_URL), 460);
 }
 
 void main();
