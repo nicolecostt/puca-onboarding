@@ -102,6 +102,10 @@ _Avoid_: botão, opção
 **Transição**:
 Regra que escolhe para onde a jornada vai depois de um passo. (Não confundir com o vínculo de mesmo nome.)
 
+**Primeira tarefa**:
+Atividade real e pequena que a Puca entrega ao fim da sessão, escolhida do catálogo que o time aprovou conforme o perfil da pessoa. O gestor aprova antes de a pessoa começar.
+_Avoid_: ticket, task, exercício
+
 ## Quadro
 
 **Quadro**:
