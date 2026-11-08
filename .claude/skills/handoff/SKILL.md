@@ -20,7 +20,7 @@ Opções: $ARGUMENTS
 3. **Contratos.** Algum item de `docs/contratos.md` mudou? Se sim, o doc foi atualizado e a quebra está marcada?
 4. **Decisões.** Alguma escolha nesta tarefa muda o trabalho dos outros? Registre em `docs/decisoes/NNNN-assunto.md`
    (modelo em `docs/decisoes/README.md`). Se não houver, não crie nada.
-5. **Docs.** README, `journey-format.md` ou `demo.md` precisam refletir a mudança?
+5. **Docs.** `docs/desenvolvimento.md`, `journey-format.md` ou `demo.md` precisam refletir a mudança?
 6. **Commit.** Mostre a mensagem no padrão `tipo(escopo): o que mudou` e só commite com o ok da pessoa.
    Se o pedido já foi "pode subir", "sobe isso" ou "abre o PR", isso é o ok para commit, push e PR (desde que o check esteja verde).
 7. **Base do sistema.** A mudança altera algo descrito no `PRODUCT.md` ou cria/renomeia um termo? Atualize pela skill

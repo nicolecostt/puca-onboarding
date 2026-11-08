@@ -1,7 +1,7 @@
-# puca-onboarding
+# Desenvolvimento
 
-Front do **Orbis**, produto de onboarding e transição entre equipes. A agente que conversa com a pessoa é a **Puca**.
-Visão do produto em [`PRODUCT.md`](PRODUCT.md); glossário em [`CONTEXT.md`](CONTEXT.md).
+Como rodar, a estrutura de pastas e onde mexer. O que é o produto está no [`README.md`](../README.md) e no
+[`PRODUCT.md`](../PRODUCT.md); o glossário, no [`CONTEXT.md`](../CONTEXT.md).
 
 Vite + TypeScript, sem framework.
 
@@ -16,7 +16,7 @@ npm run build      # build de produção em dist/
 npm run check      # typecheck + testes + base do sistema + harness + build (o que o CI roda em cada PR)
 ```
 
-Trabalhando com agentes de programação (Claude Code, Codex…): regras do time em [`AGENTS.md`](AGENTS.md).
+Trabalhando com agentes de programação (Claude Code, Codex…): regras do time em [`AGENTS.md`](../AGENTS.md).
 
 ## Estrutura
 
@@ -77,7 +77,7 @@ dá a voz e o LLM: `POST /api/speak` (fala → áudio ElevenLabs, com cache), `P
 e `POST /api/voice/token` (microfone via Deepgram). Sem o servidor, a sessão segue só com legenda e chat.
 
 ```bash
-cp server/.env.example server/.env   # chaves: Featherless (obrigatória), Deepgram e ElevenLabs (voz, opcionais)
+cp server/.env.example server/.env   # chaves: Anthropic (LLM, decisão 0007; sem ela, Featherless), Deepgram e ElevenLabs (voz, opcionais)
 npm run dev:server   # API em :8787 (o Vite repassa /api)
 npm run dev          # abre a lista de telas → "Sessão no quadro" → "Começar sessão com voz"
 npm run dev:fly      # só o front: o Vite repassa /api para o servidor do Fly, sem dev:server nem server/.env
@@ -141,4 +141,4 @@ A conversa ainda é simulada (sem LLM nem voz); o motor (`src/journey/runner.ts`
 - `?perfil=ana` (recém-contratada: passa pela parte institucional) ou `?perfil=bruno` (mudando de time: vai direto ao time).
 - `?auto=1` responde sozinho, para apresentar sem mexer no mouse.
 
-Para uma sessão nova, crie outro `*.journey.json` em `src/journey/data/`. Formato em [`docs/journey-format.md`](docs/journey-format.md).
+Para uma sessão nova, crie outro `*.journey.json` em `src/journey/data/`. Formato em [`docs/journey-format.md`](journey-format.md).
