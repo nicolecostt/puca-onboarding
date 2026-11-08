@@ -1,5 +1,5 @@
-// Perfil da pessoa: vem da call de entrevista, da URL (?perfil=, que a escolha nas boas-vindas manda para a call), da
-// escolha por cima da sessão ou de um dos dois perfis da demo (src/data/profiles.ts).
+// Perfil da pessoa: vem da call inicial (Puca descobre o vínculo na conversa), da URL (?perfil=, o link de
+// apresentação) ou de um dos dois perfis da demo (src/data/profiles.ts).
 import { onboardingStore } from "./storage";
 import { normalize } from "./conditions";
 import { company } from "../data/company";
@@ -36,8 +36,8 @@ export function vinculoFromAnswer(answer: string | undefined): Vinculo {
 }
 
 /**
- * Monta o perfil a partir das respostas da call de entrevista. Com o vínculo já escolhido antes da call
- * (nas boas-vindas), ele vale e a call não pergunta de novo.
+ * Monta o perfil a partir das respostas da call de entrevista. Com o vínculo já conhecido antes da call
+ * (?perfil=), ele vale e a call não pergunta de novo.
  */
 export function profileFromAnswers(answers: Partial<Record<string, string>>, vinculo?: Vinculo): Profile {
   return {
@@ -80,8 +80,8 @@ export function escopoDoPerfil(profile: Profile): string {
 const URL_PROFILES: Record<string, Vinculo> = { novo: "novo", transicao: "transicao", ana: "novo", bruno: "transicao" };
 
 /**
- * Ordem: ?perfil= na URL → perfil salvo (escolha ou call) → demo do Bruno (mesmo padrão das outras telas).
- * `source: "demo"` quer dizer que ninguém escolheu: a sessão pede a escolha antes de começar.
+ * Ordem: ?perfil= na URL → perfil salvo (call) → demo do Bruno (mesmo padrão das outras telas).
+ * `source: "demo"` quer dizer que ninguém passou pela call: a sessão manda para as boas-vindas.
  */
 export function resolveProfile(search: string): { profile: Profile; source: "url" | "entrevista" | "demo" } {
   const fromUrl = URL_PROFILES[new URLSearchParams(search).get("perfil") ?? ""];

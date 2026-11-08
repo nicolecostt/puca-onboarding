@@ -4,7 +4,7 @@ import { DEMO_PROFILES } from "../../journey/profile";
 import { dadosParaSessao } from "./recuperacao";
 
 describe("passagem para a sessão depois de falha na call", () => {
-  it("call aberta sem escolha conserva o vínculo informado na conversa", () => {
+  it("call aberta sem ?perfil= conserva o vínculo informado na conversa", () => {
     expect(dadosParaSessao({ nome: "Bruno", vinculo: "transicao" }, null).perfil.vinculo).toBe("transicao");
   });
 

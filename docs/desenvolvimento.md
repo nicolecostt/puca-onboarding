@@ -70,7 +70,6 @@ src/
     agent-cam/           "câmera" do agente no canto da tela
     agent-cursor/        cursor de Puca (seta + "Puca") mexendo na tela, por enquanto simulado
     journey-panel/       painel "Sua jornada" da sessão: objetivo, momentos marcados pela calibragem e próximos passos
-    escolha-perfil/      os dois cartões da escolha do perfil (nas boas-vindas e por cima da sessão quando ninguém escolheu)
   journey/               jornada da sessão em JSON: tipos, validador, motor, perfil, calibragem, jornada da pessoa e intenções (pulo, perguntas)
     data/                jornadas em JSON (kota.journey.json é a demo)
   lib/                   código compartilhado
@@ -165,9 +164,10 @@ movem. Os controles no canto do quadro (−, zoom, +, Ajustar) e os atalhos `Shi
 resto. Clicar num nó continua abrindo o cartão e valendo como toque na checagem; o clique que encerra um arraste não
 conta. Se a pessoa afastar o quadro e Puca falar de algo fora da tela, o quadro centra no que ele está mostrando.
 
-- O perfil vem da escolha nas boas-vindas (dois cartões, que mandam `?perfil=` para a call) e da call inicial, que o
+- O perfil vem da call inicial: Puca pergunta se a pessoa está entrando na Kota ou mudando de time e anota o
+  `vinculo`. Até lá, a admissão que ele confirma vai com o cargo sem gênero (`onboarding-call/admissao.ts`). A call o
   salva (`onboardingStore()`: `localStorage` no app para Mac, `sessionStorage` no navegador); no fim da call, o app abre
-  o Início, com a sessão como próximo passo. Aberta sem perfil salvo e sem `?perfil=`, a sessão mostra a mesma escolha antes de o Puca começar. Sem LLM, a call mostra "Seguir para o Início", que segue com o perfil de exemplo de quem foi escolhido.
+  o Início, com a sessão como próximo passo. Aberta sem perfil salvo e sem `?perfil=`, a sessão manda para as boas-vindas. Sem LLM, a call mostra "Seguir para o Início", que segue com o vínculo que a conversa já trouxe (sem ele, a Ana).
 - `?perfil=ana` (recém-contratada: passa pela parte institucional) ou `?perfil=bruno` (mudando de time: vai direto ao time).
 - `?auto=1` responde sozinho, para apresentar sem mexer no mouse.
 

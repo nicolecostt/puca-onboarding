@@ -7,8 +7,8 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 |---|---|---|---|
 | Jornada da sessão (JSON) | `src/journey/types.ts` + [`journey-format.md`](journey-format.md) | `runner.ts`, `whiteboard/from-journey.ts`, `screens/lesson`, quem escreve jornadas | `validate.ts` + `__tests__/validate.test.ts` |
 | Eventos entre componentes | `src/lib/events.ts` (`DocumentEventMap`) | telas e componentes que escutam `callbar:*`, `chatpanel:*`, `onboarding:*`, `journey:*`, `journeypanel:*`, `agentcam:*` | `tsc` |
-| Perfil da pessoa | `src/journey/profile.ts`, `src/journey/escolha.ts` e `src/data/types.ts` | escolha nas boas-vindas (manda `?perfil=` para a call, que não pergunta o vínculo de novo) e call inicial (grava `puca:profile`) → sessão → `POST /api/ask`; sessão aberta sem perfil nem `?perfil=` mostra a escolha e grava o perfil escolhido | `__tests__/validate.test.ts`, `__tests__/escolha.test.ts` |
-| Calibragem | `src/journey/types.ts` (`Calibragem`) + `src/journey/calibragem.ts` (temas, regras, `puca:calibragem`) — [seção abaixo](#calibragem) | call inicial escreve (#16), a escolha por cima da sessão grava o exemplo da pessoa escolhida, e a checagem da sessão atualiza (#24) → jornada (#17) e adaptação das explicações (#23) leem | `__tests__/calibragem.test.ts` |
+| Perfil da pessoa | `src/journey/profile.ts` e `src/data/types.ts` | call inicial (Puca descobre o vínculo na conversa; com `?perfil=` ele já vai anotado) grava `puca:profile` → sessão → `POST /api/ask`; sessão aberta sem perfil nem `?perfil=` manda para as boas-vindas | `__tests__/validate.test.ts`, `__tests__/perfil-salvo.test.ts` |
+| Calibragem | `src/journey/types.ts` (`Calibragem`) + `src/journey/calibragem.ts` (temas, regras, `puca:calibragem`) — [seção abaixo](#calibragem) | call inicial escreve (#16) e a checagem da sessão atualiza (#24) → jornada (#17) e adaptação das explicações (#23) leem | `__tests__/calibragem.test.ts` |
 | Voz ↔ quadro | `BoardAction.at` em `src/journey/types.ts` + `RunnerIO.say(text, cues)` + `GET /api/tts/:id/words` — [seção abaixo](#voz--quadro) | `runner.ts`, `screens/lesson` (`io.say`), `src/voice/agent-voice.ts`, quem escreve jornadas | `validate.test.ts`, `runner.test.ts`, `server/src/voice/tts/service.test.ts` |
 | Jornada da pessoa | `src/journey/types.ts` (`JornadaDaPessoa`) + `src/journey/jornada-da-pessoa.ts` (`montarJornadaDaPessoa`, `proximosPassos`) — [seção abaixo](#jornada-da-pessoa) | sessão, painel "Sua jornada" (#17) → progresso (#18), painel do buddy (#19), checagem (#24) | `__tests__/jornada-da-pessoa.test.ts` |
 | Rota da fala | `src/journey/route.ts` (`Route`: jump → reply → tarefa → select → knowledge → faq → ask; numa checagem, `waiting.check`: o que não é pergunta nem pulo é `reply`; `tarefa`: pergunta que cita a primeira tarefa, respondida pelos campos dela em `src/journey/duvidas-da-tarefa.ts`, com `RouteContext.tarefa`/`tarefaApresentada` opcionais) | `screens/lesson`, voz e chat | `__tests__/route.test.ts` |
@@ -242,6 +242,11 @@ interface OrbisNavegador {
 - **Na jornada**, a ação é `{ type: "navegador", acao: AcaoDaPuca, at?: string }`: com `at`, sai quando a fala chega
   no trecho, como as do quadro; vale em momento sem quadro. Se a pessoa toma a vez, as ações do navegador que
   faltavam **não** rodam (as do quadro, sim).
+
+- **Pelo LLM da sessão** (`/api/turn`): a ferramenta `mostrar_no_navegador { fonte }` escolhe pelo título uma das fontes
+  do kit (`fontesDoNavegador` em `server/src/agent/turn.ts`: as `docs` dos nós, a pasta de código de cada serviço e o
+  repositório). O servidor troca o título pela URL do kit e emite `{ type: "action", action: { type: "navegador", acao:
+  { tipo: "abrir", url } } }`; o modelo nunca escreve URL. A página fica na tela até o próximo passo.
 
 Exemplo válido de ação num passo:
 

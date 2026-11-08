@@ -47,6 +47,23 @@ describe("turn", () => {
     expect(evs.filter((e) => e.type === "next_step" || e.type === "go_to")).toEqual([{ type: "next_step" }]);
   });
 
+  it("abre no navegador a fonte do kit que o modelo escolheu pelo título, nunca uma URL do modelo", async () => {
+    script = [
+      { type: "text", text: "Olha o código do ledgerwriter." },
+      tool("mostrar_no_navegador", { fonte: "Código do ledgerwriter" }),
+      tool("mostrar_no_navegador", { fonte: "https://evil.com" }),
+      { type: "done", finishReason: "tool_use" },
+    ];
+    const evs = await run({ kind: "fala", text: "me mostra o código do ledgerwriter" });
+    const acoes = evs.filter((e) => e.type === "action");
+    expect(acoes).toEqual([
+      { type: "action", action: { type: "navegador", acao: { tipo: "abrir", url: "https://github.com/JucaGF/kota-bank/tree/main/src/ledger/ledgerwriter" } } },
+    ]);
+    const spec = buildTurnTools(journey).find((t) => t.function.name === "mostrar_no_navegador");
+    const fontes = (spec?.function.parameters as { properties: { fonte: { enum: string[] } } }).properties.fonte.enum;
+    expect(fontes).toEqual(expect.arrayContaining(["Repositório kota-bank", "ADR 1 · Quebrar o monolito do livro-razão em três serviços", "Notion · Quem somos"]));
+  });
+
   it("leva o Notion na parte fixa e a interrupção e a fala da pessoa na última mensagem", async () => {
     script = [{ type: "text", text: "Das dez às quatro. Posso voltar?" }];
     await run({ kind: "fala", text: "e o home office?", interrupted: "O gateway recebe a venda." });

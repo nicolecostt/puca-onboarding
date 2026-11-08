@@ -153,7 +153,7 @@ export const DEMO_CALIBRAGENS: Record<Vinculo, Calibragem> = {
 const URL_VINCULO: Record<string, Vinculo> = { novo: "novo", transicao: "transicao", ana: "novo", bruno: "transicao" };
 
 /**
- * Mesma ordem do perfil: ?perfil= na URL → calibragem salva (call ou escolha) → exemplo do vínculo do perfil salvo →
+ * Mesma ordem do perfil: ?perfil= na URL → calibragem salva (call) → exemplo do vínculo do perfil salvo →
  * demo do Bruno. Assim quem escolheu a Ana nunca cai na calibragem do Bruno.
  */
 export function resolveCalibragem(search: string): { calibragem: Calibragem; source: "url" | "call" | "demo" } {

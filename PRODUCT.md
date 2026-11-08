@@ -419,12 +419,12 @@ O desenho do kit está em [`docs/kit-da-kota.md`](docs/kit-da-kota.md), e as esc
 
 ### 13.1. O jurado vive a pessoa
 
-O jurado não assiste a uma demo: ele **é a pessoa** sendo integrada e **escolhe o perfil** com que entra:
+O jurado não assiste a uma demo: ele **é a pessoa** sendo integrada e diz na call inicial com qual perfil entra (Puca pergunta, não há tela de escolha):
 
 - **Novo**: acabou de entrar na Kota.
 - **Transição**: já está na Kota e muda de time.
 
-Nos dois perfis a pessoa entra no time de Livro-razão; quem está em transição vem do time de Contas. A escolha muda a jornada, como em [§7](#7-demonstração-dos-dois-perfis).
+Nos dois perfis a pessoa entra no time de Livro-razão; quem está em transição vem do time de Contas. O perfil muda a jornada, como em [§7](#7-demonstração-dos-dois-perfis).
 
 ### 13.2. O kit da Kota: fonte e prova ao mesmo tempo
 

@@ -11,9 +11,8 @@ import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../
 import { emit } from "../../lib/events";
 import { esc, qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
-import { activeProfile, company } from "../../data";
-import { loadSavedProfile, profileFromAnswers, resolveProfile, saveProfile } from "../../journey/profile";
-import { ID_DO_VINCULO } from "../../journey/escolha";
+import { loadSavedProfile, profileFromAnswers, resolveProfile, saveProfile, vinculoFromAnswer } from "../../journey/profile";
+import { admissaoDaCall } from "./admissao";
 import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem";
 import { createAgentVoice, MIC_AVISO, type CallRequest, type SpeakOptions } from "../../voice/agent-voice";
 import { dadosParaSessao } from "./recuperacao";
@@ -22,20 +21,11 @@ const savedProfile = loadSavedProfile();
 if (!savedProfile) qs<HTMLAnchorElement>(document, ".brand").href = "../boas-vindas/";
 preserveProfileLinks();
 
-// Com quem a pessoa entra: a escolha nas boas-vindas (?perfil= na URL) ou o perfil já salvo. Com ela, a call usa a
-// admissão dessa pessoa e o vínculo já vai anotado, então Puca não pergunta de novo se é a primeira vez na empresa
-// ou uma troca de time (server/src/agent/call.ts: "Não pergunte o que já está anotado").
-const escolha = resolveProfile(location.search);
-const vinculoEscolhido = escolha.source === "demo" ? null : escolha.profile.vinculo;
-// Dados da admissão: a empresa já sabe, Puca só confirma (sem escolha, a Ana).
-const profile = activeProfile(vinculoEscolhido ? ID_DO_VINCULO[vinculoEscolhido] : "ana");
-const admissao = {
-  cargo: profile.role,
-  time: profile.toTeam,
-  gestor: company.people[profile.managerId]?.name ?? "",
-};
-
-
+// Quem entra (novo na Kota ou mudando de time) Puca descobre na conversa e anota como `vinculo`. Só o link de
+// apresentação (?perfil=ana|bruno) traz o vínculo de antes, e aí ele já vai anotado (server/src/agent/call.ts: "Não
+// pergunte o que já está anotado"). Perfil salvo de outra vez não conta: refazer a call pergunta de novo.
+const conhecido = resolveProfile(location.search);
+const vinculoConhecido = conhecido.source === "url" ? conhecido.profile.vinculo : null;
 
 const SEM_PUCA = "Puca está fora do ar agora. Recarregue a página em alguns minutos para fazer a call.";
 const FALHOU = "Perdi a conexão para pensar agora. Pode repetir?";
@@ -82,7 +72,7 @@ async function main(): Promise<void> {
     timer: qs(document, "#timer"),
   };
 
-  const answers: Record<string, string> = vinculoEscolhido ? { vinculo: vinculoEscolhido } : {};
+  const answers: Record<string, string> = vinculoConhecido ? { vinculo: vinculoConhecido } : {};
   const cultura: string[] = [];
   const registro = criarRegistro("call-inicial");
   const history: { role: "user" | "assistant"; content: string }[] = [];
@@ -119,7 +109,7 @@ async function main(): Promise<void> {
       clearTimeout(silencio);
       voice.stop();
       voice.stopListening();
-      const { perfil, calibragem } = dadosParaSessao(answers, vinculoEscolhido);
+      const { perfil, calibragem } = dadosParaSessao(answers, vinculoConhecido);
       saveProfile(perfil);
       saveCalibragem(calibragem);
       seguir?.remove();
@@ -213,7 +203,7 @@ async function main(): Promise<void> {
     // a fala deste turno vai no `text`, não no histórico
     const passado = kind === "fala" ? history.slice(0, -1) : history.slice();
     const ok = await voice.call(
-      { kind, text, history: passado, interrupted: interrupted ? { said: interrupted } : undefined, admissao, anotado: { ...answers }, cultura: [...cultura] },
+      { kind, text, history: passado, interrupted: interrupted ? { said: interrupted } : undefined, admissao: admissaoDaCall(answers.vinculo ? vinculoFromAnswer(answers.vinculo) : null), anotado: { ...answers }, cultura: [...cultura] },
       {
         onSpeak: (t, play) =>
           falar(t, async (o) => {
@@ -270,7 +260,7 @@ async function main(): Promise<void> {
     state.done = true;
     setAgent("done");
     voice.stopListening();
-    const perfil = profileFromAnswers(answers, vinculoEscolhido ?? undefined);
+    const perfil = profileFromAnswers(answers, vinculoConhecido ?? undefined);
     saveCalibragem(calibragemFromAnswers(perfil, answers));
     saveProfile(perfil);
     salvarConversa();
@@ -330,7 +320,7 @@ async function main(): Promise<void> {
   render();
   if (!voice.llm) {
     chat.addMessage({ from: "agent", text: SEM_PUCA });
-    // sem a call, a pessoa não fica presa aqui: segue para a sessão com o perfil de exemplo de quem ela escolheu.
+    // sem a call, a pessoa não fica presa aqui: segue para a sessão com o perfil de exemplo do vínculo (o do ?perfil=, ou Ana).
     // A legenda fica com a primeira frase (o aviso inteiro está no chat), para o botão caber acima da barra da call.
     el.captionAgent.textContent = "Puca está fora do ar agora.";
     setAgent("offline");
@@ -352,10 +342,9 @@ async function main(): Promise<void> {
   });
 }
 
-/** Fim da call: a conversa e os controles somem (style.css, body.is-leaving) antes de abrir o Início, que leva à sessão. */
+/** Abre o Início mantendo a call visível até a troca de página. */
 function leaveToSession(): void {
-  document.body.classList.add("is-leaving");
-  window.setTimeout(() => location.replace("../inicio/"), 460);
+  location.replace("../inicio/");
 }
 
 void main();

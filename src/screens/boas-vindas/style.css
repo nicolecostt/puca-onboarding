@@ -189,12 +189,6 @@ body {
   }
 }
 
-/* Primeira abertura: a escolha do perfil (components/escolha-perfil) no centro, no lugar do cumprimento */
-.home--escolha {
-  align-items: center;
-  padding-inline: 16px;
-}
-
 /* ---- E-mail do Slack da Kota, antes da primeira sessão (#209); o mesmo campo fica no Início ---- */
 .slack-email {
   width: 100%;
