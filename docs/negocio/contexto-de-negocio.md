@@ -146,7 +146,7 @@ São perguntas, não afirmações de que o concorrente não tem a funcionalidade
 
 **Sana Learn (conferido em 2026-11-07):** a [página de preços](https://sanalabs.com/products/sana-learn/pricing) não mostra valores. A cobrança é por usuário por mês, o plano "Built to scale" começa em 300 usuários e o Enterprise tem preço sob consulta. A página cita "an AI Tutor for every learner". A Sana tem oferta específica de [onboarding de funcionários](https://sanalabs.com/products/sana-learn/solutions/employee-onboarding): "Every new hire gets an AI tutor on day one." Isso confirma que a categoria já oferece tutor com IA para quem chega: o diferencial da Puca precisa estar na forma (voz com quadro, calibragem, encaminhamento, transição entre times), não em "ter IA". O "onboarding" do FAQ de preços é a implantação da própria Sana, não a integração de funcionários.
 
-Conexões com sistemas, RAG, agentes, voz e computer use são meios. Viram argumento comercial quando produzem um resultado útil, demonstrável e relevante para o RH e para a pessoa. Não alegar ausência de concorrência, melhor precisão, redução percentual de tempo, vantagem de dados ou barreira à cópia sem evidência. A comparação completa é a #43; o que a Lousa faz de verdade é a #74.
+Conexões com sistemas, RAG, agentes, voz e computer use são meios. Viram argumento comercial quando produzem um resultado útil, demonstrável e relevante para o RH e para a pessoa. Não alegar ausência de concorrência, melhor precisão, redução percentual de tempo, vantagem de dados ou barreira à cópia sem evidência. A comparação completa é a #43; o que o Orbis faz de verdade é a #74.
 
 ## 9. Validação que já temos
 
@@ -208,4 +208,4 @@ A frase descreve a proposta. Antes de usá-la como capacidade pronta, conferir o
 | Durante o piloto | Uso, tarefas, bloqueios e apoio | Evidência de utilidade |
 | Fim do piloto | Revisão com o RH | Conversão, ajuste ou encerramento explícito |
 
-Não reabrir sem motivo novo: o RH aprova; os dois vínculos fazem parte da proposta; há piloto pago e contrato anual com mínimo; custos são apurados depois da implementação; a equipe já está construindo a implantação (conectar a Lousa às fontes e aos acessos de um cliente), ainda sem cliente.
+Não reabrir sem motivo novo: o RH aprova; os dois vínculos fazem parte da proposta; há piloto pago e contrato anual com mínimo; custos são apurados depois da implementação; a equipe já está construindo a implantação (conectar o Orbis às fontes e aos acessos de um cliente), ainda sem cliente.

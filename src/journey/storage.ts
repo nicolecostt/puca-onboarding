@@ -1,4 +1,4 @@
-// Onde a Lousa guarda o que precisa sobreviver entre telas (rastro, encaminhamentos): o localStorage
+// Onde o Orbis guarda o que precisa sobreviver entre telas (rastro, encaminhamentos): o localStorage
 // do navegador, atrás de uma interface simples para os testes rodarem em node. Nada aqui pode
 // quebrar a aula: aba anônima, cota cheia ou JSON corrompido viram "não guardou" / "lista vazia".
 
