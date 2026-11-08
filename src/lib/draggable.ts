@@ -18,6 +18,8 @@ export interface DraggableOptions {
   suppressClickAfterDrag?: boolean;
   /** Duplo clique em botão também reseta? (padrão: não) */
   dblClickOnButtons?: boolean;
+  /** Espaço a deixar livre embaixo do elemento (ex.: a barra de call presa na câmera). */
+  reserveBottom?: () => number;
   onPlace?: () => void;
   onReset?: () => void;
 }
@@ -29,7 +31,7 @@ interface Point {
 
 const MARGIN = 8;
 
-export function makeDraggable(el: HTMLElement, opts: DraggableOptions): { reset: () => void } {
+export function makeDraggable(el: HTMLElement, opts: DraggableOptions): { reset: () => void; clamp: () => void } {
   const handle = opts.handle ?? el;
   // cada tela lembra a sua posição: o layout muda de uma tela para outra
   const storageKey = `${opts.storageKey}@${location.pathname}`;
@@ -38,7 +40,8 @@ export function makeDraggable(el: HTMLElement, opts: DraggableOptions): { reset:
   function place(x: number, y: number): Point {
     const r = el.getBoundingClientRect();
     x = Math.min(Math.max(MARGIN, x), Math.max(MARGIN, innerWidth - r.width - MARGIN));
-    y = Math.min(Math.max(MARGIN, y), Math.max(MARGIN, innerHeight - r.height - MARGIN));
+    const below = opts.reserveBottom?.() ?? 0;
+    y = Math.min(Math.max(MARGIN, y), Math.max(MARGIN, innerHeight - r.height - below - MARGIN));
     el.classList.add("is-placed");
     el.style.left = `${x}px`;
     el.style.top = `${y}px`;
@@ -113,12 +116,12 @@ export function makeDraggable(el: HTMLElement, opts: DraggableOptions): { reset:
     reset();
   });
 
-  // continua dentro da tela quando a janela muda de tamanho
-  window.addEventListener("resize", () => {
+  // continua dentro da tela (quando a janela muda de tamanho, por exemplo)
+  function clamp(): void {
     if (!el.classList.contains("is-placed")) return;
-    const r = el.getBoundingClientRect();
-    place(r.left, r.top);
-  });
+    place(parseFloat(el.style.left) || 0, parseFloat(el.style.top) || 0);
+  }
+  window.addEventListener("resize", clamp);
 
   // posição salva da última vez
   try {
@@ -128,5 +131,5 @@ export function makeDraggable(el: HTMLElement, opts: DraggableOptions): { reset:
     /* posição inválida ou sem localStorage */
   }
 
-  return { reset };
+  return { reset, clamp };
 }

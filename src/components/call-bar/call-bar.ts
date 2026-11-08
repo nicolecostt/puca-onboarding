@@ -6,7 +6,6 @@ import "../../styles/tokens.css";
 import "./call-bar.css";
 import pauseIcon from "./icons/pause.svg";
 import handIcon from "./icons/hand.svg";
-import ringIcon from "./icons/level-ring.svg";
 import micIcon from "./icons/mic.svg";
 import chatIcon from "./icons/chat.svg";
 import chatOpenIcon from "./icons/chat-open.svg";
@@ -57,7 +56,6 @@ export function mountCallBar(opts: CallBarOptions = {}): CallBar {
           <img src="${handIcon}" width="16" height="16" alt="">
         </button>
         <div class="call-mic">
-          <img class="call-mic__ring" src="${ringIcon}" width="60" height="56" alt="">
           <button class="call-mic__btn" data-act="mute" aria-pressed="false" aria-label="Silenciar microfone">
             <img src="${micIcon}" width="18" height="18" alt="">
           </button>
@@ -78,12 +76,10 @@ export function mountCallBar(opts: CallBarOptions = {}): CallBar {
   (opts.parent ?? document.body).appendChild(dock);
 
   const statusEl = qs(dock, ".call-status");
-  const ring = qs(dock, ".call-mic__ring");
   const chatBtn = qs<HTMLButtonElement>(dock, '[data-act="chat"]');
   const chatImg = qs<HTMLImageElement>(chatBtn, "img");
   const redial = qs<HTMLButtonElement>(dock, ".call-redial");
   const liveBtns = dock.querySelectorAll<HTMLButtonElement>(".call-live button");
-  ring.addEventListener("animationend", () => ring.classList.remove("is-pulsing"));
 
   // Estados do Figma: Chat=Closed (ponto de não lido) / Chat=Open (fundo cinza)
   function setChatOpen(open: boolean): void {
@@ -93,11 +89,6 @@ export function mountCallBar(opts: CallBarOptions = {}): CallBar {
   }
   document.addEventListener("chatpanel:change", (e) => setChatOpen(e.detail.open));
 
-  function pulseRing(): void {
-    ring.classList.remove("is-pulsing");
-    void ring.offsetWidth; // reinicia a animação mesmo em cliques seguidos
-    ring.classList.add("is-pulsing");
-  }
 
   const attached = opts.attachTo ?? null;
   const drag =
@@ -106,7 +97,8 @@ export function mountCallBar(opts: CallBarOptions = {}): CallBar {
       : makeDraggable(dock, { storageKey: "callbar:pos", threshold: 5, suppressClickAfterDrag: true });
   dock.classList.toggle("is-fixed", opts.draggable === false);
 
-  // Presa na câmera: fica logo embaixo dela (ou em cima, se não couber), com a mesma largura.
+  // Presa na câmera: fica sempre logo embaixo dela, com a mesma largura (a câmera deixa o espaço).
+  // Com a call encerrada, o botão de ligar vai para o canto da tela (ver call-bar.css).
   if (attached) {
     dock.classList.add("is-attached");
     document.body.classList.add("has-attached-callbar");
@@ -115,13 +107,12 @@ export function mountCallBar(opts: CallBarOptions = {}): CallBar {
     const follow = (r: DOMRect) => {
       last = r;
       const h = qs(dock, ".call-bar").offsetHeight || 42;
-      const below = r.bottom + GAP + h <= innerHeight - 8;
       dock.style.width = `${r.width}px`;
       dock.style.left = `${r.left}px`;
-      dock.style.top = `${below ? r.bottom + GAP : r.top - GAP - h}px`;
+      dock.style.top = `${Math.min(r.bottom + GAP, innerHeight - h - 8)}px`;
     };
     document.addEventListener("agentcam:move", (e) => {
-      // escondida (call encerrada): a barra fica onde estava, com o botão de ligar
+      // escondida (call encerrada): o botão de ligar fica no canto, sem seguir a câmera
       if (e.detail.visible || !last) follow(e.detail.rect);
     });
     requestAnimationFrame(() => attached.sync());
@@ -144,7 +135,6 @@ export function mountCallBar(opts: CallBarOptions = {}): CallBar {
       dock.classList.remove("is-ended");
       liveBtns.forEach((b) => b.removeAttribute("tabindex"));
       redial.tabIndex = -1;
-      pulseRing();
     },
     resetPosition: drag.reset,
   };
@@ -165,7 +155,6 @@ export function mountCallBar(opts: CallBarOptions = {}): CallBar {
     if (act === "pause") btn.setAttribute("aria-label", on ? "Retomar" : "Pausar");
     if (act === "mute") {
       btn.setAttribute("aria-label", on ? "Ativar microfone" : "Silenciar microfone");
-      pulseRing();
     }
     if (act === "end") api.end(e.detail === 0);
     if (act === "start") api.start();

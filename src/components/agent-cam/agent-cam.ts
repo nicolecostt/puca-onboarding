@@ -62,7 +62,7 @@ export function mountAgentCam(opts: AgentCamOptions = {}): AgentCam {
     emit("agentcam:move", { rect: r, visible });
     document.body.classList.toggle("has-agent-cam", visible);
     if (!visible) return;
-    const gap = 12;
+    const gap = 24; // respiro entre o chat e a câmera
     // barra de call presa embaixo da câmera: o chat desvia dela
     const bar = document.querySelector<HTMLElement>(".call-dock.is-attached");
     const barBelow = bar && bar.getBoundingClientRect().top >= r.bottom ? bar.offsetHeight + 8 : 0;
@@ -80,6 +80,11 @@ export function mountAgentCam(opts: AgentCamOptions = {}): AgentCam {
     threshold: 3,
     preventDefault: true,
     dblClickOnButtons: true,
+    // a barra de call presa embaixo da câmera sempre cabe: a câmera não desce além dela
+    reserveBottom: () => {
+      const bar = document.querySelector<HTMLElement>(".call-dock.is-attached");
+      return bar ? bar.offsetHeight + 8 : 0;
+    },
     onPlace: syncChat,
     onReset: syncChat,
   });
@@ -105,6 +110,7 @@ export function mountAgentCam(opts: AgentCamOptions = {}): AgentCam {
     },
     show() {
       cam.classList.remove("is-hidden");
+      drag.clamp(); // volta para dentro da tela se a posição salva não deixa espaço para a barra
       syncChat();
     },
     hide() {
