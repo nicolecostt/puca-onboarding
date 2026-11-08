@@ -87,8 +87,10 @@ respondem as mesmas rotas. O que muda é o que cada requisição precisa levar:
   `/api/health` responde `tts: false`, `stt: false` ou `llm: false`.
 - **CORS:** só `app://orbis` (o app) e `http://localhost:5173` (o Vite), com `Authorization` e `Content-Type`.
 
-Erros que o app trata como "sem servidor" (`ask()` de `src/voice/agent-voice.ts` devolve `false` e a sessão segue como
-sem servidor, em `src/screens/lesson/main.ts`; o `/api/speak` fica só na legenda; o microfone dá lugar ao chat):
+Erros que o app trata como "sem servidor" (`ask()`, `turn()` e `call()` de `src/voice/agent-voice.ts` devolvem `false` e a
+sessão segue como sem servidor, em `src/screens/lesson/main.ts`; o `/api/speak` fica só na legenda; o microfone dá lugar
+ao chat). Além dos status abaixo, também devolvem `false`: 200 com `timing.llm_error`, SSE inválido, vazio ou incompleto,
+e resposta que passa de 30 s. A fala `speak` com `source: "fallback"` não toca: a tela fala a própria frase de falha.
 
 | Status | Corpo | Quando |
 |---|---|---|
