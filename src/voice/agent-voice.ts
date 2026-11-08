@@ -53,7 +53,7 @@ export interface AgentVoice {
   speak(text: string, opts?: SpeakOptions): Promise<void>;
   /** Corta o que está tocando e o que ia tocar. */
   stop(): void;
-  /** Pergunta ao agente. false = servidor indisponível (a tela usa o fallback dela). */
+  /** Pergunta ao agente; corta a fala e a pergunta anteriores. false = servidor indisponível (a tela usa o fallback dela). */
   ask(req: AskRequest, h: AskHandlers): Promise<boolean>;
   /** Liga o microfone. onFinal recebe cada fala completa da pessoa. */
   listen(onFinal: (text: string) => void, onCaption?: (text: string) => void): Promise<void>;
@@ -151,6 +151,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       askAbort?.abort();
     },
     async ask(req, h) {
+      voice.stop(); // nunca duas respostas juntas: a pergunta nova corta a anterior e o que ela ia falar
       const ac = new AbortController();
       askAbort = ac;
       let res: Response;
