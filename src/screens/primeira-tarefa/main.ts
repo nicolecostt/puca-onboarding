@@ -1,4 +1,4 @@
-// Página da primeira tarefa (#15) no Notion da Tail, simulado: a tarefa que a Puca entregou na sessão e o estado da
+// Página da primeira tarefa (#15) no Notion da Kota, simulado: a tarefa que a Puca entregou na sessão e o estado da
 // aprovação do gestor. Lê o pedido do localStorage (?id=, ou o mais recente) e muda sozinha quando o gestor aprova no Slack.
 import "../../styles/base.css";
 import "./style.css";
@@ -23,7 +23,7 @@ function render(): void {
   empty.hidden = !!p;
   if (!p) return;
   const t = p.tarefa;
-  document.title = `${t.titulo} · Tail`;
+  document.title = `${t.titulo} · Kota`;
   set("#titulo", t.titulo);
   set("#pessoa", p.pessoa.trim() && p.pessoa.trim().toLowerCase() !== "você" ? p.pessoa.trim() : "Pessoa em integração");
   set("#problema", t.problema);

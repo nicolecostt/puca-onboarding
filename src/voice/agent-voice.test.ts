@@ -59,7 +59,7 @@ describe("createAgentVoice com o áudio bloqueado", () => {
     await ok;
     let tocou = false;
     const asked = voice.ask(
-      { text: "e o settlement?", moment_id: "m", step_id: "s", perfil: "novo", history: [] },
+      { text: "e o balancereader?", moment_id: "m", step_id: "s", perfil: "novo", history: [] },
       { onSpeak: (_t, play) => play().then(() => void (tocou = true)), onAction: () => {}, onGoTo: () => {} },
     );
     await vi.advanceTimersByTimeAsync(10); // bem antes do limite de 1 s do player

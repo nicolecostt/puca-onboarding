@@ -42,7 +42,7 @@ describe("calibragemFromAnswers", () => {
   });
 
   it("só a transição guarda time anterior, o que aproveita e o que muda", () => {
-    const r = { time_anterior: "Antifraude", aproveita: "Kafka", diferencas: "terminais" };
+    const r = { time_anterior: "Contas", aproveita: "JWT", diferencas: "saldo e extrato" };
     expect(calibragemFromAnswers(DEMO_PROFILES.transicao, r)).toMatchObject(r);
     expect(calibragemFromAnswers(DEMO_PROFILES.novo, r).time_anterior).toBeUndefined();
   });
@@ -60,7 +60,7 @@ describe("calibragens da demo", () => {
     expect(DEMO_CALIBRAGENS.novo.objetivos).toHaveLength(1);
   });
 
-  it("os momentos de cada tema existem na jornada da Tail", () => {
+  it("os momentos de cada tema existem na jornada da Kota", () => {
     const ids = new Set(demo.moments.map((m) => m.id));
     for (const t of Object.values(CALIBRAGEM_TEMAS)) for (const m of t.momentos) expect(ids).toContain(m);
   });
@@ -71,8 +71,8 @@ describe("atualizarCalibragem (checagem da sessão)", () => {
   const ana = DEMO_CALIBRAGENS.novo;
 
   it("entendeu: o tema sobe para pelo menos usa, com certeza alta e origem sessao", () => {
-    const c = atualizarCalibragem(ana, { tema: "pagamentos", passo: "ch-pergunta", entendeu: true, tentativas: 1, resposta: "settlement" }, agora);
-    expect(itemDoTema(c, "pagamentos")).toEqual({ tema: "pagamentos", nivel: "usa", certeza: "alta", evidencia: "settlement", origem: "sessao", checagem: "entendeu" });
+    const c = atualizarCalibragem(ana, { tema: "pagamentos", passo: "ch-pergunta", entendeu: true, tentativas: 1, resposta: "balancereader" }, agora);
+    expect(itemDoTema(c, "pagamentos")).toEqual({ tema: "pagamentos", nivel: "usa", certeza: "alta", evidencia: "balancereader", origem: "sessao", checagem: "entendeu" });
     expect(c.atualizada_em).toBe(agora.toISOString());
   });
 

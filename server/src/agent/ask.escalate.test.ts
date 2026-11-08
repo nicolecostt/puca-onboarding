@@ -58,7 +58,7 @@ describe("ask: encaminhamento", () => {
   });
 
   it("resposta com fonte: nenhum encaminhamento", async () => {
-    script = [{ type: "text", text: "O authorizer calcula o MDR, segundo o ADR-019." }, { type: "done", finishReason: "stop" }];
+    script = [{ type: "text", text: "O balancereader responde o saldo do cache, segundo o ADR-0004." }, { type: "done", finishReason: "stop" }];
     expect(escalations(await run())).toEqual([]);
   });
 

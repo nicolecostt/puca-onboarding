@@ -48,8 +48,8 @@ describe("montarJornadaDaPessoa", () => {
     const j = montarJornadaDaPessoa(journey, DEMO_CALIBRAGENS.transicao);
     const m = (id: string) => j.momentos.find((x) => x.id === id)!;
     expect(m("falha").motivo).toContain("retry e DLQ");
-    expect(m("pagamentos").motivo).toContain("adquirência");
-    expect(m("empresa-e-cultura").motivo).toMatch(/já é da Tail/);
+    expect(m("pagamentos").motivo).toContain("transferência e saldo");
+    expect(m("empresa-e-cultura").motivo).toMatch(/já é da Kota/);
     expect(m("checagem").motivo).toBe("");
   });
 

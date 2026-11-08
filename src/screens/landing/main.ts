@@ -80,7 +80,7 @@ function mountSkills(sphere: AgentVisual | null): void {
   show(0);
 }
 
-// ---- Nós do exemplo de quadro: dados lidos da jornada da Tail (o mesmo quadro da sessão) ----
+// ---- Nós do exemplo de quadro: dados lidos da jornada da Kota (o mesmo quadro da sessão) ----
 interface NodeCard {
   title: string;
   role: string;
@@ -136,7 +136,7 @@ function mountBoard(): void {
     const node = (e.target as Element).closest<HTMLElement>(".node");
     if (node?.dataset.node) select(node.dataset.node);
   });
-  select("topic", false);
+  select("ledgerwriter", false);
 }
 
 mountBoard();
