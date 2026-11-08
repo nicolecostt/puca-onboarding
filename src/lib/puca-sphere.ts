@@ -3,6 +3,7 @@
 //
 // Mouse: a esfera inclina na direção do cursor e os pontos perto dele crescem e escurecem.
 // Clique: solta uma ondulação que corre pela superfície.
+// Faixa: arco-íris holográfico (o tom muda ao longo da faixa e gira com o tempo); o fundo fica claro.
 import type { AgentVisual, AgentVisualFactory, AgentVisualState, RGB } from "./agent-visual";
 
 // ---- Ajustes ----
@@ -36,11 +37,20 @@ const mix = (a: RGB, b: RGB, t: number): RGB => ({
 });
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
+/** Cor do arco-íris holográfico: tom 0–360, saturação e luz 0–1. */
+function hsl(h: number, s: number, l: number): RGB {
+  const k = (n: number) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => 255 * (l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)));
+  return { r: f(0), g: f(8), b: f(4) };
+}
+
+// arco-íris: quantos graus de tom por volta da esfera e por segundo
+const HUE_SPREAD = 360; // graus de tom ao longo de uma volta da faixa
+const HUE_SPEED = 40; // graus por segundo (pensando gira mais rápido)
+
 export const mountPucaSphere: AgentVisualFactory = (container) => {
   const BASE = tokenColor("--puca-sphere-dot", { r: 201, g: 201, b: 201 }); // cinza dos pontos de fundo
-  const ACCENT = tokenColor("--puca-sphere-accent", { r: 255, g: 95, b: 162 }); // rosa da faixa
-  const ACCENT_WARM = tokenColor("--puca-sphere-warm", { r: 224, g: 52, b: 127 }); // pensando
-  const CORE = tokenColor("--puca-sphere-core", { r: 255, g: 156, b: 198 }); // miolo da faixa
   const CLICK = tokenColor("--puca-sphere-click", { r: 47, g: 91, b: 255 }); // ondulação do clique
 
   const canvas = document.createElement("canvas");
@@ -96,6 +106,7 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
   let tiltX = 0; // inclinação atual (segue o mouse com atraso)
   let tiltY = 0;
   let phase = 0;
+  let hue = 0; // tom de partida do arco-íris, gira com o tempo
 
   // mouse em coordenadas -1..1 relativas à esfera; null = fora
   let mouse: { x: number; y: number } | null = null;
@@ -188,7 +199,8 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
       }
     }
 
-    const accent = mix(ACCENT, ACCENT_WARM, warmMix);
+    hue = (hue + dt * HUE_SPEED * (1 + warmMix * 1.5)) % 360;
+    const sat = 0.85 + warmMix * 0.15;
     const R = Math.min(w, h) * 0.44;
     const cxS = w / 2;
     const cyS = h / 2;
@@ -245,8 +257,10 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
       const heat = Math.min(1, Math.max(halo, halo2) + touch * 0.5);
       const dark = Math.min(1, core * 0.95 + touch * 0.35);
 
-      let c = mix(BASE, accent, heat);
-      c = mix(c, CORE, dark);
+      // tom do ponto: anda com a longitude e com a posição na tela (brilho holográfico)
+      const h = hue + (lo / (Math.PI * 2)) * HUE_SPREAD + (sx[i] - sy[i]) * 140;
+      let c = mix(BASE, hsl(h, sat, 0.62), heat);
+      c = mix(c, hsl(h + 30, sat, 0.75), dark);
       // o clique corre pela esfera em azul
       c = mix(c, CLICK, Math.min(1, ring * 3));
 
@@ -274,7 +288,7 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
       warm = on;
     },
     getColor() {
-      const c = mix(ACCENT, ACCENT_WARM, warmMix);
+      const c = hsl(hue, 0.85, 0.62);
       return { r: Math.round(c.r), g: Math.round(c.g), b: Math.round(c.b) };
     },
   };

@@ -52,10 +52,7 @@
   --color-pink: #ff5fa2;
 
   /* esfera da Puca (src/lib/puca-sphere.ts): só #rrggbb, o canvas lê estes valores */
-  --puca-sphere-dot: #c9c9c9; /* pontos de fundo, cinza claro */
-  --puca-sphere-accent: #ff5fa2; /* faixa rosa (= --color-pink) */
-  --puca-sphere-warm: #e0347f; /* pensando: rosa mais forte */
-  --puca-sphere-core: #ff9cc6; /* miolo da faixa, rosa claro */
+  --puca-sphere-dot: #c9c9c9; /* pontos de fundo, cinza claro (a faixa é arco-íris, gerada no canvas) */
   --puca-sphere-click: #2f5bff; /* ondulação do clique (= --color-blue) */
 
   --color-highlight: rgba(250, 204, 21, 0.35); /* trecho sendo falado / foco no quadro */
