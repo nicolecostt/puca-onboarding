@@ -1,6 +1,7 @@
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { type AdrKota, caminhoAdr } from "../../tipos";
+import { existe, nomes } from "../caminhos";
 import type { ContextoKota, Regra } from "../contexto";
 
 const ONDE = "## Onde ver no código";
@@ -84,14 +85,4 @@ function ondeVer(a: AdrKota, caminhos: string[] | undefined, repo: string): stri
     ...a.ancoras.filter((c) => !caminhos.includes(c)).map((c) => `âncora ${c} do mapa falta em "Onde ver no código"`),
     ...caminhos.filter((c) => !existe(repo, c)).map((c) => `âncora ${c} não existe no repo`),
   ];
-}
-
-// O GitHub diferencia maiúsculas no caminho; o disco padrão do macOS, não, e existsSync aceitaria src/Ledger.
-function existe(raiz: string, caminho: string): boolean {
-  const partes = caminho.split("/");
-  return partes.every((parte, i) => nomes(join(raiz, ...partes.slice(0, i))).includes(parte));
-}
-
-function nomes(pasta: string): string[] {
-  return existsSync(pasta) && statSync(pasta).isDirectory() ? readdirSync(pasta) : [];
 }
