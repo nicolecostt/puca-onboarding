@@ -354,7 +354,7 @@ A partir das capturas da página de onboarding da Sana Learn compartilhadas por 
 
 Na referência compartilhada, a Sana descreve seu AI Tutor oferecendo respostas em linguagem natural com citações do conhecimento da empresa. O Puca pretende aprofundar essa experiência, especialmente em **onboarding técnico**, com:
 
-- conversa por voz ou texto conectada a uma **lousa visual interativa**;
+- conversa por voz ou texto conectada a um **quadro visual interativo**;
 - construção progressiva de mapas e explicações sobre arquitetura, fluxos e decisões técnicas;
 - possibilidade de **interromper, explorar uma dúvida e retomar** a explicação;
 - adaptação ao conhecimento identificado na call inicial e nas sessões anteriores;
@@ -464,7 +464,7 @@ A Puca é vendida para empresas (B2B): **a empresa compra e o RH aprova**. A ent
 | **Gestor e engenharia** | Ajudam a definir tarefas, contexto e qualidade esperada. |
 | **Buddy** | Orienta quando precisa e mostra onde há repetição ou bloqueio. |
 | **TI e segurança** | Participam da conexão com os sistemas da empresa e da avaliação de acessos, quando for o caso. |
-| **Pessoa** | Usa a Lousa para aprender e fazer as primeiras tarefas. |
+| **Pessoa** | Usa o Orbis para aprender e fazer as primeiras tarefas. |
 
 Foco inicial: empresas com times de tecnologia, contratações ou mudanças de time recorrentes e conhecimento espalhado em várias fontes. Não há corte de tamanho definido. Grandes empresas são um bom começo, não um limite.
 
@@ -475,7 +475,7 @@ Os dois vínculos, novo e transição ([§3](#3-cenários-principais-de-uso)), f
 - **Unidade:** a integração, ou seja, uma pessoa entrando num contexto de destino. Novo e transição consomem o **mesmo saldo**, com o mesmo preço, até os dados mostrarem diferença de custo ou de valor.
 - **Piloto pago:** preço e número de integrações menores que no contrato anual. Padrão de partida: **60 dias de uso**, contados depois que fontes e acessos estão disponíveis, em uma equipe. Revisão no meio e revisão comercial no fim.
 - **Contrato anual:** volume de integrações com **quantidade mínima**.
-- **Implantação:** conectar a Lousa às fontes e aos acessos de um cliente. A equipe já está construindo essa parte do produto, mas ainda não há implantação em nenhum cliente. Uma taxa separada só será proposta se o esforço observado justificar.
+- **Implantação:** conectar o Orbis às fontes e aos acessos de um cliente. A equipe já está construindo essa parte do produto, mas ainda não há implantação em nenhum cliente. Uma taxa separada só será proposta se o esforço observado justificar.
 
 O piloto vira contrato anual quando três coisas acontecem juntas:
 
