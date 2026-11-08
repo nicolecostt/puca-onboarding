@@ -1,4 +1,4 @@
-// Tela de auxílio: barra de call, chat e câmera de Puca por cima de outra ferramenta.
+// Tela de auxílio: barra de call, chat e câmera do Puca por cima de outra ferramenta.
 // A tela inteira imita o Slack (tema claro) com os dados da Kota; o conteúdo está no index.html.
 import "../../styles/base.css";
 import "./style.css";
@@ -19,7 +19,7 @@ const BUDDY_ACK = "Vi aqui, te respondo já.";
 const now = () => new Date().toLocaleTimeString("pt-BR", { hour: "numeric", minute: "2-digit" }).replace(":", "h");
 const initials = (name: string) => name.split(/\s+/).map((w) => w[0] ?? "").join("").slice(0, 2).toUpperCase();
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-/** Resposta do gestor na DM com Puca. Sem nome (profile.nome vira "você"), fala da pessoa. */
+/** Resposta do gestor na DM com o Puca. Sem nome (profile.nome vira "você"), fala da pessoa. */
 function aprovadaMsg(pessoa: string): string {
   const nome = pessoa.trim();
   return nome && nome.toLowerCase() !== "você" ? `Aprovada. Pode passar para ${nome}.` : "Aprovada. Pode passar para a pessoa.";
@@ -30,9 +30,9 @@ async function main(): Promise<void> {
   const cam = mountAgentCam({ name: "Puca", visual: await loadAgentVisual() });
   mountCallBar({ chat, attachTo: cam }); // barra presa embaixo da câmera; sem status por cima do Slack
   const cursor = mountAgentCursor();
-  mountPucaDots(document.querySelector<HTMLElement>("#cu-dots")!); // as bolinhas de Puca no aviso do topo
+  mountPucaDots(document.querySelector<HTMLElement>("#cu-dots")!); // as bolinhas do Puca no aviso do topo
 
-  // Simula Puca conversando: fala por um tempo, faz uma pausa, às vezes pensa
+  // Simula o Puca conversando: fala por um tempo, faz uma pausa, às vezes pensa
   const script: [AgentVisualState, number][] = [
     ["talk", 3200], ["idle", 1600], ["talk", 2400], ["think", 1800], ["talk", 3000], ["idle", 2200],
   ];
@@ -62,14 +62,14 @@ async function main(): Promise<void> {
   });
 
   // O que a sessão deixou para o Slack: encaminhamentos à buddy (#28) e pedidos de aprovação da primeira tarefa
-  // ao gestor (#15). Puca abre a DM, digita e envia, um de cada vez. "enviando" antes da animação: outra aba do
+  // ao gestor (#15). O Puca abre a DM, digita e envia, um de cada vez. "enviando" antes da animação: outra aba do
   // Slack, ou um recarregar, não manda de novo.
   const outbox = createOutbox(browserStore());
   const pedidos = createPedidos(browserStore());
   const tab = uid();
   let sending = false;
 
-  /** O cursor abre a DM, digita o texto e clica em enviar; a mensagem fica no feed como de Puca. */
+  /** O cursor abre a DM, digita o texto e clica em enviar; a mensagem fica no feed como do Puca. */
   async function escreverNaDm(name: string, text: string): Promise<void> {
     const dm = findDm(name);
     if (dm) {
@@ -92,7 +92,7 @@ async function main(): Promise<void> {
     b.disabled = true;
     b.textContent = "Aprovada";
   };
-  /** Mensagem do pedido com o botão. O clique é o gestor decidindo (§12.2): Puca nunca aprova sozinha. */
+  /** Mensagem do pedido com o botão. O clique é o gestor decidindo (§12.2): o Puca nunca aprova sozinho. */
   function mostrarPedido(p: PedidoDeAprovacao): void {
     const button = postApprovalRequest({
       text: pedidoMessage(p),
@@ -168,8 +168,8 @@ async function main(): Promise<void> {
   // Recarregou com pedido já enviado e ainda sem resposta: a DM do gestor volta com o botão, sem animação.
   restaurar();
 
-  // Cursor de Puca mexendo no Slack (simulado): abre o canal, mostra o link do README,
-  // passa pelo cartão e vai até a busca. Repete em laço; para enquanto Puca envia um encaminhamento,
+  // Cursor do Puca mexendo no Slack (simulado): abre o canal, mostra o link do README,
+  // passa pelo cartão e vai até a busca. Repete em laço; para enquanto o Puca envia um encaminhamento,
   // e não volta mais depois de abrir uma DM (o tour é do canal).
   const pick = (sel: string) => document.querySelector(sel);
   const tour: { sel: string; click?: boolean; stay: number }[] = [

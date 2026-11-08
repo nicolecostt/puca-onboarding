@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import demo from "../data/tail.journey.json";
+import demo from "../data/kota.journey.json";
 import { loadJourney } from "../validate";
 import { DEMO_PROFILES } from "../profile";
 import { nextPosition, type Posicao } from "../pauta";
@@ -18,7 +18,7 @@ describe("nextPosition", () => {
   });
 
   it("usa a resposta da pessoa, mesmo dita com outras palavras", () => {
-    expect(ids(nextPosition(journey, DEMO_PROFILES.novo, at("pagamentos", "pg-pergunta"), { reply: "e se a liquidação falhar" }))).toBe("falha/fa-retry");
+    expect(ids(nextPosition(journey, DEMO_PROFILES.novo, at("pagamentos", "pg-pergunta"), { reply: "e se o balancereader cair" }))).toBe("falha/fa-recusa");
     expect(ids(nextPosition(journey, DEMO_PROFILES.novo, at("pagamentos", "pg-pergunta")))).toBe("checagem/ch-pergunta");
   });
 

@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "main": "dist-desktop/main.cjs",
-  "description": "Orbis: Puca conduz o onboarding por voz",
+  "description": "Orbis: O Puca conduz o onboarding por voz",
   "author": "Orbis",
   "scripts": {
     "dev": "vite",

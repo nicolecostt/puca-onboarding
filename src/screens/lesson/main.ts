@@ -173,7 +173,7 @@ async function main(): Promise<void> {
     const off = paused || ended;
     const voice = off ? "paused" : agentState === "speaking" ? "talk" : "listen";
     el.voice.dataset.state = voice;
-    el.voice.setAttribute("aria-label", ended ? "Sessão encerrada" : paused ? "Puca pausado" : voice === "talk" ? "Puca falando" : micOk ? "Puca ouvindo" : "Puca esperando pelo chat");
+    el.voice.setAttribute("aria-label", ended ? "Sessão encerrada" : paused ? "O Puca pausado" : voice === "talk" ? "O Puca falando" : micOk ? "O Puca ouvindo" : "O Puca esperando pelo chat");
     el.liveDot.classList.toggle("is-off", off);
     cam.setPaused(off);
     if (!off) cam.setState(CAM_STATE[agentState]);

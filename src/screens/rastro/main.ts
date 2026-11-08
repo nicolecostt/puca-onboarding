@@ -1,5 +1,5 @@
 // Tela só para a demo (#51): lista o rastro guardado neste navegador pela sessão e baixa em JSON.
-// Não faz parte do produto; serve para mostrar à banca que dá para auditar o que Puca fez e por quê.
+// Não faz parte do produto; serve para mostrar à banca que dá para auditar o que o Puca fez e por quê.
 import "../../styles/base.css";
 import "./style.css";
 import { createOutbox, FORWARDING_KEY } from "../../journey/forwarding";

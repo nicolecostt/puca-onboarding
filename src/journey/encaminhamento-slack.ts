@@ -11,9 +11,9 @@ export interface PedidoDeEncaminhamento {
   para: string;
   pergunta: string;
   resumo: string;
-  /** Títulos das fontes que Puca consultou, como em Forwarding.consulted. */
+  /** Títulos das fontes que o Puca consultou, como em Forwarding.consulted. */
   fontes_consultadas: string[];
-  /** Por que Puca não respondeu. */
+  /** Por que o Puca não respondeu. */
   motivo: string;
   /** E-mail do jurado no Slack da Kota; sem ele, nada é postado. */
   email?: string;

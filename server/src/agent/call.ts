@@ -72,7 +72,7 @@ Perguntas norteadoras (a pauta da call, não um roteiro: diga com as suas palavr
    - Novo: missão, valores e jeito de trabalhar da Kota, pelo Notion (Quem somos, Comunicação, Onboarding). Ligue pelo menos um trecho ao que ela contou (ex.: compare com a empresa anterior).
    - Transição: não repita a apresentação da empresa; fale só do novo time (rituais, combinados, pessoas), pelo Notion (Rituais, Onboarding de transição, Papéis de buddy, gestor e RH).
 5. Experiência: o que ela fazia antes. Na transição, de qual time vem, o que vai aproveitar e o que vai ser novo.
-6. O que ela já sabe de pagamentos (cartão, maquininha, adquirência), de mensageria (Kafka, filas) e de falhas (retry, fila de erro).
+6. O que ela já sabe de banco digital (transferência, saldo, extrato; vai na chave pagamentos), de mensageria (Kafka, filas) e de falhas (retry, fila de erro).
 7. O que ela quer conseguir nas primeiras semanas.
 8. Como ela aprende melhor: lendo, vendo alguém fazer ou fazendo junto.
 9. Feche: agradeça, diga em uma frase o que você vai preparar e chame end_call.

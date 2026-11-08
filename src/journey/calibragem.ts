@@ -1,4 +1,4 @@
-// Calibragem: o que Puca concluiu na call inicial sobre o que a pessoa já sabe e o que ela quer.
+// Calibragem: o que o Puca concluiu na call inicial sobre o que a pessoa já sabe e o que ela quer.
 // A call inicial escreve; a jornada e a adaptação das explicações leem. Formato em docs/contratos.md.
 // Por enquanto o nível sai de regras por palavras (funciona sem servidor e é sempre igual na demo).
 import { normalize } from "./conditions";

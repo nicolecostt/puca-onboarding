@@ -15,14 +15,14 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask`, `/api/turn` ([turno](#turno-da-sessão)), `/api/call` ([call inicial](#call-inicial)), `/api/voice/token`, `/api/encaminhamentos`; token do Supabase, limites e CORS — [seção abaixo](#api-do-servidor) | `src/voice/agent-voice.ts`, `src/voice/pcm-player.ts`, `screens/lesson`, `server/bench/turn-latency.ts` | `server/src/app.test.ts`, `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
-| Rastro (decisões de Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
+| Rastro (decisões do Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
 | Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` | `screens/lesson` (cria e pede o envio no Slack da Kota pelo servidor, `src/journey/slack-real.ts`), `screens/live-session` (envia no Slack simulado o que ficou pendente), rastro (`forwarding_id`, `forwarding_link`), `screens/rh` (conta os abertos pelo `status`); envio real: [seção abaixo](#encaminhamento-no-slack-da-kota) | `__tests__/forwarding.test.ts`, `__tests__/slack-real.test.ts`, `server/src/slack/encaminhar.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
 | Primeira tarefa | `src/journey/primeira-tarefa.ts` (`TarefaDoTime`, `PedidoDeAprovacao`, chave `puca:primeiras-tarefas` no `localStorage`) e os nós `kind: "task"` da jornada — [seção abaixo](#primeira-tarefa) | `screens/lesson` (cria o pedido quando o cartão da tarefa abre), `screens/live-session` (pede a aprovação ao gestor no Slack e grava a aprovação), `screens/primeira-tarefa` (página da tarefa), `screens/rh` (conta pessoas com pedido não aprovado, por `status` e `pessoa`) | `__tests__/primeira-tarefa.test.ts`, `screens/primeira-tarefa/pagina.test.ts` |
 | App para Mac (`window.orbis`) | `desktop/preload.ts` + `src/orbis.d.ts` — [seção abaixo](#app-para-mac) | telas que testam `if (window.orbis)`; a #123 acrescenta `navegador` | `tsc` |
-| Visual de Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
+| Visual do Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
 
-Exemplo válido de `TrailEntry` (uma fala da pessoa e o que Puca fez com ela):
+Exemplo válido de `TrailEntry` (uma fala da pessoa e o que o Puca fez com ela):
 
 ```json
 {
@@ -121,7 +121,7 @@ interface PedidoDeEncaminhamento {
   pergunta: string;
   resumo: string;
   fontes_consultadas: string[];     // títulos, como em Forwarding.consulted
-  motivo: string;                   // por que Puca não respondeu (Forwarding.reason)
+  motivo: string;                   // por que o Puca não respondeu (Forwarding.reason)
   email?: string;                   // e-mail do jurado no Slack da Kota; sem ele, nada é postado
 }
 // 200
@@ -173,7 +173,7 @@ if (window.orbis) console.log(`Orbis ${window.orbis.versao}`); // no app
 
 ## Calibragem
 
-O que Puca concluiu na call inicial sobre o que a pessoa já sabe e o que ela quer (glossário: **calibragem**).
+O que o Puca concluiu na call inicial sobre o que a pessoa já sabe e o que ela quer (glossário: **calibragem**).
 A call inicial grava no fim da conversa; quem lê usa `resolveCalibragem(location.search)`
 (`?perfil=` → calibragem salva pela call → demo do Bruno), no mesmo padrão do perfil.
 Enquanto a sua parte não lê de verdade, use `DEMO_CALIBRAGENS.novo` (Ana) e `DEMO_CALIBRAGENS.transicao` (Bruno) como mock.
@@ -298,9 +298,9 @@ data: {"type":"timing","timing":{"first_speak_ms":700,"llm_first_token_ms":680,"
 
 ## Voz ↔ quadro
 
-Cada ação do quadro acontece na palavra em que Puca fala dela (PRODUCT.md §4.1: o quadro é construído progressivamente).
+Cada ação do quadro acontece na palavra em que o Puca fala dela (PRODUCT.md §4.1: o quadro é construído progressivamente).
 
-- **Na jornada:** qualquer ação de `actions` aceita `at`, um trecho da `line` do passo. A ação sai quando Puca chega
+- **Na jornada:** qualquer ação de `actions` aceita `at`, um trecho da `line` do passo. A ação sai quando o Puca chega
   nesse trecho; sem `at`, sai antes da fala (como sempre foi). O validador exige que o trecho exista na fala.
   ```json
   { "type": "reveal", "targets": ["valor-dono", "m-dono"], "at": "dono do problema" }
@@ -400,7 +400,7 @@ ele é, para o FAQ e o agente não falarem da tarefa do outro perfil:
 `Problema: …` · `Por que importa: …` · `Sistemas: …` · `Onde ler: …` · `Quem ajuda: …`
 
 Quando o cartão de um nó `task` abre, a sessão cria um **pedido de aprovação** para o gestor. A tela do Slack pega o pedido,
-Puca escreve na DM do gestor, e o gestor aprova com um clique. A página da tarefa e a sessão escutam o evento `storage`.
+O Puca escreve na DM do gestor, e o gestor aprova com um clique. A página da tarefa e a sessão escutam o evento `storage`.
 
 - Status: `pendente` (a sessão criou) → `enviando` (uma aba do Slack pegou; `claimed_by`/`claimed_at`, com a mesma regra de 30 s
   do encaminhamento) → `aguardando` (mensagem enviada na DM do gestor) → `aprovada` (o gestor clicou; `aprovada_por` e `aprovada_em`).
