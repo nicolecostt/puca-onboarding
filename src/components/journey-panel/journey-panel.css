@@ -125,7 +125,7 @@
 .jp-moments::before {
   content: "";
   position: absolute;
-  left: 13.5px; /* centro da marca */
+  left: 14.5px; /* centro da marca: 8px de padding + 7px */
   top: 14px;
   bottom: 14px;
   width: 1px;
@@ -137,7 +137,7 @@
   position: relative;
   cursor: pointer;
   width: 100%;
-  padding: 6px;
+  padding: 7px 8px;
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -153,13 +153,13 @@
 /* marca: visto cheio (feito), anel com ponto (agora), vazada (a seguir), traço (pulado) */
 .jp-moment__mark {
   flex: none;
-  width: 16px;
-  height: 16px;
-  margin-top: 1px;
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  border: 1.5px solid var(--color-subtle);
+  border: 1.25px solid var(--color-subtle);
   background: var(--color-surface); /* tampa o trilho */
   color: var(--color-surface);
 }
@@ -173,8 +173,8 @@
 }
 .jp-moment--agora .jp-moment__mark::after {
   content: "";
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: var(--color-text);
 }
@@ -190,6 +190,7 @@
 }
 .jp-moment__when {
   font-size: 11px;
+  line-height: 14px;
   font-weight: 500;
   color: var(--color-muted);
 }
@@ -226,9 +227,9 @@
 /* Selo do estado: texto pequeno à direita, sem caixa; o estado vem do traço embaixo */
 .jp-tag {
   flex: none;
-  margin-top: 2px;
+  margin-top: 1px;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 16px;
   white-space: nowrap;
   color: var(--color-muted);
@@ -236,12 +237,21 @@
 .jp-tag--aprender {
   color: var(--color-text);
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
 .jp-tag--revisar {
   text-decoration: underline dashed;
-  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
 .jp-tag--fora {
   color: var(--color-subtle);
+}
+/* com "agora" ou "a seguir" em cima (14px + 2px), marca e selo descem para a linha do título */
+.jp-moment__btn:has(.jp-moment__when) .jp-moment__mark {
+  margin-top: 18px;
+}
+.jp-moment__btn:has(.jp-moment__when) .jp-tag {
+  margin-top: 17px;
 }
