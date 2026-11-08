@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { TtsCache } from "./cache";
+import { TravaDiaria } from "../../trava-diaria";
 import { TtsService } from "./service";
 import type { TtsChunk, TtsProvider, TtsRequest } from "./types";
 
@@ -114,5 +115,20 @@ describe("TtsService", () => {
     const failing = service(new FakeProvider([chunk([1], "x")], 0, new Error("boom")));
     failing.start({ action_id: "f", text: "x" }).catch(() => undefined);
     expect(await failing.words("f")).toEqual([]);
+  });
+
+  it("trava diária: sínteses simultâneas reservam antes e não passam juntas do limite; falha devolve", async () => {
+    const trava = new TravaDiaria(5);
+    const svc = service(new FakeProvider([chunk([1], "abc")], 20));
+    svc.limitarCom(trava);
+    const a = svc.start({ action_id: "a", text: "abc" });
+    const b = svc.start({ action_id: "b", text: "def" }); // ao mesmo tempo: 3 + 3 > 5
+    expect((await a).audio_bytes).toBe(1);
+    await expect(b).rejects.toThrow("limite_diario");
+    const falha = service(new FakeProvider([chunk([1], "x")], 0, new Error("boom")));
+    const t2 = new TravaDiaria(5);
+    falha.limitarCom(t2);
+    await expect(falha.start({ action_id: "f", text: "xyz" })).rejects.toThrow("boom");
+    expect(t2.usa(5)).toBe(true); // a reserva da síntese que falhou voltou
   });
 });

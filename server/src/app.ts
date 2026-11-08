@@ -50,6 +50,24 @@ function sse(reply: FastifyReply): (ev: AskEvent) => void {
 }
 
 const MAX_TEXT = 500;
+const MAX_CAMPO_PERFIL = 120;
+
+/** Perfil que veio do app: só os campos conhecidos, texto curto e vínculo válido (o servidor é público). */
+export function perfilSeguro(p: unknown, perfil: string | undefined): Profile {
+  const base = DEMO_PROFILES[perfil === "transicao" ? "transicao" : "novo"];
+  if (!p || typeof p !== "object") return base;
+  const o = p as Record<string, unknown>;
+  const campo = (k: string) => (typeof o[k] === "string" ? (o[k] as string).slice(0, MAX_CAMPO_PERFIL) : undefined);
+  return {
+    nome: campo("nome") || base.nome,
+    cargo: campo("cargo"),
+    time: campo("time"),
+    gestor: campo("gestor"),
+    ferramentas: campo("ferramentas"),
+    aprender: campo("aprender"),
+    vinculo: o.vinculo === "transicao" ? "transicao" : "novo",
+  };
+}
 
 /** Limite por pessoa de cada rota (docs/stack.md §5.3). */
 const POR_MINUTO = (max: number) => ({ rateLimit: { max, timeWindow: "1 minute" } });
@@ -131,7 +149,7 @@ export function buildApp(opts: BuildAppOptions = {}) {
         reply.raw.on("close", () => { if (!reply.raw.writableFinished) ac.abort(); });
         const emit = sse(reply);
         const timing = await ask(
-          { journey, profile: b.profile ?? DEMO_PROFILES[b.perfil ?? "novo"], momentId: moment.id, stepId: step.id, text, history, tts, model: env.model, timeoutMs: env.llmTimeoutMs, signal: ac.signal },
+          { journey, profile: perfilSeguro(b.profile, b.perfil), momentId: moment.id, stepId: step.id, text, history, tts, model: env.model, timeoutMs: env.llmTimeoutMs, signal: ac.signal },
           emit,
         );
         reply.raw.end();

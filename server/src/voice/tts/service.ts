@@ -30,7 +30,8 @@ interface Job {
 
 export interface TravaDoTts {
   esgotada(): boolean;
-  registra(chars: number): void;
+  usa(chars: number): boolean;
+  devolve(chars: number): void;
 }
 
 export interface TtsServiceOptions {
@@ -125,8 +126,11 @@ export class TtsService {
       let first: number | null = null;
       const chars: CharTiming[] = [];
       let bytes = 0;
+      let reservado = false;
       try {
-        if (this.trava?.esgotada()) throw new Error("limite_diario");
+        // reserva antes de chamar o provedor: sínteses simultâneas não passam juntas da trava
+        if (this.trava && !this.trava.usa(spoken.length)) throw new Error("limite_diario");
+        reservado = !!this.trava;
         for await (const chunk of provider.synthesize({
           text: spoken,
           previous_text: req.previous_text,
@@ -139,12 +143,14 @@ export class TtsService {
           chars.push(...chunk.chars);
           wake();
         }
-        if (bytes > 0) this.trava?.registra(spoken.length);
+        if (bytes === 0 && reservado) this.trava?.devolve(spoken.length); // nada sintetizado: não conta
+        reservado = false;
         const words = charsToWords(chars);
         // guarda em segundo plano: o Storage não atrasa o fim do áudio nem as palavras; falhar só perde o cache
         if (!job.abort.signal.aborted && bytes > 0) this.track(cache.put(key, Buffer.concat(job.chunks), words));
         return { words: remapWordTimings(spokenWords, words), first_byte_ms: first, audio_bytes: bytes, cached: false };
       } catch (err) {
+        if (bytes === 0 && reservado) this.trava?.devolve(spoken.length);
         job.error = err instanceof Error ? err : new Error(String(err));
         throw job.error;
       } finally {

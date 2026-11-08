@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT, type JWK } from "jose";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { buildApp, loadDemoJourney } from "./app";
+import { buildApp, loadDemoJourney, perfilSeguro } from "./app";
 import { criaVerificaToken, type VerificaToken } from "./auth";
 import { TtsCache } from "./voice/tts/cache";
 import { TtsService } from "./voice/tts/service";
@@ -114,11 +114,11 @@ describe("travas diárias", () => {
 
   it("TTS: conta só o sintetizado; esgotada, recusa fala nova, serve a do cache e /api/health diz tts: false", async () => {
     const tts = fakeTts();
-    const app = buildApp({ journey, tts, verificaToken: null, limiteDiario: { tts: 10 } });
+    const app = buildApp({ journey, tts, verificaToken: null, limiteDiario: { tts: 14 } });
     expect((await app.inject({ method: "GET", url: "/api/health" })).json().tts).toBe(true);
     const primeira = await app.inject({ method: "POST", url: "/api/speak", payload: { text: "Olá, tudo bem?" } });
     expect(primeira.statusCode).toBe(200);
-    await tts.words(primeira.json().id); // síntese pronta: 14 caracteres, passou de 10
+    await tts.words(primeira.json().id); // síntese pronta: 14 caracteres, chegou ao limite
     await tts.flush(); // e já gravada no cache
     const nova = await app.inject({ method: "POST", url: "/api/speak", payload: { text: "mais uma fala" } });
     expect(nova.statusCode).toBe(503);
@@ -126,6 +126,17 @@ describe("travas diárias", () => {
     expect((await app.inject({ method: "POST", url: "/api/speak", payload: { text: "Olá, tudo bem?" } })).statusCode).toBe(200);
     expect((await app.inject({ method: "GET", url: "/api/health" })).json().tts).toBe(false);
     await app.close();
+  });
+});
+
+describe("perfil vindo do app", () => {
+  it("só passa campos conhecidos, curtos, e vínculo válido", () => {
+    const p = perfilSeguro({ nome: "Ana".repeat(1000), time: 42, vinculo: "admin", extra: "x" }, "novo");
+    expect(p.nome.length).toBe(120);
+    expect(p.time).toBeUndefined();
+    expect(p.vinculo).toBe("novo");
+    expect("extra" in p).toBe(false);
+    expect(perfilSeguro(undefined, "transicao").vinculo).toBe("transicao");
   });
 });
 

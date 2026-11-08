@@ -31,10 +31,10 @@ export class TravaDiaria {
     return true;
   }
 
-  /** Soma `n` ao uso do dia sem recusar (uso que só se sabe depois, como os caracteres sintetizados). */
-  registra(n: number): void {
+  /** Devolve `n` unidades reservadas e não usadas (ex.: síntese que falhou antes do primeiro byte). */
+  devolve(n: number): void {
     this.vira();
-    this.usado += n;
+    this.usado = Math.max(0, this.usado - n);
   }
 
   /** true quando o limite do dia já foi atingido. */

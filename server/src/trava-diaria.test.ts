@@ -22,6 +22,13 @@ describe("TravaDiaria", () => {
     expect(diaEmSaoPaulo(now)).toBe("2026-11-09");
   });
 
+  it("devolve o que foi reservado e não usado", () => {
+    const t = new TravaDiaria(10);
+    expect(t.usa(10)).toBe(true);
+    t.devolve(10);
+    expect(t.usa(5)).toBe(true);
+  });
+
   it("sem limite (Infinity) nunca recusa", () => {
     const t = new TravaDiaria(Infinity);
     expect(t.usa(1e9)).toBe(true);
