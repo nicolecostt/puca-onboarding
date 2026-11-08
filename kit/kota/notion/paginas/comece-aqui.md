@@ -9,7 +9,7 @@ Você entra no time **Livro-razão**, que registra cada centavo que entra e sai 
 - **Novo na Kota.** Você é a Ana Lacerda, engenheira de software pleno, e acabou de entrar na empresa. Puca começa pela parte institucional (cultura, políticas e acessos) e depois vai para o time. O seu roteiro é [Novo na Kota](notion:onboarding-novo).
 - **Mudando de time.** Você é o Bruno Siqueira, engenheiro de software pleno, e vem do time Contas. Puca pula a parte institucional, compara o time novo com o que você já conhece e vai direto ao Livro-razão. O seu roteiro é [Mudando de time](notion:onboarding-transicao).
 
-Na primeira vez que o Orbis abre, escolha o cartão da Ana ("Entrando na Kota") ou o do Bruno ("Mudando de time"). Antes, se quiser, informe abaixo dos cartões o e-mail com que entrou no Slack da Kota. A escolha vale para a call inicial e para a sessão, e Puca não pergunta de novo. Para depois testar o outro perfil, remova o app e os dados com `curl -fsSL https://raw.githubusercontent.com/nicolecostt/puca-onboarding/main/scripts/instalar.sh | bash -s -- --desinstalar` e instale de novo.
+O Orbis abre nas boas-vindas. Se quiser, informe ali o e-mail com que entrou no Slack da Kota e comece a call inicial. Na call, Puca pergunta se você está entrando na Kota (como a Ana) ou mudando de time (como o Bruno): a resposta vale para a call e para a sessão. Para depois testar o outro perfil, abra o Orbis de novo, comece outra call e responda o contrário.
 
 ## Onde estão as coisas
 

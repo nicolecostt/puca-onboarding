@@ -378,7 +378,7 @@ body {
   cursor: pointer;
 }
 
-/* Sem LLM a call não acontece: logo acima do aviso, a saída para a sessão com o perfil escolhido. */
+/* Sem LLM a call não acontece: logo acima do aviso, a saída para a sessão com o vínculo que a conversa já trouxe. */
 .call-seguir {
   display: block;
   height: 40px;

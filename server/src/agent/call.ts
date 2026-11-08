@@ -6,6 +6,7 @@ import type { TtsService } from "../voice/tts/service";
 import { streamChat, type ChatMessage, type ToolSpec } from "../llm";
 import { estimateTokens, type AskTiming } from "./ask";
 import { FAILURE_LINE, pickBridge } from "./bridges";
+import { vinculoFromAnswer } from "../../../src/journey/profile";
 import { SentenceSplitter } from "./sentences";
 
 /** O que a call anota: as mesmas chaves que profileFromAnswers e calibragemFromAnswers leem. */
@@ -99,7 +100,8 @@ export function callContext(input: CallInput): string {
   const anotado = Object.entries(input.anotado).filter(([, v]) => v);
   // o time anterior e o que aproveita só valem para quem está mudando de time
   const daTransicao = new Set(["time_anterior", "aproveita", "diferencas"]);
-  const transicao = input.anotado.vinculo === "transicao";
+  // a mesma leitura do cliente (vinculoFromAnswer): "transição" ou "mudando de time" também são transição (revisão do #221)
+  const transicao = !!input.anotado.vinculo && vinculoFromAnswer(input.anotado.vinculo) === "transicao";
   const faltam: string[] = CAMPOS_DA_CALL.filter((k) => !input.anotado[k] && (transicao || !daTransicao.has(k)));
   // a cultura só entra depois de saber o vínculo (novo ouve a empresa; transição ouve o time)
   if (input.anotado.vinculo) {
@@ -191,7 +193,9 @@ export async function callTurn(input: CallInput, emit: (ev: CallEvent) => void):
       if (pending) sentence(pending);
       const a = (ev.args ?? {}) as { key?: string; value?: string };
       if (ev.name === "answer" && CAMPOS_DA_CALL.includes(a.key as CampoDaCall) && a.value?.trim()) {
-        emit({ type: "answer", key: a.key as CampoDaCall, value: a.value.trim().slice(0, 300) });
+        // o vínculo sai já no valor do contrato ("novo" ou "transicao"), para tela e servidor lerem igual
+        const value = a.key === "vinculo" ? vinculoFromAnswer(a.value) : a.value.trim().slice(0, 300);
+        emit({ type: "answer", key: a.key as CampoDaCall, value });
       } else if (ev.name === "culture_told" && TEMAS_DE_CULTURA.includes((ev.args as { topic?: string }).topic ?? "")) {
         emit({ type: "culture", topic: (ev.args as { topic: string }).topic });
       } else if (ev.name === "end_call" && !ended) {

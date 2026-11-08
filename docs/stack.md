@@ -422,7 +422,7 @@ Decisão: [0006](decisoes/0006-infra-servidor-e-dados.md). Issues: #18, #19.
 
 - **Login anônimo do Supabase por instalação** (`signInAnonymously`): cada jurado ganha um id próprio, sem e-mail nem
   senha, e os dados de um não se misturam com os de outro.
-- A tela de entrada parece um login: nome, escolha do perfil (novo ou transição) e, opcional, o e-mail com que a
+- A tela de entrada parece um login: nome e, opcional, o e-mail com que a
   pessoa entrou no Slack da Kota (só para o encaminhamento chegar a ela, §10.1). Vão para os metadados da conta no
   Supabase Auth e para a tabela `pessoas`.
 - Para a apresentação, contas fixas com e-mail e senha (`ana@kota.example`, `bruno@kota.example`), criadas pelo

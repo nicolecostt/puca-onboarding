@@ -1,6 +1,6 @@
 // E-mail do jurado no Slack da Kota, pedido antes da primeira sessão (#209): com ele, a primeira dúvida que Puca
 // encaminha já chega por mensagem direta no Slack de verdade (#129, src/journey/slack-real.ts). Opcional; o Início
-// continua com o mesmo campo para trocar depois. Salva enquanto a pessoa digita: escolher o cartão sem apertar nada
+// continua com o mesmo campo para trocar depois. Salva enquanto a pessoa digita: começar a call sem apertar nada
 // não perde o e-mail.
 import { lerEmailDoSlack, salvarEmailDoSlack } from "../../journey/slack-real";
 import { browserStore } from "../../journey/storage";
