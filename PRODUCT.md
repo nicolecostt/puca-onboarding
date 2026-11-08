@@ -393,7 +393,9 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 
 - **Agir num sistema, não só falar.** O encaminhamento do passo 4 precisa acontecer de fato no Slack simulado da tela `live-session`. O guia aceita conexões simuladas *"desde que o agente realmente opere sobre elas na demo"*.
 - **Rastro.** Cada decisão da Puca (o que respondeu, de qual fonte, quando encaminhou e por quê) fica registrada e pode ser auditada depois.
-- **Custo.** Mostrar quanto custa uma sessão em tempo e tokens, comparado com as horas que o buddy gastaria explicando a mesma coisa.
+- **Custo.** Cada sessão registra quanto custou em tempo e tokens, para o time auditar a demo (o JSON baixado do rastro e o log do servidor). Esse número não aparece na tela. A comparação com as horas que o buddy gastaria explicando a mesma coisa, e o valor em dinheiro, ficam para quando tudo estiver pronto (#94).
+
+  > Decisão da Nicole em 2026-11-07.
 
 > **Limites que o desafio impõe:** decisões sobre pessoas ficam com humanos, e a demo usa só dados sintéticos. A calibragem e o andamento descrevem o processo de integração, e não avaliam o desempenho da pessoa (ver o aviso de privacidade em [§5](#5-visibilidade-para-buddy-gestor-e-rh)).
 
