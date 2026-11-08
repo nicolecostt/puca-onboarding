@@ -1,5 +1,5 @@
 // Escolha do perfil (PRODUCT.md §13.1): dois cartões, quem está entrando na Kota e quem está mudando de time. Usada
-// na tela src/screens/escolha/ (antes da call inicial) e por cima da sessão quando ninguém escolheu.
+// nas boas-vindas (antes da call inicial) e por cima da sessão quando ninguém escolheu.
 //   mountEscolhaPerfil(el, { aoEscolher: (vinculo) => … });
 import "../../styles/tokens.css";
 import "./escolha-perfil.css";

@@ -3,8 +3,8 @@ import { DEMO_CALIBRAGENS, resolveCalibragem } from "../calibragem";
 import { ID_DO_VINCULO, escolherPerfil } from "../escolha";
 import { DEMO_PROFILES, loadSavedProfile, profileFromAnswers, resolveProfile, saveProfile } from "../profile";
 
-/** localStorage de mentira: o que o app grava e lê de uma abertura para outra. */
-function instalarLocalStorage(): Map<string, string> {
+/** Storage de mentira no lugar do sessionStorage (navegador) e do localStorage (app para Mac): onboardingStore(). */
+function instalarStorage(): Map<string, string> {
   const dados = new Map<string, string>();
   const store = {
     getItem: (k: string) => dados.get(k) ?? null,
@@ -17,19 +17,21 @@ function instalarLocalStorage(): Map<string, string> {
     },
   };
   Object.defineProperty(globalThis, "localStorage", { value: store, configurable: true });
+  Object.defineProperty(globalThis, "sessionStorage", { value: store, configurable: true });
   return dados;
 }
 
 describe("escolha do perfil", () => {
   let dados: Map<string, string>;
   beforeEach(() => {
-    dados = instalarLocalStorage();
+    dados = instalarStorage();
   });
   afterEach(() => {
     Reflect.deleteProperty(globalThis, "localStorage");
+    Reflect.deleteProperty(globalThis, "sessionStorage");
   });
 
-  it("a escolha fica no localStorage e vale numa nova abertura", () => {
+  it("a escolha por cima da sessão fica salva e a sessão abre com ela", () => {
     escolherPerfil("novo");
     expect(dados.has("puca:profile")).toBe(true);
     expect(loadSavedProfile()).toEqual(DEMO_PROFILES.novo);

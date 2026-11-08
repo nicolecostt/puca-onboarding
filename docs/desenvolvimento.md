@@ -53,7 +53,6 @@ src/
     lessons/             sessões do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css
     landing/             apresentação do Orbis e de Puca (só preto, branco e a cor de Puca)
-    escolha/             escolha do perfil antes da call: entrando na Kota (Ana) ou mudando de time (Bruno); salva e abre a call
     onboarding-call/     call inicial: Puca conversa com a pessoa e grava a calibragem; no fim, abre as boas-vindas
     boas-vindas/         "Oi, {nome}": ir para o início ou refazer a call inicial
     inicio/              início do Orbis: progresso, perfil, tarefas, acessos e ligar para Puca
@@ -69,7 +68,7 @@ src/
     agent-cam/           "câmera" do agente no canto da tela
     agent-cursor/        cursor de Puca (seta + "Puca") mexendo na tela, por enquanto simulado
     journey-panel/       painel "Sua jornada" da sessão: objetivo, momentos marcados pela calibragem e próximos passos
-    escolha-perfil/      os dois cartões da escolha do perfil (tela escolha/ e por cima da sessão quando ninguém escolheu)
+    escolha-perfil/      os dois cartões da escolha do perfil (nas boas-vindas e por cima da sessão quando ninguém escolheu)
   journey/               jornada da sessão em JSON: tipos, validador, motor, perfil, calibragem, jornada da pessoa e intenções (pulo, perguntas)
     data/                jornadas em JSON (kota.journey.json é a demo)
   lib/                   código compartilhado
@@ -156,9 +155,9 @@ A tela `src/screens/lesson/` roda a jornada em JSON (`src/journey/data/kota.jour
 Pelo chat ela também pode pedir para mudar de assunto ou fazer perguntas, que Puca responde com o conhecimento da sessão.
 A conversa ainda é simulada (sem LLM nem voz); o motor (`src/journey/runner.ts`) não depende da tela.
 
-- O perfil vem da escolha antes da call (`src/screens/escolha/`) e da call inicial, e fica salvo no `localStorage`:
-  no fim da call, as boas-vindas levam ao início, e "Começar a sessão" abre a sessão. Aberta sem perfil salvo e sem
-  `?perfil=`, a sessão mostra a mesma escolha antes de Puca começar.
+- O perfil vem da escolha nas boas-vindas (dois cartões, que mandam `?perfil=` para a call) e da call inicial, que o
+  salva (`onboardingStore()`: `localStorage` no app para Mac, `sessionStorage` no navegador); no fim da call, o app abre
+  a sessão. Aberta sem perfil salvo e sem `?perfil=`, a sessão mostra a mesma escolha antes de Puca começar.
 - `?perfil=ana` (recém-contratada: passa pela parte institucional) ou `?perfil=bruno` (mudando de time: vai direto ao time).
 - `?auto=1` responde sozinho, para apresentar sem mexer no mouse.
 

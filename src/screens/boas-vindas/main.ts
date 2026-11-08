@@ -1,23 +1,37 @@
-// Boas-vindas: abre no fim da call inicial. Cumprimenta pelo perfil salvo na call e dá duas saídas:
-// ir para o início do Orbis ou refazer a call inicial (as duas levam o ?perfil= junto).
+// Entrada do Orbis: a call inicial começa nas boas-vindas. Na primeira abertura, a pessoa escolhe com quem entra na
+// Kota (PRODUCT.md §13.1): Ana, entrando na empresa, ou Bruno, mudando de time. A escolha vai para a call como
+// ?perfil= (a call usa a admissão dessa pessoa e não pergunta de novo o vínculo); o perfil só fica salvo no fim da call.
 import "../../styles/base.css";
 import "./style.css";
+import { activeProfile } from "../../data";
+import { mountEscolhaPerfil } from "../../components/escolha-perfil/escolha-perfil";
+import { ID_DO_VINCULO } from "../../journey/escolha";
+import { sessionCompleted } from "../../journey/session-progress";
+import { loadSavedProfile } from "../../journey/profile";
+import { preserveProfileLinks } from "../../lib/navigation";
 import { qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
-import { resolveProfile } from "../../journey/profile";
 
-const { profile } = resolveProfile(location.search);
-qs(document, "#title").textContent = `Oi, ${profile.nome}.`;
-qs(document, "#lead").textContent = profile.time
-  ? `Sua primeira semana com o time ${profile.time} está pronta.`
-  : "Sua primeira semana está pronta.";
-qs(document, "#who").textContent = profile.nome;
-for (const id of ["#go-inicio", "#go-call"]) {
-  const a = qs<HTMLAnchorElement>(document, id);
-  a.href = a.getAttribute("href") + location.search;
+const savedProfile = loadSavedProfile();
+if (savedProfile) {
+  location.replace(sessionCompleted(savedProfile) ? "../inicio/" : "../lesson/");
+} else if (new URLSearchParams(location.search).get("perfil")) {
+  // perfil já escolhido no endereço (link de apresentação): cumprimenta e vai direto para a call
+  preserveProfileLinks();
+  const profile = activeProfile("ana");
+  qs(document, "#title").textContent = `Oi, ${profile.nickname}.`;
+  qs(document, "#who").textContent = profile.name;
+  particulas(".topbar__row > *, .home__title, .home__lead, .home__actions > *");
+} else {
+  const home = qs(document, ".home");
+  home.classList.add("home--escolha");
+  home.replaceChildren();
+  mountEscolhaPerfil(home, {
+    aoEscolher: (vinculo) => location.assign(`../onboarding-call/?perfil=${ID_DO_VINCULO[vinculo]}`),
+  });
+  particulas(".topbar__row > *, .escolha__titulo, .escolha__texto, .escolha__cartao");
 }
 
-mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
-  occluders: ".topbar__row > *, .home__title, .home__lead, .home__actions > *",
-  max: 40,
-});
+function particulas(occluders: string): void {
+  mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), { occluders, max: 40 });
+}

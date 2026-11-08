@@ -1,6 +1,7 @@
 // Calibragem: o que Puca concluiu na call inicial sobre o que a pessoa já sabe e o que ela quer.
 // A call inicial escreve; a jornada e a adaptação das explicações leem. Formato em docs/contratos.md.
 // Por enquanto o nível sai de regras por palavras (funciona sem servidor e é sempre igual na demo).
+import { onboardingStore } from "./storage";
 import { normalize } from "./conditions";
 import { DEMO_PROFILES, loadSavedProfile } from "./profile";
 import { callAnswers } from "../data/call-answers";
@@ -125,7 +126,7 @@ export function atualizarCalibragem(c: Calibragem, r: ResultadoChecagem, agora =
 
 export function saveCalibragem(c: Calibragem): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(c));
+    onboardingStore().setItem(STORAGE_KEY, JSON.stringify(c));
   } catch {
     // sem storage (aba privada, preview): quem lê cai no exemplo da demo
   }
@@ -133,7 +134,7 @@ export function saveCalibragem(c: Calibragem): void {
 
 export function loadCalibragem(): Calibragem | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = onboardingStore().getItem(STORAGE_KEY);
     if (!raw) return null;
     const c = JSON.parse(raw) as Partial<Calibragem>;
     if (c.versao !== 1 || !c.perfil || !Array.isArray(c.conhecimentos) || !Array.isArray(c.objetivos)) return null;

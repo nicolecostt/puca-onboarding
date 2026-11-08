@@ -4,18 +4,23 @@
 // "por voz" (resposta de exemplo depois de alguns segundos) ou digitando no chat.
 import "../../styles/base.css";
 import "./style.css";
+import { preserveProfileLinks } from "../../lib/navigation";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
 import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../lib/agent-visual";
 import { emit } from "../../lib/events";
 import { esc, qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
-import { activeProfile, company, profiles } from "../../data";
+import { activeProfile, company } from "../../data";
 import { callAnswers } from "../../data/call-answers";
 import { normalize } from "../../journey/conditions";
-import { profileFromAnswers, resolveProfile, saveProfile, vinculoFromAnswer } from "../../journey/profile";
+import { loadSavedProfile, profileFromAnswers, resolveProfile, saveProfile, vinculoFromAnswer } from "../../journey/profile";
 import { ID_DO_VINCULO } from "../../journey/escolha";
 import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem";
+
+const savedProfile = loadSavedProfile();
+if (!savedProfile) qs<HTMLAnchorElement>(document, ".brand").href = "../boas-vindas/";
+preserveProfileLinks();
 
 // ---- Roteiro ----
 // Puca confirma os dados da admissão (não pergunta o que a empresa já sabe) e gasta a conversa com o que
@@ -36,12 +41,12 @@ interface Field {
   sample: string;
 }
 
-// Com quem a pessoa entra: a escolha antes da call (src/screens/escolha/, salva) ou o ?perfil= da URL. Com ela, a call
-// usa a admissão dessa pessoa e não pergunta de novo se é a primeira vez na empresa ou uma troca de time.
+// Com quem a pessoa entra: a escolha nas boas-vindas (?perfil= na URL) ou o perfil já salvo. Com ela, a call usa a
+// admissão dessa pessoa e não pergunta de novo se é a primeira vez na empresa ou uma troca de time.
 const escolha = resolveProfile(location.search);
 const vinculoEscolhido = escolha.source === "demo" ? null : escolha.profile.vinculo;
-// Dados da admissão e respostas de exemplo vêm do perfil da demo escolhido (sem escolha: ?perfil= ou o Bruno)
-const profile = vinculoEscolhido ? (profiles[ID_DO_VINCULO[vinculoEscolhido]] ?? activeProfile()) : activeProfile();
+// Dados da admissão e respostas de exemplo vêm do perfil da demo escolhido (sem escolha, a Ana)
+const profile = activeProfile(vinculoEscolhido ? ID_DO_VINCULO[vinculoEscolhido] : "ana");
 const sample = callAnswers[profile.id] ?? {};
 const admissao = {
   cargo: profile.role,
@@ -111,8 +116,7 @@ const FIELDS: Field[] = [
   },
 ];
 
-/** Boas-vindas, aberta no fim da call; de lá a pessoa vai para o início ou refaz a call. */
-const HOME_URL = `../boas-vindas/${location.search}`; // leva o ?perfil= junto
+
 
 const OUTRO = (a: Answers) =>
   `Perfeito, ${a.nome}. Já tenho o que preciso. Vou montar sua primeira semana com o time ${a.time} e te mostro em seguida.`;
@@ -312,19 +316,18 @@ async function main(): Promise<void> {
   state.done = true;
   setAgent("done");
 
-  // Entrega o perfil e a calibragem para a sessão no quadro e sai da call para as boas-vindas.
+  // Entrega o perfil e a calibragem para a sessão no quadro e abre o quadro.
   const perfil = profileFromAnswers(answers, vinculoEscolhido ?? undefined);
-  saveProfile(perfil);
   saveCalibragem(calibragemFromAnswers(perfil, answers));
+  saveProfile(perfil);
   await wait(1400);
-  leaveToHome();
+  leaveToSession();
 }
 
-/** Fim da call: a conversa e os controles somem (style.css, body.is-leaving) e a página
- *  "estoura" para as boas-vindas (view transition, boas-vindas/style.css). */
-function leaveToHome(): void {
+/** Fim da call: a conversa e os controles somem (style.css, body.is-leaving) antes de abrir o quadro. */
+function leaveToSession(): void {
   document.body.classList.add("is-leaving");
-  window.setTimeout(() => location.assign(HOME_URL), 460);
+  window.setTimeout(() => location.replace("../lesson/"), 460);
 }
 
 void main();

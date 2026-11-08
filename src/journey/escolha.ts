@@ -1,6 +1,6 @@
-// Escolha do perfil antes da call inicial (PRODUCT.md §13.1: o jurado escolhe com quem entra na Kota). Os dois perfis
-// são fixos na demo: a escolha grava o perfil e a calibragem de exemplo da pessoa escolhida, e a call, se acontecer,
-// grava por cima com as respostas dela.
+// Escolha do perfil (PRODUCT.md §13.1: o jurado escolhe com quem entra na Kota). Os dois perfis são fixos na demo.
+// Nas boas-vindas, a escolha só vai para a call como ?perfil= (perfil salvo quer dizer call feita); por cima da sessão,
+// aberta sem perfil, `escolherPerfil` grava o perfil e a calibragem de exemplo da pessoa escolhida.
 import { DEMO_CALIBRAGENS, saveCalibragem } from "./calibragem";
 import { DEMO_PROFILES, saveProfile } from "./profile";
 import type { Profile, Vinculo } from "./types";

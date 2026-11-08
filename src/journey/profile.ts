@@ -1,5 +1,6 @@
-// Perfil da pessoa: vem da escolha antes da call e da call inicial (localStorage, vale nas próximas aberturas), da URL
-// (?perfil=) ou de um dos dois perfis da demo (src/data/profiles.ts).
+// Perfil da pessoa: vem da call de entrevista, da URL (?perfil=, que a escolha nas boas-vindas manda para a call), da
+// escolha por cima da sessão ou de um dos dois perfis da demo (src/data/profiles.ts).
+import { onboardingStore } from "./storage";
 import { normalize } from "./conditions";
 import { company } from "../data/company";
 import { profiles } from "../data/profiles";
@@ -36,7 +37,7 @@ export function vinculoFromAnswer(answer: string | undefined): Vinculo {
 
 /**
  * Monta o perfil a partir das respostas da call de entrevista. Com o vínculo já escolhido antes da call
- * (src/screens/escolha/), ele vale e a call não pergunta de novo.
+ * (nas boas-vindas), ele vale e a call não pergunta de novo.
  */
 export function profileFromAnswers(answers: Partial<Record<string, string>>, vinculo?: Vinculo): Profile {
   return {
@@ -52,7 +53,7 @@ export function profileFromAnswers(answers: Partial<Record<string, string>>, vin
 
 export function saveProfile(p: Profile): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
+    onboardingStore().setItem(STORAGE_KEY, JSON.stringify(p));
   } catch {
     // sem storage (aba privada, preview): a sessão cai no perfil de demo
   }
@@ -60,7 +61,7 @@ export function saveProfile(p: Profile): void {
 
 export function loadSavedProfile(): Profile | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = onboardingStore().getItem(STORAGE_KEY);
     if (!raw) return null;
     const p = JSON.parse(raw) as Partial<Profile>;
     if (typeof p.nome !== "string" || (p.vinculo !== "novo" && p.vinculo !== "transicao")) return null;
