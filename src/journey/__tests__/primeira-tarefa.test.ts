@@ -31,11 +31,11 @@ describe("tarefa do catálogo", () => {
   it("tarefaDoNo lê os cinco campos do nó task", () => {
     const t = tarefaDoNo(node("task"))!;
     expect(t.no).toBe("task");
-    expect(t.titulo).toBe("Limite de valor por transferência no ledgerwriter");
-    expect(t.problema.startsWith("o ledgerwriter aceita transferência")).toBe(true);
-    expect(t.porque).toBe("um valor digitado errado sai inteiro da conta, e no livro-razão nada que foi gravado muda");
-    expect(t.sistemas).toBe("só o ledgerwriter (o TransactionValidator e os testes dele)");
-    expect(t.onde_ler).toBe("README do ledgerwriter e ADR 1");
+    expect(t.titulo).toBe("Limite de R$ 10.000,00 por transação no ledgerwriter");
+    expect(t.problema.startsWith("o ledgerwriter aceita transação de qualquer valor positivo")).toBe(true);
+    expect(t.porque.startsWith("o validador é a última barreira")).toBe(true);
+    expect(t.sistemas).toBe("ledgerwriter, frontend e ledger-db");
+    expect(t.onde_ler).toBe("README do ledgerwriter, o TransactionValidator e o ADR 1");
     expect(t.quem_ajuda).toBe("Beatriz Cavalcanti e Thiago Nakamura");
 
     const semAjuda: BoardNode = { ...node("task"), info: { ...node("task").info!, bullets: node("task").info!.bullets!.slice(0, 4) } };
@@ -168,10 +168,10 @@ describe("pedidoMessage", () => {
     const text = pedidoMessage(pedidos.add(draft()));
     expect(text).toContain("Oi, Natália Brandão!");
     expect(text).toContain("Pedido de aprovação da primeira tarefa de Bruno");
-    expect(text).toContain("Extrato de outra conta responde 403 no transactionhistory");
-    expect(text).toContain("Problema: pedir o extrato de outra conta com um token válido responde 401");
-    expect(text).toContain("Sistemas: só o transactionhistory");
-    expect(text).toContain("Quem ajuda: Beatriz Cavalcanti e Thiago Nakamura");
+    expect(text).toContain("Extrato de outra conta responde 403, não 401");
+    expect(text).toContain("Problema: pedir o extrato de outra conta com um JWT válido responde 401");
+    expect(text).toContain("Sistemas: transactionhistory, userservice e frontend");
+    expect(text).toContain("Quem ajuda: Beatriz Cavalcanti e Gustavo Schmitt");
     expect(text).toContain("Posso passar para a pessoa?");
     expect(text).not.toMatch(/\b(ele|ela|o Bruno|a Bruno)\b/);
   });

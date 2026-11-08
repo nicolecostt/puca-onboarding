@@ -551,18 +551,18 @@
         {
           "id": "task",
           "label": "Primeira tarefa",
-          "sublabel": "limite por transferência",
+          "sublabel": "limite por transação",
           "kind": "task",
           "x": 330,
           "y": 560,
           "w": 200,
           "info": {
-            "role": "Limite de valor por transferência no ledgerwriter",
+            "role": "Limite de R$ 10.000,00 por transação no ledgerwriter",
             "bullets": [
-              "Problema: o ledgerwriter aceita transferência de qualquer valor; hoje ele só confere se o valor é maior que zero",
-              "Por que importa: um valor digitado errado sai inteiro da conta, e no livro-razão nada que foi gravado muda",
-              "Sistemas: só o ledgerwriter (o TransactionValidator e os testes dele)",
-              "Onde ler: README do ledgerwriter e ADR 1",
+              "Problema: o ledgerwriter aceita transação de qualquer valor positivo. O time combinou um teto de R$ 10.000,00 por transação, e acima disso o TransactionValidator recusa com amount above limit",
+              "Por que importa: o validador é a última barreira antes de gravar no livro-razão, então um valor digitado errado ou uma conta invadida não move tudo de uma vez",
+              "Sistemas: ledgerwriter, frontend e ledger-db",
+              "Onde ler: README do ledgerwriter, o TransactionValidator e o ADR 1",
               "Quem ajuda: Beatriz Cavalcanti e Thiago Nakamura"
             ],
             "docs": [
@@ -587,13 +587,13 @@
           "y": 560,
           "w": 220,
           "info": {
-            "role": "Extrato de outra conta responde 403 no transactionhistory",
+            "role": "Extrato de outra conta responde 403, não 401",
             "bullets": [
-              "Problema: pedir o extrato de outra conta com um token válido responde 401, como se faltasse login",
-              "Por que importa: 401 quer dizer token inválido; com o token certo e a conta errada, o certo é 403, e quem investiga um erro procura no lugar certo",
-              "Sistemas: só o transactionhistory (o TransactionHistoryController e os testes dele)",
-              "Onde ler: ADR 2 e README do transactionhistory",
-              "Quem ajuda: Beatriz Cavalcanti e Thiago Nakamura"
+              "Problema: pedir o extrato de outra conta com um JWT válido responde 401, que quer dizer não autenticado. A pessoa está autenticada; falta permissão para aquela conta, e o certo é 403",
+              "Por que importa: com 401 nos dois casos, quem lê o log não separa um token vencido de alguém tentando ler o extrato de outro cliente",
+              "Sistemas: transactionhistory, userservice e frontend",
+              "Onde ler: README do transactionhistory, o TransactionHistoryController e o ADR 2",
+              "Quem ajuda: Beatriz Cavalcanti e Gustavo Schmitt"
             ],
             "docs": [
               {
@@ -1642,7 +1642,7 @@
         {
           "id": "pt-tarefa-novo",
           "goal": "Apresentar a tarefa de quem é novo",
-          "line": "É colocar um limite de valor por transferência no ledgerwriter. O cartão explica o problema, por que importa e onde ler.",
+          "line": "É colocar um teto de dez mil reais por transação no ledgerwriter. O cartão explica o problema, por que importa e onde ler.",
           "actions": [
             {
               "type": "reveal",
@@ -1667,7 +1667,7 @@
               "at": "O cartão explica"
             }
           ],
-          "knowledge": "A tarefa mexe só no ledgerwriter: a validação no TransactionValidator e os testes dele. O README do ledgerwriter explica como rodar os testes com scripts/testar.sh ledgerwriter. A issue fica no kota-bank, com o label primeira-tarefa. A Beatriz acompanha e o Thiago revisa."
+          "knowledge": "A mudança fica no ledgerwriter: a validação no TransactionValidator e os testes dele. Os testes rodam com scripts/testar.sh ledgerwriter, como explica o README do kota-bank. A issue, com o mesmo título da tarefa, fica no kota-bank, com o label primeira-tarefa. A Beatriz e o Thiago ajudam."
         },
         {
           "id": "pt-escopo",
@@ -1727,12 +1727,12 @@
               "at": "O cartão explica"
             }
           ],
-          "knowledge": "A tarefa mexe só no transactionhistory: o TransactionHistoryController e os testes dele. O ADR 2 explica como cada serviço confere o JWT sozinho. A issue fica no kota-bank, com o label primeira-tarefa. A Beatriz acompanha e o Thiago revisa."
+          "knowledge": "A mudança fica no transactionhistory: o TransactionHistoryController e os testes dele. O ADR 2 explica como cada serviço confere sozinho o JWT que o userservice assina. A issue, com o mesmo título da tarefa, fica no kota-bank, com o label primeira-tarefa. A Beatriz e o Gustavo ajudam."
         },
         {
           "id": "pt-escopo-transicao",
           "goal": "Mostrar onde a tarefa de quem está em transição mexe",
-          "line": "Ela mexe só no transactionhistory. Se travar, a Beatriz e o Thiago podem te ajudar, e a dúvida pode ir no livro-razao-ajuda.",
+          "line": "Ela mexe só no transactionhistory. Se travar, a Beatriz e o Gustavo podem te ajudar, e a dúvida pode ir no livro-razao-ajuda.",
           "actions": [
             {
               "type": "close_card"
