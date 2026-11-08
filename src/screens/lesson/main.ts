@@ -477,6 +477,8 @@ async function main(): Promise<void> {
     // ask: o agente responde; a ponte sai na hora e o LLM vem atrás.
     remember("user", text);
     const said: string[] = [];
+    // títulos das fontes que a resposta citou: vão junto no encaminhamento (o evento fontes chega antes do escalate)
+    let fontesCitadas: string[] = [];
     const t0 = performance.now();
     const asked =
       !!currentMoment &&
@@ -490,7 +492,12 @@ async function main(): Promise<void> {
           },
           onAction: (a) => io.apply(a),
           onGoTo: goTo,
-          onEscalate: (summary) => forward(entry.id, { question: text, summary, reason: "Não encontrei fonte confiável para responder." }),
+          onEscalate: (summary) => forward(entry.id, { question: text, summary, reason: "Não encontrei fonte confiável para responder.", consulted: fontesCitadas }),
+          // fontes do kit que a resposta citou: ficam no rastro para conferir
+          onFontes: (fontes) => {
+            fontesCitadas = fontes.map((f) => f.titulo);
+            trail.update(entry.id, { sources: fontes.map((f) => (f.url ? `${f.titulo} · ${f.url}` : f.titulo)) });
+          },
           // custo da sessão (#52): só no rastro, para auditar; nada em tela
           onTiming: (t) =>
             trail.update(entry.id, { llm_ms: t.total_ms, llm_error: t.llm_error ?? undefined, tokens_in: t.tokens_in ?? undefined, tokens_out: t.tokens_out ?? undefined, tokens_estimated: t.tokens_estimated }),
