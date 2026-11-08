@@ -22,7 +22,7 @@ export function validarMapa(m: MapaKota, nomesProibidos: string[] = []): string[
 }
 
 const chave = (s: string) => s.normalize("NFKD").replace(/[\p{M}\p{Cf}]/gu, "").replace(/\s+/g, " ").trim().toLowerCase();
-const primeiroNome = (nome: string) => nome.trim().split(/\s+/)[0];
+const palavras = (s: string) => s.replace(/\p{Cf}/gu, "").split(/[^\p{L}\p{M}]+/u).filter(Boolean);
 
 function repetidos(pessoas: PessoaKota[]): string[] {
   const campos = [["id", "id"], ["nome", "nome"], ["email", "e-mail"], ["slack", "slack"]] as const;
@@ -136,8 +136,17 @@ function perfis(m: MapaKota): string[] {
 
 function proibidos(pessoas: PessoaKota[], nomes: string[]): string[] {
   return pessoas.flatMap((p) => {
-    if (nomes.some((n) => chave(n) === chave(p.nome))) return [`pessoa ${p.id}: nome "${p.nome}" é da Tail`];
-    const xara = nomes.find((n) => chave(primeiroNome(n)) === chave(primeiroNome(p.nome)));
-    return xara ? [`pessoa ${p.id}: primeiro nome "${primeiroNome(p.nome)}" de "${xara}" é da Tail`] : [];
+    const erros = new Set<string>();
+    for (const [campo, texto] of [["nome", p.nome], ["slack", p.slack]] as const) {
+      if (nomes.some((n) => chave(n) === chave(texto))) {
+        erros.add(`pessoa ${p.id}: ${campo} "${texto}" é da Tail`);
+        continue;
+      }
+      for (const palavra of palavras(texto)) {
+        const xara = nomes.find((n) => chave(palavras(n)[0]) === chave(palavra));
+        if (xara) erros.add(`pessoa ${p.id}: primeiro nome "${palavra}" de "${xara}" é da Tail`);
+      }
+    }
+    return [...erros];
   });
 }

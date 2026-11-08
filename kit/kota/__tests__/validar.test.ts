@@ -183,6 +183,22 @@ describe("validarMapa", () => {
     expect(validarMapa(mapaMinimo(), ["Diego Rocha"])).toEqual([]);
   });
 
+  it("acusa primeiro nome de um nome proibido em qualquer palavra do nome", () => {
+    const casos = [
+      ["Ana Paula Ferreira", "Paula Nunes", "Paula"],
+      ["João Marcos Leite", "Marcos Vidal", "Marcos"],
+      ["Ana Júlia Paiva", "Júlia Paiva", "Júlia"],
+      ["Ana-Paula Ferreira", "Paula Nunes", "Paula"],
+    ];
+    for (const [nome, proibido, palavra] of casos)
+      expect(erros(com((m) => { m.pessoas[0].nome = nome; }), [proibido])).toMatch(`pessoa ana-souza: primeiro nome "${palavra}" de "${proibido}" é da Tail`);
+  });
+
+  it("acusa nome proibido no Slack", () => {
+    expect(erros(com((m) => { m.pessoas[0].slack = "Diego Ramos"; }), ["Diego Ramos"])).toMatch('pessoa ana-souza: slack "Diego Ramos" é da Tail');
+    expect(erros(com((m) => { m.pessoas[0].slack = "Paula S."; }), ["Paula Nunes"])).toMatch('pessoa ana-souza: primeiro nome "Paula" de "Paula Nunes" é da Tail');
+  });
+
   it("compara nomes proibidos sem diferenciar maiúsculas e acentos", () => {
     expect(erros(mapaMinimo(), ["ána SOUZA"])).toMatch(/pessoa ana-souza: nome "Ana Souza" é da Tail/);
     expect(erros(mapaMinimo(), ["FABIO Nunes"])).toMatch(/pessoa fabio-lima: primeiro nome "Fábio" de "FABIO Nunes" é da Tail/);
