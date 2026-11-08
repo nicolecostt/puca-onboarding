@@ -387,8 +387,9 @@ primary_region = "iad"
   Como a chave pública do Supabase vai no app, qualquer um cria contas anônimas, cada uma com o próprio limite. Por
   isso o que segura o custo são as **travas diárias globais**, uma por provedor pago: `LIMITE_DIARIO_LLM` (chamadas
   ao `/api/ask`), `LIMITE_DIARIO_TTS` (caracteres no `/api/speak`) e `LIMITE_DIARIO_STT` (tokens do
-  `/api/voice/token`). Passou, a rota cai no comportamento sem servidor: ponte e rotas locais no lugar do LLM (sem encaminhamento), voz do
-  navegador no lugar do TTS, chat no lugar do microfone. E o login anônimo fica com o limite por IP do Supabase e, se
+  `/api/voice/token`). Passou, a rota cai no comportamento sem servidor: o que iria ao LLM recebe a frase de falha, sem
+  encaminhamento (as rotas locais da `route.ts`, inclusive `faq` e `tarefa`, continuam respondendo e encaminhando
+  como hoje; decisão 0007), voz do navegador no lugar do TTS, chat no lugar do microfone. E o login anônimo fica com o limite por IP do Supabase e, se
   houver abuso, captcha (o Supabase Auth aceita Turnstile ou hCaptcha nesse login).
 - **CORS:** só a origem `app://orbis` (e `http://localhost:5173` em dev).
 - **Cache de áudio:** sai do disco e vai para o Supabase Storage, bucket privado `tts-cache`, chave = hash(texto, voz,
@@ -496,9 +497,10 @@ Tail, prompt escrito para o Qwen.
   `usage.cache_read_input_tokens` > 0 a partir da segunda fala.
 - **Aquecimento:** ao começar a sessão, uma chamada com `max_tokens: 0` e a parte fixa, para a primeira pergunta já
   achar o cache.
-- **Tempo e erros:** o limite de 8 s de hoje continua. Tentar de novo só se nada foi emitido ainda. Timeout, erro e
-  `stop_reason: "refusal"` viram **só ponte**, sem encaminhamento: a fala fica no rastro com o motivo verdadeiro
-  (decisão 0007, #85). Erros pelas classes do SDK
+- **Tempo e erros:** o limite de 8 s de hoje continua. Tentar de novo só se nada foi emitido ainda. Timeout, erro,
+  `stop_reason: "refusal"` e resposta vazia **não encaminham**: a Puca diz a frase de falha (não a `FALLBACK_LINE` de
+  falta de fonte, `server/src/agent/bridges.ts`) e o rastro guarda o motivo da falha, num campo novo do contrato do
+  Rastro (decisão 0007, #85). Erros pelas classes do SDK
   (`Anthropic.RateLimitError`, `Anthropic.APIError`), nunca por texto.
 - **Bench:** `npm run bench:llm -- --provider anthropic|featherless` no repo, com os cenários trocados para a jornada
   da Kota quando ela existir (#120).
