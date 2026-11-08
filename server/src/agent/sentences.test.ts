@@ -10,7 +10,7 @@ describe("limparFala", () => {
   it("tira o próprio nome e as aspas em volta da fala", () => {
     expect(limparFala("Puca: Oi, Ana!")).toBe("Oi, Ana!");
     expect(limparFala('Pergunto: "Como prefere que eu te chame?"')).toBe("Como prefere que eu te chame?");
-    expect(limparFala("Puca — Pronto, seguimos.")).toBe("Pronto, seguimos.");
+    expect(limparFala("O Puca — Pronto, seguimos.")).toBe("Pronto, seguimos.");
     expect(limparFala('Pergunto: "Como prefere que eu te chame"?')).toBe("Como prefere que eu te chame?");
   });
   it("não mexe em fala normal, nem em dois-pontos no meio da frase", () => {
