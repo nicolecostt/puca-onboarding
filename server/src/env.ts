@@ -26,8 +26,9 @@ export const env = {
   cacheDir: process.env.TTS_CACHE_DIR ?? fileURLToPath(new URL("../cache/tts", import.meta.url)),
   /** Sem SUPABASE_URL (dev local), o servidor não exige token e o cache de áudio fica no disco. */
   supabaseUrl,
-  /** No Fly: sem SUPABASE_URL o servidor não sobe (não fica aberto por engano). */
+  /** "1": exige token e não sobe sem SUPABASE_URL. "0": não exige, mesmo com Supabase (até o app fazer login, #159). */
   exigeToken: process.env.EXIGE_TOKEN === "1",
+  tokenDesligado: process.env.EXIGE_TOKEN === "0",
   supabaseJwksUrl: process.env.SUPABASE_JWKS_URL || (supabaseUrl ? `${supabaseUrl}/auth/v1/.well-known/jwks.json` : ""),
   supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
   /** Travas diárias globais por provedor pago (docs/stack.md §5.3). Vazias = sem trava. */
