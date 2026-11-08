@@ -624,6 +624,18 @@ main,
   color: var(--grey);
 }
 
+.install__stage {
+  position: relative;
+  width: min(100%, 380px);
+  aspect-ratio: 1;
+  margin-top: 56px;
+}
+
+.install__sphere {
+  position: absolute;
+  inset: 0;
+}
+
 .install__steps {
   grid-column: 7 / span 6;
   margin: 0;
@@ -799,6 +811,9 @@ kbd {
   }
   .install__intro {
     margin-bottom: 40px;
+  }
+  .install__stage {
+    display: none;
   }
   .who__col,
   .who__col:nth-of-type(1),
