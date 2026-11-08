@@ -1,6 +1,7 @@
 // Pergunta que a tela não resolveu sozinha (fora das respostas sugeridas, do conhecimento e do FAQ).
 // Sem estado: a tela manda momento, passo, perfil e o histórico curto. A primeira coisa que sai é
 // uma fala-ponte (áudio em cache); o LLM responde atrás dela, frase a frase.
+import type { DestinoDoEncaminhamento } from "../../../src/journey/encaminhamento-slack";
 import { randomUUID } from "node:crypto";
 import { detectIntent } from "../../../src/journey/conditions";
 import { looksLikeQuestion } from "../../../src/journey/forwarding";
@@ -13,6 +14,16 @@ import { buildMessages, buildTools, visibleNodes } from "./prompt";
 import { SentenceSplitter } from "./sentences";
 
 export type SpeakSource = "bridge" | "llm" | "fallback";
+const DESTINOS: readonly DestinoDoEncaminhamento[] = ["buddy", "gestor", "rh"];
+
+/** Destino que a própria fala do LLM indicou: People/RH, ou o gestor; senão, nenhum (a buddy). */
+export function destinoPelaFala(fala: string): DestinoDoEncaminhamento | undefined {
+  if (/\bbuddy\b/i.test(fala)) return undefined; // citou a buddy: ela é o destino padrão
+  if (/\b(people|rh)\b/i.test(fala)) return "rh";
+  if (/\bgestor(a|es)?\b/i.test(fala)) return "gestor";
+  return undefined;
+}
+
 export type LlmFailure = "timeout" | "interrupted" | "provider_error" | "refusal" | "empty_response";
 
 export type AskEvent =
@@ -20,8 +31,8 @@ export type AskEvent =
   | { type: "action"; action: BoardAction }
   /** A pessoa pediu outro ponto da sessão: "moment:<id>" ou "step:<id>" (transições do passo atual). */
   | { type: "go_to"; target: string }
-  /** Sem fonte confiável: a tela encaminha a dúvida à buddy (no máximo um por pedido, antes do timing). */
-  | { type: "escalate"; summary: string }
+  /** Sem fonte confiável: a tela encaminha a dúvida (no máximo um por pedido, antes do timing). Sem destino, à buddy. */
+  | { type: "escalate"; summary: string; destino?: DestinoDoEncaminhamento }
   /** Trechos do kit citados na resposta ([fN]), sem repetir; antes do timing. */
   | { type: "fontes"; fontes: { titulo: string; url: string }[] }
   | { type: "timing"; timing: AskTiming };
@@ -72,6 +83,9 @@ const CITACAO = new RegExp(
 
 // O LLM às vezes admite que não confirmou sem chamar escalate_to_buddy: vale como encaminhamento.
 const NO_SOURCE = /não (consegui|consigo) confirmar|não (achei|tenho) (isso )?confirmad/i;
+// O Puca diz que encaminha ("Escalo para People", "Vou te encaminhar") sem chamar a tool: não pode prometer e não
+// encaminhar. Só vale sem fonte citada: "Vou te encaminhar para a página de férias [f1]" é levar a uma página.
+const PROMETEU = /\b(vou (te |lhe )?(encaminhar|escalar)|encaminho|escalo)\b/i;
 
 // Caso pessoal da pessoa ("qual vai ser o meu bônus?"): a regra geral vem do kit, mas o caso dela vai para a buddy.
 // Se o LLM não encaminhou, o código encaminha (nunca em falha técnica).
@@ -143,8 +157,15 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   let wentTo = false;
   let escalationSummary: string | null = null;
   let saidNoSource = false;
+  let prometeu = false;
   let refused = false;
-  const escalate = (summary: string) => { escalationSummary ??= summary; };
+  let escalationDestino: DestinoDoEncaminhamento | undefined;
+  const escalate = (summary: string, destino?: DestinoDoEncaminhamento) => {
+    if (escalationSummary) return;
+    escalationSummary = summary;
+    escalationDestino = destino;
+  };
+  let falado = "";
   const sentence = (raw: string) => {
     const s = raw.replace(CITACAO, (m) => { for (const n of m.match(/\d+/g) ?? []) citados.add(Number(n)); return ""; }).trim();
     // frase vazia, ou que sobrou só com pontuação ("CI. [f1]." deixa "."), não é falada
@@ -152,8 +173,10 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
     timing.llm_first_sentence_ms ??= ms();
     spoke = true;
     say(s, "llm");
+    falado += ` ${s}`;
     // só marca: se o LLM chamar escalate_to_buddy logo depois, vale o resumo dele
     if (NO_SOURCE.test(s)) saidNoSource = true;
+    if (PROMETEU.test(s)) prometeu = true;
   };
 
   // custo (#52): o que foi enviado e o que chegou, para estimar se o provedor não informar
@@ -181,8 +204,10 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
       } else if (ev.name === "open_card" && a?.target && ids.has(a.target)) {
         emit({ type: "action", action: { type: "card", target: a.target } });
       } else if (ev.name === "escalate_to_buddy") {
-        const summary = (ev.args as { summary?: unknown } | null)?.summary;
-        escalate(typeof summary === "string" && summary.trim() ? summary.trim() : input.text);
+        const args = ev.args as { summary?: unknown; destino?: unknown } | null;
+        const summary = args?.summary;
+        const destino = DESTINOS.find((d) => d === args?.destino);
+        escalate(typeof summary === "string" && summary.trim() ? summary.trim() : input.text, destino);
       } else if (ev.name === "go_to" && typeof a?.target === "string") {
         wentTo = true;
         emit({ type: "go_to", target: a.target });
@@ -223,8 +248,12 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   if (timing.llm_error && timing.llm_error !== "interrupted") {
     say(FAILURE_LINE, "fallback");
   } else if (!input.signal?.aborted && looksLikeQuestion(input.text)) {
-    if (resumo) emit({ type: "escalate", summary: resumo });
-    else if (saidNoSource || pessoal) emit({ type: "escalate", summary: input.text });
+    // sem destino na tool, vale o que o Puca acabou de dizer ("fale com People", "com sua gestora"): fala e mensagem
+    // batem; caso pessoal sem destino nenhum vai a People (PRODUCT.md §13.2)
+    const destino = escalationDestino ?? destinoPelaFala(falado) ?? (pessoal ? "rh" : undefined);
+    const comDestino = destino ? { destino } : {};
+    if (resumo) emit({ type: "escalate", summary: resumo, ...comDestino });
+    else if (saidNoSource || (prometeu && citados.size === 0) || pessoal) emit({ type: "escalate", summary: input.text, ...comDestino });
   }
   timing.total_ms = ms();
   emit({ type: "timing", timing });

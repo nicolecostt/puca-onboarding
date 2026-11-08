@@ -13,7 +13,7 @@ vi.mock("../llm", () => ({
     for (const ev of script) yield ev;
   },
 }));
-const { turn } = await import("./turn");
+const { turn, buildTurnTools } = await import("./turn");
 type TurnEvent = Parameters<Parameters<typeof turn>[1]>[0];
 
 const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/kota.journey.json", import.meta.url), "utf8")));
@@ -64,3 +64,45 @@ describe("turn", () => {
     expect(evs.some((e) => e.type === "escalate")).toBe(false);
   });
 });
+
+describe("turn: destino do encaminhamento (#125, mensagem real do #129)", () => {
+  const escalates = (evs: TurnEvent[]) => evs.filter((e) => e.type === "escalate");
+
+  it("a tool traz o destino: ele vai junto", async () => {
+    script = [
+      { type: "text", text: "Isso é com o seu gestor. " },
+      { type: "tool_call", name: "escalate_to_buddy", args: { summary: "Contrato", destino: "gestor" }, raw: "" },
+      { type: "done", finishReason: "end_turn" },
+    ];
+    expect(escalates(await run({ kind: "fala", text: "como fica o meu contrato?" }))).toEqual([{ type: "escalate", summary: "Contrato", destino: "gestor" }]);
+  });
+
+  it("tool sem destino: vale a fala; caso pessoal sem nada vai a People", async () => {
+    script = [
+      { type: "text", text: "Não consegui confirmar isso. " },
+      { type: "tool_call", name: "escalate_to_buddy", args: { summary: "Bônus" }, raw: "" },
+      { type: "done", finishReason: "end_turn" },
+    ];
+    expect(escalates(await run({ kind: "fala", text: "qual vai ser o meu bônus?" }))).toEqual([{ type: "escalate", summary: "Bônus", destino: "rh" }]);
+  });
+
+  it("caso pessoal encaminha a People mesmo sem a tool (o LLM só explicou a regra)", async () => {
+    script = [{ type: "text", text: "A PLR é paga uma vez por ano, conforme a política." }, { type: "done", finishReason: "end_turn" }];
+    expect(escalates(await run({ kind: "fala", text: "qual vai ser o meu bônus?" }))).toEqual([{ type: "escalate", summary: "qual vai ser o meu bônus?", destino: "rh" }]);
+  });
+
+  it("dúvida técnica sem destino: a buddy, sem destino no evento", async () => {
+    script = [
+      { type: "text", text: "Não consegui confirmar isso. " },
+      { type: "tool_call", name: "escalate_to_buddy", args: { summary: "Convênio" }, raw: "" },
+      { type: "done", finishReason: "end_turn" },
+    ];
+    expect(escalates(await run({ kind: "fala", text: "tem convênio com academia?" }))).toEqual([{ type: "escalate", summary: "Convênio" }]);
+  });
+
+  it("o LLM recebe o destino opcional na tool", () => {
+    const tool = buildTurnTools(journey).find((t) => t.function.name === "escalate_to_buddy")!;
+    expect((tool.function.parameters as { properties: Record<string, { enum?: string[] }> }).properties.destino.enum).toEqual(["buddy", "gestor", "rh"]);
+  });
+});
+

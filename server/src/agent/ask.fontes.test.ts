@@ -124,22 +124,22 @@ describe("ask: caso pessoal", () => {
     const iFontes = evs.findIndex((e) => e.type === "fontes");
     const iEscalate = evs.findIndex((e) => e.type === "escalate");
     expect(evs[iFontes]).toEqual({ type: "fontes", fontes: [{ titulo: bonus.titulo, url: bonus.url }] });
-    expect(evs[iEscalate]).toEqual({ type: "escalate", summary: "qual vai ser o meu bônus?" });
+    expect(evs[iEscalate]).toEqual({ type: "escalate", summary: "qual vai ser o meu bônus?", destino: "rh" });
     // as fontes chegam antes do encaminhamento, e os dois antes do timing
     expect(iFontes).toBeLessThan(iEscalate);
     expect(iEscalate).toBeLessThan(evs.findIndex((e) => e.type === "timing"));
   });
 
-  it("outros casos pessoais (minhas férias, a minha avaliação de desempenho, meu salario) também encaminham", async () => {
+  it("outros casos pessoais (minhas férias, a minha avaliação de desempenho, meu salario) também encaminham, a People", async () => {
     for (const fala of ["quantas férias eu tenho? as minhas férias já saem?", "como está a minha avaliação?", "quando sai meu salario novo?"]) {
       script = soARegra;
-      expect((await run(fala)).filter((e) => e.type === "escalate")).toEqual([{ type: "escalate", summary: fala }]);
+      expect((await run(fala)).filter((e) => e.type === "escalate")).toEqual([{ type: "escalate", summary: fala, destino: "rh" }]);
     }
   });
 
   it("o LLM já encaminhou: vale o resumo dele, sem segundo encaminhamento", async () => {
     script = [...soARegra.slice(0, 1), { type: "tool_call", name: "escalate_to_buddy", args: { summary: "Bônus da pessoa" }, raw: "" }, soARegra[1]];
-    expect((await run("qual vai ser o meu bônus?")).filter((e) => e.type === "escalate")).toEqual([{ type: "escalate", summary: "Bônus da pessoa" }]);
+    expect((await run("qual vai ser o meu bônus?")).filter((e) => e.type === "escalate")).toEqual([{ type: "escalate", summary: "Bônus da pessoa", destino: "rh" }]);
   });
 
   it("pergunta não pessoal sobre o bônus não encaminha", async () => {
@@ -193,7 +193,7 @@ describe("ask: escalate do modelo com fonte", () => {
     const bonus: Trecho = { id: "f1", titulo: "Bônus · Visão geral", url: "https://exemplo.notion.site/bonus", texto: "A PLR é paga uma vez por ano." };
     achados = [bonus];
     script = [{ type: "text", text: "A PLR é paga uma vez por ano [f1]." }, escalar("Bônus da Ana, caso individual"), { type: "done", finishReason: "stop" }];
-    expect(escalates(await run("qual vai ser o meu bônus?"))).toEqual([{ type: "escalate", summary: "Bônus da Ana, caso individual" }]);
+    expect(escalates(await run("qual vai ser o meu bônus?"))).toEqual([{ type: "escalate", summary: "Bônus da Ana, caso individual", destino: "rh" }]);
   });
 
   it("sem citação e com escalate do modelo: encaminha", async () => {
@@ -226,7 +226,7 @@ describe("ask: escalate do modelo com fonte", () => {
     achados = [bonus];
     script = [{ type: "text", text: "É proporcional aos meses [f1]." }, escalar("Ana quer saber o bônus [f1]. Regra geral em (f1)."), { type: "done", finishReason: "stop" }];
     const [esc] = escalates(await run("qual vai ser o meu bônus?"));
-    expect(esc).toEqual({ type: "escalate", summary: "Ana quer saber o bônus (Bônus · Quem recebe). Regra geral em." });
+    expect(esc).toEqual({ type: "escalate", summary: "Ana quer saber o bônus (Bônus · Quem recebe). Regra geral em.", destino: "rh" });
   });
 });
 
