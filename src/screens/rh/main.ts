@@ -8,7 +8,7 @@ import { esc, qs } from "../../lib/dom";
 import { company } from "../../data";
 import { mountPucaDots } from "../../lib/puca-dots";
 import { loadJourney } from "../../journey/validate";
-import demoJourney from "../../journey/data/tail.journey.json";
+import demoJourney from "../../journey/data/kota.journey.json";
 import { SESSIONS_KEY, TRAIL_KEY } from "../../journey/trail";
 import { FORWARDING_KEY } from "../../journey/forwarding";
 import { PEDIDOS_KEY } from "../../journey/primeira-tarefa";

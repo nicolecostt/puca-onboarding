@@ -103,12 +103,14 @@ export function matchFaq<T extends { node: string; label: string; intent: FaqInt
   const words = keywords(text);
   const intent = detectIntent(text);
   // Tamanho do trecho da fala que cita o nó (0 = não cita). Vale o nó citado pelo trecho mais longo:
-  // "config-topic" cita o nó config-topic, e não o nó "topic", cujo id está dentro do nome.
+  // "ledger-db" cita o nó ledger-db, e não o nó "db", cujo id está dentro do nome. A citação exata vence a que só se
+  // parece com a palavra: "ledger" lembra "ledgermonolith", mas quem disse "ledger-db" falou do ledger-db.
+  const EXATA = 1000;
   const mention = (f: T): number => {
     const label = normalize(f.label);
     const node = normalize(f.node);
     const exact = Math.max(said.includes(` ${label} `) ? label.length : 0, said.includes(` ${node} `) ? node.length : 0);
-    if (exact) return exact;
+    if (exact) return EXATA + exact;
     const lk = keywords(f.label);
     return lk.length > 0 && lk.every((k) => words.some((w) => sameWord(w, k))) ? label.length : 0;
   };

@@ -48,7 +48,7 @@ src/
     base.css             tokens + reset; importado por toda tela
   data/                  dados de exemplo da demo (depois podem vir de uma API)
     types.ts             formatos: perfil, empresa, jornada, sessão, quadro
-    company.ts           Tail, pessoas e etapas da jornada
+    company.ts           a Kota (lida do mapa do kit), pessoas e etapas da jornada
     profiles.ts          os dois perfis: ?perfil=bruno (transição) | ?perfil=ana (recém-contratada)
     lessons/             sessões do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css
@@ -69,7 +69,7 @@ src/
     agent-cursor/        cursor de Puca (seta + "Puca") mexendo na tela, por enquanto simulado
     journey-panel/       painel "Sua jornada" da sessão: objetivo, momentos marcados pela calibragem e próximos passos
   journey/               jornada da sessão em JSON: tipos, validador, motor, perfil, calibragem, jornada da pessoa e intenções (pulo, perguntas)
-    data/                jornadas em JSON (tail.journey.json é a demo)
+    data/                jornadas em JSON (kota.journey.json é a demo)
   lib/                   código compartilhado
     events.ts            eventos tipados (callbar:*, chatpanel:*, onboarding:*)
     draggable.ts         arrastar elementos fixos pela tela
@@ -149,7 +149,7 @@ mudam a velocidade e a forma da onda. A faixa é um arco-íris metálico gerado 
 
 ## Sessão no quadro
 
-A tela `src/screens/lesson/` roda a jornada em JSON (`src/journey/data/tail.journey.json`): Puca fala, o quadro
+A tela `src/screens/lesson/` roda a jornada em JSON (`src/journey/data/kota.journey.json`): Puca fala, o quadro
 (`src/components/whiteboard/`) vai se montando e a pessoa responde pelas respostas sugeridas, pelo chat ou tocando no quadro.
 Pelo chat ela também pode pedir para mudar de assunto ou fazer perguntas, que Puca responde com o conhecimento da sessão.
 A conversa ainda é simulada (sem LLM nem voz); o motor (`src/journey/runner.ts`) não depende da tela.

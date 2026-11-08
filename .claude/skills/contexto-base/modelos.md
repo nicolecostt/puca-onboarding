@@ -9,7 +9,7 @@ Vai no fim, com o próximo número. Três mudanças juntas:
 **1. No sumário** (a âncora é o título em minúsculas, sem pontuação, espaços viram hífens; acentos ficam):
 
 ```markdown
-13. [Avaliação pelos jurados: o mundo fictício da Tail](#13-avaliação-pelos-jurados-o-mundo-fictício-da-tail)
+13. [Avaliação pelos jurados: o mundo fictício da Kota](#13-avaliação-pelos-jurados-o-mundo-fictício-da-kota)
 ```
 
 **2. Separador** `---` depois da seção anterior.
@@ -17,7 +17,7 @@ Vai no fim, com o próximo número. Três mudanças juntas:
 **3. A seção:**
 
 ```markdown
-## 13. Avaliação pelos jurados: o mundo fictício da Tail
+## 13. Avaliação pelos jurados: o mundo fictício da Kota
 
 > Alinhamento com Joaquim em 2026-11-07.
 

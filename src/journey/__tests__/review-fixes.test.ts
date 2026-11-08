@@ -5,7 +5,7 @@ import { memoryStore } from "../storage";
 import { uid } from "../uid";
 
 const draft = (question: string, summary = question): Omit<Forwarding, "id" | "at" | "status"> => ({
-  to: { name: "Paula Nunes", role: "buddy" }, pessoa: "Ana", question, summary, consulted: [], reason: "motivo", moment: null,
+  to: { name: "Beatriz Cavalcanti", role: "buddy" }, pessoa: "Ana", question, summary, consulted: [], reason: "motivo", moment: null,
 });
 
 describe("I3: envio preso em 'enviando' volta a ser pegável", () => {
@@ -13,7 +13,7 @@ describe("I3: envio preso em 'enviando' volta a ser pegável", () => {
     let t = Date.parse("2026-11-07T22:00:00Z");
     const store = memoryStore();
     const out = createOutbox(store, { now: () => new Date(t) });
-    const f = out.add(draft("Quem cuida do tail-common?"));
+    const f = out.add(draft("Quando o ledgermonolith sai do repositório?"));
     out.claim(f.id, "aba-que-fechou");
     expect(out.pending("aba-nova")).toEqual([]);
     t += 31_000;
@@ -25,7 +25,7 @@ describe("I3: envio preso em 'enviando' volta a ser pegável", () => {
     let t = Date.parse("2026-11-07T22:00:00Z");
     const out = createOutbox(memoryStore(), { now: () => new Date(t) });
     expect(out.nextRetryIn("aba-nova")).toBeNull(); // nada preso: não agenda
-    const f = out.add(draft("Quem cuida do tail-common?"));
+    const f = out.add(draft("Quando o ledgermonolith sai do repositório?"));
     out.claim(f.id, "aba-que-fechou");
     t += 10_000;
     expect(out.nextRetryIn("aba-nova")).toBe(20_000);
@@ -56,7 +56,7 @@ describe("M2: o resumo do agente chega à buddy", () => {
     expect(forwardingMessage(f)).toContain("Resumo: Política de home office do time");
   });
   it("resumo igual à pergunta não repete", () => {
-    const f = { ...draft("Quem cuida do tail-common?"), id: "1", at: "", status: "pendente" as const };
+    const f = { ...draft("Quando o ledgermonolith sai do repositório?"), id: "1", at: "", status: "pendente" as const };
     expect(forwardingMessage(f)).not.toContain("Resumo:");
   });
 });
@@ -66,6 +66,6 @@ describe("M5: conversa fiada não vira encaminhamento", () => {
     for (const t of ["ok", "valeu", "beleza então"]) expect(looksLikeQuestion(t)).toBe(false);
   });
   it("pergunta com '?' ou frase com 3+ palavras é dúvida", () => {
-    for (const t of ["home office?", "qual a política de home office", "quem cuida do tail-common"]) expect(looksLikeQuestion(t)).toBe(true);
+    for (const t of ["home office?", "qual a política de home office", "quando o ledgermonolith sai do repositório"]) expect(looksLikeQuestion(t)).toBe(true);
   });
 });

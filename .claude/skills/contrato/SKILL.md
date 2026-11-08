@@ -24,7 +24,7 @@ A lista de contratos e quem depende de cada um está em `docs/contratos.md`. Com
    Se for um contrato novo entre duas pessoas (ex.: front ↔ backend), combine esse exemplo com a outra pessoa antes de implementar.
    Quem trabalha no outro lado pode usar o exemplo como mock enquanto isso.
 4. **Aplique no mesmo PR:** tipo, todos os usos, `docs/contratos.md` e, para jornada, também `validate.ts`, um teste em
-   `src/journey/__tests__/` e a seção de `docs/journey-format.md`. A demo `tail.journey.json` tem que continuar válida.
+   `src/journey/__tests__/` e a seção de `docs/journey-format.md`. A demo `kota.journey.json` tem que continuar válida.
 5. **Verifique** com `npm run check`.
 
 ## Saída

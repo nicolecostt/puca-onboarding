@@ -24,7 +24,7 @@ const DEFAULT_MODELS: Record<string, string> = { anthropic: "claude-haiku-5-5", 
 const models = values.models ?? DEFAULT_MODELS[values.provider!];
 if (!models) throw new Error(`--provider deve ser anthropic ou featherless`);
 
-const journey = loadJourney(JSON.parse(readFileSync(new URL("../../src/journey/data/tail.journey.json", import.meta.url), "utf8")));
+const journey = loadJourney(JSON.parse(readFileSync(new URL("../../src/journey/data/kota.journey.json", import.meta.url), "utf8")));
 const base: Omit<TurnContext, "momentId" | "stepId"> = { journey, profile: DEMO_PROFILES.novo };
 
 interface Scenario {

@@ -1,0 +1,1800 @@
+{
+  "version": 1,
+  "id": "kota-livro-razao",
+  "title": "Sua primeira sessão",
+  "company": "Kota",
+  "agent": {
+    "name": "Puca",
+    "guidelines": {
+      "core_identity": "Você é Puca, mentora de integração da Kota, um banco digital fictício. Você acompanha quem acabou de entrar ou está mudando de time e explica a empresa, o time e os sistemas montando um quadro visual.",
+      "personality_and_tone": "Acolhedora, direta e calma. Frases curtas. Explica termos técnicos na primeira vez que aparecem. Nunca avalia nem dá nota para a pessoa.",
+      "safety_and_escalation": "Quando não houver fonte confiável, diga que não conseguiu confirmar e indique a buddy. Dúvidas sobre salário, bônus, contrato ou o caso pessoal da pessoa vão para o gestor ou para People, com a regra geral e um resumo da dúvida."
+    }
+  },
+  "boards": {
+    "empresa": {
+      "title": "A Kota",
+      "nodes": [
+        {
+          "id": "missao",
+          "label": "Missão",
+          "sublabel": "cada centavo no lugar",
+          "kind": "value",
+          "x": 720,
+          "y": 150,
+          "info": {
+            "role": "Cuidar do dinheiro de cada cliente sem erro e sem susto. Abrir a conta, ver o saldo certo e transferir tem que ser simples.",
+            "docs": [
+              {
+                "title": "Notion · Quem somos",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81849a35d3b5f53b6ac8"
+              }
+            ]
+          }
+        },
+        {
+          "id": "valor-centavo",
+          "label": "Cada centavo confere",
+          "kind": "value",
+          "x": 240,
+          "y": 309,
+          "info": {
+            "role": "Saldo errado não é bug pequeno. Antes de discutir velocidade, a Kota confere se o número fecha.",
+            "docs": [
+              {
+                "title": "Notion · Quem somos",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81849a35d3b5f53b6ac8"
+              },
+              {
+                "title": "ADR 3 · Um banco por domínio",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0003-um-banco-por-dominio.md"
+              }
+            ]
+          }
+        },
+        {
+          "id": "valor-porque",
+          "label": "O porquê fica escrito",
+          "kind": "value",
+          "x": 560,
+          "y": 309,
+          "info": {
+            "role": "Toda decisão técnica que importa vira um ADR no repositório, e as maiores passam antes por uma RFC no Notion.",
+            "docs": [
+              {
+                "title": "Notion · Quem somos",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81849a35d3b5f53b6ac8"
+              },
+              {
+                "title": "Notion · De RFC a ADR",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81b282d9fd1c5e941b3e"
+              }
+            ]
+          }
+        },
+        {
+          "id": "valor-publico",
+          "label": "Perguntamos em público",
+          "kind": "value",
+          "x": 880,
+          "y": 309,
+          "info": {
+            "role": "Dúvida técnica vai no canal de ajuda do time que cuida do assunto, e não em mensagem direta, para a resposta ficar para quem vier depois.",
+            "docs": [
+              {
+                "title": "Notion · Quem somos",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81849a35d3b5f53b6ac8"
+              },
+              {
+                "title": "Notion · Comunicação",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81c3af77fb645616c4e4"
+              }
+            ]
+          }
+        },
+        {
+          "id": "valor-acompanha",
+          "label": "Quem muda, acompanha",
+          "kind": "value",
+          "x": 1200,
+          "y": 309,
+          "info": {
+            "role": "Quem sobe uma mudança cuida do efeito dela no cliente, antes e depois do deploy.",
+            "docs": [
+              {
+                "title": "Notion · Quem somos",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81849a35d3b5f53b6ac8"
+              }
+            ]
+          }
+        },
+        {
+          "id": "area-eng",
+          "label": "Engenharia",
+          "sublabel": "Contas · Livro-razão · Canais · Plataforma",
+          "kind": "team",
+          "x": 400,
+          "y": 520,
+          "info": {
+            "role": "Quatro times, cada um com gestor, tech lead, buddy, canal no Slack e plantão.",
+            "docs": [
+              {
+                "title": "Notion · Times",
+                "url": "https://lean-ptarmigan-dd2.notion.site/d4f3cb23c7f24d6aa75cbd2db6262da2"
+              }
+            ]
+          }
+        },
+        {
+          "id": "area-people",
+          "label": "People",
+          "sublabel": "carreira, benefícios e políticas",
+          "kind": "team",
+          "x": 800,
+          "y": 520,
+          "info": {
+            "role": "O RH da Kota: contrato, salário, benefícios, férias e o ciclo de desempenho.",
+            "docs": [
+              {
+                "title": "Notion · Papéis de buddy, gestor e RH",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81eab1f1e0890669261e"
+              }
+            ]
+          }
+        },
+        {
+          "id": "area-seguranca",
+          "label": "Segurança",
+          "sublabel": "acessos e vazamentos",
+          "kind": "team",
+          "x": 1140,
+          "y": 520,
+          "info": {
+            "role": "Cuida de acessos a produção e de suspeitas de vazamento.",
+            "docs": [
+              {
+                "title": "Notion · Quem somos",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81849a35d3b5f53b6ac8"
+              }
+            ]
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "m-centavo",
+          "from": "missao",
+          "to": "valor-centavo"
+        },
+        {
+          "id": "m-porque",
+          "from": "missao",
+          "to": "valor-porque"
+        },
+        {
+          "id": "m-publico",
+          "from": "missao",
+          "to": "valor-publico"
+        },
+        {
+          "id": "m-acompanha",
+          "from": "missao",
+          "to": "valor-acompanha"
+        }
+      ]
+    },
+    "time": {
+      "title": "Seu time",
+      "nodes": [
+        {
+          "id": "time",
+          "label": "{time}",
+          "sublabel": "seu time",
+          "kind": "team",
+          "x": 720,
+          "y": 342,
+          "info": {
+            "role": "Registra cada centavo que entra e sai das contas, sem perder nem duplicar transação, e mostra saldo e extrato corretos.",
+            "owner": "{gestor}",
+            "owner_confirmed": true,
+            "docs": [
+              {
+                "title": "Notion · Times",
+                "url": "https://lean-ptarmigan-dd2.notion.site/d4f3cb23c7f24d6aa75cbd2db6262da2"
+              }
+            ]
+          }
+        },
+        {
+          "id": "gestor",
+          "label": "{gestor}",
+          "sublabel": "gestão",
+          "kind": "person",
+          "x": 720,
+          "y": 150,
+          "info": {
+            "role": "Combina os objetivos das primeiras semanas, aprova acessos e a primeira tarefa e conversa com você toda semana.",
+            "team": "{time}",
+            "docs": [
+              {
+                "title": "Notion · Papéis de buddy, gestor e RH",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81eab1f1e0890669261e"
+              }
+            ]
+          }
+        },
+        {
+          "id": "buddy",
+          "label": "Beatriz Cavalcanti",
+          "sublabel": "sua buddy",
+          "kind": "person",
+          "x": 300,
+          "y": 234,
+          "info": {
+            "role": "Ajuda no dia a dia: onde fica cada coisa, como o time faz code review e por que um serviço é do jeito que é.",
+            "team": "{time}",
+            "bullets": [
+              "Sobe o ambiente local com você",
+              "Acompanha a sua primeira tarefa e o seu primeiro PR",
+              "Não avalia você: o que você pergunta fica entre vocês"
+            ],
+            "docs": [
+              {
+                "title": "Notion · Papéis de buddy, gestor e RH",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81eab1f1e0890669261e"
+              }
+            ]
+          }
+        },
+        {
+          "id": "tech-lead",
+          "label": "Thiago Nakamura",
+          "sublabel": "tech lead",
+          "kind": "person",
+          "x": 396,
+          "y": 510,
+          "info": {
+            "role": "A referência técnica do time: tem a palavra final nas decisões técnicas e libera o acesso a produção.",
+            "team": "{time}",
+            "docs": [
+              {
+                "title": "Notion · Papéis de buddy, gestor e RH",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81eab1f1e0890669261e"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rituais",
+          "label": "Rituais",
+          "sublabel": "daily · retro qui. 16h",
+          "kind": "doc",
+          "x": 1140,
+          "y": 234,
+          "info": {
+            "bullets": [
+              "Daily: todo dia útil, de manhã, em 15 minutos",
+              "Ciclos de duas semanas, com planejamento e review",
+              "Retro da quinzena: quinta, 16h"
+            ],
+            "docs": [
+              {
+                "title": "Notion · Rituais",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f8119ac0adf2714000be4"
+              }
+            ]
+          }
+        },
+        {
+          "id": "canal",
+          "label": "#livro-razao",
+          "sublabel": "canal no Slack",
+          "kind": "doc",
+          "x": 1044,
+          "y": 510,
+          "info": {
+            "role": "O canal do Livro-razão é o #livro-razao, e as dúvidas de quem é de fora chegam no #livro-razao-ajuda.",
+            "docs": [
+              {
+                "title": "Notion · Comunicação",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f81c3af77fb645616c4e4"
+              }
+            ]
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-gestor",
+          "from": "gestor",
+          "to": "time"
+        },
+        {
+          "id": "e-buddy",
+          "from": "buddy",
+          "to": "time"
+        },
+        {
+          "id": "e-tech-lead",
+          "from": "time",
+          "to": "tech-lead"
+        },
+        {
+          "id": "e-rituais",
+          "from": "rituais",
+          "to": "time"
+        },
+        {
+          "id": "e-canal",
+          "from": "time",
+          "to": "canal"
+        }
+      ]
+    },
+    "pagamentos": {
+      "title": "O caminho de uma transferência",
+      "nodes": [
+        {
+          "id": "cliente",
+          "label": "Cliente\nno site",
+          "kind": "external",
+          "x": 110,
+          "y": 330,
+          "w": 130,
+          "info": {
+            "role": "Quem usa o banco pelo site: entra, vê o saldo e o extrato e transfere para um contato."
+          }
+        },
+        {
+          "id": "frontend",
+          "label": "frontend",
+          "sublabel": "Canais",
+          "kind": "frontend",
+          "x": 330,
+          "y": 330,
+          "w": 150,
+          "info": {
+            "role": "O site do banco: login, cadastro, saldo, transferência e depósito.",
+            "team": "Canais",
+            "owner": "Larissa Fagundes",
+            "owner_confirmed": true,
+            "docs": [
+              {
+                "title": "README do frontend",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/src/frontend/README.md"
+              },
+              {
+                "title": "Notion · Sistemas",
+                "url": "https://lean-ptarmigan-dd2.notion.site/5aafc83d7b9e4c1ab77423d4757c5b9b"
+              }
+            ]
+          }
+        },
+        {
+          "id": "userservice",
+          "label": "userservice",
+          "sublabel": "Contas",
+          "kind": "service",
+          "x": 330,
+          "y": 150,
+          "w": 160,
+          "info": {
+            "role": "Cadastro e login dos clientes. Assina o JWT que os outros serviços conferem.",
+            "team": "Contas",
+            "owner": "Rodrigo Queiroz",
+            "owner_confirmed": true,
+            "adr": {
+              "id": "ADR-0002",
+              "title": "JWT assinado pelo userservice e validado em cada serviço",
+              "summary": "O userservice assina o token com a chave privada, e cada serviço confere sozinho com a chave pública, sem chamar o userservice.",
+              "owner": "Rodrigo Queiroz"
+            },
+            "docs": [
+              {
+                "title": "ADR 2 · JWT assinado pelo userservice e validado em cada serviço",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0002-jwt-assinado-pelo-userservice-e-validado-em-cada-servico.md"
+              },
+              {
+                "title": "README do userservice",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/src/accounts/userservice/README.md"
+              }
+            ]
+          }
+        },
+        {
+          "id": "ledgerwriter",
+          "label": "ledgerwriter",
+          "sublabel": "{time}",
+          "kind": "service",
+          "x": 620,
+          "y": 330,
+          "w": 170,
+          "info": {
+            "role": "Valida a transferência, confere o saldo de quem envia e grava no livro-razão.",
+            "team": "Livro-razão",
+            "owner": "Thiago Nakamura",
+            "owner_confirmed": true,
+            "adr": {
+              "id": "ADR-0001",
+              "title": "Quebrar o monolito do livro-razão em três serviços",
+              "summary": "O monolito do livro-razão virou três serviços: o ledgerwriter grava, o balancereader responde o saldo e o transactionhistory, o extrato.",
+              "owner": "Thiago Nakamura"
+            },
+            "docs": [
+              {
+                "title": "ADR 1 · Quebrar o monolito do livro-razão em três serviços",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0001-quebrar-o-monolito-do-livro-razao-em-tres-servicos.md"
+              },
+              {
+                "title": "README do ledgerwriter",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/src/ledger/ledgerwriter/README.md"
+              },
+              {
+                "title": "Notion · RFC 1",
+                "url": "https://lean-ptarmigan-dd2.notion.site/412bd621283f8124b3e9e8825d85de18"
+              }
+            ]
+          }
+        },
+        {
+          "id": "balancereader",
+          "label": "balancereader",
+          "sublabel": "{time}",
+          "kind": "service",
+          "x": 920,
+          "y": 150,
+          "w": 180,
+          "info": {
+            "role": "Responde o saldo de cada conta, de um cache em memória mantido em dia pela leitura do livro-razão.",
+            "team": "Livro-razão",
+            "owner": "Thiago Nakamura",
+            "owner_confirmed": true,
+            "adr": {
+              "id": "ADR-0004",
+              "title": "Saldo e extrato com cache em memória, lidos do livro-razão",
+              "summary": "Cada leitor tem o próprio cache em memória e lê as transações novas do ledger-db a cada 100 ms. O saldo pode estar até um ciclo atrasado.",
+              "owner": "Thiago Nakamura"
+            },
+            "docs": [
+              {
+                "title": "ADR 4 · Saldo e extrato com cache em memória, lidos do livro-razão",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0004-saldo-e-extrato-com-cache-em-memoria-lidos-do-livro-razao.md"
+              },
+              {
+                "title": "README do balancereader",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/src/ledger/balancereader/README.md"
+              }
+            ]
+          }
+        },
+        {
+          "id": "ledger-db",
+          "label": "ledger-db",
+          "sublabel": "{time}",
+          "kind": "db",
+          "x": 920,
+          "y": 330,
+          "w": 160,
+          "info": {
+            "role": "O banco do livro-razão, com todas as transações. Só aceita inserção: o que foi gravado não muda.",
+            "team": "Livro-razão",
+            "owner": "Thiago Nakamura",
+            "owner_confirmed": true,
+            "adr": {
+              "id": "ADR-0003",
+              "title": "Um banco por domínio",
+              "summary": "Contas e livro-razão têm bancos separados, e a tabela de transações ignora qualquer UPDATE ou DELETE.",
+              "owner": "Nádia Saliba"
+            },
+            "docs": [
+              {
+                "title": "ADR 3 · Um banco por domínio",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0003-um-banco-por-dominio.md"
+              },
+              {
+                "title": "README do ledger-db",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/src/ledger/ledger-db/README.md"
+              }
+            ]
+          }
+        },
+        {
+          "id": "transactionhistory",
+          "label": "transactionhistory",
+          "sublabel": "{time}",
+          "kind": "service",
+          "x": 920,
+          "y": 510,
+          "w": 200,
+          "info": {
+            "role": "Responde o extrato de cada conta, com as últimas transações num cache em memória.",
+            "team": "Livro-razão",
+            "owner": "Thiago Nakamura",
+            "owner_confirmed": true,
+            "docs": [
+              {
+                "title": "ADR 4 · Saldo e extrato com cache em memória, lidos do livro-razão",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0004-saldo-e-extrato-com-cache-em-memoria-lidos-do-livro-razao.md"
+              },
+              {
+                "title": "README do transactionhistory",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/src/ledger/transactionhistory/README.md"
+              }
+            ]
+          }
+        },
+        {
+          "id": "monolito",
+          "label": "ledgermonolith",
+          "kind": "service",
+          "x": 1230,
+          "y": 330,
+          "w": 180,
+          "note": "legado · não sobe",
+          "info": {
+            "role": "A versão antiga, em monolito, dos três serviços do livro-razão. Fica no repositório como legado: não sobe em nenhum ambiente e não recebe mudança nova.",
+            "team": "Livro-razão",
+            "owner": "Thiago Nakamura",
+            "owner_confirmed": true,
+            "docs": [
+              {
+                "title": "ADR 1 · Quebrar o monolito do livro-razão em três serviços",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0001-quebrar-o-monolito-do-livro-razao-em-tres-servicos.md"
+              },
+              {
+                "title": "README do ledgermonolith",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/src/ledgermonolith/README.md"
+              }
+            ]
+          }
+        },
+        {
+          "id": "task",
+          "label": "Primeira tarefa",
+          "sublabel": "limite por transferência",
+          "kind": "task",
+          "x": 330,
+          "y": 560,
+          "w": 200,
+          "info": {
+            "role": "Limite de valor por transferência no ledgerwriter",
+            "bullets": [
+              "Problema: o ledgerwriter aceita transferência de qualquer valor; hoje ele só confere se o valor é maior que zero",
+              "Por que importa: um valor digitado errado sai inteiro da conta, e no livro-razão nada que foi gravado muda",
+              "Sistemas: só o ledgerwriter (o TransactionValidator e os testes dele)",
+              "Onde ler: README do ledgerwriter e ADR 1",
+              "Quem ajuda: Beatriz Cavalcanti e Thiago Nakamura"
+            ],
+            "docs": [
+              {
+                "title": "README do ledgerwriter",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/src/ledger/ledgerwriter/README.md"
+              },
+              {
+                "title": "ADR 1 · Quebrar o monolito do livro-razão em três serviços",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0001-quebrar-o-monolito-do-livro-razao-em-tres-servicos.md"
+              }
+            ],
+            "vinculo": "novo"
+          }
+        },
+        {
+          "id": "task-403",
+          "label": "Primeira tarefa",
+          "sublabel": "403 no extrato de outra conta",
+          "kind": "task",
+          "x": 330,
+          "y": 560,
+          "w": 220,
+          "info": {
+            "role": "Extrato de outra conta responde 403 no transactionhistory",
+            "bullets": [
+              "Problema: pedir o extrato de outra conta com um token válido responde 401, como se faltasse login",
+              "Por que importa: 401 quer dizer token inválido; com o token certo e a conta errada, o certo é 403, e quem investiga um erro procura no lugar certo",
+              "Sistemas: só o transactionhistory (o TransactionHistoryController e os testes dele)",
+              "Onde ler: ADR 2 e README do transactionhistory",
+              "Quem ajuda: Beatriz Cavalcanti e Thiago Nakamura"
+            ],
+            "docs": [
+              {
+                "title": "ADR 2 · JWT assinado pelo userservice e validado em cada serviço",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/docs/adr/0002-jwt-assinado-pelo-userservice-e-validado-em-cada-servico.md"
+              },
+              {
+                "title": "README do transactionhistory",
+                "url": "https://github.com/JucaGF/kota-bank/blob/main/src/ledger/transactionhistory/README.md"
+              }
+            ],
+            "vinculo": "transicao"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-cli-front",
+          "from": "cliente",
+          "to": "frontend",
+          "evidence": {
+            "kind": "proven",
+            "x": 190,
+            "y": 270
+          }
+        },
+        {
+          "id": "e-front-user",
+          "from": "frontend",
+          "to": "userservice",
+          "label": "login · JWT",
+          "label_at": {
+            "x": 350,
+            "y": 245
+          },
+          "evidence": {
+            "kind": "proven",
+            "x": 250,
+            "y": 245
+          }
+        },
+        {
+          "id": "e-front-writer",
+          "from": "frontend",
+          "to": "ledgerwriter",
+          "label": "POST /transactions",
+          "label_font": "mono",
+          "label_at": {
+            "x": 470,
+            "y": 300
+          },
+          "evidence": {
+            "kind": "proven",
+            "x": 470,
+            "y": 360
+          }
+        },
+        {
+          "id": "e-writer-balance",
+          "from": "ledgerwriter",
+          "to": "balancereader",
+          "label": "confere o saldo",
+          "label_at": {
+            "x": 700,
+            "y": 220
+          },
+          "evidence": {
+            "kind": "proven",
+            "x": 640,
+            "y": 250
+          }
+        },
+        {
+          "id": "e-writer-db",
+          "from": "ledgerwriter",
+          "to": "ledger-db",
+          "label": "grava",
+          "label_at": {
+            "x": 770,
+            "y": 300
+          },
+          "evidence": {
+            "kind": "proven",
+            "x": 770,
+            "y": 360
+          }
+        },
+        {
+          "id": "e-db-balance",
+          "from": "ledger-db",
+          "to": "balancereader",
+          "label": "lê a cada 100 ms",
+          "label_at": {
+            "x": 1010,
+            "y": 240
+          }
+        },
+        {
+          "id": "e-db-history",
+          "from": "ledger-db",
+          "to": "transactionhistory",
+          "label": "lê a cada 100 ms",
+          "label_at": {
+            "x": 1010,
+            "y": 420
+          }
+        },
+        {
+          "id": "e-task-writer",
+          "from": "task",
+          "to": "ledgerwriter",
+          "label": "mexe aqui"
+        },
+        {
+          "id": "e-task-history",
+          "from": "task-403",
+          "to": "transactionhistory",
+          "label": "mexe aqui"
+        }
+      ]
+    }
+  },
+  "moments": [
+    {
+      "id": "boas-vindas",
+      "title": "Boas-vindas",
+      "goal": "Cumprimentar e explicar o roteiro da sessão conforme o momento da pessoa",
+      "view": {
+        "mode": "logo"
+      },
+      "steps": [
+        {
+          "id": "bv-oi",
+          "goal": "Cumprimentar pelo nome",
+          "line": "Oi, {nome}! Agora que eu já te conheço um pouco, vamos para a sua primeira sessão.",
+          "transitions": [
+            {
+              "to": {
+                "step": "bv-transicao"
+              },
+              "when": "a pessoa já é da empresa e está mudando de time",
+              "if": {
+                "profile": "vinculo",
+                "eq": "transicao"
+              }
+            }
+          ]
+        },
+        {
+          "id": "bv-novo",
+          "goal": "Explicar o roteiro de quem acabou de chegar",
+          "line": "Como é o seu começo aqui, vou primeiro te mostrar quem é a Kota, depois o seu time e, por fim, o caminho de uma transferência.",
+          "transitions": [
+            {
+              "to": {
+                "moment": "empresa-e-cultura"
+              }
+            }
+          ]
+        },
+        {
+          "id": "bv-transicao",
+          "goal": "Explicar o roteiro de quem está mudando de time",
+          "line": "Como você já conhece a Kota, vou pular a apresentação institucional e ir direto ao que muda: o novo time e os sistemas dele.",
+          "transitions": [
+            {
+              "to": {
+                "moment": "seu-time"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "empresa-e-cultura",
+      "title": "A Kota",
+      "goal": "Apresentar missão, valores e áreas da empresa",
+      "view": {
+        "mode": "board",
+        "board": "empresa"
+      },
+      "steps": [
+        {
+          "id": "ec-missao",
+          "goal": "Mostrar a missão",
+          "line": "A Kota é um banco digital, e a missão é cuidar do dinheiro de cada cliente sem erro e sem susto. Por trás de um site simples, cada centavo tem que estar no lugar.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "missao"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ec-valores",
+          "goal": "Mostrar os quatro valores",
+          "line": "Quatro valores sustentam o jeito de trabalhar: cada centavo confere, o porquê fica escrito, perguntamos em público e quem muda, acompanha.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "valor-centavo",
+                "m-centavo"
+              ],
+              "at": "cada centavo confere"
+            },
+            {
+              "type": "reveal",
+              "targets": [
+                "valor-porque",
+                "m-porque"
+              ],
+              "at": "o porquê fica escrito"
+            },
+            {
+              "type": "reveal",
+              "targets": [
+                "valor-publico",
+                "m-publico"
+              ],
+              "at": "perguntamos em público"
+            },
+            {
+              "type": "reveal",
+              "targets": [
+                "valor-acompanha",
+                "m-acompanha"
+              ],
+              "at": "quem muda, acompanha"
+            }
+          ]
+        },
+        {
+          "id": "ec-areas",
+          "goal": "Mostrar as áreas e onde a pessoa entra",
+          "line": "A engenharia tem quatro times, e fora dela ficam People e a segurança da informação. Você vai trabalhar na engenharia, no time de Livro-razão.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "area-eng",
+                "area-people",
+                "area-seguranca"
+              ]
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "area-eng"
+              ],
+              "tone": "focus",
+              "at": "Você vai trabalhar na engenharia"
+            }
+          ]
+        },
+        {
+          "id": "ec-pergunta",
+          "goal": "Oferecer detalhar um valor",
+          "line": "Quer que eu detalhe algum valor antes de seguirmos para o seu time?",
+          "decision": "wait",
+          "suggested_replies": [
+            "O que é perguntar em público?",
+            "Pode seguir"
+          ],
+          "transitions": [
+            {
+              "to": {
+                "moment": "seu-time"
+              },
+              "when": "a pessoa quer seguir",
+              "if": {
+                "reply": "Pode seguir"
+              }
+            }
+          ]
+        },
+        {
+          "id": "ec-publico",
+          "goal": "Detalhar o valor perguntamos em público",
+          "line": "Perguntar em público quer dizer que dúvida técnica vai no canal de ajuda do time que cuida do assunto, e não em mensagem direta. Assim a resposta fica para a próxima pessoa. Ninguém aqui acha pergunta boba, muito menos de quem acabou de chegar.",
+          "actions": [
+            {
+              "type": "clear_highlight"
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "valor-publico"
+              ],
+              "tone": "focus"
+            },
+            {
+              "type": "card",
+              "target": "valor-publico"
+            }
+          ]
+        }
+      ],
+      "knowledge": "A Kota é um banco digital: pelo site, o cliente abre a conta, entra, vê saldo e extrato, transfere para os contatos e deposita. A engenharia tem quatro times: Contas, Livro-razão, Canais e Plataforma. Fora da engenharia, People cuida de carreira, benefícios e políticas, e a segurança da informação cuida de acessos e vazamentos. Os valores estão no Notion, na página Quem somos."
+    },
+    {
+      "id": "seu-time",
+      "title": "Seu time",
+      "goal": "Apresentar o time, a gestão, a buddy e os rituais",
+      "view": {
+        "mode": "board",
+        "board": "time"
+      },
+      "steps": [
+        {
+          "id": "st-time",
+          "goal": "Apresentar o time",
+          "line": "Este é o seu time, {time}. Ele registra cada centavo que entra e sai das contas, sem perder nem duplicar transação, e mostra saldo e extrato corretos.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "time"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "st-gestor",
+          "goal": "Apresentar a gestão",
+          "line": "{gestor} lidera o time. É com ela que você combina objetivos, acessos e a sua primeira tarefa.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "gestor",
+                "e-gestor"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "st-buddy",
+          "goal": "Apresentar a buddy",
+          "line": "A Beatriz Cavalcanti é a sua buddy. Dúvida do dia a dia, de onde fica cada coisa a como o time faz code review, começa com ela.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "buddy",
+                "e-buddy"
+              ]
+            },
+            {
+              "type": "card",
+              "target": "buddy",
+              "at": "Dúvida do dia a dia"
+            }
+          ]
+        },
+        {
+          "id": "st-rituais",
+          "goal": "Mostrar tech lead, rituais e canal",
+          "line": "O Thiago Nakamura é o tech lead e tem a palavra final nas decisões técnicas. A daily é todo dia de manhã, a retro é na quinta às quatro, e o canal do time no Slack é o livro-razao.",
+          "actions": [
+            {
+              "type": "close_card"
+            },
+            {
+              "type": "reveal",
+              "targets": [
+                "tech-lead",
+                "e-tech-lead"
+              ]
+            },
+            {
+              "type": "reveal",
+              "targets": [
+                "rituais",
+                "e-rituais"
+              ],
+              "at": "A daily"
+            },
+            {
+              "type": "reveal",
+              "targets": [
+                "canal",
+                "e-canal"
+              ],
+              "at": "o canal do time"
+            }
+          ]
+        },
+        {
+          "id": "st-pergunta",
+          "goal": "Checar se ficou claro quem procurar",
+          "line": "Ficou claro quem procurar para cada coisa?",
+          "decision": "wait",
+          "suggested_replies": [
+            "Ficou claro",
+            "Qual a diferença entre gestor e buddy?"
+          ],
+          "transitions": [
+            {
+              "to": {
+                "step": "st-diferenca"
+              },
+              "when": "a pessoa quer entender gestor e buddy",
+              "if": {
+                "reply": "Qual a diferença entre gestor e buddy?"
+              }
+            },
+            {
+              "to": {
+                "moment": "pagamentos"
+              }
+            }
+          ]
+        },
+        {
+          "id": "st-diferenca",
+          "goal": "Explicar a diferença entre gestor e buddy",
+          "line": "{gestor} cuida do que você vai fazer e de como você está indo. A Beatriz cuida de como fazer: ela te ajuda a se achar no dia a dia e não te avalia. Na dúvida, comece pela Beatriz.",
+          "actions": [
+            {
+              "type": "highlight",
+              "targets": [
+                "gestor",
+                "buddy"
+              ],
+              "tone": "focus"
+            }
+          ]
+        }
+      ],
+      "knowledge": "O time de Livro-razão trabalha em ciclos de duas semanas. A daily é todo dia útil, de manhã, em 15 minutos, e a retro da quinzena é na quinta às 16h. O canal do Livro-razão é o #livro-razao, e as dúvidas de quem é de fora chegam no #livro-razao-ajuda. O plantão é um rodízio semanal que cobre dia e noite, e quem chega acompanha um plantão antes de entrar na escala. O buddy acompanha os três primeiros meses de quem é novo e o primeiro mês de quem muda de time."
+    },
+    {
+      "id": "pagamentos",
+      "title": "O caminho de uma transferência",
+      "goal": "Mostrar o caminho de uma transferência do site até o livro-razão",
+      "view": {
+        "mode": "board",
+        "board": "pagamentos"
+      },
+      "knowledge": "O ledgerwriter confere o saldo de quem envia perguntando ao balancereader por HTTP antes de gravar. O balancereader e o transactionhistory não consultam o banco a cada pedido: cada um tem um cache em memória, e um leitor em segundo plano busca as transações novas no ledger-db a cada 100 ms. Por isso o saldo pode estar até um ciclo atrasado, um risco que o time aceitou no ADR 4. O ledger-db só aceita inserção: uma correção é uma transação nova. O token de login é o JWT que o userservice assina; cada serviço do livro-razão confere sozinho com a chave pública, como conta o ADR 2. O ledgermonolith é a versão antiga dos três serviços e fica no repositório como legado.",
+      "steps": [
+        {
+          "id": "pg-site",
+          "goal": "Mostrar a entrada do fluxo",
+          "line": "Agora a parte técnica. Vamos seguir uma transferência do começo ao fim. Tudo começa no site, o frontend, que é do time de Canais.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "cliente",
+                "frontend",
+                "e-cli-front"
+              ]
+            },
+            {
+              "type": "focus",
+              "target": "frontend"
+            }
+          ],
+          "highlight": "Tudo começa no site"
+        },
+        {
+          "id": "pg-login",
+          "goal": "Mostrar o login",
+          "line": "Para entrar, o cliente faz login no userservice, do time de Contas, que devolve um JWT. Esse token vai junto em todo pedido.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "userservice",
+                "e-front-user"
+              ]
+            },
+            {
+              "type": "focus",
+              "target": "userservice"
+            }
+          ],
+          "highlight": "devolve um JWT"
+        },
+        {
+          "id": "pg-ledgerwriter",
+          "goal": "Mostrar quem grava a transferência",
+          "line": "Quando o cliente transfere, o site manda a transação para o ledgerwriter, o primeiro serviço do seu time. Ele valida a transação e confere o token.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "ledgerwriter",
+                "e-front-writer"
+              ]
+            },
+            {
+              "type": "focus",
+              "target": "ledgerwriter"
+            }
+          ],
+          "highlight": "manda a transação para o ledgerwriter"
+        },
+        {
+          "id": "pg-saldo",
+          "goal": "Mostrar a conferência do saldo",
+          "line": "Antes de gravar, o ledgerwriter pergunta ao balancereader se quem envia tem saldo. Essa chamada nasceu quando o monolito virou três serviços, no ADR 1.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "balancereader",
+                "e-writer-balance"
+              ]
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "e-writer-balance"
+              ],
+              "tone": "focus",
+              "at": "pergunta ao balancereader"
+            }
+          ],
+          "highlight": "pergunta ao balancereader"
+        },
+        {
+          "id": "pg-gravacao",
+          "goal": "Mostrar onde a transação fica gravada",
+          "line": "Com saldo, a transação é gravada no ledger-db, o banco do livro-razão. Lá nada que foi gravado muda: uma correção é uma transação nova.",
+          "actions": [
+            {
+              "type": "clear_highlight"
+            },
+            {
+              "type": "reveal",
+              "targets": [
+                "ledger-db",
+                "e-writer-db"
+              ]
+            },
+            {
+              "type": "focus",
+              "target": "ledger-db"
+            }
+          ],
+          "highlight": "nada que foi gravado muda"
+        },
+        {
+          "id": "pg-leitores",
+          "goal": "Mostrar a leitura de saldo e extrato",
+          "line": "O balancereader e o transactionhistory leem as transações novas do ledger-db a cada 100 milissegundos e guardam saldo e extrato num cache em memória. É dali que o site mostra o saldo e o extrato.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "e-db-balance"
+              ]
+            },
+            {
+              "type": "reveal",
+              "targets": [
+                "transactionhistory",
+                "e-db-history"
+              ],
+              "at": "e o transactionhistory"
+            },
+            {
+              "type": "focus",
+              "target": null
+            }
+          ],
+          "highlight": "a cada 100 milissegundos"
+        },
+        {
+          "id": "pg-caminho",
+          "goal": "Recapitular o caminho feliz",
+          "line": "Juntando tudo: site, ledgerwriter, ledger-db e os dois leitores. Esse é o caminho de uma transferência.",
+          "actions": [
+            {
+              "type": "flow",
+              "path": [
+                "e-front-writer",
+                "e-writer-db",
+                "e-db-balance"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "pg-seu-time",
+          "goal": "Mostrar onde o time da pessoa entra",
+          "line": "Tudo à direita do site é do seu time: o ledgerwriter, os dois leitores e o ledger-db. A gente volta num deles na sua primeira tarefa.",
+          "actions": [
+            {
+              "type": "highlight",
+              "targets": [
+                "ledgerwriter",
+                "balancereader",
+                "ledger-db",
+                "transactionhistory",
+                "e-writer-balance",
+                "e-writer-db",
+                "e-db-balance",
+                "e-db-history"
+              ],
+              "tone": "ok",
+              "at": "Tudo à direita do site"
+            }
+          ],
+          "highlight": "Tudo à direita do site é do seu time"
+        },
+        {
+          "id": "pg-pergunta",
+          "goal": "Oferecer aprofundamentos no fluxo",
+          "line": "Quer ver o que acontece quando uma peça desse caminho falha?",
+          "decision": "wait",
+          "suggested_replies": [
+            "E se o balancereader cair?",
+            "Quem cuida de cada serviço?",
+            "Pode seguir"
+          ],
+          "actions": [
+            {
+              "type": "clear_highlight"
+            }
+          ],
+          "transitions": [
+            {
+              "to": {
+                "moment": "falha"
+              },
+              "when": "a pessoa quer entender a falha",
+              "if": {
+                "reply": "E se o balancereader cair?"
+              }
+            },
+            {
+              "to": {
+                "moment": "quem-cuida"
+              },
+              "when": "a pessoa quer saber os responsáveis",
+              "if": {
+                "reply": "Quem cuida de cada serviço?"
+              }
+            },
+            {
+              "to": {
+                "moment": "checagem"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "falha",
+      "title": "Quando falha",
+      "goal": "Explicar o caminho de erro e as decisões que o explicam",
+      "steps": [
+        {
+          "id": "fa-recusa",
+          "goal": "Mostrar a transferência recusada",
+          "line": "Se o balancereader cair, o ledgerwriter não consegue conferir o saldo e recusa a transferência com um erro. Nada é gravado pela metade: o cliente tenta de novo depois.",
+          "actions": [
+            {
+              "type": "highlight",
+              "targets": [
+                "ledgerwriter",
+                "e-writer-balance",
+                "balancereader"
+              ],
+              "tone": "warn"
+            },
+            {
+              "type": "focus",
+              "target": "balancereader"
+            }
+          ]
+        },
+        {
+          "id": "fa-atraso",
+          "goal": "Mostrar o atraso aceito no saldo",
+          "line": "E tem um risco aceito de propósito: como o balancereader lê o banco a cada 100 milissegundos, duas transferências da mesma conta no mesmo ciclo podem passar com o saldo antigo. O ADR 4 conta por que o time aceitou.",
+          "actions": [
+            {
+              "type": "focus",
+              "target": null
+            },
+            {
+              "type": "flow",
+              "path": [
+                "e-writer-db",
+                "e-db-balance"
+              ],
+              "at": "lê o banco a cada 100 milissegundos"
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "e-db-balance",
+                "balancereader"
+              ],
+              "tone": "warn",
+              "at": "saldo antigo"
+            },
+            {
+              "type": "card",
+              "target": "balancereader",
+              "at": "O ADR 4"
+            }
+          ]
+        },
+        {
+          "id": "fa-checa",
+          "goal": "Conferir se ficou claro o caminho de erro",
+          "line": "Uma pergunta rápida, só para ver se ficou claro: se o balancereader estiver fora do ar, o que acontece com uma transferência?",
+          "decision": "wait",
+          "suggested_replies": [
+            "É recusada, sem gravar nada",
+            "É gravada e o saldo confere depois",
+            "Fica numa fila esperando"
+          ],
+          "check": {
+            "tema": "falhas",
+            "replies": [
+              "É recusada, sem gravar nada"
+            ]
+          },
+          "transitions": [
+            {
+              "to": {
+                "step": "fa-certo"
+              },
+              "if": {
+                "checagem": "entendeu"
+              }
+            }
+          ]
+        },
+        {
+          "id": "fa-reforco",
+          "goal": "Mostrar de novo, mais devagar, por que a transferência é recusada",
+          "line": "Olha o caminho de novo: antes de gravar, o ledgerwriter pergunta o saldo ao balancereader. Sem resposta, ele não sabe se há saldo, então recusa. Não existe fila no meio: nada fica esperando.",
+          "highlight": "Sem resposta, ele não sabe se há saldo",
+          "actions": [
+            {
+              "type": "close_card"
+            },
+            {
+              "type": "clear_highlight"
+            },
+            {
+              "type": "flow",
+              "path": [
+                "e-front-writer",
+                "e-writer-balance"
+              ],
+              "at": "pergunta o saldo"
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "e-writer-balance",
+                "balancereader"
+              ],
+              "tone": "warn",
+              "at": "Sem resposta"
+            }
+          ],
+          "transitions": [
+            {
+              "to": {
+                "step": "fa-fila"
+              }
+            }
+          ]
+        },
+        {
+          "id": "fa-certo",
+          "goal": "Confirmar o caminho de erro com o quadro",
+          "line": "Isso. Sem o balancereader, a transferência é recusada e nada é gravado. O cliente tenta de novo quando ele voltar.",
+          "actions": [
+            {
+              "type": "close_card"
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "ledgerwriter",
+                "e-writer-balance"
+              ],
+              "tone": "ok"
+            }
+          ]
+        },
+        {
+          "id": "fa-fila",
+          "goal": "Mostrar a decisão que explica o desenho",
+          "line": "Você pode se perguntar por que não há uma fila entre o ledgerwriter e os leitores. Ela foi proposta na RFC 3 e rejeitada: o ADR 6 conta o que pesou. É o valor de deixar o porquê escrito.",
+          "actions": [
+            {
+              "type": "clear_highlight"
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "e-db-balance",
+                "e-db-history"
+              ],
+              "tone": "focus"
+            }
+          ],
+          "highlight": "o ADR 6 conta o que pesou"
+        },
+        {
+          "id": "fa-pergunta",
+          "goal": "Oferecer ver os responsáveis pelos serviços",
+          "line": "Quer saber quem cuida de cada serviço, ou podemos seguir?",
+          "decision": "wait",
+          "suggested_replies": [
+            "Quem cuida de cada serviço?",
+            "Pode seguir"
+          ],
+          "transitions": [
+            {
+              "to": {
+                "moment": "quem-cuida"
+              },
+              "when": "a pessoa quer saber os responsáveis",
+              "if": {
+                "reply": "Quem cuida de cada serviço?"
+              }
+            },
+            {
+              "to": {
+                "moment": "checagem"
+              }
+            }
+          ]
+        }
+      ],
+      "knowledge": "Se o balancereader não responde, o ledgerwriter devolve erro e não grava a transferência. O saldo pode estar até 100 ms atrasado, e o ADR 4 aceita esse risco. Se o maior transactionId do ledger-db diminuir, como num banco restaurado de backup, o leitor do balancereader para, o /healthy passa a responder erro e o serviço precisa ser reiniciado. A fila entre o ledgerwriter e os leitores foi proposta na RFC 3 pelo Gustavo Schmitt e rejeitada no ADR 6."
+    },
+    {
+      "id": "quem-cuida",
+      "title": "Quem cuida",
+      "goal": "Mostrar o time e a pessoa responsável por cada serviço",
+      "steps": [
+        {
+          "id": "qc-contas-canais",
+          "goal": "Mostrar os responsáveis fora do time",
+          "line": "O site é de Canais, com a Larissa Fagundes como tech lead. O userservice é de Contas, com o Rodrigo Queiroz. O cartão mostra a decisão sobre o JWT.",
+          "actions": [
+            {
+              "type": "close_card"
+            },
+            {
+              "type": "clear_highlight"
+            },
+            {
+              "type": "focus",
+              "target": null
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "frontend",
+                "userservice"
+              ],
+              "tone": "focus"
+            },
+            {
+              "type": "card",
+              "target": "userservice",
+              "at": "O cartão mostra"
+            }
+          ]
+        },
+        {
+          "id": "qc-livro-razao",
+          "goal": "Mostrar os responsáveis do time",
+          "line": "O ledgerwriter, os dois leitores e o ledger-db são do Livro-razão. O CODEOWNERS liga essas pastas ao Thiago Nakamura e à {gestor}.",
+          "actions": [
+            {
+              "type": "clear_highlight"
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "ledgerwriter",
+                "balancereader",
+                "ledger-db",
+                "transactionhistory",
+                "e-writer-balance",
+                "e-writer-db",
+                "e-db-balance",
+                "e-db-history"
+              ],
+              "tone": "focus"
+            },
+            {
+              "type": "card",
+              "target": "ledgerwriter",
+              "at": "O CODEOWNERS"
+            }
+          ]
+        },
+        {
+          "id": "qc-legado",
+          "goal": "Mostrar o legado do time",
+          "line": "Por fim, o ledgermonolith. Ele também é do Livro-razão, mas é legado: fica no repositório, não sobe em nenhum ambiente e não recebe mudança. Correção vai nos três serviços, nunca nele.",
+          "actions": [
+            {
+              "type": "close_card"
+            },
+            {
+              "type": "clear_highlight"
+            },
+            {
+              "type": "reveal",
+              "targets": [
+                "monolito"
+              ]
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "monolito"
+              ],
+              "tone": "warn"
+            },
+            {
+              "type": "card",
+              "target": "monolito",
+              "at": "não sobe em nenhum ambiente"
+            }
+          ],
+          "highlight": "Correção vai nos três serviços, nunca nele"
+        }
+      ]
+    },
+    {
+      "id": "checagem",
+      "title": "Checagem rápida",
+      "goal": "Verificar o entendimento do fluxo sem dar nota",
+      "steps": [
+        {
+          "id": "ch-pergunta",
+          "goal": "Pedir que a pessoa aponte onde investigar",
+          "line": "Uma pergunta rápida, sem nota: um cliente transferiu, a transação está gravada, mas o saldo no site não mudou. Onde você olharia primeiro? Toque no quadro.",
+          "actions": [
+            {
+              "type": "close_card"
+            },
+            {
+              "type": "clear_highlight"
+            },
+            {
+              "type": "focus",
+              "target": null
+            }
+          ],
+          "decision": "select",
+          "expect": {
+            "nodes": [
+              "balancereader",
+              "ledger-db"
+            ],
+            "on_correct": "Boa escolha. A transação já está no ledger-db, e quem mostra o saldo é o balancereader, que lê o banco a cada 100 milissegundos. São os dois primeiros lugares para olhar.",
+            "on_wrong": "Quase. Repare no que fica entre a transação gravada e o saldo que o site mostra. Onde o saldo poderia ter ficado velho?",
+            "retries": 1,
+            "on_reveal": "Sem problema. Eu começaria pelo ledger-db, para ver se a transação está lá, e pelo balancereader, que lê o banco e guarda o saldo. Vou deixar os dois destacados."
+          },
+          "check": {
+            "tema": "pagamentos"
+          },
+          "transitions": [
+            {
+              "to": {
+                "moment": "primeira-tarefa"
+              },
+              "if": {
+                "checagem": "entendeu"
+              }
+            }
+          ]
+        },
+        {
+          "id": "ch-reforco",
+          "goal": "Explicar de novo, mais simples, onde o saldo pode ficar velho",
+          "line": "Pensa assim: a transação gravada fica no ledger-db, e o saldo que o site mostra vem do cache do balancereader. Se o saldo não muda, ou a transação não chegou ao banco, ou o leitor do balancereader parou. Por isso esses dois vêm primeiro.",
+          "highlight": "ou o leitor do balancereader parou",
+          "actions": [
+            {
+              "type": "clear_highlight"
+            },
+            {
+              "type": "flow",
+              "path": [
+                "e-writer-db",
+                "e-db-balance"
+              ],
+              "at": "fica no ledger-db"
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "ledger-db",
+                "e-db-balance",
+                "balancereader"
+              ],
+              "tone": "focus",
+              "at": "ou a transação não chegou"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primeira-tarefa",
+      "title": "Primeira tarefa",
+      "goal": "Ligar o que foi aprendido a uma tarefa real e pequena",
+      "steps": [
+        {
+          "id": "pt-tarefa",
+          "goal": "Anunciar a primeira tarefa",
+          "line": "Para fechar a parte técnica, separei uma primeira tarefa do catálogo que o time aprovou, pensada para o seu momento.",
+          "actions": [
+            {
+              "type": "clear_highlight"
+            }
+          ],
+          "transitions": [
+            {
+              "to": {
+                "step": "pt-tarefa-transicao"
+              },
+              "if": {
+                "profile": "vinculo",
+                "eq": "transicao"
+              }
+            }
+          ]
+        },
+        {
+          "id": "pt-tarefa-novo",
+          "goal": "Apresentar a tarefa de quem é novo",
+          "line": "É colocar um limite de valor por transferência no ledgerwriter. O cartão explica o problema, por que importa e onde ler.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "ledgerwriter"
+              ]
+            },
+            {
+              "type": "reveal",
+              "targets": [
+                "task",
+                "e-task-writer"
+              ]
+            },
+            {
+              "type": "focus",
+              "target": "task"
+            },
+            {
+              "type": "card",
+              "target": "task",
+              "at": "O cartão explica"
+            }
+          ],
+          "knowledge": "A tarefa mexe só no ledgerwriter: a validação no TransactionValidator e os testes dele. O README do ledgerwriter explica como rodar os testes com scripts/testar.sh ledgerwriter. A issue fica no kota-bank, com o label primeira-tarefa. A Beatriz acompanha e o Thiago revisa."
+        },
+        {
+          "id": "pt-escopo",
+          "goal": "Mostrar que a tarefa de quem é novo tem escopo pequeno",
+          "line": "Ela mexe só no ledgerwriter, então você não precisa entender o sistema inteiro. A Beatriz sobe o ambiente com você, e o Thiago revisa.",
+          "actions": [
+            {
+              "type": "close_card"
+            },
+            {
+              "type": "focus",
+              "target": null
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "task",
+                "e-task-writer",
+                "ledgerwriter"
+              ],
+              "tone": "ok"
+            }
+          ],
+          "transitions": [
+            {
+              "to": {
+                "step": "pt-aprovacao"
+              }
+            }
+          ]
+        },
+        {
+          "id": "pt-tarefa-transicao",
+          "goal": "Apresentar a tarefa de quem está em transição",
+          "line": "Como você vem de Contas e conhece o JWT, ela usa isso: fazer o transactionhistory responder 403 quando o token é válido mas a conta é de outra pessoa. O cartão explica.",
+          "actions": [
+            {
+              "type": "reveal",
+              "targets": [
+                "transactionhistory"
+              ]
+            },
+            {
+              "type": "reveal",
+              "targets": [
+                "task-403",
+                "e-task-history"
+              ]
+            },
+            {
+              "type": "focus",
+              "target": "task-403"
+            },
+            {
+              "type": "card",
+              "target": "task-403",
+              "at": "O cartão explica"
+            }
+          ],
+          "knowledge": "A tarefa mexe só no transactionhistory: o TransactionHistoryController e os testes dele. O ADR 2 explica como cada serviço confere o JWT sozinho. A issue fica no kota-bank, com o label primeira-tarefa. A Beatriz acompanha e o Thiago revisa."
+        },
+        {
+          "id": "pt-escopo-transicao",
+          "goal": "Mostrar onde a tarefa de quem está em transição mexe",
+          "line": "Ela mexe só no transactionhistory. Se travar, a Beatriz e o Thiago podem te ajudar, e a dúvida pode ir no livro-razao-ajuda.",
+          "actions": [
+            {
+              "type": "close_card"
+            },
+            {
+              "type": "focus",
+              "target": null
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "task-403",
+                "e-task-history",
+                "transactionhistory"
+              ],
+              "tone": "ok"
+            }
+          ]
+        },
+        {
+          "id": "pt-aprovacao",
+          "goal": "Contar que a tarefa foi para o gestor aprovar",
+          "line": "Mandei a tarefa para {gestor} aprovar no Slack. Depois de aprovada, ela fica na página da tarefa, com tudo o que eu te mostrei."
+        }
+      ],
+      "knowledge": "A primeira tarefa sai do catálogo que o time aprovou, as issues com o label primeira-tarefa no kota-bank: quem é novo recebe uma mais guiada, quem está em transição uma que usa o que já sabe. Cada issue vem com uma branch onde o teste falha. Puca manda a tarefa para o gestor aprovar no Slack; aprovada, ela fica na página da tarefa."
+    },
+    {
+      "id": "encerramento",
+      "title": "Encerramento",
+      "goal": "Resumir a sessão e dizer o que a buddy recebe",
+      "view": {
+        "mode": "logo"
+      },
+      "steps": [
+        {
+          "id": "en-resumo",
+          "goal": "Resumir o que foi visto",
+          "line": "Por hoje é isso, {nome}. Vimos o seu time, o caminho de uma transferência e a sua primeira tarefa."
+        },
+        {
+          "id": "en-pergunta",
+          "goal": "Explicar o que a buddy recebe e oferecer revisão",
+          "line": "A Beatriz recebe um resumo das etapas que você concluiu, não da nossa conversa. Quer rever alguma parte?",
+          "decision": "wait",
+          "suggested_replies": [
+            "Rever o caminho da transferência",
+            "Terminar por hoje"
+          ],
+          "transitions": [
+            {
+              "to": {
+                "moment": "pagamentos"
+              },
+              "when": "a pessoa quer rever o caminho da transferência",
+              "if": {
+                "reply": "Rever o caminho da transferência"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

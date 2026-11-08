@@ -4,7 +4,7 @@
 // força um perfil da demo; ?auto=1 responde sozinho, para apresentar sem mexer no mouse.
 import "../../styles/base.css";
 import "./style.css";
-import demo from "../../journey/data/tail.journey.json";
+import demo from "../../journey/data/kota.journey.json";
 import { loadJourney } from "../../journey/validate";
 import { createRunner, type Runner, type RunnerIO } from "../../journey/runner";
 import { createClock, Cancelled } from "../../journey/clock";

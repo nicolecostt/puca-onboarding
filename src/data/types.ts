@@ -67,10 +67,10 @@ export interface BoardNode {
   x: number;
   y: number;
   w: number;
-  /** id da pessoa dona (mostra @handle) ou texto livre (ex.: "cdn.tail.dev"). */
+  /** id da pessoa dona (mostra @handle) ou texto livre (ex.: "kota.example"). */
   ownerId?: string;
   caption?: string;
-  /** Texto do selo embaixo do nó (ex.: "caixa preta · aguardando Carla"). */
+  /** Texto do selo embaixo do nó (ex.: "legado · não sobe"). */
   note?: string;
   /** Detalhes ao clicar no nó (ou quando Puca abre o cartão). */
   details?: NodeDetails;

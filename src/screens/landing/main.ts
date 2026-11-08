@@ -7,7 +7,7 @@ import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../
 import { qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
 import { mountPucaDots } from "../../lib/puca-dots";
-import demo from "../../journey/data/tail.journey.json";
+import demo from "../../journey/data/kota.journey.json";
 import type { BoardNode, Journey } from "../../journey/types";
 import notion from "../../../kit/kota/notion/urls.json";
 import slack from "../../../kit/kota/slack/workspace.json";
@@ -82,7 +82,7 @@ function mountSkills(sphere: AgentVisual | null): void {
   show(0);
 }
 
-// ---- Nós do exemplo de quadro: dados lidos da jornada da Tail (o mesmo quadro da sessão) ----
+// ---- Nós do exemplo de quadro: dados lidos da jornada da Kota (o mesmo quadro da sessão) ----
 interface NodeCard {
   title: string;
   role: string;
@@ -138,7 +138,7 @@ function mountBoard(): void {
     const node = (e.target as Element).closest<HTMLElement>(".node");
     if (node?.dataset.node) select(node.dataset.node);
   });
-  select("topic", false);
+  select("ledgerwriter", false);
 }
 
 // ---- Instalar: links do kit da Kota (vêm dos arquivos do kit) e o botão de copiar o comando ----

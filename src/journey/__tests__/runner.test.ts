@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import demo from "../data/tail.journey.json";
+import demo from "../data/kota.journey.json";
 import { loadJourney } from "../validate";
 import { createRunner, type RunnerIO } from "../runner";
 import { DEMO_PROFILES } from "../profile";
@@ -36,7 +36,7 @@ function fakeIO(replies: string[], clicks: string[] = []) {
   return { io, said, actions, views, checks };
 }
 
-const run = (profile: Profile, replies: string[], clicks: string[] = ["settlement"]) => {
+const run = (profile: Profile, replies: string[], clicks: string[] = ["balancereader"]) => {
   const f = fakeIO(replies, clicks);
   return createRunner(journey, profile, f.io).run().then((r) => ({ ...r, ...f }));
 };
@@ -59,19 +59,19 @@ describe("runner", () => {
   });
 
   it("a primeira tarefa muda com o vínculo e termina pedindo a aprovação", async () => {
-    const aprovacao = "Mandei a tarefa para Marcos Vidal aprovar no Slack. Depois de aprovada, ela fica na página da tarefa, com tudo o que eu te mostrei.";
+    const aprovacao = "Mandei a tarefa para Natália Brandão aprovar no Slack. Depois de aprovada, ela fica na página da tarefa, com tudo o que eu te mostrei.";
     const pt = (steps: string[]) => steps.filter((s) => s.startsWith("pt-"));
     const cards = (actions: BoardAction[]) => actions.flatMap((a) => (a.type === "card" ? [a.target] : []));
 
     const ana = await run(DEMO_PROFILES.novo, ["Pode seguir", "Ficou claro", "Pode seguir", "Terminar por hoje"]);
     expect(pt(ana.steps)).toEqual(["pt-tarefa", "pt-tarefa-novo", "pt-escopo", "pt-aprovacao"]);
     expect(cards(ana.actions)).toContain("task");
-    expect(cards(ana.actions)).not.toContain("task-dlq");
+    expect(cards(ana.actions)).not.toContain("task-403");
     expect(ana.said).toContain(aprovacao);
 
     const bruno = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"]);
     expect(pt(bruno.steps)).toEqual(["pt-tarefa", "pt-tarefa-transicao", "pt-escopo-transicao", "pt-aprovacao"]);
-    expect(cards(bruno.actions)).toContain("task-dlq");
+    expect(cards(bruno.actions)).toContain("task-403");
     expect(cards(bruno.actions)).not.toContain("task");
     expect(bruno.said).toContain(aprovacao);
   });
@@ -79,8 +79,8 @@ describe("runner", () => {
   it("resposta sugerida leva ao aprofundamento, e texto livre também", async () => {
     const r = await run(DEMO_PROFILES.transicao, [
       "Ficou claro",
-      "E se a liquidação falhar?", // pagamentos → falha
-      "Para a settlement.dlq", // checagem do caminho de erro
+      "E se o balancereader cair?", // pagamentos → falha
+      "É recusada, sem gravar nada", // checagem do caminho de erro
       "quem cuida disso?", // falha → quem-cuida (texto livre)
       "Terminar por hoje",
     ]);
@@ -88,12 +88,12 @@ describe("runner", () => {
   });
 
   it("momento sem vista herda o quadro sem recomeçar", async () => {
-    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "E se a liquidação falhar?", "Para a settlement.dlq", "Pode seguir", "Terminar por hoje"]);
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "E se o balancereader cair?", "É recusada, sem gravar nada", "Pode seguir", "Terminar por hoje"]);
     expect(r.views).toEqual(["logo", "time", "pagamentos", "pagamentos (herdada)", "pagamentos (herdada)", "pagamentos (herdada)", "logo"]);
   });
 
   it("checagem: erro reexplica, acerto confirma", async () => {
-    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"], ["pos", "settlement"]);
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"], ["frontend", "balancereader"]);
     const expect_ = journey.moments.find((m) => m.id === "checagem")!.steps[0].expect!;
     expect(r.said).toContain(expect_.on_wrong);
     expect(r.said).toContain(expect_.on_correct);
@@ -101,51 +101,51 @@ describe("runner", () => {
   });
 
   it("checagem: depois das tentativas mostra a resposta", async () => {
-    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"], ["pos", "gateway"]);
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"], ["frontend", "userservice"]);
     const expect_ = journey.moments.find((m) => m.id === "checagem")!.steps[0].expect!;
     expect(r.said).toContain(expect_.on_reveal);
     expect(r.actions).toContainEqual({ type: "highlight", targets: expect_.nodes, tone: "ok" });
   });
 
   it("checagem por toque: acertar (mesmo na segunda tentativa) é entendeu e pula o reforço", async () => {
-    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"], ["pos", "settlement"]);
-    expect(r.checks).toEqual([{ tema: "pagamentos", passo: "ch-pergunta", entendeu: true, tentativas: 2, resposta: "settlement" }]);
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"], ["frontend", "balancereader"]);
+    expect(r.checks).toEqual([{ tema: "pagamentos", passo: "ch-pergunta", entendeu: true, tentativas: 2, resposta: "balancereader" }]);
     expect(r.steps).not.toContain("ch-reforco");
   });
 
   it("checagem por toque: precisar que Puca revele é rever e passa pelo reforço no quadro", async () => {
-    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"], ["pos", "gateway"]);
-    expect(r.checks).toMatchObject([{ tema: "pagamentos", entendeu: false, tentativas: 2, resposta: "gateway" }]);
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"], ["frontend", "userservice"]);
+    expect(r.checks).toMatchObject([{ tema: "pagamentos", entendeu: false, tentativas: 2, resposta: "userservice" }]);
     expect(r.steps).toContain("ch-reforco");
     expect(r.moments.at(-2)).toBe("primeira-tarefa");
   });
 
   it("checagem por resposta: texto livre que casa com a resposta certa é entendeu", async () => {
-    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "E se a liquidação falhar?", "vai pra settlement.dlq", "Pode seguir", "Terminar por hoje"]);
-    expect(r.checks[0]).toMatchObject({ tema: "falhas", passo: "fa-checa", entendeu: true, resposta: "vai pra settlement.dlq" });
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "E se o balancereader cair?", "ela é recusada sem gravar nada", "Pode seguir", "Terminar por hoje"]);
+    expect(r.checks[0]).toMatchObject({ tema: "falhas", passo: "fa-checa", entendeu: true, resposta: "ela é recusada sem gravar nada" });
     expect(r.steps).toContain("fa-certo");
     expect(r.steps).not.toContain("fa-reforco");
   });
 
   it("checagem por resposta: resposta errada é rever, reforça e segue sem confirmar", async () => {
-    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "E se a liquidação falhar?", "Ela se perde", "Pode seguir", "Terminar por hoje"]);
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "E se o balancereader cair?", "Fica numa fila esperando", "Pode seguir", "Terminar por hoje"]);
     expect(r.checks[0]).toMatchObject({ tema: "falhas", entendeu: false });
     expect(r.steps).toContain("fa-reforco");
     expect(r.steps).not.toContain("fa-certo");
-    expect(r.steps).toContain("fa-caixa-preta");
+    expect(r.steps).toContain("fa-fila");
   });
 
   it("rever o caminho volta ao início do momento de pagamentos", async () => {
-    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Rever o caminho da transação", "Pode seguir", "Terminar por hoje"], [
-      "settlement",
-      "settlement",
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Rever o caminho da transferência", "Pode seguir", "Terminar por hoje"], [
+      "balancereader",
+      "balancereader",
     ]);
     expect(r.moments.filter((m) => m === "pagamentos")).toHaveLength(2);
     expect(r.ended).toBe("done");
   });
 
   it("para no limite de passos se as transições formarem laço", async () => {
-    const f = fakeIO(Array(500).fill("Rever o caminho da transação"), Array(100).fill("settlement"));
+    const f = fakeIO(Array(500).fill("Rever o caminho da transferência"), Array(100).fill("balancereader"));
     const r = await createRunner(journey, DEMO_PROFILES.transicao, f.io, { maxSteps: 40 }).run();
     expect(r.ended).toBe("limit");
     expect(r.steps).toHaveLength(40);
@@ -163,11 +163,11 @@ describe("runner", () => {
           {
             id: "s",
             goal: "falar com marcas",
-            line: "Oi, {nome}: primeiro o POS, depois o gateway.",
+            line: "Oi, {nome}: primeiro o site, depois o ledgerwriter.",
             actions: [
-              { type: "reveal", targets: ["gateway"], at: "o gateway" },
+              { type: "reveal", targets: ["ledgerwriter"], at: "o ledgerwriter" },
               { type: "clear_highlight" },
-              { type: "reveal", targets: ["pos"], at: "o POS" },
+              { type: "reveal", targets: ["frontend"], at: "o site" },
             ],
           },
         ],
@@ -186,11 +186,11 @@ describe("runner", () => {
       select: async () => "",
     };
     await createRunner(loadJourney(j), DEMO_PROFILES.transicao, io).run();
-    expect(events).toEqual(["apply clear_highlight", "say Oi, Bruno: primeiro o POS, depois o gateway."]);
-    const line = "Oi, Bruno: primeiro o POS, depois o gateway.";
+    expect(events).toEqual(["apply clear_highlight", "say Oi, Bruno: primeiro o site, depois o ledgerwriter."]);
+    const line = "Oi, Bruno: primeiro o site, depois o ledgerwriter.";
     expect(cues?.map((c) => [c.at, c.action.type === "reveal" ? c.action.targets[0] : ""])).toEqual([
-      [line.indexOf("o POS"), "pos"],
-      [line.indexOf("o gateway"), "gateway"],
+      [line.indexOf("o site"), "frontend"],
+      [line.indexOf("o ledgerwriter"), "ledgerwriter"],
     ]);
   });
 });

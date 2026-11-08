@@ -1,19 +1,19 @@
 // Respostas de exemplo da call inicial para os dois perfis da demo (?perfil=bruno | ana).
 // A call usa quando a pessoa "responde por voz" na simulação; a calibragem de demo também sai daqui.
-// Bruno: já trabalhou com filas, pouco de adquirência. Ana: pouco de filas, nunca viu adquirência.
+// Bruno: vem de Contas, conhece login e JWT, nunca mexeu com saldo e extrato. Ana: nunca trabalhou com banco.
 
 export const callAnswers: Record<string, Record<string, string>> = {
   bruno: {
-    vinculo: "Estou mudando de time, vim do Antifraude",
+    vinculo: "Estou mudando de time, vim de Contas",
     confirma: "Isso, certinho",
-    time_anterior: "Antifraude",
-    experiencia: "No Antifraude eu cuidava dos consumidores Kafka que analisam as transações",
-    aproveita: "Kafka e o jeito de investigar uma transação com problema",
-    diferencas: "A parte de terminais e configuração, e o time é todo novo pra mim",
-    pagamentos: "Um pouco, pelo lado da fraude, mas adquirência eu não conheço",
-    mensageria: "Sim, uso Kafka todo dia",
-    falhas: "Já, a gente tinha retry e DLQ nos consumidores",
-    objetivos: "Entender o caminho da transação e fazer minha primeira mudança no terminal-config sozinho",
+    time_anterior: "Contas",
+    experiencia: "Em Contas eu cuidava do login e do JWT no userservice",
+    aproveita: "JWT e o jeito de investigar um login com problema",
+    diferencas: "Saldo e extrato, Java no lugar de Python, e o time é todo novo pra mim",
+    pagamentos: "Pouco, só pelo lado do login; transferência e saldo eu não conheço",
+    mensageria: "Sim, usei filas no emprego anterior",
+    falhas: "Já, no emprego anterior a gente tinha retry e DLQ nos consumidores",
+    objetivos: "Entender o caminho de uma transferência e fazer minha primeira mudança no livro-razão sozinho",
   },
   ana: {
     vinculo: "Primeira vez",

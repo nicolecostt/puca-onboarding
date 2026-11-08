@@ -11,7 +11,7 @@ Pedido: $ARGUMENTS
 > **Base do sistema:** o glossário do `CONTEXT.md` já está no seu contexto (o `CLAUDE.md` importa); use os termos dele.
 > Uma jornada é conteúdo de produto: leia no `PRODUCT.md` a sessão (§4.1–4.3), os perfis (§7) e o que a demo precisa mostrar. Falas, títulos e `goal` usam os termos do glossário (momento, passo, nó, fonte, encaminhamento). Se o pedido contradiz o `PRODUCT.md`, pare e mostre a contradição. Se algo novo precisa entrar na base, use a skill `contexto-base`.
 
-O formato completo está em `docs/journey-format.md`. Leia antes de escrever. Use `src/journey/data/tail.journey.json`
+O formato completo está em `docs/journey-format.md`. Leia antes de escrever. Use `src/journey/data/kota.journey.json`
 como exemplo do que já funciona.
 
 ## Passos
@@ -26,7 +26,7 @@ como exemplo do que já funciona.
    npx vitest run src/journey   # demo continua válida
    ```
    e adicione um caso em `src/journey/__tests__/validate.test.ts` que importa o arquivo novo e espera `errorsOf(...)` igual a `[]`.
-5. **Veja rodando.** A tela `src/screens/lesson/main.ts` importa `tail.journey.json` direto. Para ver outra jornada,
+5. **Veja rodando.** A tela `src/screens/lesson/main.ts` importa `kota.journey.json` direto. Para ver outra jornada,
    troque o import localmente ou combine com o time como escolher a jornada (isso muda contrato: skill `contrato`).
    Abra `/src/screens/lesson/?perfil=ana&auto=1` e `?perfil=bruno&auto=1`.
 
