@@ -3,10 +3,12 @@
 // (passo do mesmo momento, ou início de outro momento a partir do último passo),
 // passo "wait" com pergunta ou respostas sugeridas, ações só sobre nós do quadro em vigor.
 import type { BoardSpec, Journey, Moment, View } from "./types";
+import { TIPOS_DE_ACAO } from "../lib/orbis";
 
 export type ValidationResult = { ok: true; journey: Journey } | { ok: false; errors: string[] };
 
-const ACTION_TYPES = new Set(["reveal", "highlight", "clear_highlight", "focus", "flow", "card", "close_card", "reset"]);
+const ACTION_TYPES = new Set(["reveal", "highlight", "clear_highlight", "focus", "flow", "card", "close_card", "reset", "navegador"]);
+const TIPOS_NAVEGADOR = new Set<string>(TIPOS_DE_ACAO);
 const DECISIONS = new Set(["auto", "wait", "select"]);
 /** Os temas da calibragem (mesma lista de CALIBRAGEM_TEMAS; um teste confere). */
 export const TEMAS = new Set(["empresa", "rituais", "pagamentos", "mensageria", "falhas"]);
@@ -121,6 +123,15 @@ export function validateJourney(input: unknown): ValidationResult {
       for (const a of s.actions ?? []) {
         if (!ACTION_TYPES.has(a.type)) {
           errors.push(`${where(s)}: ação "${(a as { type: string }).type}" desconhecida`);
+          continue;
+        }
+        if (a.type === "navegador") {
+          // o navegador não depende do quadro: só confere o tipo e o `at`
+          const tipo = (a.acao as { tipo?: unknown } | undefined)?.tipo;
+          if (!isStr(tipo) || !TIPOS_NAVEGADOR.has(tipo)) errors.push(`${where(s)}: ação "navegador" com tipo "${String(tipo)}" desconhecido`);
+          if (a.at !== undefined && (!isStr(a.at) || !s.line.includes(a.at))) {
+            errors.push(`${where(s)}: ação "navegador" tem at "${String(a.at)}", que não é trecho da fala do passo`);
+          }
           continue;
         }
         if (!board) {

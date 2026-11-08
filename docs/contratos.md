@@ -18,7 +18,8 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | Rastro (decisões da Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
 | Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` | `screens/lesson` (cria e pede o envio no Slack da Kota pelo servidor, `src/journey/slack-real.ts`), `screens/live-session` (envia no Slack simulado o que ficou pendente), rastro (`forwarding_id`, `forwarding_link`), `screens/rh` (conta os abertos pelo `status`); envio real: [seção abaixo](#encaminhamento-no-slack-da-kota) | `__tests__/forwarding.test.ts`, `__tests__/slack-real.test.ts`, `server/src/slack/encaminhar.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
 | Primeira tarefa | `src/journey/primeira-tarefa.ts` (`TarefaDoTime`, `PedidoDeAprovacao`, chave `puca:primeiras-tarefas` no `localStorage`) e os nós `kind: "task"` da jornada — [seção abaixo](#primeira-tarefa) | `screens/lesson` (cria o pedido quando o cartão da tarefa abre), `screens/live-session` (pede a aprovação ao gestor no Slack e grava a aprovação), `screens/primeira-tarefa` (página da tarefa), `screens/rh` (conta pessoas com pedido não aprovado, por `status` e `pessoa`) | `__tests__/primeira-tarefa.test.ts`, `screens/primeira-tarefa/pagina.test.ts` |
-| App para Mac (`window.orbis`) | `desktop/preload.ts` + `src/orbis.d.ts` — [seção abaixo](#app-para-mac) | telas que testam `if (window.orbis)`; a #123 acrescenta `navegador` | `tsc` |
+| App para Mac (`window.orbis`) | `desktop/preload.ts` + `src/orbis.d.ts` — [seção abaixo](#app-para-mac) | telas que testam `if (window.orbis)` | `tsc` |
+| Computer use (`window.orbis.navegador`) | `src/lib/orbis.ts` (`AcaoDaPuca`, `ResultadoDaFila`, `OrbisNavegador`) + ação `navegador` da jornada em `src/journey/types.ts` — [seção abaixo](#computer-use) | `desktop/navegador/` (executa), `screens/lesson` (palco do navegador), quem escreve jornadas | `__tests__/validate.test.ts`, `desktop/navegador/*.test.ts`, `tsc` |
 | Visual da Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
 
@@ -62,7 +63,6 @@ escreve o formato aqui (tipo + um exemplo válido) **antes** de implementar; o o
 | Company brain | pergunta → trechos com **fonte** (ADR, código, doc cultural) | `knowledge` dos passos e `info.docs`/`info.adr` dos nós |
 | Progresso e memória | o que a pessoa estudou, dúvidas e onde parou, entre sessões | perfil em `sessionStorage` (`puca:profile`) |
 | Painel buddy/gestor/RH | marcos, pendências e pedidos de suporte | etapas da jornada em `src/data/company.ts` |
-| Computer use | o agente mexendo nas ferramentas | cursor em `components/agent-cursor`; primeiro uso real: o envio do encaminhamento no Slack (`screens/live-session/slack-dm.ts`) |
 
 ## API do servidor
 
@@ -160,7 +160,8 @@ O app Electron (decisão 0004, `docs/stack.md` §3, #158) abre o mesmo front por
 interface Orbis {
   /** Versão do app (a do package.json), ex.: "0.1.0". */
   versao: string;
-  // a #123 acrescenta `navegador` (docs/stack.md §3.2): mostrar, esconder, executar, cancelar, aoAgirAPessoa
+  /** Navegador da Puca: ver "Computer use" abaixo. */
+  navegador?: OrbisNavegador;
 }
 declare global { interface Window { orbis?: Orbis } }
 ```
@@ -169,6 +170,41 @@ Exemplo de uso numa tela:
 
 ```ts
 if (window.orbis) console.log(`Orbis ${window.orbis.versao}`); // no app
+```
+
+## Computer use
+
+O navegador da Puca (decisão 0008, `docs/stack.md` §4, #123): uma área da sessão com um navegador de verdade dentro do
+app, onde a Puca abre o mundo da Kota e aponta, circula, marca e clica no ritmo da fala. Só existe no app; sem
+`window.orbis.navegador` (`npm run dev` no navegador comum), a ação `navegador` da jornada é ignorada e o simulado segue.
+
+```ts
+type Alvo = { texto: string; seletor?: string } | { seletor: string };   // texto visível, sem maiúscula nem acento
+type AcaoDaPuca =
+  | { tipo: "abrir"; url: string }
+  | { tipo: "apontar" | "circular" | "marcar" | "rolar" | "clicar"; alvo: Alvo }
+  | { tipo: "limpar" };
+interface ResultadoDaFila { feitas: number; falhas: { acao: AcaoDaPuca; motivo: string }[]; cancelada: boolean }
+interface OrbisNavegador {
+  mostrar(bounds: { x: number; y: number; width: number; height: number }): void; // px do conteúdo da janela
+  esconder(): void;
+  executar(acoes: AcaoDaPuca[]): Promise<ResultadoDaFila>; // fila serial: um lote de cada vez, na ordem
+  cancelar(): void; // a pessoa falou por cima: para antes da próxima ação e limpa os desenhos
+}
+```
+
+- **Endereços permitidos:** `https://github.com/JucaGF/kota-bank` (e o que vem abaixo dele) e
+  `https://lean-ptarmigan-dd2.notion.site/`. `abrir` fora disso falha com `"fora da Kota"`; clique que leva para fora
+  não navega.
+- **Falha não quebra a fila:** alvo não achado vira `falhas` e a próxima ação roda. Nenhuma ação publica nada.
+- **Na jornada**, a ação é `{ type: "navegador", acao: AcaoDaPuca, at?: string }`: com `at`, sai quando a fala chega
+  no trecho, como as do quadro; vale em momento sem quadro. Se a pessoa toma a vez, as ações do navegador que
+  faltavam **não** rodam (as do quadro, sim).
+
+Exemplo válido de ação num passo:
+
+```json
+{ "type": "navegador", "acao": { "tipo": "circular", "alvo": { "texto": "README.md" } }, "at": "ADR 1" }
 ```
 
 ## Calibragem

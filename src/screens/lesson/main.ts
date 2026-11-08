@@ -651,6 +651,7 @@ async function main(): Promise<void> {
       }
     },
     apply(a) {
+      if (a.type === "navegador") return; // Tarefa 4: palco do navegador
       if (!board) return;
       switch (a.type) {
         case "reveal": return board.reveal(a.targets);
