@@ -173,3 +173,60 @@ describe("CORS", () => {
     await app.close();
   });
 });
+
+describe("POST /api/encaminhamentos (#129)", () => {
+  const corpo = {
+    id: "f1",
+    destino: "buddy",
+    para: "Paula Nunes",
+    pergunta: "Quem cuida do tail-common?",
+    resumo: "Quem cuida do tail-common?",
+    fontes_consultadas: ["ADR-012"],
+    motivo: "Não há responsável confirmado.",
+    email: "jurado@exemplo.com",
+  };
+  const enviou = { enviado: true as const, canal: "D1", ts: "1.2", link: "https://kota.slack.com/archives/D1/p12" };
+
+  it("manda ao encaminhador e devolve o resultado", async () => {
+    const recebidos: unknown[] = [];
+    const app = buildApp({ journey, tts: null, verificaToken: null, encaminhar: async (p) => (recebidos.push(p), enviou) });
+    const r = await app.inject({ method: "POST", url: "/api/encaminhamentos", payload: corpo });
+    expect(r.statusCode).toBe(200);
+    expect(r.json()).toEqual(enviou);
+    expect(recebidos).toEqual([corpo]);
+    await app.close();
+  });
+
+  it("corpo inválido: 400, e o encaminhador não é chamado", async () => {
+    let chamou = false;
+    const app = buildApp({ journey, tts: null, verificaToken: null, encaminhar: async () => ((chamou = true), enviou) });
+    const r = await app.inject({ method: "POST", url: "/api/encaminhamentos", payload: { ...corpo, pergunta: "" } });
+    expect(r.statusCode).toBe(400);
+    expect(r.json()).toEqual({ error: "pedido_invalido" });
+    expect(chamou).toBe(false);
+    await app.close();
+  });
+
+  it("sem SLACK_BOT_TOKEN: 503 sem_slack", async () => {
+    const app = buildApp({ journey, tts: null, verificaToken: null, encaminhar: null });
+    const r = await app.inject({ method: "POST", url: "/api/encaminhamentos", payload: corpo });
+    expect(r.statusCode).toBe(503);
+    expect(r.json()).toEqual({ enviado: false, motivo: "sem_slack" });
+    await app.close();
+  });
+
+  it("falha do Slack: 502, sem vazar o erro", async () => {
+    const app = buildApp({ journey, tts: null, verificaToken: null, encaminhar: async () => Promise.reject(new Error("Slack chat.postMessage: not_in_channel")) });
+    const r = await app.inject({ method: "POST", url: "/api/encaminhamentos", payload: corpo });
+    expect(r.statusCode).toBe(502);
+    expect(r.json()).toEqual({ error: "slack_falhou" });
+    await app.close();
+  });
+
+  it("com token exigido, sem token: 401", async () => {
+    const app = buildApp({ journey, tts: null, verificaToken: verifica, encaminhar: async () => enviou });
+    const r = await app.inject({ method: "POST", url: "/api/encaminhamentos", payload: corpo });
+    expect(r.statusCode).toBe(401);
+    await app.close();
+  });
+});
