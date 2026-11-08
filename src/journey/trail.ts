@@ -2,7 +2,7 @@
 // (journey/route.ts), o que respondeu e de qual fonte. Fica no navegador; a tela de demo `rastro/`
 // mostra e baixa em JSON. Formato em docs/contratos.md.
 import type { Route } from "./route";
-import { readJson, writeJson, type KeyValueStore } from "./storage";
+import { readList, writeJson, type KeyValueStore } from "./storage";
 import { uid } from "./uid";
 import type { Journey, Moment } from "./types";
 
@@ -62,18 +62,16 @@ export const TRAIL_KEY = "puca:rastro";
 export const SESSIONS_KEY = "puca:sessoes";
 const MAX_ENTRIES = 500;
 
+// O que a sessão e a tela de rastro leem sem conferir: o resto pode faltar.
+const isTrailEntry = (x: unknown): x is TrailEntry => typeof (x as TrailEntry)?.id === "string" && Array.isArray((x as TrailEntry).sources);
+const isTrailSession = (x: unknown): x is TrailSession => typeof (x as TrailSession)?.session === "string";
+
 export function createTrail(store: KeyValueStore, opts: { now?: () => Date; session?: string } = {}) {
   const now = opts.now ?? (() => new Date());
   const session = opts.session ?? uid();
-  const read = (): TrailEntry[] => {
-    const v = readJson<unknown>(store, TRAIL_KEY, []);
-    return Array.isArray(v) ? (v as TrailEntry[]) : [];
-  };
+  const read = (): TrailEntry[] => readList(store, TRAIL_KEY, isTrailEntry);
   const write = (list: TrailEntry[]) => writeJson(store, TRAIL_KEY, list.slice(-MAX_ENTRIES));
-  const readSessions = (): TrailSession[] => {
-    const v = readJson<unknown>(store, SESSIONS_KEY, []);
-    return Array.isArray(v) ? (v as TrailSession[]) : [];
-  };
+  const readSessions = (): TrailSession[] => readList(store, SESSIONS_KEY, isTrailSession);
   const writeSessions = (list: TrailSession[]) => writeJson(store, SESSIONS_KEY, list);
 
   return {

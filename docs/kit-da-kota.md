@@ -180,21 +180,21 @@ um workspace e age como a pessoa logada, e o servidor da Puca não consegue usar
 
 - **Preencher**: um script cria os canais (`conversations.create`) e posta o histórico (`chat.postMessage`). Com o
   escopo `chat:write.customize`, cada mensagem sai com nome e foto de uma pessoa da Kota, sem contas reais.
-- **Agir na demo (em aberto, #13)**: o mesmo app poderia ser usado pelo servidor da Puca no encaminhamento ("agir num
-  sistema", §12.2 do `PRODUCT.md`). Isso muda a regra "o servidor só dá voz e LLM", a §12.2 (hoje o encaminhamento é
-  no Slack simulado da `live-session`) e o contrato de Encaminhamento: não está decidido aqui.
-- **Pessoas da Kota não são membros reais**: o encaminhamento vai para o canal de ajuda do time (ex.:
-  `#livro-razao-ajuda`), citando a buddy pelo nome, ou para uma DM com o próprio jurado.
+- **Agir na demo (decidido na 0008, #13)**: o mesmo app é usado pelo servidor da Puca no encaminhamento ("agir num
+  sistema", §12.2 do `PRODUCT.md`). O Slack real complementa o simulado, que fica no `npm run dev`, como plano B e na
+  aprovação do gestor.
+- **Pessoas da Kota não são membros reais**: o encaminhamento vai por mensagem direta do bot ao próprio jurado,
+  dizendo a quem iria na Kota (a buddy pelo nome, o RH ou o gestor). Nunca num canal: todos os jurados entram no mesmo
+  workspace, e a dúvida de um não pode aparecer para os outros.
 - **O jurado entra pelo link de convite** do workspace, que fica no guia de uso. Quem tiver o link entra no workspace
   onde o bot age: o app fica com o mínimo de escopos.
-- **Em aberto (#13)**: o Slack real substitui ou complementa o Slack simulado da tela `live-session`.
-- O token fica fora do repositório (no script de preenchimento; no `server/.env` se a #13 decidir que o servidor age).
+- O token fica fora do repositório (no script de preenchimento; no `server/.env` do servidor, decisão 0008).
 
 ### 7.2. Quem consome o kit
 
 Quem consome a cópia é o company brain (#26). Como o servidor da Puca acessa o Notion **na hora da demo** (token de
-integração, MCP local ou só a cópia) fica para #13 e #26: o MCP hospedado do Notion entra com o login de uma pessoa e
-não serve para um servidor.
+integração, MCP local ou só a cópia) ficou decidido na 0008: só a cópia, sem token nem MCP na hora da sessão. O MCP
+hospedado do Notion entra com o login de uma pessoa e não serve para um servidor.
 
 ## 8. Rodar o banco
 

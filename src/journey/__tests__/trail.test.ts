@@ -42,6 +42,25 @@ describe("createTrail", () => {
     expect(trail.list()).toHaveLength(1);
   });
 
+  it("item malformado no rastro é descartado e não quebra o update", () => {
+    const store = memoryStore();
+    const valida = { ...entry("válida"), id: "ok", at: "2026-11-08T05:00:00.000Z", session: "s" };
+    store.setItem(TRAIL_KEY, JSON.stringify([null, { id: "sem-fontes" }, valida]));
+    const trail = createTrail(store);
+    expect(trail.list().map((e) => e.id)).toEqual(["ok"]);
+    expect(() => trail.update("ok", { answer: "x" })).not.toThrow();
+    expect(trail.list()[0].answer).toBe("x");
+  });
+
+  it("sessão malformada no navegador não impede de começar nem de baixar o json", () => {
+    const store = memoryStore();
+    store.setItem(SESSIONS_KEY, JSON.stringify([null, {}]));
+    const trail = createTrail(store);
+    expect(() => trail.startSession()).not.toThrow();
+    expect(() => trail.exportJson()).not.toThrow();
+    expect(trail.sessions()).toHaveLength(1);
+  });
+
   it("navegador sem espaço (setItem lança) não quebra a sessão", () => {
     const full: KeyValueStore = { getItem: () => null, setItem: () => { throw new Error("QuotaExceededError"); } };
     expect(() => createTrail(full).record(entry("x"))).not.toThrow();

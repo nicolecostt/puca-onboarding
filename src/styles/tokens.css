@@ -82,6 +82,9 @@
 
   --color-puca: #171717; /* cursor da Puca mexendo na tela */
   --color-puca-text: #ffffff;
+  /* avatar de pessoa numa cor do espectro da Puca: o tom (--hue) vem da tela; saturação e luz ficam aqui */
+  --person-saturation: 80%;
+  --person-lightness: 72%;
 
   /* A cor da Puca: o arco-íris metálico da faixa da esfera, para poucos pontos especiais
      (o foco dela no quadro, partículas). Use dentro da regra animada:
