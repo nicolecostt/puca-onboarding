@@ -90,7 +90,10 @@ só diz se o tema está entendido ou se vale rever, e atualiza a calibragem e a 
 
 - `tema`: um dos temas da calibragem (`empresa`, `rituais`, `pagamentos`, `mensageria`, `falhas`).
 - Num `select`, entendeu = tocou num dos `expect.nodes` **sem** precisar que a Puca revelasse a resposta.
-- Num `wait`, `replies` diz quais `suggested_replies` mostram que entendeu. Texto livre e voz valem pelo mesmo casamento de palavras das respostas sugeridas.
+- Num `wait`, `replies` diz quais `suggested_replies` mostram que entendeu. Texto livre e voz valem pelo mesmo casamento de palavras
+  das respostas sugeridas: enquanto a checagem espera, o que a pessoa diz vai inteiro para ela (não para o `knowledge`, que
+  entregaria a resposta). Pergunta ("pode repetir?") e pedido de mudar de assunto continuam funcionando.
+- Não escreva `when` nas transições por `checagem`: o `when` vira opção para o agente, e a checagem só o motor decide.
 - A transição pode depender do resultado: `if: { "checagem": "entendeu" }` ou `{ "checagem": "rever" }`. Use isso para reforçar
   no quadro (explicar de novo, mais simples) ou para oferecer aprofundar.
 
@@ -167,6 +170,6 @@ A aula escolhe o perfil nesta ordem:
 - Transições apontam para destinos que existem; `if.reply` está nas `suggested_replies` do passo.
 - Passo `wait` com pergunta ou respostas sugeridas; passo `select` com `expect` completo.
 - `check` só em passo `wait` ou `select`, com um tema que existe; num `wait`, `check.replies` estão nas `suggested_replies`;
-  `if.checagem` só em passo com `check`.
+  `if.checagem` só em passo com `check` e sem `when`.
 
 Rode `npm test` depois de editar uma jornada: o primeiro teste valida a jornada de demo.

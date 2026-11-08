@@ -94,6 +94,8 @@ export interface MomentoDaPessoa {
   motivo: string;
   /** Temas da calibragem que o momento cobre (vazio nos momentos sem tema, como a checagem). */
   temas: Tema[];
+  /** A checagem da aula pediu para rever: o momento volta aos próximos passos mesmo já visto. */
+  rever?: true;
 }
 
 /** A jornada como a pessoa vê: os objetivos dela e cada momento marcado pela calibragem. Contrato em docs/contratos.md. */

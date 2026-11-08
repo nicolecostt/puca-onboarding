@@ -51,6 +51,13 @@ describe("validateJourney", () => {
     expect(errorsOf(j).join("\n")).toMatch(/transição por checagem num passo sem check/);
   });
 
+  it("recusa when numa transição por checagem", () => {
+    const j = clone(demo);
+    const checa = j.moments.flatMap((m) => m.steps).find((s) => s.id === "fa-checa")!;
+    checa.transitions![0].when = "a pessoa entendeu";
+    expect(errorsOf(j).join("\n")).toMatch(/transição por checagem não leva when/);
+  });
+
   it("recusa transição para momento inexistente", () => {
     const j = clone(demo);
     j.moments[0].steps[1].transitions = [{ to: { moment: "sumiu" } }];

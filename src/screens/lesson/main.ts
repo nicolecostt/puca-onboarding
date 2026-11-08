@@ -16,7 +16,7 @@ import { browserStore } from "../../journey/storage";
 import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
 import { createTrail, sourcesFor } from "../../journey/trail";
 import { createAgentVoice } from "../../voice/agent-voice";
-import { interpolateDeep, resolveProfile } from "../../journey/profile";
+import { interpolate, interpolateDeep, resolveProfile } from "../../journey/profile";
 import { atualizarCalibragem, resolveCalibragem, saveCalibragem } from "../../journey/calibragem";
 import { montarJornadaDaPessoa } from "../../journey/jornada-da-pessoa";
 import type { Moment, Profile, Step, Vinculo } from "../../journey/types";
@@ -264,7 +264,7 @@ async function main(): Promise<void> {
       el.captionUser.textContent = text;
       chat.addMessage({ from: "user", text });
     }
-    const waiting = pending?.kind === "reply" ? { kind: "reply" as const, replies: pending.replies ?? [] } : pending?.kind === "select" ? { kind: "select" as const } : null;
+    const waiting = pending?.kind === "reply" ? { kind: "reply" as const, replies: pending.replies ?? [], check: !!currentStep?.check } : pending?.kind === "select" ? { kind: "select" as const } : null;
     const route = routeUtterance(text, { journey, moment: currentMoment, step: currentStep, waiting, board: currentBoard, faqs });
     const entry = trail.record({
       from,
@@ -322,6 +322,12 @@ async function main(): Promise<void> {
       ));
     // gravado mesmo se a pessoa interrompeu: fica a resposta parcial
     if (asked) return trail.update(entry.id, { answer: said.join(" "), ms: Math.round(performance.now() - t0) });
+    // numa checagem só chega aqui pergunta (resposta vai pela rota): não conta como resposta, a Puca repete a pergunta
+    if (pending?.kind === "reply" && currentStep?.check) {
+      const line = `Sem problema, repito: ${interpolate(currentStep.line, profile)}`;
+      trail.update(entry.id, { answer: line });
+      return void speakAside(line);
+    }
     if (pending?.kind === "reply") return answer(text, "chat");
     // sem servidor e sem fonte confiável: a dúvida fica anotada (§4.5, encaminhamento para uma pessoa)
     const line = "Não achei isso confirmado na documentação, então não quero chutar. Anotei a sua pergunta para a sua buddy responder.";

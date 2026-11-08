@@ -8,10 +8,10 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | Jornada da aula (JSON) | `src/journey/types.ts` + [`journey-format.md`](journey-format.md) | `runner.ts`, `whiteboard/from-journey.ts`, `screens/lesson`, quem escreve jornadas | `validate.ts` + `__tests__/validate.test.ts` |
 | Eventos entre componentes | `src/lib/events.ts` (`DocumentEventMap`) | telas e componentes que escutam `callbar:*`, `chatpanel:*`, `onboarding:*`, `journey:*`, `journeypanel:*`, `agentcam:*` | `tsc` |
 | Perfil da pessoa | `src/journey/profile.ts` e `src/data/types.ts` | call inicial (grava `sessionStorage` `puca:profile`) → aula → `POST /api/ask` | `__tests__/validate.test.ts` |
-| Calibragem | `src/journey/types.ts` (`Calibragem`) + `src/journey/calibragem.ts` (temas, regras, `sessionStorage` `puca:calibragem`) — [seção abaixo](#calibragem) | call inicial escreve (#16) → jornada (#17) e adaptação das explicações (#23) leem | `__tests__/calibragem.test.ts` |
+| Calibragem | `src/journey/types.ts` (`Calibragem`) + `src/journey/calibragem.ts` (temas, regras, `sessionStorage` `puca:calibragem`) — [seção abaixo](#calibragem) | call inicial escreve (#16) e a checagem da aula atualiza (#24) → jornada (#17) e adaptação das explicações (#23) leem | `__tests__/calibragem.test.ts` |
 | Voz ↔ quadro | `BoardAction.at` em `src/journey/types.ts` + `RunnerIO.say(text, cues)` + `GET /api/tts/:id/words` — [seção abaixo](#voz--quadro) | `runner.ts`, `screens/lesson` (`io.say`), `src/voice/agent-voice.ts`, quem escreve jornadas | `validate.test.ts`, `runner.test.ts`, `server/src/voice/tts/service.test.ts` |
 | Jornada da pessoa | `src/journey/types.ts` (`JornadaDaPessoa`) + `src/journey/jornada-da-pessoa.ts` (`montarJornadaDaPessoa`, `proximosPassos`) — [seção abaixo](#jornada-da-pessoa) | aula, painel "Sua jornada" (#17) → progresso (#18), painel do buddy (#19), checagem (#24) | `__tests__/jornada-da-pessoa.test.ts` |
-| Rota da fala | `src/journey/route.ts` (`Route`: jump → reply → select → knowledge → faq → ask) | `screens/lesson`, voz e chat | `__tests__/route.test.ts` |
+| Rota da fala | `src/journey/route.ts` (`Route`: jump → reply → select → knowledge → faq → ask; numa checagem, `waiting.check`: o que não é pergunta nem pulo é `reply`) | `screens/lesson`, voz e chat | `__tests__/route.test.ts` |
 | API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask`, `/api/voice/token` | `src/voice/agent-voice.ts`, `screens/lesson` | `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
@@ -140,7 +140,9 @@ Quem lê chama `montarJornadaDaPessoa(journey, calibragem)`, uma função pura q
 - **Nenhum momento sai da jornada.** O estado só marca; o runner segue o mesmo JSON.
 - **Estado** (`EstadoMomento`), nesta ordem:
   - `fora`: vínculo `transicao` e momento do tema `empresa` (é o desvio que o passo `bv-oi` já faz).
-  - Resultado da checagem na aula (`checagem` de algum tema do momento): `rever` → `revisar`; senão, `entendeu` → `ja_conhece`.
+  - Resultado da checagem na aula (`checagem` de algum tema do momento): `rever` → `revisar` (e `rever: true`); senão,
+    `entendeu` → `ja_conhece`. A checagem vale mais que a regra do menor nível abaixo: ela confere o momento como um
+    todo (ex.: a Ana acerta a checagem de `pagamentos` e o momento fica "já conhece", mesmo com `mensageria` em `nao_conhece`).
   - `ja_conhece`: nível `domina` com certeza `alta`.
   - `revisar`: nível `usa`, ou `domina` com certeza menor.
   - `aprender`: `nao_conhece` ou `ja_ouviu`, e todo momento sem tema (boas-vindas, quem cuida, checagem…).
@@ -149,7 +151,8 @@ Quem lê chama `montarJornadaDaPessoa(journey, calibragem)`, uma função pura q
 - **Motivo**: depois de uma checagem, uma frase fixa sobre ela ("Na checagem da aula, ficou claro." / "Na checagem da aula,
   vale rever este assunto."); senão, a frase da pessoa na call (`evidencia` do tema que decidiu) quando existe; senão, uma frase fixa por estado.
 - O painel "Sua jornada" remonta com `JourneyPanel.setJornada(jornada)` quando a calibragem muda, mantendo o progresso.
-- `proximosPassos(jornada, visitados, atual)`: os momentos que faltam, sem os `fora`, na ordem.
+- `proximosPassos(jornada, visitados, atual)`: os momentos que faltam, sem os `fora`, na ordem. Um momento com
+  `rever: true` volta a faltar mesmo já visto (§12.1: a checagem atualiza o que ainda falta).
 
 Exemplo (Bruno, transição; saída de `montarJornadaDaPessoa(journey, DEMO_CALIBRAGENS.transicao)`, momentos cortados):
 

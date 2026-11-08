@@ -1231,7 +1231,6 @@
               "to": {
                 "step": "fa-certo"
               },
-              "when": "a pessoa entendeu o caminho de erro",
               "if": {
                 "checagem": "entendeu"
               }
@@ -1454,7 +1453,6 @@
               "to": {
                 "moment": "primeira-tarefa"
               },
-              "when": "a pessoa achou onde olhar sozinha",
               "if": {
                 "checagem": "entendeu"
               }

@@ -177,6 +177,7 @@ export function validateJourney(input: unknown): ValidationResult {
         }
         if (t.if && "checagem" in t.if) {
           if (!s.check) errors.push(`${where(s)}: transição por checagem num passo sem check`);
+          if (t.when) errors.push(`${where(s)}: transição por checagem não leva when (o when vira opção para o agente; a checagem é do motor)`);
           if (!RESULTADOS_CHECAGEM.has(t.if.checagem)) errors.push(`${where(s)}: checagem "${String(t.if.checagem)}" desconhecida (use "entendeu" ou "rever")`);
         }
         if (t.if && "reply" in t.if && !s.suggested_replies?.includes(t.if.reply)) {

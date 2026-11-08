@@ -101,6 +101,12 @@ describe("proximosPassos", () => {
     expect(ids).toEqual(["falha", "quem-cuida", "checagem", "primeira-tarefa", "encerramento"]);
   });
 
+  it("o que a checagem pediu para rever volta aos próximos passos, mesmo já visto", () => {
+    const c = atualizarCalibragem(DEMO_CALIBRAGENS.transicao, { tema: "falhas", passo: "fa-checa", entendeu: false, tentativas: 1, resposta: "Ela se perde" });
+    const ids = proximosPassos(montarJornadaDaPessoa(journey, c), ["boas-vindas", "seu-time", "pagamentos", "falha", "checagem"], "primeira-tarefa").map((m) => m.id);
+    expect(ids).toEqual(["falha", "quem-cuida", "encerramento"]);
+  });
+
   it("depois de um pulo para frente, os pulados continuam como próximos", () => {
     const ids = proximosPassos(bruno, ["boas-vindas", "checagem"], "checagem").map((m) => m.id);
     expect(ids).toEqual(["seu-time", "pagamentos", "falha", "quem-cuida", "primeira-tarefa", "encerramento"]);
