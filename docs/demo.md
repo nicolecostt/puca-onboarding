@@ -9,9 +9,11 @@ Quando um passo da demo mudar de estado, atualize a tabela no mesmo PR.
 git switch main && git pull
 npm ci
 npm run check      # tem que estar verde
-npm run dev:server # API em :8787; precisa de server/.env (modelo em server/.env.example)
-npm run dev        # http://localhost:5173
+npm run dev:fly    # http://localhost:5173, usando o servidor do Fly (Claude e voz); não precisa de server/.env
 ```
+
+Para testar uma mudança no servidor, troque o `dev:fly` por `npm run dev:server` (API em :8787, precisa de
+`server/.env`, modelo em `server/.env.example`) e `npm run dev`. Qualquer outro servidor: `API_TARGET=<url> npm run dev`.
 
 Sem as chaves de voz no `server/.env`, a sessão usa texto e a voz do browser. Sem o servidor, segue só com legenda e chat.
 

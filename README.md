@@ -80,6 +80,7 @@ e `POST /api/voice/token` (microfone via Deepgram). Sem o servidor, a sessão se
 cp server/.env.example server/.env   # chaves: Featherless (obrigatória), Deepgram e ElevenLabs (voz, opcionais)
 npm run dev:server   # API em :8787 (o Vite repassa /api)
 npm run dev          # abre a lista de telas → "Sessão no quadro" → "Começar sessão com voz"
+npm run dev:fly      # só o front: o Vite repassa /api para o servidor do Fly, sem dev:server nem server/.env
 npm run precompute -- --only pontes   # pré-gera áudio (pontes|faq|roteiro; --dry mostra o custo em caracteres)
 npm run bench:llm    # latência do LLM por modelo/config → server/bench/results/
 npm run bench:turn   # tempo até a Puca começar a responder, por caminho (--tts mede o áudio também)
