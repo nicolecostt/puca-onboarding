@@ -28,7 +28,7 @@ export function openDm(name: string): void {
     const h2 = document.createElement("h2");
     h2.textContent = name;
     const p = document.createElement("p");
-    p.textContent = `Esta é a sua conversa com ${name}. A Puca escreve aqui quando precisa de ajuda com uma dúvida.`;
+    p.textContent = `Esta é a sua conversa com ${name}. A Puca escreve aqui quando precisa de ajuda com uma dúvida ou de uma aprovação.`;
     intro.append(h2, p);
     feed.replaceChildren(intro);
   }
@@ -55,9 +55,9 @@ export async function typeInComposer(text: string, cursor: AgentCursor): Promise
 }
 
 /** Mensagem nova no fim do feed, no formato das que já estão no Slack. Uma linha do texto = um parágrafo. */
-export function postMessage(m: { author: string; avatar: string; tone: "blue" | "pink" | "puca"; text: string; time: string }): void {
+export function postMessage(m: { author: string; avatar: string; tone: "blue" | "pink" | "puca"; text: string; time: string }): HTMLElement | null {
   const feed = $(".sk-feed");
-  if (!feed) return;
+  if (!feed) return null;
   const article = document.createElement("article");
   article.className = "sk-msg";
   const av = document.createElement("span");
@@ -76,6 +76,22 @@ export function postMessage(m: { author: string; avatar: string; tone: "blue" | 
   article.append(av, body);
   feed.append(article);
   feed.scrollTop = feed.scrollHeight;
+  return body;
+}
+
+/** Pedido de aprovação da Puca: a mensagem, o link para a página da tarefa e o botão que o gestor clica. */
+export function postApprovalRequest(m: { text: string; time: string; link: string; onApprove: () => void }): HTMLButtonElement {
+  const body = postMessage({ author: "Puca", avatar: "P", tone: "puca", text: m.text, time: m.time });
+  const actions = document.createElement("div");
+  actions.className = "sk-actions";
+  const link = Object.assign(document.createElement("a"), { className: "sk-link", href: m.link, target: "puca-tarefa", textContent: "Abrir a página da tarefa" });
+  const button = Object.assign(document.createElement("button"), { type: "button", className: "sk-approve", textContent: "Aprovar tarefa" });
+  button.addEventListener("click", () => m.onApprove());
+  actions.append(link, button);
+  body?.append(actions);
+  const feed = $(".sk-feed");
+  if (feed) feed.scrollTop = feed.scrollHeight;
+  return button;
 }
 
 /** Limpa o campo de mensagem depois de enviar. */

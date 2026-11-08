@@ -8,13 +8,20 @@ import { mountAgentCam } from "../../components/agent-cam/agent-cam";
 import { mountAgentCursor } from "../../components/agent-cursor/agent-cursor";
 import { loadAgentVisual, type AgentVisualState } from "../../lib/agent-visual";
 import { createOutbox, FORWARDING_KEY, forwardingMessage } from "../../journey/forwarding";
+import { createPedidos, pedidoMessage, PEDIDOS_KEY, type PedidoDeAprovacao } from "../../journey/primeira-tarefa";
 import { browserStore } from "../../journey/storage";
 import { uid } from "../../journey/uid";
-import { clearComposer, findDm, openDm, postMessage, typeInComposer } from "./slack-dm";
+import { clearComposer, findDm, openDm, postApprovalRequest, postMessage, typeInComposer } from "./slack-dm";
 
 const BUDDY_ACK = "Vi aqui, te respondo já.";
 const now = () => new Date().toLocaleTimeString("pt-BR", { hour: "numeric", minute: "2-digit" }).replace(":", "h");
 const initials = (name: string) => name.split(/\s+/).map((w) => w[0] ?? "").join("").slice(0, 2).toUpperCase();
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+/** Resposta do gestor na DM com a Puca. Sem nome (profile.nome vira "você"), fala da pessoa. */
+function aprovadaMsg(pessoa: string): string {
+  const nome = pessoa.trim();
+  return nome && nome.toLowerCase() !== "você" ? `Aprovada. Pode passar para ${nome}.` : "Aprovada. Pode passar para a pessoa.";
+}
 
 async function main(): Promise<void> {
   const chat = mountChatPanel();
@@ -51,40 +58,77 @@ async function main(): Promise<void> {
     cursor.setPaused(paused);
   });
 
-  // Encaminhamentos que a sessão deixou para a buddy (#28): a Puca abre a DM, digita e envia.
-  // "enviando" antes da animação: outra aba do Slack, ou um recarregar, não manda de novo.
+  // O que a sessão deixou para o Slack: encaminhamentos à buddy (#28) e pedidos de aprovação da primeira tarefa
+  // ao gestor (#15). A Puca abre a DM, digita e envia, um de cada vez. "enviando" antes da animação: outra aba do
+  // Slack, ou um recarregar, não manda de novo.
   const outbox = createOutbox(browserStore());
+  const pedidos = createPedidos(browserStore());
   const tab = uid();
   let sending = false;
-  async function sendPending(): Promise<void> {
+
+  /** O cursor abre a DM, digita o texto e clica em enviar; a mensagem fica no feed como da Puca. */
+  async function escreverNaDm(name: string, text: string): Promise<void> {
+    const dm = findDm(name);
+    if (dm) {
+      await cursor.moveTo(dm);
+      await cursor.click();
+    }
+    openDm(name);
+    await typeInComposer(text, cursor);
+    const send = document.querySelector(".sk-composer__send");
+    if (send) {
+      await cursor.moveTo(send);
+      await cursor.click();
+    }
+    clearComposer(name);
+  }
+
+  // Botões "Aprovar tarefa" desta aba: outra aba pode aprovar, e o botão daqui fica desabilitado.
+  const botoes = new Map<string, HTMLButtonElement>();
+  const desabilitar = (b: HTMLButtonElement) => {
+    b.disabled = true;
+    b.textContent = "Aprovada";
+  };
+  /** Mensagem do pedido com o botão. O clique é o gestor decidindo (§12.2): a Puca nunca aprova sozinha. */
+  function mostrarPedido(p: PedidoDeAprovacao): void {
+    const button = postApprovalRequest({
+      text: pedidoMessage(p),
+      time: now(),
+      link: `../primeira-tarefa/?id=${encodeURIComponent(p.id)}`,
+      onApprove: () => {
+        const aprovou = pedidos.aprovar(p.id, p.gestor);
+        desabilitar(button);
+        if (aprovou) postMessage({ author: p.gestor, avatar: initials(p.gestor), tone: "pink", text: aprovadaMsg(p.pessoa), time: now() });
+      },
+    });
+    botoes.set(p.id, button);
+  }
+
+  async function drain(): Promise<void> {
     if (sending) return;
     sending = true;
     try {
       for (let f = outbox.pending(tab)[0]; f; f = outbox.pending(tab)[0]) {
         outbox.claim(f.id, tab);
         // a outra aba pode ter pegado no mesmo instante: espera as duas escreverem e fica quem ganhou
-        await new Promise((r) => setTimeout(r, 150));
+        await sleep(150);
         if (outbox.ownerOf(f.id) !== tab) continue;
-        const dm = findDm(f.to.name);
-        if (dm) {
-          await cursor.moveTo(dm);
-          await cursor.click();
-        }
-        openDm(f.to.name);
         const text = forwardingMessage(f);
-        await typeInComposer(text, cursor);
-        const send = document.querySelector(".sk-composer__send");
-        if (send) {
-          await cursor.moveTo(send);
-          await cursor.click();
-        }
-        clearComposer(f.to.name);
+        await escreverNaDm(f.to.name, text);
         postMessage({ author: "Puca", avatar: "P", tone: "puca", text, time: now() });
         outbox.setStatus(f.id, "enviado");
         // a buddy confirma antes da próxima dúvida sair: a conversa fica na ordem
-        await new Promise((r) => setTimeout(r, 3000));
+        await sleep(3000);
         postMessage({ author: f.to.name, avatar: initials(f.to.name), tone: "blue", text: BUDDY_ACK, time: now() });
         outbox.setStatus(f.id, "confirmado");
+      }
+      for (let p = pedidos.pending(tab)[0]; p; p = pedidos.pending(tab)[0]) {
+        pedidos.claim(p.id, tab);
+        await sleep(150);
+        if (pedidos.ownerOf(p.id) !== tab) continue;
+        await escreverNaDm(p.gestor, pedidoMessage(p));
+        mostrarPedido(p);
+        pedidos.setStatus(p.id, "aguardando");
       }
     } finally {
       sending = false;
@@ -95,13 +139,26 @@ async function main(): Promise<void> {
   let retry: ReturnType<typeof setTimeout> | undefined;
   function scheduleRetry(): void {
     clearTimeout(retry);
-    const wait = outbox.nextRetryIn(tab);
-    if (wait !== null) retry = setTimeout(() => void sendPending(), wait + 1000);
+    const waits = [outbox.nextRetryIn(tab), pedidos.nextRetryIn(tab)].filter((w): w is number => w !== null);
+    if (waits.length) retry = setTimeout(() => void drain(), Math.min(...waits) + 1000);
   }
   addEventListener("storage", (e) => {
-    if (e.key === FORWARDING_KEY) void sendPending();
+    if (e.key === FORWARDING_KEY) void drain();
+    if (e.key === PEDIDOS_KEY) {
+      for (const p of pedidos.list()) {
+        const b = botoes.get(p.id);
+        if (b && p.status === "aprovada") desabilitar(b);
+      }
+      void drain();
+    }
   });
-  await sendPending();
+  await drain();
+  // Recarregou com pedido já enviado e ainda sem resposta: a DM do gestor volta com o botão, sem animação.
+  for (const p of pedidos.list()) {
+    if (p.status !== "aguardando" || botoes.has(p.id)) continue;
+    openDm(p.gestor);
+    mostrarPedido(p);
+  }
 
   // Cursor da Puca mexendo no Slack (simulado): abre o canal, mostra o link do README,
   // passa pelo cartão e vai até a busca. Repete em laço; para enquanto a Puca envia um encaminhamento,
