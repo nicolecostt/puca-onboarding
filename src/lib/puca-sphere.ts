@@ -19,9 +19,9 @@ function tokenColor(name: string, fallback: RGB): RGB {
 
 /** Como cada estado mexe na onda. */
 const MOODS: Record<AgentVisualState, { speed: number; amp: number; width: number; spin: number; pulse: number }> = {
-  idle: { speed: 0.5, amp: 0.3, width: 1, spin: 0.12, pulse: 0 },
-  think: { speed: 1.4, amp: 0.38, width: 0.75, spin: 0.35, pulse: 0 },
-  talk: { speed: 0.9, amp: 0.34, width: 1.15, spin: 0.16, pulse: 1 },
+  idle: { speed: 0.35, amp: 0.3, width: 1, spin: 0.08, pulse: 0 },
+  think: { speed: 1.0, amp: 0.38, width: 0.75, spin: 0.25, pulse: 0 },
+  talk: { speed: 0.63, amp: 0.34, width: 1.15, spin: 0.11, pulse: 1 },
 };
 
 interface Ripple {
@@ -48,7 +48,7 @@ function hsl(h: number, s: number, l: number): RGB {
 
 // arco-íris: quantos graus de tom por volta da esfera e por segundo
 const HUE_SPREAD = 360; // graus de tom ao longo de uma volta da faixa
-const HUE_SPEED = 40; // graus por segundo (pensando gira mais rápido)
+const HUE_SPEED = 28; // graus por segundo (pensando gira mais rápido)
 const WHITE: RGB = { r: 255, g: 255, b: 255 }; // brilho metálico
 
 export const mountPucaSphere: AgentVisualFactory = (container) => {
@@ -185,7 +185,7 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
     cz = Math.cos(tiltY); szw = Math.sin(tiltY);
 
     // fala: a onda "respira" em pulsos curtos
-    const talk = mood.pulse * (0.5 + 0.5 * Math.sin(now * 9) * Math.sin(now * 3.1));
+    const talk = mood.pulse * (0.5 + 0.5 * Math.sin(now * 6.5) * Math.sin(now * 2.2));
     const amp = mood.amp * (1 + talk * 0.35);
     const bandW = 0.1 * mood.width * (1 + talk * 0.4);
     const haloW = 0.27 * mood.width;
