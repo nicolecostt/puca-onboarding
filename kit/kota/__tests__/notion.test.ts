@@ -126,7 +126,14 @@ describe("resolverLinks", () => {
 });
 
 describe("regra paginas", () => {
-  const OBRIGATORIAS = ARVORE.filter((n) => n.tipo !== "database" && n.chave !== "comece-aqui").map((n) => n.chave);
+  // As páginas que os grupos N3a a N3e escrevem; a comece-aqui é da C5.
+  const OBRIGATORIAS = [
+    "quem-somos", "rituais", "code-review", "deploy", "incidentes", "de-rfc-a-adr", "comunicacao",
+    "rfc-1", "rfc-2", "rfc-3",
+    "seguranca-e-acesso", "dados-de-cliente-e-lgpd", "ferias", "home-office", "despesas", "papeis-buddy-gestor-rh",
+    "ciclo-de-desempenho", "trilha-de-carreira", "promocao", "bonus", "revisao-salarial",
+    "onboarding-novo", "onboarding-transicao", "glossario",
+  ];
   const pastaCom = (paginas: Record<string, string>) => {
     const pasta = pastaTemp();
     for (const chave of OBRIGATORIAS) writeFileSync(join(pasta, `${chave}.md`), "# Página\n");
@@ -166,7 +173,14 @@ describe("regra paginas", () => {
   });
 
   it("pasta que ainda não existe: acusa cada página que falta, sem lançar", () =>
-    expect(checar(join(pastaTemp(), "paginas"))).toHaveLength(OBRIGATORIAS.length));
+    expect(checar(join(pastaTemp(), "paginas"))).toHaveLength(24));
+
+  it("com as páginas da N3 e a comece-aqui da C5, não falta nada: página que só agrupa subpáginas não pede Markdown", () =>
+    expect(checar(pastaCom({ "comece-aqui": "# Comece aqui\n" }))).toEqual([]));
+
+  it("página que só agrupa subpáginas, se tiver Markdown, é conferida", () =>
+    expect(checar(pastaCom({ politicas: "Dúvidas: fulano@kota.example" })))
+      .toEqual([expect.stringMatching(/politicas\.md.*fulano@kota\.example/)]));
 
   it("com repo, acusa link do kota-bank para caminho que não existe, inclusive com outra caixa", () => {
     const repo = pastaTemp();

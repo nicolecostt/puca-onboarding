@@ -9,6 +9,8 @@ const EMAIL = /[\p{L}\p{N}._%+-]+@[\p{L}\p{N}-]+(?:\.[\p{L}\p{N}-]+)+/gu;
 const HANDLE = /(?<![\p{L}\p{N}_.%+-])@[\p{L}\p{N}_-]+/gu;
 // Comece aqui é o guia de uso do jurado, escrito na C5.
 const SEM_PAGINA_NESTA_RAIA = new Set(["comece-aqui"]);
+// Página que agrupa subpáginas mostra a lista delas no Notion; nenhum grupo da N3 escreve texto para ela.
+const AGRUPAM = new Set(ARVORE.map((n) => n.pai));
 
 export const criarRegraPaginas = (pasta: string): Regra => ({
   nome: "paginas",
@@ -16,7 +18,8 @@ export const criarRegraPaginas = (pasta: string): Regra => ({
   checar(ctx) {
     const arquivos = existsSync(pasta) ? readdirSync(pasta).filter((f) => f.endsWith(".md")).sort() : [];
     const faltam = ARVORE
-      .filter((n) => n.tipo !== "database" && !SEM_PAGINA_NESTA_RAIA.has(n.chave) && !arquivos.includes(`${n.chave}.md`))
+      .filter((n) => n.tipo !== "database" && !AGRUPAM.has(n.chave) && !SEM_PAGINA_NESTA_RAIA.has(n.chave))
+      .filter((n) => !arquivos.includes(`${n.chave}.md`))
       .map((n) => `chave ${n.chave}: falta paginas/${n.chave}.md`);
     return [...faltam, ...arquivos.flatMap((f) => conferir(`paginas/${f}`, readFileSync(join(pasta, f), "utf8"), ctx))];
   },
