@@ -31,6 +31,7 @@
     "kota:marca": "tsx kit/kota/marca/cli.ts",
     "kota:readme-raiz": "tsx kit/kota/gerar/readme-raiz.ts",
     "kota:tarefas": "tsx kit/kota/tarefas/publicar.ts",
+    "kota:publicar": "tsx kit/kota/historia/publicar.ts",
     "contas-demo": "tsx server/scripts/contas-demo.ts"
   },
   "devDependencies": {
