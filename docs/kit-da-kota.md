@@ -96,7 +96,8 @@ O kit fica onde uma pessoa de verdade procuraria cada coisa: o que é de engenha
   6. Um ADR **rejeitado** (ex.: fila entre `ledgerwriter` e os leitores), porque empresa de verdade também tem esses.
 - **`docs/runbooks/`**: 2 ou 3 procedimentos (trocar a chave do JWT, `ledger-db` cheio, subir o banco do zero).
 - **Issues abertas com label de primeira tarefa**: 3 a 5 tarefas pequenas, cada uma com teste que falha antes e passa
-  depois. É de onde a Puca tira a primeira tarefa (§4.4). Pelo menos uma no Livro-razão para cada perfil.
+  depois. São o catálogo de primeira tarefa da Kota: a Puca escolhe conforme o perfil e o gestor aprova antes de a
+  pessoa começar (§4.4). Pelo menos uma no Livro-razão para cada perfil.
   A `main` fica sempre verde: cada issue aponta para a branch `tarefa/<n>`, com o teste que falha, e para a
   `solucao/<n>`, com ele passando **(nossa escolha)**.
 
@@ -179,12 +180,15 @@ um workspace e age como a pessoa logada, e o servidor da Puca não consegue usar
 
 - **Preencher**: um script cria os canais (`conversations.create`) e posta o histórico (`chat.postMessage`). Com o
   escopo `chat:write.customize`, cada mensagem sai com nome e foto de uma pessoa da Kota, sem contas reais.
-- **Agir na demo**: o mesmo app é usado pelo servidor da Puca para o encaminhamento ("agir num sistema", §12.2 do `PRODUCT.md`).
+- **Agir na demo (em aberto, #13)**: o mesmo app poderia ser usado pelo servidor da Puca no encaminhamento ("agir num
+  sistema", §12.2 do `PRODUCT.md`). Isso muda a regra "o servidor só dá voz e LLM", a §12.2 (hoje o encaminhamento é
+  no Slack simulado da `live-session`) e o contrato de Encaminhamento: não está decidido aqui.
 - **Pessoas da Kota não são membros reais**: o encaminhamento vai para o canal de ajuda do time (ex.:
   `#livro-razao-ajuda`), citando a buddy pelo nome, ou para uma DM com o próprio jurado.
-- **O jurado entra pelo link de convite** do workspace, que fica no guia de uso.
+- **O jurado entra pelo link de convite** do workspace, que fica no guia de uso. Quem tiver o link entra no workspace
+  onde o bot age: o app fica com o mínimo de escopos.
 - **Em aberto (#13)**: o Slack real substitui ou complementa o Slack simulado da tela `live-session`.
-- O token fica no `server/.env`, nunca no repositório.
+- O token fica fora do repositório (no script de preenchimento; no `server/.env` se a #13 decidir que o servidor age).
 
 ### 7.2. Quem consome o kit
 
@@ -209,9 +213,11 @@ não serve para um servidor.
 ### Restrições
 
 - **Licença Apache-2.0**: o `LICENSE` fica e os cabeçalhos de copyright dos arquivos de código também (cerca de 218
-  arquivos). O README da raiz diz que o código é baseado no Bank of Anthos. A marca (Bank of Anthos, Anthos, Cymbal,
-  Google) não aparece como marca da Kota.
-- **Dados sintéticos** (§12.2): pessoas, e-mails, contas e transações são inventados.
+  arquivos). O README da raiz diz que o código é baseado no Bank of Anthos. Arquivos que a gente modificar levam um aviso
+  visível de modificação (§4(b) da licença). O upstream não tem `NOTICE` (conferido em 2026-11-08); se aparecer, fica.
+  A marca (Bank of Anthos, Anthos, Cymbal, Google) não aparece como marca da Kota.
+- **Dados sintéticos** (§12.2): pessoas, e-mails, contas e transações são inventados. E-mails só com domínio
+  reservado (ex.: `kota.example`), para não cair em contas reais.
 
 ## 9. Fora deste trabalho
 

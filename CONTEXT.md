@@ -140,7 +140,7 @@ Registro de uma decisão técnica do time e do porquê dela.
 
 **Kota**:
 O banco digital fictício onde se passam a demo e o teste dos jurados.
-_Avoid_: Tail (nome antigo), empresa de exemplo, empresa mock
+_Avoid_: Tail, empresa de exemplo, empresa mock
 
 **Kit da Kota**:
 Os materiais falsos, mas realistas, da Kota (repositório com código que roda, ADRs, Notion com cultura, pessoas, políticas e responsáveis). É a fonte da Puca e a prova que o jurado confere.

@@ -315,7 +315,7 @@ A call inicial é o momento de identificar **o que a pessoa já conhece**, suas 
 - **De onde vem:** só da documentação oficial da empresa, com as mesmas regras de fonte da [§4.5](#45-conhecimento-contínuo-e-encaminhamento-humano). O que não está documentado a Puca não inventa.
 - **Na transição entre times:** só as particularidades culturais do novo time, sem repetir a apresentação institucional ([Cenário B](#cenário-b--funcionário-em-transição-interna)).
 
-> **Exemplo:** “Antes de seguir, uma coisa sobre como a Kota trabalha: aqui quem encontra um problema é dono dele até alguém assumir. Você vai ver isso no seu primeiro ticket. E no seu time anterior, como funcionava?”
+> **Exemplo:** “Antes de seguir, uma coisa sobre como a Kota trabalha: aqui quem encontra um problema é dono dele até alguém assumir. Você vai ver isso na sua primeira tarefa. E no seu time anterior, como funcionava?”
 
 > **No hackathon:** a tela da call inicial (`src/screens/onboarding-call`) hoje só faz perguntas; a cultura aparece na sessão, no momento “empresa e cultura” da jornada de demo. Trazer o onboarding cultural para a call está em #57.
 
