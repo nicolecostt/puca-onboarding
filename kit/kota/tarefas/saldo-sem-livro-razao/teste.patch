@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Beatriz Cavalcanti <beatriz@kota.example>
+Date: Sun, 8 Nov 2026 09:11:14 -0300
+Subject: [PATCH] =?UTF-8?q?test(balancereader):=20saldo=20responde=20503?=
+ =?UTF-8?q?=20quando=20o=20cache=20n=C3=A3o=20l=C3=AA=20o=20livro-raz?=
+ =?UTF-8?q?=C3=A3o?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../com/kota/balancereader/BalanceReaderControllerTest.java   | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/ledger/balancereader/src/test/java/br/com/kota/balancereader/BalanceReaderControllerTest.java b/src/ledger/balancereader/src/test/java/br/com/kota/balancereader/BalanceReaderControllerTest.java
+index 10fb4e8..532d322 100644
+--- a/src/ledger/balancereader/src/test/java/br/com/kota/balancereader/BalanceReaderControllerTest.java
++++ b/src/ledger/balancereader/src/test/java/br/com/kota/balancereader/BalanceReaderControllerTest.java
+@@ -220,7 +220,7 @@ class BalanceReaderControllerTest {
+     }
+ 
+     @Test
+-    @DisplayName("Given the cache throws an error for an authenticated user, return 500")
++    @DisplayName("Given the cache throws an error for an authenticated user, return 503")
+     void getBalanceFailsWhenCacheThrowsError() throws Exception {
+         // Given
+         when(verifier.verify(TOKEN)).thenReturn(jwt);
+@@ -233,7 +233,7 @@ class BalanceReaderControllerTest {
+ 
+         // Then
+         assertNotNull(actualResult);
+-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actualResult.getStatusCode());
++        assertEquals(HttpStatus.SERVICE_UNAVAILABLE, actualResult.getStatusCode());
+     }
+ 
+ }
