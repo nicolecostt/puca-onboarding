@@ -34,6 +34,9 @@ export function ligarNavegador(win: BrowserWindow): void {
     win.contentView.addChildView(v);
     view = v;
     const wc = v.webContents;
+    // a partição do navegador nunca dá permissão (microfone, câmera, localização, notificação) a página da Kota
+    wc.session.setPermissionRequestHandler((_w, _p, responder) => responder(false));
+    wc.session.setPermissionCheckHandler(() => false);
     // Guarda: só o mundo da Kota; janela nova nunca.
     const bloquear = (e: { preventDefault(): void }, url: string) => {
       if (!permitido(url)) e.preventDefault();
@@ -41,6 +44,10 @@ export function ligarNavegador(win: BrowserWindow): void {
     wc.on("will-navigate", (e, url) => bloquear(e, url));
     wc.on("will-redirect", (e, url) => bloquear(e, url));
     wc.setWindowOpenHandler(() => ({ action: "deny" }));
+    // GitHub e Notion trocam de página sem recarregar (pushState): fora do kota-bank, volta
+    wc.on("did-navigate-in-page", (_e, url, principal) => {
+      if (principal && !permitido(url) && wc.navigationHistory.canGoBack()) wc.navigationHistory.goBack();
+    });
 
     await wc.loadURL("about:blank"); // o depurador só responde com um documento carregado
     wc.debugger.attach("1.3");
@@ -130,6 +137,9 @@ export function ligarNavegador(win: BrowserWindow): void {
     }
     return resultado;
   }
+
+  // a janela do Orbis recarregou ou trocou de tela: o navegador, que fica por cima do HTML, some até a sessão pedir de novo
+  win.webContents.on("did-navigate", () => view?.setVisible(false));
 
   ipcMain.on("orbis:navegador:mostrar", (_e, b: Bounds) => {
     const bounds = { x: Math.round(b.x), y: Math.round(b.y), width: Math.max(1, Math.round(b.width)), height: Math.max(1, Math.round(b.height)) };
