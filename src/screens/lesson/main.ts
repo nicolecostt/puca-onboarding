@@ -247,8 +247,9 @@ async function main(): Promise<void> {
   const SLACK = { href: "../live-session/", target: "puca-slack", label: "Abrir Slack" };
 
   /** Encaminha a dúvida à buddy (§4.5): guarda para o Slack, marca no rastro e avisa na sessão. */
-  function forward(entryId: string, f: { question: string; summary: string; reason: string }): void {
-    const created = outbox.add({ ...f, to: { name: buddy, role: "buddy" }, pessoa: profile.nome, consulted: consultedNow(), moment: currentMoment?.id ?? null });
+  function forward(entryId: string, f: { question: string; summary: string; reason: string; consulted?: string[] }): void {
+    const consulted = [...new Set([...(f.consulted ?? []), ...consultedNow()])];
+    const created = outbox.add({ ...f, to: { name: buddy, role: "buddy" }, pessoa: profile.nome, consulted, moment: currentMoment?.id ?? null });
     trail.update(entryId, { forwarding_id: created.id });
     showToast(`Encaminhado à ${buddy} no Slack`, SLACK);
   }
@@ -301,8 +302,8 @@ async function main(): Promise<void> {
     return line;
   }
 
-  // Fala da pessoa (chat ou voz). A ordem está em journey/route.ts: pulo → resposta sugerida → nome de
-  // um item do quadro → conhecimento da sessão → FAQ do nó → agente (ponte na hora + LLM no servidor).
+  // Fala da pessoa (chat ou voz). A ordem está em journey/route.ts: pulo → resposta sugerida → dúvida da primeira
+  // tarefa → nome de um item do quadro → FAQ do nó → conhecimento da sessão → agente (ponte na hora + LLM no servidor).
   async function handleUtterance(text: string, from: "chat" | "voz"): Promise<void> {
     text = text.trim();
     if (!text) return;
@@ -351,7 +352,9 @@ async function main(): Promise<void> {
           // a tarefa não diz isso: não chuta, encaminha à buddy com o motivo (§4.5)
           const line = "Isso não está na tarefa, então não quero chutar. Já encaminhei a sua pergunta no Slack.";
           trail.update(entry.id, { answer: line });
-          forward(entry.id, { question: text, summary: text, reason: r.motivo });
+          // a tarefa foi o que a Puca consultou (§4.5: o encaminhamento leva o que já foi consultado)
+          const daTarefa = tarefaDaSessao ? [`Primeira tarefa · ${tarefaDaSessao.titulo}`] : [];
+          forward(entry.id, { question: text, summary: text, reason: r.motivo, consulted: daTarefa });
           return speakAside(line);
         }
         trail.update(entry.id, { answer: r.texto });

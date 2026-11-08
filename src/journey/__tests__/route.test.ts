@@ -116,6 +116,19 @@ describe("routeUtterance: dúvida da primeira tarefa (#79)", () => {
     expect(routeUtterance("qual o prazo da tarefa?", pctx)).toMatchObject({ kind: "tarefa", resposta: { kind: "sem_fonte" } });
   });
 
+  it("o conhecimento só vale o do momento da tarefa, para não inventar responsável (revisão do PR #121, achado 1)", () => {
+    const pt = journey.moments.find((m) => m.id === "primeira-tarefa")!;
+    const pctx: RouteContext = { ...tctx, moment: pt, step: pt.steps.at(-1)!, waiting: null };
+    for (const fala of ["quem é o dono da minha tarefa?", "a tarefa tem prazo?"]) {
+      expect(routeUtterance(fala, pctx), fala).toMatchObject({ kind: "tarefa", resposta: { kind: "sem_fonte" } });
+    }
+    expect(routeUtterance("quem aprova a tarefa?", pctx).kind).toBe("knowledge");
+    // o passo que apresenta a tarefa do outro vínculo (a da Ana) não responde pelo Bruno
+    expect(routeUtterance("e o firmware da tarefa?", pctx)).toMatchObject({ kind: "tarefa", resposta: { kind: "sem_fonte" } });
+    // de outro momento, a pergunta de aprovação também acha o conhecimento do momento da tarefa
+    expect(routeUtterance("quem aprova a tarefa?", { ...tctx, waiting: null }).kind).toBe("knowledge");
+  });
+
   it("sem tarefa no contexto, nada muda", () => {
     expect(routeUtterance("o que é a primeira tarefa?", ctx).kind).toBe("faq");
   });

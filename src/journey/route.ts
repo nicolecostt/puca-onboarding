@@ -12,7 +12,7 @@
 import { matchFaq, scoreReply, normalize } from "./conditions";
 import { respostaSobreTarefa, semPalavraTarefa, type RespostaSobreTarefa } from "./duvidas-da-tarefa";
 import type { Faq } from "./faq";
-import type { TarefaDoTime } from "./primeira-tarefa";
+import { tarefaDoPasso, type TarefaDoTime } from "./primeira-tarefa";
 import { answerFromKnowledge, findJump } from "./intent";
 import type { Journey, Moment, Step } from "./types";
 
@@ -69,13 +69,20 @@ export function routeUtterance(text: string, ctx: RouteContext): Route {
   // tarefa" é também o rótulo de um nó, e uma pergunta não é toque.
   if (isQuestion(text)) {
     const r = respostaSobreTarefa(text, ctx.tarefa ?? null, ctx.tarefaApresentada ?? false);
-    if (r?.kind === "sem_fonte") {
-      // a tarefa não diz, mas a sessão pode saber ("quem aprova a tarefa?"): o conhecimento casa pelo resto da pergunta,
-      // sem a palavra "tarefa", que sozinha casaria qualquer coisa. Ainda sem o LLM.
+    if (r?.kind === "sem_fonte" && ctx.tarefa) {
+      // a tarefa não diz, mas a sessão pode saber ("quem aprova a tarefa?"). Só o conhecimento do momento que apresenta
+      // a tarefa (e dos passos dele): o de outros momentos fala de outros sistemas e punha como "dono da tarefa" quem
+      // não é (revisão do #121). Casa pelo resto da pergunta, sem a palavra "tarefa", que sozinha casaria qualquer coisa.
       const rest = semPalavraTarefa(text);
-      const known =
-        answerFromKnowledge(rest, ctx.step, ctx.moment) ??
-        ctx.journey.moments.map((m) => answerFromKnowledge(rest, null, m)).find((a): a is string => !!a);
+      const no = ctx.tarefa.no;
+      const daTarefa = ctx.journey.moments.filter((m) => m.steps.some((st) => st.actions?.some((a) => a.type === "card" && a.target === no)));
+      const known = daTarefa
+        .flatMap((m) => [
+          answerFromKnowledge(rest, null, m),
+          // passo que apresenta a tarefa de outro vínculo não fala por esta pessoa
+          ...m.steps.filter((st) => (tarefaDoPasso(ctx.journey, st)?.no ?? no) === no).map((st) => answerFromKnowledge(rest, st, null)),
+        ])
+        .find((a): a is string => !!a);
       if (known) return { kind: "knowledge", text: known };
     }
     if (r) return { kind: "tarefa", resposta: r };
