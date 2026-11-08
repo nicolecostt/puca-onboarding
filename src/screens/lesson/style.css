@@ -440,3 +440,15 @@ body.is-call-off .lesson__board {
   color: var(--color-ink);
   font-weight: 600;
 }
+
+/* ---- Escolha do perfil por cima da sessão (ninguém escolheu antes): components/escolha-perfil ---- */
+.escolha-portao {
+  position: fixed;
+  inset: 0;
+  z-index: 1001; /* acima da barra de call, da câmera e do chat */
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  backdrop-filter: blur(6px);
+}

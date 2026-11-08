@@ -3,7 +3,7 @@
 // Por enquanto o nível sai de regras por palavras (funciona sem servidor e é sempre igual na demo).
 import { onboardingStore } from "./storage";
 import { normalize } from "./conditions";
-import { DEMO_PROFILES } from "./profile";
+import { DEMO_PROFILES, loadSavedProfile } from "./profile";
 import { callAnswers } from "../data/call-answers";
 import type { Calibragem, Certeza, ItemCalibragem, Nivel, Profile, ResultadoChecagem, Tema, Vinculo } from "./types";
 
@@ -152,11 +152,14 @@ export const DEMO_CALIBRAGENS: Record<Vinculo, Calibragem> = {
 
 const URL_VINCULO: Record<string, Vinculo> = { novo: "novo", transicao: "transicao", ana: "novo", bruno: "transicao" };
 
-/** Mesma ordem do perfil: ?perfil= na URL → calibragem salva pela call → demo do Bruno. */
+/**
+ * Mesma ordem do perfil: ?perfil= na URL → calibragem salva (call ou escolha) → exemplo do vínculo do perfil salvo →
+ * demo do Bruno. Assim quem escolheu a Ana nunca cai na calibragem do Bruno.
+ */
 export function resolveCalibragem(search: string): { calibragem: Calibragem; source: "url" | "call" | "demo" } {
   const fromUrl = URL_VINCULO[new URLSearchParams(search).get("perfil") ?? ""];
   if (fromUrl) return { calibragem: DEMO_CALIBRAGENS[fromUrl], source: "url" };
   const saved = loadCalibragem();
   if (saved) return { calibragem: saved, source: "call" };
-  return { calibragem: DEMO_CALIBRAGENS.transicao, source: "demo" };
+  return { calibragem: DEMO_CALIBRAGENS[loadSavedProfile()?.vinculo ?? "transicao"], source: "demo" };
 }

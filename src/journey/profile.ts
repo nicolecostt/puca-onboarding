@@ -1,5 +1,5 @@
-// Perfil da pessoa: vem da call de entrevista, da URL (?perfil=)
-// ou de um dos dois perfis da demo (src/data/profiles.ts).
+// Perfil da pessoa: vem da call de entrevista, da URL (?perfil=, que a escolha nas boas-vindas manda para a call), da
+// escolha por cima da sessão ou de um dos dois perfis da demo (src/data/profiles.ts).
 import { onboardingStore } from "./storage";
 import { normalize } from "./conditions";
 import { company } from "../data/company";
@@ -35,8 +35,11 @@ export function vinculoFromAnswer(answer: string | undefined): Vinculo {
   return transicao.some((k) => t.includes(k)) ? "transicao" : "novo";
 }
 
-/** Monta o perfil a partir das respostas da call de entrevista. */
-export function profileFromAnswers(answers: Partial<Record<string, string>>): Profile {
+/**
+ * Monta o perfil a partir das respostas da call de entrevista. Com o vínculo já escolhido antes da call
+ * (nas boas-vindas), ele vale e a call não pergunta de novo.
+ */
+export function profileFromAnswers(answers: Partial<Record<string, string>>, vinculo?: Vinculo): Profile {
   return {
     nome: answers.nome?.trim() || "você",
     cargo: answers.cargo,
@@ -44,7 +47,7 @@ export function profileFromAnswers(answers: Partial<Record<string, string>>): Pr
     gestor: answers.gestor,
     ferramentas: answers.ferramentas,
     aprender: answers.aprender,
-    vinculo: vinculoFromAnswer(answers.vinculo),
+    vinculo: vinculo ?? vinculoFromAnswer(answers.vinculo),
   };
 }
 
@@ -71,7 +74,10 @@ export function loadSavedProfile(): Profile | null {
 /** ?perfil= aceita o vínculo (novo | transicao) ou o perfil da demo (ana | bruno). */
 const URL_PROFILES: Record<string, Vinculo> = { novo: "novo", transicao: "transicao", ana: "novo", bruno: "transicao" };
 
-/** Ordem: ?perfil= na URL → perfil salvo pela entrevista → demo do Bruno (mesmo padrão das outras telas). */
+/**
+ * Ordem: ?perfil= na URL → perfil salvo (escolha ou call) → demo do Bruno (mesmo padrão das outras telas).
+ * `source: "demo"` quer dizer que ninguém escolheu: a sessão pede a escolha antes de começar.
+ */
 export function resolveProfile(search: string): { profile: Profile; source: "url" | "entrevista" | "demo" } {
   const fromUrl = URL_PROFILES[new URLSearchParams(search).get("perfil") ?? ""];
   if (fromUrl) return { profile: DEMO_PROFILES[fromUrl], source: "url" };

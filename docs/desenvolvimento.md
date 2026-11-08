@@ -70,6 +70,7 @@ src/
     agent-cam/           "câmera" do agente no canto da tela
     agent-cursor/        cursor do Puca (seta + "Puca") mexendo na tela, por enquanto simulado
     journey-panel/       painel "Sua jornada" da sessão: objetivo, momentos marcados pela calibragem e próximos passos
+    escolha-perfil/      os dois cartões da escolha do perfil (nas boas-vindas e por cima da sessão quando ninguém escolheu)
   journey/               jornada da sessão em JSON: tipos, validador, motor, perfil, calibragem, jornada da pessoa e intenções (pulo, perguntas)
     data/                jornadas em JSON (kota.journey.json é a demo)
   lib/                   código compartilhado
@@ -164,7 +165,9 @@ movem. Os controles no canto do quadro (−, zoom, +, Ajustar) e os atalhos `Shi
 resto. Clicar num nó continua abrindo o cartão e valendo como toque na checagem; o clique que encerra um arraste não
 conta. Se a pessoa afastar o quadro e o Puca falar de algo fora da tela, o quadro centra no que ele está mostrando.
 
-- O perfil vem da call inicial: no fim dela, as boas-vindas levam ao início, e "Começar a sessão" abre a sessão.
+- O perfil vem da escolha nas boas-vindas (dois cartões, que mandam `?perfil=` para a call) e da call inicial, que o
+  salva (`onboardingStore()`: `localStorage` no app para Mac, `sessionStorage` no navegador); no fim da call, o app abre
+  a sessão. Aberta sem perfil salvo e sem `?perfil=`, a sessão mostra a mesma escolha antes de o Puca começar. Sem LLM, a call mostra "Ir para a sessão", que segue com o perfil de exemplo de quem foi escolhido.
 - `?perfil=ana` (recém-contratada: passa pela parte institucional) ou `?perfil=bruno` (mudando de time: vai direto ao time).
 - `?auto=1` responde sozinho, para apresentar sem mexer no mouse.
 

@@ -11,7 +11,8 @@ import { emit } from "../../lib/events";
 import { esc, qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
 import { activeProfile, company } from "../../data";
-import { loadSavedProfile, profileFromAnswers, saveProfile } from "../../journey/profile";
+import { loadSavedProfile, profileFromAnswers, resolveProfile, saveProfile } from "../../journey/profile";
+import { ID_DO_VINCULO, escolherPerfil } from "../../journey/escolha";
 import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem";
 import { createAgentVoice, MIC_AVISO, type CallRequest, type SpeakOptions } from "../../voice/agent-voice";
 
@@ -19,8 +20,13 @@ const savedProfile = loadSavedProfile();
 if (!savedProfile) qs<HTMLAnchorElement>(document, ".brand").href = "../boas-vindas/";
 preserveProfileLinks();
 
-// Dados da admissão: a empresa já sabe, o Puca só confirma (o vínculo salvo nas boas-vindas escolhe a pessoa da demo).
-const profile = activeProfile(savedProfile?.vinculo === "transicao" ? "bruno" : "ana");
+// Com quem a pessoa entra: a escolha nas boas-vindas (?perfil= na URL) ou o perfil já salvo. Com ela, a call usa a
+// admissão dessa pessoa e o vínculo já vai anotado, então o Puca não pergunta de novo se é a primeira vez na empresa
+// ou uma troca de time (server/src/agent/call.ts: "Não pergunte o que já está anotado").
+const escolha = resolveProfile(location.search);
+const vinculoEscolhido = escolha.source === "demo" ? null : escolha.profile.vinculo;
+// Dados da admissão: a empresa já sabe, o Puca só confirma (sem escolha, a Ana).
+const profile = activeProfile(vinculoEscolhido ? ID_DO_VINCULO[vinculoEscolhido] : "ana");
 const admissao = {
   cargo: profile.role,
   time: profile.toTeam,
@@ -72,7 +78,7 @@ async function main(): Promise<void> {
     timer: qs(document, "#timer"),
   };
 
-  const answers: Record<string, string> = {};
+  const answers: Record<string, string> = vinculoEscolhido ? { vinculo: vinculoEscolhido } : {};
   const cultura: string[] = [];
   const history: { role: "user" | "assistant"; content: string }[] = [];
   const state = { paused: false, ended: false, muted: false, seconds: 0, done: false, started: false };
@@ -231,7 +237,7 @@ async function main(): Promise<void> {
     state.done = true;
     setAgent("done");
     voice.stopListening();
-    const perfil = profileFromAnswers(answers);
+    const perfil = profileFromAnswers(answers, vinculoEscolhido ?? undefined);
     saveCalibragem(calibragemFromAnswers(perfil, answers));
     saveProfile(perfil);
     window.setTimeout(leaveToSession, 1400);
@@ -285,7 +291,19 @@ async function main(): Promise<void> {
   render();
   if (!voice.llm) {
     chat.addMessage({ from: "agent", text: SEM_PUCA });
-    el.captionAgent.textContent = SEM_PUCA;
+    // sem a call, a pessoa não fica presa aqui: segue para a sessão com o perfil de exemplo de quem ela escolheu.
+    // A legenda fica com a primeira frase (o aviso inteiro está no chat), para o botão caber acima da barra da call.
+    el.captionAgent.textContent = "O Puca está fora do ar agora.";
+    const seguir = document.createElement("button");
+    seguir.type = "button";
+    seguir.className = "call-seguir";
+    seguir.textContent = "Ir para a sessão";
+    el.captionAgent.before(seguir); // logo acima do aviso: embaixo dele fica a barra da call
+    seguir.addEventListener("click", () => {
+      seguir.remove();
+      escolherPerfil(vinculoEscolhido ?? (profile.kind === "transfer" ? "transicao" : "novo"));
+      leaveToSession();
+    });
     return;
   }
   // O navegador só libera som e microfone depois de um clique.
