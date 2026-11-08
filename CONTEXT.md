@@ -50,7 +50,7 @@ _Avoid_: diagnóstico, avaliação
 ## Conversa
 
 **Call inicial**:
-A primeira conversa, em que a Puca acolhe a pessoa e preenche o perfil.
+A primeira conversa, em que a Puca acolhe a pessoa, faz o onboarding cultural e preenche o perfil.
 _Avoid_: entrevista, kickoff
 
 **Aula**:
@@ -131,3 +131,31 @@ _Avoid_: documento, referência
 
 **ADR**:
 Registro de uma decisão técnica do time e do porquê dela.
+
+## Avaliação
+
+**Tail**:
+A empresa fictícia onde se passam a demo e o teste dos jurados.
+_Avoid_: empresa de exemplo, empresa mock
+
+**Kit da Tail**:
+Os materiais falsos, mas realistas, da Tail (repos, código, ADRs, Notion, políticas, organograma). É a fonte da Puca e a prova que o jurado confere.
+_Avoid_: mock, dados fake, dataset
+
+**Guia de uso**:
+O que acompanha o kit para o jurado: quem ele é na história, como escolher o perfil, onde estão os materiais e o que vale tentar.
+_Avoid_: manual, tutorial
+
+**Jurado**:
+Quem avalia a Lousa no hackathon. Vive a pessoa: escolhe o perfil e passa pela jornada.
+_Avoid_: avaliador, juiz
+
+## Negócio
+
+**Integração**:
+O que a empresa compra: uma pessoa entrando num contexto de destino, como novo ou em transição. É a unidade de cobrança. (Não confundir com a conexão com sistemas, como Slack, Jira ou GitHub.)
+_Avoid_: jornada (é o roteiro da aula), licença, assento
+
+**Piloto**:
+Primeira contratação paga, curta e com poucas integrações, que termina numa decisão de continuar, ajustar ou encerrar.
+_Avoid_: teste grátis, prova de conceito

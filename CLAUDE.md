@@ -24,6 +24,9 @@ o que não estiver no código, numa issue, num PR ou nestes docs, os outros agen
 - **Todo texto usa os termos do glossário**: código, interface, commits, issues, PRs e docs.
 - **Adicionar ou mudar algo nos dois só pela skill `/contexto-base`**: ela diz onde cada coisa vai, segue o modelo,
   valida (`npm run check:contexto`) e leva a mudança para as issues e os docs afetados.
+- **Regra nova para os agentes só pela skill `/nova-regra`** ("a partir de agora…", "sempre que…", skill, hook,
+  permissão, CI): ela escolhe o lugar mais leve que resolve, evita regra duplicada ou contraditória, valida
+  (`npm run check:harness`) e registra a decisão. Preferência só sua vai em `CLAUDE.local.md`.
 
 ## Comandos
 
@@ -32,8 +35,9 @@ npm run dev          # telas (Vite)
 npm run dev:server   # API em :8787 (o Vite repassa /api)
 npm run typecheck
 npm test             # valida a jornada de demo e o motor
-npm run check        # typecheck + testes + base do sistema + build (o que o CI roda em cada PR)
+npm run check        # typecheck + testes + base do sistema + harness + build (o que o CI roda em cada PR)
 npm run check:contexto  # só a base: sumário e âncoras do PRODUCT.md, formato do CONTEXT.md
+npm run check:harness   # só o harness: skills na tabela abaixo, revisor, scripts dos hooks executáveis
 ```
 
 Antes de dizer que terminou: `npm run check` (ou, no mínimo, `npm run typecheck && npm test`). Nunca diga que passou sem ter rodado.
@@ -61,12 +65,21 @@ Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o
    `main` e veja se alguém mudou (na `main` ou num PR aberto) os arquivos que você está mexendo. Um hook roda
    `scripts/sync-check.sh` a cada mensagem e avisa com `[sync]`: quando aparecer, pare e sincronize antes de seguir.
 4. **Escopo pequeno, merge cedo.** Não reformate nem "melhore" o que a issue não pede.
+   - **Faltou algo ou ficou dúvida? Vira issue nova.** Resolvendo uma issue, achou algo faltando (dado, tela, contrato,
+     doc, teste), algo que você não tem certeza de como deve ser, ou algo que sobra (código morto, duplicado)? Não
+     resolva por fora do escopo nem deixe só na conversa: crie uma issue curta (template `tarefa`, label da área), cite a
+     atual (`Relacionada a #<n>`) e diga no PR quais issues abriu. Antes, veja se já não existe uma (`gh issue list --search`).
+     Se a dúvida trava a issue atual, pergunte à pessoa em vez de supor.
 5. **Contratos** ([`docs/contratos.md`](docs/contratos.md)): formato novo ou alterado entra no doc antes de implementar
    os dois lados; quebra de compatibilidade vai marcada no PR.
 6. **Decisão que afeta os outros** vira um arquivo em `docs/decisoes/`. Conversa do dia a dia não vira documento.
 7. **Git seguro:** sem `push --force`, `reset --hard`, `checkout -- .` ou `clean` sem a pessoa pedir; não descarte
    alteração não commitada que você não fez. Nunca commite `.env`, chaves de API, `sandbox/` ou `dist/`.
-8. **Material que não é código** (negócio, pitch, TAM/SAM/SOM, ferramentas da submissão) vai em `docs/negocio/`.
+8. **Revisão e merge de PR** seguem a skill `revisar`: a pergunta é "dá para integrar sem quebrar nada nem atrapalhar
+   ninguém?", e só conta problema com evidência e cenário concreto. `scripts/pr-check.sh <n>` dá os fatos (merge com a
+   `main`, conflitos reais com outros PRs e se são mecânicos, CI, base depois do merge). Hooks: pedido de revisão traz
+   esses fatos sozinho; `gh pr merge` e aprovar são barrados com conflito com a `main`, CI vermelho ou base quebrada.
+9. **Material que não é código** (negócio, pitch, TAM/SAM/SOM, ferramentas da submissão) vai em `docs/negocio/`.
 
 ## Skills da equipe: chame sozinho, ninguém vai pedir
 
@@ -79,10 +92,11 @@ Mais de uma situação ao mesmo tempo? Chame na ordem da tabela.
 | Vai editar, commitar ou abrir PR; apareceu `[sync]`; "alguém mexeu na main?" | `sincronizar` |
 | Começar ou retomar trabalho: "pega a issue 17", "bora fazer X", "implementa Y", "continua" | `comecar-tarefa` |
 | Algo entra ou muda no `PRODUCT.md`/`CONTEXT.md`: "anota no PRODUCT", "novo insight", "alinhamos que…", termo novo | `contexto-base` |
+| Regra nova para os agentes: "a partir de agora…", "sempre que…", "coloca no CLAUDE.md", "cria um hook/skill", "bloqueia X" | `nova-regra` |
 | Mudar um formato que outra parte usa: campo de API, tipo, evento, payload | `contrato` |
 | Criar ou editar aula/jornada (`*.journey.json`) | `nova-jornada` |
 | Criar tela ou componente | `nova-tela` |
-| "Revisa", "tá bom pra subir?", revisar PR de alguém | `revisar` (usa o subagente `revisor`) |
+| "Revisa", "tá bom pra subir?", "pode aprovar?", "dá pra mergear?", revisar PR de alguém | `revisar` (usa o subagente `revisor`) |
 | "Terminei", "pronto", "pode subir", "abre o PR" | `handoff` |
 | "A demo funciona?", antes de apresentar, depois de merges | `checar-demo` |
 

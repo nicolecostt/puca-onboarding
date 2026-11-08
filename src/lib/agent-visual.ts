@@ -1,6 +1,5 @@
-// Visual do agente (a "bolha"). Ainda em definição: hoje existe só um teste local
-// (sandbox/puca-teste.ts, fora do git). Se o arquivo não existir, as telas usam
-// um círculo neutro no lugar.
+// Visual do agente: a esfera de pontos da Puca (puca-sphere.ts), usada em todas as telas.
+// Se der erro ao carregar, as telas usam um círculo neutro no lugar.
 
 export type AgentVisualState = "idle" | "think" | "talk";
 
@@ -20,16 +19,11 @@ export interface AgentVisual {
 
 export type AgentVisualFactory = (container: HTMLElement) => AgentVisual;
 
-// import.meta.glob não quebra o build quando o arquivo não existe: só volta vazio.
-const testVisual = import.meta.glob<{ mountPuca: AgentVisualFactory }>("../../sandbox/puca-teste.ts");
-
 export async function loadAgentVisual(): Promise<AgentVisualFactory | null> {
-  const load = testVisual["../../sandbox/puca-teste.ts"];
-  if (!load) return null;
   try {
-    return (await load()).mountPuca;
+    return (await import("./puca-sphere")).mountPucaSphere;
   } catch (err) {
-    console.warn("Não foi possível carregar o visual de teste do agente:", err);
+    console.warn("Não foi possível carregar o visual da Puca:", err);
     return null;
   }
 }

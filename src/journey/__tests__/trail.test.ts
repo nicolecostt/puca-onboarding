@@ -67,12 +67,22 @@ describe("createTrail", () => {
 describe("sourcesFor", () => {
   const faq = (node: string, intent: string): Route => ({ kind: "faq", faq: faqs.find((f) => f.node === node && f.intent === intent)! });
 
-  it("cartão do nó: títulos das fontes do nó", () => {
-    expect(sourcesFor(faq("authorizer", "owner"), journey, pagamentos)).toEqual(["ADR-019 · Cálculo de MDR por plano", "fees/mdr.go"]);
+  it("o que é: títulos das docs do nó", () => {
+    expect(sourcesFor(faq("authorizer", "what"), journey, pagamentos)).toEqual(["ADR-019 · Cálculo de MDR por plano", "fees/mdr.go"]);
   });
 
-  it("cartão do nó com ADR: inclui o id do ADR", () => {
-    expect(sourcesFor(faq("gateway", "why"), journey, pagamentos)).toContain("ADR-012");
+  it("por que existe: só o ADR, nunca as outras docs do nó", () => {
+    expect(sourcesFor(faq("gateway", "why"), journey, pagamentos)).toEqual(["ADR-012"]);
+  });
+
+  it("quem cuida: sem fonte, porque as docs do nó não dizem quem cuida", () => {
+    expect(sourcesFor(faq("authorizer", "owner"), journey, pagamentos)).toEqual([]);
+  });
+
+  it("responsável não confirmado: sem fonte", () => {
+    const unconfirmed = faqs.find((f) => f.intent === "owner" && f.text.startsWith("Não tenho um responsável confirmado"))!;
+    expect(unconfirmed).toBeTruthy();
+    expect(sourcesFor({ kind: "faq", faq: unconfirmed }, journey, pagamentos)).toEqual([]);
   });
 
   it("conhecimento da aula: aponta o momento", () => {
