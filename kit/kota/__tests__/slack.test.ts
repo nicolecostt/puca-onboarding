@@ -1,3 +1,5 @@
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { mapa } from "../mapa";
 import { caminhoAdr } from "../tipos";
@@ -199,5 +201,15 @@ describe("slackDeVerdade", () => {
     expect(erro).toBeInstanceOf(Error);
     expect((erro as Error).message).toMatch(/SLACK_BOT_TOKEN/);
     expect((erro as Error).message).not.toMatch(/token-de-teste|segredo-colado/);
+  });
+});
+
+describe("SLACK_BOT_TOKEN fora do git", () => {
+  const raiz = fileURLToPath(new URL("../../..", import.meta.url));
+  const ignorado = (caminho: string) => spawnSync("git", ["check-ignore", "-q", "--no-index", caminho], { cwd: raiz }).status === 0;
+
+  it("os arquivos onde se costuma guardar o token ficam fora do git, e o .env.example não", () => {
+    expect([".env", ".env.local", "server/.env", "server/.env.local", ".env.slack", "slack.env", ".envrc"].filter((c) => !ignorado(c))).toEqual([]);
+    expect(ignorado("server/.env.example")).toBe(false);
   });
 });

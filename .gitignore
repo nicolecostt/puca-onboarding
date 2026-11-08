@@ -1,4 +1,8 @@
 .env
+.env.*
+!.env.example
+*.env
+.envrc
 .DS_Store
 
 # testes locais (agente azul etc.): não comitar
