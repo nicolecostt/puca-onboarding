@@ -84,7 +84,7 @@ export function createTrail(store: KeyValueStore, opts: { now?: () => Date; sess
       write([...read(), entry]);
       return entry;
     },
-    update(id: string, patch: Partial<Pick<TrailEntry, "answer" | "forwarding_id" | "ms" | "llm_ms" | "llm_error" | "tokens_in" | "tokens_out" | "tokens_estimated">>): void {
+    update(id: string, patch: Partial<Pick<TrailEntry, "answer" | "sources" | "forwarding_id" | "ms" | "llm_ms" | "llm_error" | "tokens_in" | "tokens_out" | "tokens_estimated">>): void {
       write(read().map((e) => (e.id === id ? { ...e, ...patch } : e)));
     },
     list: read,
