@@ -22,7 +22,7 @@ Trabalhando com agentes de programação (Claude Code, Codex…): regras do time
 
 ```
 index.html               lista das telas (página inicial do npm run dev)
-DESIGN.md                sistema visual: preto, branco e a cor da Puca; tipos, componentes e regras
+DESIGN.md                sistema visual: preto, branco e a cor do Puca; tipos, componentes e regras
 docs/
   journey-format.md      formato da jornada (momentos, passos, quadro, transições)
 src/
@@ -36,10 +36,10 @@ src/
     profiles.ts          os dois perfis: ?perfil=bruno (transição) | ?perfil=ana (recém-contratada)
     lessons/             sessões do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css
-    landing/             apresentação do Orbis e da Puca (só preto, branco e a cor da Puca)
-    onboarding-call/     call inicial: a Puca conversa com a pessoa e grava a calibragem; no fim, abre as boas-vindas
+    landing/             apresentação do Orbis e do Puca (só preto, branco e a cor do Puca)
+    onboarding-call/     call inicial: o Puca conversa com a pessoa e grava a calibragem; no fim, abre as boas-vindas
     boas-vindas/         "Oi, {nome}": ir para o início ou refazer a call inicial
-    inicio/              início do Orbis: progresso, perfil, tarefas, acessos e ligar para a Puca
+    inicio/              início do Orbis: progresso, perfil, tarefas, acessos e ligar para o Puca
     rh/                  painel do RH: indicadores agregados das integrações e pendências (§5)
     lesson/              sessão no quadro: o quadro se monta junto com a fala
     live-session/        tela de auxílio: barra de call, chat e câmera por cima de uma tela
@@ -50,7 +50,7 @@ src/
     call-bar/            barra de call flutuante (Figma: "Session control bar")
     chat-panel/          chat flutuante (Figma: "Chat (floating window)")
     agent-cam/           "câmera" do agente no canto da tela
-    agent-cursor/        cursor da Puca (seta + "Puca") mexendo na tela, por enquanto simulado
+    agent-cursor/        cursor do Puca (seta + "Puca") mexendo na tela, por enquanto simulado
     journey-panel/       painel "Sua jornada" da sessão: objetivo, momentos marcados pela calibragem e próximos passos
   journey/               jornada da sessão em JSON: tipos, validador, motor, perfil, calibragem, jornada da pessoa e intenções (pulo, perguntas)
     data/                jornadas em JSON (tail.journey.json é a demo)
@@ -61,7 +61,7 @@ src/
     dom.ts               utilitários de DOM
 kit/kota/                kit da Kota (docs/kit-da-kota.md): o mapa (pessoas, times, sistemas, ADRs e RFCs), os
                          geradores do CODEOWNERS e dos READMEs de serviço e o check:kota (npm run check:kota -- --repo <checkout do Kota>)
-sandbox/                 testes locais, fora do git (ex.: visual da Puca)
+sandbox/                 testes locais, fora do git (ex.: visual do Puca)
 ```
 
 ## Mudar o visual
@@ -83,10 +83,12 @@ npm run dev          # abre a lista de telas → "Sessão no quadro" → "Começ
 npm run dev:fly      # só o front: o Vite repassa /api para o servidor do Fly, sem dev:server nem server/.env
 npm run precompute -- --only pontes   # pré-gera áudio (pontes|faq|roteiro; --dry mostra o custo em caracteres)
 npm run bench:llm    # latência do LLM por modelo/config → server/bench/results/
-npm run bench:turn   # tempo até a Puca começar a responder, por caminho (--tts mede o áudio também)
+npm run bench:turn   # tempo até o Puca começar a responder, por caminho (--tts mede o áudio também)
 ```
 
-Regra: a resposta nunca espera o LLM. Cada fala (voz ou chat) passa por `src/journey/route.ts`, nesta ordem:
+Regra: a sessão nunca fica muda (decisão 0010). Com LLM no servidor, cada turno vai ao `/api/turn` e o LLM conduz,
+com a jornada como pauta e o Notion da Kota como fonte. Sem LLM (ou com `?modo=roteiro`, `?auto=1`), cada fala (voz ou chat)
+passa por `src/journey/route.ts`, nesta ordem:
 pulo de assunto → resposta sugerida → dúvida da primeira tarefa (campos da tarefa da pessoa) → nome de um item do quadro →
 FAQ do nó (nó + intenção) → conhecimento da sessão → FAQ só pelo nome → agente (`/api/ask`: fala-ponte na hora + LLM em streaming, frase a frase para o TTS).
 
@@ -123,18 +125,18 @@ const call = mountCallBar({ status: "Agente falando…", chat });
 document.addEventListener("callbar:pause", (e) => console.log(e.detail.on));
 ```
 
-## Visual da Puca
+## Visual do Puca
 
-A Puca aparece como uma esfera de pontos com uma faixa em onda, sem rosto (`src/lib/puca-sphere.ts`),
+O Puca aparece como uma esfera de pontos com uma faixa em onda, sem rosto (`src/lib/puca-sphere.ts`),
 carregada por `loadAgentVisual()` em todas as telas: landing, call inicial, sessão e tela de auxílio. Ela inclina na direção
 do mouse, os pontos perto do cursor crescem e um clique solta uma ondulação. Os estados `idle`/`think`/`talk`
 mudam a velocidade e a forma da onda. A faixa é um arco-íris metálico gerado no canvas; a cor dos pontos de fundo fica em `tokens.css` (`--puca-sphere-dot`) e o arco-íris usado fora da esfera em `--puca-holo-stops`. A esfera só anima quando está na tela. Se o visual não carregar, fica um círculo neutro.
 
 ## Sessão no quadro
 
-A tela `src/screens/lesson/` roda a jornada em JSON (`src/journey/data/tail.journey.json`): a Puca fala, o quadro
+A tela `src/screens/lesson/` roda a jornada em JSON (`src/journey/data/tail.journey.json`): o Puca fala, o quadro
 (`src/components/whiteboard/`) vai se montando e a pessoa responde pelas respostas sugeridas, pelo chat ou tocando no quadro.
-Pelo chat ela também pode pedir para mudar de assunto ou fazer perguntas, que a Puca responde com o conhecimento da sessão.
+Pelo chat ela também pode pedir para mudar de assunto ou fazer perguntas, que o Puca responde com o conhecimento da sessão.
 A conversa ainda é simulada (sem LLM nem voz); o motor (`src/journey/runner.ts`) não depende da tela.
 
 - O perfil vem da call inicial: no fim dela, as boas-vindas levam ao início, e "Começar a sessão" abre a sessão.

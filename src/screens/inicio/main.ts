@@ -1,6 +1,6 @@
 // Início do Orbis: progresso no topo, perfil, tarefas (à esquerda) e ferramentas com o estado de cada acesso
-// (à direita). Ao abrir, a Puca confere os acessos e avisa o que falta (o pedido ao gestor ainda é simulado, #104).
-// No canto, "Ligar para a Puca" abre a câmera dela, com voz e chat; cada fala passa por journey/route.ts.
+// (à direita). Ao abrir, o Puca confere os acessos e avisa o que falta (o pedido ao gestor ainda é simulado, #104).
+// No canto, "Ligar para o Puca" abre a câmera dele, com voz e chat; cada fala passa por journey/route.ts.
 import "../../styles/base.css";
 import "./style.css";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
@@ -96,7 +96,7 @@ function renderTools(changed?: string): void {
 }
 renderTools();
 
-// A Puca confere os acessos ao abrir e avisa o que falta. Ela ainda não pede ao gestor de verdade (#104): não diz que pediu.
+// O Puca confere os acessos ao abrir e avisa o que falta. Ele ainda não pede ao gestor de verdade (#104): não diz que pediu.
 let lastNotice = "";
 function checkAccess(): void {
   const missing = tools.filter((t) => t.status === "missing");
@@ -125,7 +125,7 @@ async function main(): Promise<void> {
   const chat = mountChatPanel({ title: "Puca", messages: [] });
   const cam = mountAgentCam({ name: "Puca", visual: factory });
   const bar = mountCallBar({ chat, attachTo: cam });
-  // começa desligada: no canto fica só "Ligar para a Puca"
+  // começa desligada: no canto fica só "Ligar para o Puca"
   cam.hide();
   bar.end();
 
@@ -206,7 +206,7 @@ async function main(): Promise<void> {
     else voice.resume();
   });
 
-  /** Resposta da Puca no início, pelo caminho que a rota escolheu. O que é da sessão (FAQ do quadro, conhecimento,
+  /** Resposta do Puca no início, pelo caminho que a rota escolheu. O que é da sessão (FAQ do quadro, conhecimento,
    *  pulo, primeira tarefa) vem da jornada; o "ask" fica com o que esta tela sabe (acessos, tarefas, pessoas).
    *  Sem fonte, não inventa e não encaminha daqui: indica a sessão e a buddy. */
   function answer(question: string, route: Route): string {

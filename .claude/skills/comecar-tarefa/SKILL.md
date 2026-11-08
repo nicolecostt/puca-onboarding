@@ -27,7 +27,7 @@ Tarefa: $ARGUMENTS
    (cenário, funcionalidade, prioridade ou limite do hackathon). Confira se a issue bate com elas. Depois, só o que a tarefa toca:
    - tela ou componente → o `main.ts`/`.ts` dele e a seção de `docs/desenvolvimento.md`;
    - jornada ou sessão → `docs/journey-format.md` (e use a skill `nova-jornada`);
-   - voz ou servidor → `src/voice/`, `server/src/app.ts` e a regra da `src/journey/route.ts` (a resposta nunca espera o LLM);
+   - voz ou servidor → `src/voice/`, `server/src/app.ts`, `server/src/agent/turn.ts` e a regra "a sessão nunca fica muda" (decisão 0010);
    - decisões já tomadas → títulos em `docs/decisoes/`.
 4. **Conflito com o time.** `gh pr list` e veja se algum PR aberto mexe nos mesmos arquivos. Se sim, avise antes de editar.
 5. **Contratos.** Confira em `docs/contratos.md` se a tarefa muda ou cria algum (inclusive os "que vão surgir").

@@ -1,6 +1,6 @@
 // O que a pessoa quis dizer fora das respostas sugeridas (simulado por palavras-chave até ter um LLM):
 // - pedido para mudar de assunto → pulo para o início de outro momento;
-// - pergunta que o conhecimento do momento responde → a Puca responde sem sair do roteiro.
+// - pergunta que o conhecimento do momento responde → o Puca responde sem sair do roteiro.
 import { keywords, normalize, sameWord } from "./conditions";
 import type { Journey, Moment, Step } from "./types";
 
@@ -35,7 +35,7 @@ export function findJump(text: string, journey: Journey, currentMomentId?: strin
 
 /**
  * Responde uma pergunta com a frase do conhecimento (do passo e do momento atuais) que mais combina.
- * Devolve null quando nada combina: aí a Puca anota a dúvida para a buddy, sem chutar.
+ * Devolve null quando nada combina: aí o Puca anota a dúvida para a buddy, sem chutar.
  */
 export function answerFromKnowledge(question: string, step?: Step | null, moment?: Moment | null): string | null {
   const words = keywords(question);

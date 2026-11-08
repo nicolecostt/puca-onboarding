@@ -1,5 +1,5 @@
 // Quadro da sessão (Figma: "03 · Aula no quadro"). Desenha nós, setas e selos e vai revelando aos poucos,
-// acompanhando a fala da Puca. Os dados vêm da jornada (ver from-journey.ts).
+// acompanhando a fala do Puca. Os dados vêm da jornada (ver from-journey.ts).
 //   const board = mountWhiteboard(el, spec);
 //   board.reveal(["gateway", "e-pos-gw"]); board.setFocus("gateway"); board.highlight(["dlq"], "warn");
 //   board.openCard("gateway"); board.flow(["e-pos-gw", "e-gw-topic"]); board.setSelectable(true);

@@ -1,4 +1,4 @@
-# Contexto de negócio da Puca
+# Contexto de negócio do Puca
 
 > Pesquisa de Joaquim, consolidada em 2026-11-07. Fontes e números conferidos na mesma data.
 > As decisões (quem compra, como cobramos, o que prometemos) estão no [`PRODUCT.md` §14](../../PRODUCT.md#14-modelo-de-negócio-quem-compra-e-como-cobramos). Aqui ficam o detalhe, o mercado e as evidências.
@@ -14,7 +14,7 @@ Cada afirmação tem uma destas etiquetas:
 - **Hipótese:** depende de validação comercial ou operacional.
 - **Evidência externa:** resultado de uma pesquisa, válido para a população e o método dela.
 
-Não transforme hipótese em decisão, interesse verbal em venda, funcionalidade planejada em pronta, nem evidência externa em resultado da Puca.
+Não transforme hipótese em decisão, interesse verbal em venda, funcionalidade planejada em pronta, nem evidência externa em resultado do Puca.
 
 ## 2. A dor, por quem sente
 
@@ -50,17 +50,17 @@ Antes de vender o contrato anual, definir o que uma integração cobre: duraçã
 | Esforço do buddy | Horas de apoio por integração e tipo de dúvida | Nem toda interação humana é desperdício |
 | Qualidade | Aceitação, retrabalho ou critério do gestor sobre a tarefa | Velocidade sem qualidade não é sucesso |
 | Clareza de papel | Perguntas fixas sobre responsabilidades, expectativas e próximos passos | Percepção complementa, não substitui o resultado da tarefa |
-| Uso efetivo | Pessoas que fazem atividades úteis com a Puca | Número de mensagens não prova valor |
+| Uso efetivo | Pessoas que fazem atividades úteis com o Puca | Número de mensagens não prova valor |
 
 Escolher 1 ou 2 por piloto. As métricas são agregadas e descrevem o processo de integração, nunca a competência de uma pessoa: valem as regras de privacidade do [`PRODUCT.md` §5](../../PRODUCT.md#5-visibilidade-para-buddy-gestor-e-rh).
 
-Retenção em 90 dias e produtividade anual interessam, mas amostra pequena e fatores externos dificultam atribuir a mudança à Puca: um piloto de 60 dias pode ser seguido de observação aos 90, sem prometer a resposta no fim do piloto. Não usar commits ou linhas de código como medida única de produtividade.
+Retenção em 90 dias e produtividade anual interessam, mas amostra pequena e fatores externos dificultam atribuir a mudança ao Puca: um piloto de 60 dias pode ser seguido de observação aos 90, sem prometer a resposta no fim do piloto. Não usar commits ou linhas de código como medida única de produtividade.
 
 ### 4.1. Conta econômica (quando houver dados)
 
 ```
 valor do tempo de apoio liberado = horas de apoio reduzidas × custo-hora aplicável
-benefício líquido estimado = benefícios medidos − preço da Puca − esforço extra de implantação e operação
+benefício líquido estimado = benefícios medidos − preço do Puca − esforço extra de implantação e operação
 ```
 
 Tempo liberado não é corte de folha nem de caixa. Não contar duas vezes o ganho de autonomia e as horas do buddy. Não converter estatística de pesquisa em economia garantida para um cliente.
@@ -96,7 +96,7 @@ Preço único em reais para o mundo simplifica o exercício e ignora país, moed
 
 `1,40 mi × 20% × 0,25 × R$ 900 ≈ R$ 63 mi/ano`
 
-> **Corrigido em 2026-11-07:** a pesquisa usava 1,44 mi de "profissionais CLT", sem fonte localizada. A base agora é a Brasscom ([Monitor de Empregos e Salários](https://brasscom.org.br/wp-content/uploads/2024/04/BRI2-2024-001-Monitor-de-Empregos-e-Salarios-2024-04-v10-versao-SITE.pdf) e [comunicado da Brasscom](https://brasscom.org.br/macrossetor-de-tic-ultrapassa-206-mi-de-trabalhadores-em-fevereiro-de-2024/), com dados de RAIS/CAGED): 1.403.318 pessoas empregadas nos segmentos de software, serviços de TIC e TI in-house em fev/2024. Esse total setorial é um proxy amplo, não uma contagem de desenvolvedores nem de pessoas elegíveis para a Puca. Como a base não é subconjunto da global (ocupações e anos diferentes), o SAM não é um recorte rigoroso do TAM.
+> **Corrigido em 2026-11-07:** a pesquisa usava 1,44 mi de "profissionais CLT", sem fonte localizada. A base agora é a Brasscom ([Monitor de Empregos e Salários](https://brasscom.org.br/wp-content/uploads/2024/04/BRI2-2024-001-Monitor-de-Empregos-e-Salarios-2024-04-v10-versao-SITE.pdf) e [comunicado da Brasscom](https://brasscom.org.br/macrossetor-de-tic-ultrapassa-206-mi-de-trabalhadores-em-fevereiro-de-2024/), com dados de RAIS/CAGED): 1.403.318 pessoas empregadas nos segmentos de software, serviços de TIC e TI in-house em fev/2024. Esse total setorial é um proxy amplo, não uma contagem de desenvolvedores nem de pessoas elegíveis para o Puca. Como a base não é subconjunto da global (ocupações e anos diferentes), o SAM não é um recorte rigoroso do TAM.
 
 ### 6.3. SOM (24 meses)
 
@@ -128,9 +128,9 @@ As empresas abaixo são alvos para investigar, não clientes, parceiros nem empr
 | Hotmart | Contratações ou mudanças de equipe com tarefas concretas |
 | PicPay | Integração técnica acompanhada por RH e gestor |
 | Vercel | Referência internacional; fora do SAM brasileiro, acesso comercial não demonstrado |
-| Tako | Conversa de descoberta a partir do contato de RH. A Tako também organiza o desafio do hackathon ([`PRODUCT.md` §12](../../PRODUCT.md#12-encaixe-no-desafio-tako-a-puca-como-digital-worker-de-onboarding)): no pitch, não apresentar como cliente-alvo nem como endosso |
+| Tako | Conversa de descoberta a partir do contato de RH. A Tako também organiza o desafio do hackathon ([`PRODUCT.md` §12](../../PRODUCT.md#12-encaixe-no-desafio-tako-o-puca-como-digital-worker-de-onboarding)): no pitch, não apresentar como cliente-alvo nem como endosso |
 
-**Exemplo de piloto (hipotético, Stone):** uma equipe e um responsável de RH; só fontes autorizadas (documentação de domínio, arquitetura, procedimentos, tarefas do piloto); atividades que mostrem autonomia e qualidade; comparação com integrações anteriores parecidas, quando houver. A Puca orienta, faz o encaminhamento do que não resolve e, no fim, o time revisa tempo bloqueado, esforço de apoio e resultado das tarefas. A continuidade depende do RH.
+**Exemplo de piloto (hipotético, Stone):** uma equipe e um responsável de RH; só fontes autorizadas (documentação de domínio, arquitetura, procedimentos, tarefas do piloto); atividades que mostrem autonomia e qualidade; comparação com integrações anteriores parecidas, quando houver. O Puca orienta, faz o encaminhamento do que não resolve e, no fim, o time revisa tempo bloqueado, esforço de apoio e resultado das tarefas. A continuidade depende do RH.
 
 ## 8. Concorrência
 
@@ -144,7 +144,7 @@ As empresas abaixo são alvos para investigar, não clientes, parceiros nem empr
 
 São perguntas, não afirmações de que o concorrente não tem a funcionalidade. "Não encontrado" não é "inexistente".
 
-**Sana Learn (conferido em 2026-11-07):** a [página de preços](https://sanalabs.com/products/sana-learn/pricing) não mostra valores. A cobrança é por usuário por mês, o plano "Built to scale" começa em 300 usuários e o Enterprise tem preço sob consulta. A página cita "an AI Tutor for every learner". A Sana tem oferta específica de [onboarding de funcionários](https://sanalabs.com/products/sana-learn/solutions/employee-onboarding): "Every new hire gets an AI tutor on day one." Isso confirma que a categoria já oferece tutor com IA para quem chega: o diferencial da Puca precisa estar na forma (voz com quadro, calibragem, encaminhamento, transição entre times), não em "ter IA". O "onboarding" do FAQ de preços é a implantação da própria Sana, não a integração de funcionários.
+**Sana Learn (conferido em 2026-11-07):** a [página de preços](https://sanalabs.com/products/sana-learn/pricing) não mostra valores. A cobrança é por usuário por mês, o plano "Built to scale" começa em 300 usuários e o Enterprise tem preço sob consulta. A página cita "an AI Tutor for every learner". A Sana tem oferta específica de [onboarding de funcionários](https://sanalabs.com/products/sana-learn/solutions/employee-onboarding): "Every new hire gets an AI tutor on day one." Isso confirma que a categoria já oferece tutor com IA para quem chega: o diferencial do Puca precisa estar na forma (voz com quadro, calibragem, encaminhamento, transição entre times), não em "ter IA". O "onboarding" do FAQ de preços é a implantação da própria Sana, não a integração de funcionários.
 
 Conexões com sistemas, RAG, agentes, voz e computer use são meios. Viram argumento comercial quando produzem um resultado útil, demonstrável e relevante para o RH e para a pessoa. Não alegar ausência de concorrência, melhor precisão, redução percentual de tempo, vantagem de dados ou barreira à cópia sem evidência. A comparação completa é a #43; o que o Orbis faz de verdade é a #74.
 
@@ -154,7 +154,7 @@ Conversas com pessoas sobre a dor, incluindo uma profissional de RH da Tako que 
 
 ## 10. Evidências externas
 
-Sustentam o problema, não o resultado da Puca. Pesquisas de fornecedor têm interesse comercial; respostas voluntárias não representam todos os trabalhadores; correlação não é causa. Não empilhar estatísticas de fontes diferentes como se fossem a mesma amostra.
+Sustentam o problema, não o resultado do Puca. Pesquisas de fornecedor têm interesse comercial; respostas voluntárias não representam todos os trabalhadores; correlação não é causa. Não empilhar estatísticas de fontes diferentes como se fossem a mesma amostra.
 
 **Para o pitch, priorizar:** F07 (contexto na cabeça das pessoas), F08 (esperar resposta interrompe o trabalho), F03 (onboarding focado em administração) e F06 (clareza de papel cai nos primeiros meses, dado brasileiro).
 
@@ -178,12 +178,12 @@ Sustentam o problema, não o resultado da Puca. Pesquisas de fornecedor têm int
 | F16 | [Santos et al., revisão sistemática, arXiv 2024](https://arxiv.org/abs/2408.15989) | 32 estudos de soluções de software para onboarding em projetos de software; barreiras ainda não cobertas | Não comprova falta de concorrentes comerciais |
 | F17 | [Brynjolfsson, Li e Raymond, QJE 2025](https://academic.oup.com/qje/article/140/2/889/7990658) (140(2):889–942) | Assistente de IA para 5.172 agentes de atendimento: +15% de problemas resolvidos por hora, com ganho maior para quem tem menos experiência | Atendimento não é engenharia; não usar os 14% e 5.179 da versão NBER de 2023 junto |
 | M1 | SlashData, [tendências de 2025](https://www.slashdata.co/post/global-developer-population-trends-2025-how-many-developers-are-there) e [Developer Population](https://www.slashdata.co/developer-population) | Início de 2025: 47,2 mi de desenvolvedores no total, dos quais 36,5 mi profissionais. 3º tri de 2025: 48,4 mi no total (sem recorte de profissionais) | Base do TAM; estimativa por modelo, não censo. Outras casas usam outras definições (IDC, Evans Data): não misturar |
-| M2 | Brasscom, [Monitor de Empregos e Salários, abr/2024](https://brasscom.org.br/wp-content/uploads/2024/04/BRI2-2024-001-Monitor-de-Empregos-e-Salarios-2024-04-v10-versao-SITE.pdf) e [comunicado de abr/2024](https://brasscom.org.br/macrossetor-de-tic-ultrapassa-206-mi-de-trabalhadores-em-fevereiro-de-2024/) (RAIS/CAGED) | 1.403.318 pessoas empregadas nos segmentos de software, serviços de TIC e TI in-house em fev/2024 | Proxy setorial amplo para o SAM; não conta especificamente desenvolvedores ou pessoas elegíveis para a Puca |
+| M2 | Brasscom, [Monitor de Empregos e Salários, abr/2024](https://brasscom.org.br/wp-content/uploads/2024/04/BRI2-2024-001-Monitor-de-Empregos-e-Salarios-2024-04-v10-versao-SITE.pdf) e [comunicado de abr/2024](https://brasscom.org.br/macrossetor-de-tic-ultrapassa-206-mi-de-trabalhadores-em-fevereiro-de-2024/) (RAIS/CAGED) | 1.403.318 pessoas empregadas nos segmentos de software, serviços de TIC e TI in-house em fev/2024 | Proxy setorial amplo para o SAM; não conta especificamente desenvolvedores ou pessoas elegíveis para o Puca |
 
 ### 10.1. Frases proibidas
 
 - "A maioria das demissões ocorre nos primeiros 90 dias."
-- "A Puca reduz o turnover em X%" (sem medição própria).
+- "O Puca reduz o turnover em X%" (sem medição própria).
 - "Vamos recuperar todas as horas gastas buscando informação."
 - "A IA aumenta em 15% a produtividade de qualquer profissional."
 - "Temos clientes na lista de empresas citadas."
@@ -193,7 +193,7 @@ Sustentam o problema, não o resultado da Puca. Pesquisas de fornecedor têm int
 
 ## 11. Narrativa para o pitch
 
-> “Ajudamos empresas a transformar contexto interno em orientação para quem entra ou muda de equipe. A Puca apoia o aprendizado e as primeiras tarefas para que a pessoa ganhe autonomia, enquanto buddies e gestores concentram o tempo onde o apoio humano faz diferença. A empresa contrata com aprovação do RH, começando por um piloto pago que vira contrato anual por integração.”
+> “Ajudamos empresas a transformar contexto interno em orientação para quem entra ou muda de equipe. O Puca apoia o aprendizado e as primeiras tarefas para que a pessoa ganhe autonomia, enquanto buddies e gestores concentram o tempo onde o apoio humano faz diferença. A empresa contrata com aprovação do RH, começando por um piloto pago que vira contrato anual por integração.”
 
 A frase descreve a proposta. Antes de usá-la como capacidade pronta, conferir o que a demo mostra de verdade ([`docs/demo.md`](../demo.md)). Números só entram depois de medição própria, com método e limites.
 

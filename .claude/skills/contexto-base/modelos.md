@@ -49,7 +49,7 @@ Use só estes, sempre no começo do bloco:
 | `> **Exemplo:** …` | Um caso concreto |
 | `> **Hipótese …:** …` | Algo a validar, não um fato |
 | `> Alinhamento com <quem> em AAAA-MM-DD.` | A seção (ou parte) veio de uma conversa |
-| `> “…”` | Fala de exemplo da Puca ou da pessoa |
+| `> “…”` | Fala de exemplo do Puca ou da pessoa |
 
 ## PRODUCT.md — referências
 
@@ -62,7 +62,7 @@ No grupo `##` certo (Pessoas e papéis, Perfis, Conversa, Jornada, Quadro, Fonte
 
 ```markdown
 **Encaminhamento**:
-Quando a Puca admite que não achou fonte confiável e leva a dúvida, com contexto, ao buddy ou responsável.
+Quando o Puca admite que não achou fonte confiável e leva a dúvida, com contexto, ao buddy ou responsável.
 _Avoid_: escalonamento, fallback
 ```
 

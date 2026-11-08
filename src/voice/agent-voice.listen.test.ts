@@ -100,7 +100,7 @@ async function ouvindo() {
   return { voice, estados, falas };
 }
 
-describe("microfone da Puca", () => {
+describe("microfone do Puca", () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();

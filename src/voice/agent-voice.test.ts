@@ -46,7 +46,7 @@ describe("createAgentVoice com o áudio bloqueado", () => {
     await vi.advanceTimersByTimeAsync(AUDIO_RESUME_TIMEOUT_MS);
     await ok;
     vi.useRealTimers();
-    await voice.speak("Oi, eu sou a Puca.");
+    await voice.speak("Oi, eu sou o Puca.");
     expect(fetch.mock.calls.map((c) => c[0])).toEqual(["/api/health"]);
   });
 

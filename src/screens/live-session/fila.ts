@@ -15,7 +15,7 @@ export interface FilaDoSlack {
 /**
  * Envia tudo o que está pendente, um item de cada vez: encaminhamentos primeiro (a dúvida da pessoa espera), depois
  * pedidos de aprovação. Volta a olhar as duas filas depois de cada item, porque a sessão pode criar um encaminhamento
- * enquanto a Puca ainda digita o pedido. Um encaminhamento abre a DM da buddy por cima da do gestor: no fim, `restaurar`
+ * enquanto o Puca ainda digita o pedido. Um encaminhamento abre a DM da buddy por cima da do gestor: no fim, `restaurar`
  * traz de volta o pedido que ainda espera aprovação, com o botão.
  */
 export async function drenar(o: FilaDoSlack): Promise<void> {

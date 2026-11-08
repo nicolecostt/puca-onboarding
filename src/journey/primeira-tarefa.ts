@@ -1,4 +1,4 @@
-// Primeira tarefa (PRODUCT.md §4.4 e §12.1, passo 5): a Puca entrega uma tarefa do catálogo que o time aprovou e pede
+// Primeira tarefa (PRODUCT.md §4.4 e §12.1, passo 5): o Puca entrega uma tarefa do catálogo que o time aprovou e pede
 // a aprovação do gestor. O catálogo são os nós `kind: "task"` da jornada; a sessão cria o pedido quando o cartão da
 // tarefa abre, e a tela do Slack (screens/live-session) envia ao gestor e grava a aprovação. Formato em docs/contratos.md.
 import { pendentes, proximaTentativa, type Reivindicavel } from "./claim-queue";
@@ -140,7 +140,7 @@ export function createPedidos(store: KeyValueStore, opts: { now?: () => Date } =
 
 export type Pedidos = ReturnType<typeof createPedidos>;
 
-/** Texto que a Puca manda ao gestor no Slack. Não supõe o gênero de ninguém. */
+/** Texto que o Puca manda ao gestor no Slack. Não supõe o gênero de ninguém. */
 export function pedidoMessage(p: PedidoDeAprovacao): string {
   // sem nome, profile.nome vira "você" (journey/profile.ts)
   const nome = p.pessoa.trim();

@@ -20,7 +20,7 @@ como exemplo do que já funciona.
    e onde a pessoa responde (`wait`) ou toca num nó (`select`). Confirme o esboço com a pessoa.
 2. **Escreva o quadro** (`boards`): nós com `id`, `label`, `x`, `y` (quadro de 1440 × 844) e `kind`; arestas com `from`/`to`.
 3. **Escreva os momentos e passos.** `line` é orientação de fala, não texto decorado. Use `{nome}`, `{time}`, `{gestor}`
-   para personalizar. Coloque o que a Puca só diz se perguntarem em `knowledge`.
+   para personalizar. Coloque o que o Puca só diz se perguntarem em `knowledge`.
 4. **Valide.** O teste valida só a demo. Para um arquivo novo, valide assim:
    ```bash
    npx vitest run src/journey   # demo continua válida
@@ -39,4 +39,4 @@ como exemplo do que já funciona.
 - Passo `wait` sem pergunta e sem `suggested_replies`; passo `select` sem `expect` completo.
 - `{ "step": … }` só aponta para passo do mesmo momento.
 
-Regra do produto: sem fonte confirmada, use `owner_confirmed: false`. A Puca não inventa responsável.
+Regra do produto: sem fonte confirmada, use `owner_confirmed: false`. O Puca não inventa responsável.

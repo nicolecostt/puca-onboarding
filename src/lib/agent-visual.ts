@@ -1,4 +1,4 @@
-// Visual do agente: a esfera de pontos da Puca (puca-sphere.ts), usada em todas as telas.
+// Visual do agente: a esfera de pontos do Puca (puca-sphere.ts), usada em todas as telas.
 // Se der erro ao carregar, as telas usam um círculo neutro no lugar.
 
 export type AgentVisualState = "idle" | "think" | "talk";
@@ -23,7 +23,7 @@ export async function loadAgentVisual(): Promise<AgentVisualFactory | null> {
   try {
     return (await import("./puca-sphere")).mountPucaSphere;
   } catch (err) {
-    console.warn("Não foi possível carregar o visual da Puca:", err);
+    console.warn("Não foi possível carregar o visual do Puca:", err);
     return null;
   }
 }

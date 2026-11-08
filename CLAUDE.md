@@ -1,6 +1,6 @@
 # Instruções para agentes
 
-Front do Orbis + servidor da Puca (agente de onboarding por voz). Vite + TypeScript sem framework; servidor Fastify sem estado em `server/`.
+Front do Orbis + servidor do Puca (agente de onboarding por voz). Vite + TypeScript sem framework; servidor Fastify sem estado em `server/`.
 
 Somos 4 pessoas, cada uma com seu agente, e todo mundo mexe um pouco em tudo. Sessões não compartilham memória:
 o que não estiver no código, numa issue, num PR ou nestes docs, os outros agentes não sabem.
@@ -51,15 +51,16 @@ Entre polir o que já funciona e fazer um passo desse fluxo funcionar, escolha o
 
 ## Regras do projeto
 
-- A resposta nunca espera o LLM. Toda fala passa por `src/journey/route.ts`, do caminho mais barato ao mais caro; o LLM é o último.
-- A sessão (`src/screens/lesson/`) conduz a jornada no app; o servidor dá voz, LLM e as ações nos sistemas da Kota
+- A sessão nunca fica muda. O LLM conduz cada turno (`/api/turn`, decisão 0010) com a jornada como pauta, e a ponte
+  cobre a espera; sem servidor, sem LLM ou com a trava esgotada, a sessão segue a jornada como roteiro pela `src/journey/route.ts`.
+- A sessão (`src/screens/lesson/`) guarda onde a jornada está no app; o servidor dá voz, LLM e as ações nos sistemas da Kota
   (Slack, GitHub), sem guardar estado de sessão: o que precisa durar vai para o Supabase ([`docs/stack.md`](docs/stack.md) §5).
-- Telas rodam no app para Mac (Electron, decisões 0004 e 0008). A `live-session` é a casa do navegador da Puca, que fica
+- Telas rodam no app para Mac (Electron, decisões 0004 e 0008). A `live-session` é a casa do navegador do Puca, que fica
   por cima do HTML: barra de call, chat e câmera vão **em volta** da área dele, nunca por cima (vale para o navegador
   de verdade; o Slack simulado de hoje continua com os controles por cima e não sai). Recurso do app só com
   `window.orbis`, depois de o formato estar em `docs/contratos.md`; sem ele (`npm run dev` no navegador), a tela segue
   com o simulado ([`docs/stack.md`](docs/stack.md) §3.2 e §4.2).
-- Sem fonte confiável, a Puca diz que não confirmou e encaminha para a buddy. Nunca inventar responsável por um sistema.
+- Sem fonte confiável, o Puca diz que não confirmou e encaminha para a buddy. Nunca inventar responsável por um sistema.
 - Textos de interface, comentários e docs em português.
 - Framework, banco, serviço externo ou mudança de stack: registre a decisão em `docs/decisoes/` antes de implementar.
 

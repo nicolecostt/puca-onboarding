@@ -1,4 +1,4 @@
-// Pontinhos coloridos da Puca: versão pequena dela, no lugar da esfera em espaços pequenos (aviso, legenda).
+// Pontinhos coloridos do Puca: versão pequena dele, no lugar da esfera em espaços pequenos (aviso, legenda).
 // Muitas bolinhas pequenas com a cor da faixa se movem dentro de um círculo e interagem: são puxadas para o
 // centro, se empurram quando chegam perto e, ao passar perto, uma puxa a cor da outra (as cores se misturam).
 // Não gira. Só anima quando aparece na tela; com movimento reduzido, fica parada.

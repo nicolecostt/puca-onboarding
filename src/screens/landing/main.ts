@@ -12,7 +12,7 @@ import type { BoardNode, Journey } from "../../journey/types";
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// ---- Puca: pontinhos na legenda do quadro, esfera grande na seção dela ----
+// ---- Puca: pontinhos na legenda do quadro, esfera grande na seção dele ----
 async function mountSpheres(): Promise<AgentVisual | null> {
   mountPucaDots(qs<HTMLElement>(document, "#puca-orb"));
   const factory = await loadAgentVisual();
@@ -117,7 +117,7 @@ function cardFor(id: string): NodeCard | null {
 function mountBoard(): void {
   const canvas = qs<HTMLElement>(document, ".board__canvas");
   const field = (name: string) => qs<HTMLElement>(canvas, `[data-card="${name}"]`);
-  // marcar = true pinta o nó de preto (escolha da pessoa); no início o cartão só mostra o foco da Puca.
+  // marcar = true pinta o nó de preto (escolha da pessoa); no início o cartão só mostra o foco do Puca.
   const select = (id: string, marcar = true) => {
     const info = cardFor(id);
     if (!info) return;

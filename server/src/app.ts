@@ -1,5 +1,6 @@
 // API do agente (sem estado): fala → áudio, pergunta → ponte + LLM por SSE, token do STT e áudio do TTS.
-// Quem conduz a sessão é a tela (src/screens/lesson), com o runner da jornada.
+// A tela guarda onde a sessão está; o LLM conduz cada turno pelo /api/turn (decisão 0010), e o /api/ask fica
+// para o roteiro (plano B, sem LLM).
 // Contrato "API do servidor" em docs/contratos.md: token do Supabase, limites por pessoa, travas diárias e CORS.
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -10,6 +11,9 @@ import { DEMO_PROFILES } from "../../src/journey/profile";
 import type { Journey, Profile } from "../../src/journey/types";
 import { loadJourney } from "../../src/journey/validate";
 import { ask, type AskEvent } from "./agent/ask";
+import { notionDaKota } from "./agent/kota";
+import { turn, type TurnEvent, type TurnKind } from "./agent/turn";
+import { CAMPOS_DA_CALL, TEMAS_DE_CULTURA, callTurn, type CallEvent, type CampoDaCall } from "./agent/call";
 import { bearer, criaVerificaToken, type VerificaToken } from "./auth";
 import type { ChatMessage } from "./llm";
 import { env } from "./env";
@@ -44,7 +48,7 @@ function writeHead(reply: FastifyReply, headers: Record<string, string>): void {
   reply.raw.writeHead(200, { ...(reply.getHeaders() as Record<string, string>), ...headers });
 }
 
-function sse(reply: FastifyReply): (ev: AskEvent) => void {
+function sse(reply: FastifyReply): (ev: AskEvent | TurnEvent | CallEvent) => void {
   writeHead(reply, { "Content-Type": "text/event-stream", "Cache-Control": "no-store", Connection: "keep-alive", "X-Accel-Buffering": "no" });
   return (ev) => reply.raw.write(`data: ${JSON.stringify(ev)}\n\n`);
 }
@@ -80,12 +84,17 @@ export interface BuildAppOptions {
   /** Travas diárias globais; padrão: LIMITE_DIARIO_* do ambiente. */
   limiteDiario?: { llm?: number; tts?: number; stt?: number };
   corsOrigins?: string[];
+  /** Conhecimento da empresa para o turno; padrão: o Notion da Kota do kit. */
+  knowledge?: string;
   /** Para testes: substitui a geração do token do Deepgram. */
   mintSttToken?: typeof mintSttToken;
 }
 
 export function buildApp(opts: BuildAppOptions = {}) {
   const journey = opts.journey ?? loadDemoJourney();
+  const knowledge = opts.knowledge ?? notionDaKota();
+  // há LLM configurado: a tela deixa o LLM conduzir a sessão (decisão 0010)
+  const llmKey = !!(process.env.ANTHROPIC_API_KEY || process.env.FEATHERLESS_API_KEY);
   const tts = opts.tts === undefined ? tryCreateTts() : opts.tts;
   const verificaToken = opts.verificaToken === undefined ? tryCreateVerificaToken() : opts.verificaToken;
   const limites = { ...env.limiteDiario, ...opts.limiteDiario };
@@ -116,7 +125,7 @@ export function buildApp(opts: BuildAppOptions = {}) {
   });
 
   app.register(async (api) => {
-    api.get("/api/health", async () => ({ ok: true, tts: !!tts && !trava.tts.esgotada(), stt: !!env.deepgramKey && !trava.stt.esgotada(), model: env.model }));
+    api.get("/api/health", async () => ({ ok: true, tts: !!tts && !trava.tts.esgotada(), stt: !!env.deepgramKey && !trava.stt.esgotada(), llm: llmKey && !trava.llm.esgotada(), model: env.model }));
 
     /** Fala da jornada → id do áudio (do cache quando já foi gerada). */
     api.post<{ Body: { text?: string } }>("/api/speak", { config: POR_MINUTO(120) }, async (req, reply) => {
@@ -158,6 +167,69 @@ export function buildApp(opts: BuildAppOptions = {}) {
         req.log.info({ moment: moment.id, step: step.id, pessoa: req.pessoa?.id, timing }, "ask");
       },
     );
+
+    /** Um turno da sessão conduzido pelo LLM (contrato "Turno da sessão"). */
+    api.post<{
+      Body: { kind?: string; text?: string; moment_id?: string; step_id?: string; perfil?: "novo" | "transicao"; profile?: Profile; history?: ChatMessage[]; interrupted?: { said?: string } };
+    }>("/api/turn", { config: POR_MINUTO(60) }, async (req, reply) => {
+      const b = req.body ?? {};
+      const kind = (["inicio", "seguir", "fala", "silencio"] as const).find((k) => k === b.kind) as TurnKind | undefined;
+      const text = String(b.text ?? "").trim().slice(0, MAX_TEXT);
+      const moment = journey.moments.find((m) => m.id === b.moment_id);
+      const step = moment?.steps.find((s) => s.id === b.step_id);
+      if (!kind || !moment || !step || (kind === "fala" && !text)) return reply.status(400).send({ error: "kind, moment_id e step_id válidos são obrigatórios (e text numa fala)" });
+      if (!trava.llm.usa()) return reply.status(503).send({ error: "limite_diario" });
+      const history = (b.history ?? [])
+        .filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+        .slice(-12)
+        .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_TEXT) }));
+      const said = typeof b.interrupted?.said === "string" ? b.interrupted.said.slice(0, MAX_TEXT) : undefined;
+      const ac = new AbortController();
+      reply.raw.on("close", () => { if (!reply.raw.writableFinished) ac.abort(); });
+      const emit = sse(reply);
+      const timing = await turn(
+        { journey, knowledge, profile: perfilSeguro(b.profile, b.perfil), momentId: moment.id, stepId: step.id, kind, text, interrupted: said, history, tts, model: env.model, timeoutMs: Math.max(env.llmTimeoutMs, 15000), signal: ac.signal },
+        emit,
+      );
+      reply.raw.end();
+      req.log.info({ kind, moment: moment.id, step: step.id, pessoa: req.pessoa?.id, timing }, "turn");
+    });
+
+    /** Um turno da call inicial conduzida pelo LLM (contrato "Call inicial"). */
+    api.post<{
+      Body: { kind?: string; text?: string; history?: ChatMessage[]; interrupted?: { said?: string }; admissao?: Record<string, unknown>; anotado?: Record<string, unknown>; cultura?: unknown[] };
+    }>("/api/call", { config: POR_MINUTO(60) }, async (req, reply) => {
+      const b = req.body ?? {};
+      const kind = (["inicio", "fala", "silencio"] as const).find((k) => k === b.kind);
+      const text = String(b.text ?? "").trim().slice(0, MAX_TEXT);
+      if (!kind || (kind === "fala" && !text)) return reply.status(400).send({ error: "kind válido é obrigatório (e text numa fala)" });
+      if (!trava.llm.usa()) return reply.status(503).send({ error: "limite_diario" });
+      const curto = (v: unknown) => (typeof v === "string" ? v.slice(0, MAX_CAMPO_PERFIL) : undefined);
+      const ad = b.admissao ?? {};
+      const anotado: Partial<Record<CampoDaCall, string>> = {};
+      for (const k of CAMPOS_DA_CALL) {
+        const v = curto(b.anotado?.[k]);
+        if (v) anotado[k] = v;
+      }
+      const history = (b.history ?? [])
+        .filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+        .slice(-16)
+        .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_TEXT) }));
+      const ac = new AbortController();
+      reply.raw.on("close", () => { if (!reply.raw.writableFinished) ac.abort(); });
+      const emit = sse(reply);
+      const timing = await callTurn(
+        {
+          knowledge, kind, text, history, anotado, tts, model: env.model,
+          cultura: (b.cultura ?? []).filter((t): t is string => typeof t === "string" && TEMAS_DE_CULTURA.includes(t)), timeoutMs: Math.max(env.llmTimeoutMs, 15000), signal: ac.signal,
+          interrupted: curto(b.interrupted?.said),
+          admissao: { nome: curto(ad.nome), cargo: curto(ad.cargo), time: curto(ad.time), gestor: curto(ad.gestor) },
+        },
+        emit,
+      );
+      reply.raw.end();
+      req.log.info({ kind, pessoa: req.pessoa?.id, timing }, "call");
+    });
 
     api.post("/api/voice/token", { config: POR_MINUTO(20) }, async (_req, reply) => {
       if (!trava.stt.usa()) return reply.status(503).send({ error: "limite_diario" });

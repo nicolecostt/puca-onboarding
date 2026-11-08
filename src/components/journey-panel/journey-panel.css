@@ -4,9 +4,9 @@
   position: fixed;
   left: 16px;
   top: 72px;
-  z-index: 996; /* abaixo do cursor da Puca, da câmera, do chat e da barra de call */
+  z-index: 996; /* abaixo do cursor do Puca, da câmera, do chat e da barra de call */
   width: 280px;
-  max-height: calc(100vh - 72px - 190px); /* não chega na fala da Puca */
+  max-height: calc(100vh - 72px - 190px); /* não chega na fala do Puca */
   display: flex;
   flex-direction: column;
   overflow: hidden;

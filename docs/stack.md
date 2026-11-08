@@ -12,7 +12,7 @@ escolhas estão registradas em `docs/decisoes/` (0004, 0006, 0007, 0008); este d
 1. [Visão geral](#1-visão-geral)
 2. [Princípios](#2-princípios)
 3. [App para Mac (Electron)](#3-app-para-mac-electron)
-4. [Navegador da Puca (computer use)](#4-navegador-da-puca-computer-use)
+4. [Navegador do Puca (computer use)](#4-navegador-da-puca-computer-use)
 5. [Servidor (Fly.io)](#5-servidor-flyio)
 6. [Login e dados (Supabase)](#6-login-e-dados-supabase)
 7. [LLM (Claude Haiku 5.5)](#7-llm-claude-haiku-55)
@@ -35,13 +35,13 @@ escolhas estão registradas em `docs/decisoes/` (0004, 0006, 0007, 0008); este d
 |---|---|---|---|
 | App | Electron em volta do front atual (Vite + TypeScript sem framework), arquivos do front dentro do app | Mac do jurado | 0004 |
 | Distribuição | `.zip` nos Releases do GitHub + `curl -fsSL …/instalar.sh \| bash`, sem conta da Apple | GitHub | 0004 |
-| Computer use | Navegador da Puca dentro do app, controlado pelo protocolo de depuração do Chromium | Mac do jurado | 0008 |
+| Computer use | Navegador do Puca dentro do app, controlado pelo protocolo de depuração do Chromium | Mac do jurado | 0008 |
 | Servidor | O Fastify de `server/`, como **um processo sempre ligado** | Fly.io, uma máquina | 0006 |
 | Login | Supabase Auth: login anônimo por instalação, com nome e perfil | Supabase | 0006 |
 | Dados da pessoa | Supabase Postgres com RLS; o app grava local primeiro e sincroniza | Supabase + Mac | 0006 |
-| Arquivos | Supabase Storage (cache de áudio da Puca) | Supabase | 0006 |
+| Arquivos | Supabase Storage (cache de áudio do Puca) | Supabase | 0006 |
 | LLM | Claude Haiku 5.5 sem raciocínio, pelo SDK oficial | API da Anthropic | 0007 |
-| Voz | Deepgram (fala da pessoa, do app direto) e ElevenLabs Flash v2.5 (fala da Puca, pelo servidor) | provedores | — |
+| Voz | Deepgram (fala da pessoa, do app direto) e ElevenLabs Flash v2.5 (fala do Puca, pelo servidor) | provedores | — |
 | Conhecimento | Cópias locais do kit da Kota (`kota-bank` e Notion) com índice de busca de texto no servidor | servidor | #25, #26 |
 | Ações reais | Slack da Kota pela API, com o bot; GitHub com token de escopo mínimo | servidor | 0008 |
 
@@ -51,9 +51,9 @@ Mac do jurado                                       Nuvem
 │ Orbis.app (Electron)                 │  HTTPS    │ Fly.io: server/ (Fastify)    │
 │  ├ janela do Orbis (front Vite)  ────┼──────────▶│  /api/ask   → Claude Haiku   │
 │  │   motor da jornada, quadro, voz   │  SSE/PCM  │  /api/speak → ElevenLabs     │
-│  ├ navegador da Puca (WebContents)   │◀──────────┼  /api/encaminhamentos → Slack│
+│  ├ navegador do Puca (WebContents)   │◀──────────┼  /api/encaminhamentos → Slack│
 │  │   GitHub · Notion · Slack web     │           │  índice do kit da Kota       │
-│  │   camada da Puca (desenho, cursor)│           └──────────────┬───────────────┘
+│  │   camada do Puca (desenho, cursor)│           └──────────────┬───────────────┘
 │  └ fila local (localStorage) ────────┼──── supabase-js ───▶ Supabase (Auth, Postgres, Storage)
 │ microfone ──── WebSocket (token curto) ───────────────────▶ Deepgram
 └──────────────────────────────────────┘
@@ -63,15 +63,16 @@ Mac do jurado                                       Nuvem
 
 ## 2. Princípios
 
-1. **A resposta nunca espera o LLM** (regra do `CLAUDE.md`). Toda fala passa por `src/journey/route.ts`; o LLM é o
-   último caminho e começa com uma ponte. A rede também não: o conhecimento vem de cópias locais.
-2. **A sessão nunca trava por causa de infraestrutura.** Supabase fora do ar, Slack lento ou o navegador da Puca
+1. **A sessão nunca fica muda** (regra do `CLAUDE.md`, decisão 0010). O LLM conduz cada turno pelo `/api/turn`, com a
+   jornada como pauta e uma ponte se a primeira frase demorar; sem servidor, sem LLM ou com a trava esgotada, a sessão
+   segue a jornada como roteiro pela `src/journey/route.ts`. O conhecimento vem de cópias locais (o Notion da Kota no prompt).
+2. **A sessão nunca trava por causa de infraestrutura.** Supabase fora do ar, Slack lento ou o navegador do Puca
    sem login: a sessão segue e a pendência fica na fila local, no rastro ou num aviso curto.
 3. **Nenhuma chave de API no app.** O app só conhece o endereço do servidor e a chave pública do Supabase
    (feita para ficar no cliente, protegida por RLS). Toda chave paga fica no servidor.
-4. **Guarda em código, não no prompt.** O que a Puca pode abrir e fazer é limitado por lista e por confirmação no
+4. **Guarda em código, não no prompt.** O que o Puca pode abrir e fazer é limitado por lista e por confirmação no
    código do app e do servidor; o prompt só orienta.
-5. **Tudo que a Puca afirma tem fonte no kit da Kota** (`PRODUCT.md` §13). Sem fonte, encaminhamento.
+5. **Tudo que o Puca afirma tem fonte no kit da Kota** (`PRODUCT.md` §13). Sem fonte, encaminhamento.
 6. **`npm run dev` no navegador continua funcionando** sem Electron, sem Supabase e sem servidor, com o computer
    use simulado de hoje. Cada peça nova detecta se está disponível e cai no comportamento atual se não estiver.
 
@@ -85,7 +86,7 @@ Decisão: [0004](decisoes/0004-app-desktop-electron.md). MVP só para macOS (App
 
 - O front atual roda sem mudança: é o mesmo Chromium do desenvolvimento.
 - Medido em 2026-11-08 (Mac M4): a sessão gasta ~33% de um núcleo no Electron contra ~28% no Chrome; o custo é da
-  página, não do Electron. A camada transparente com o cursor da Puca gasta ~6%.
+  página, não do Electron. A camada transparente com o cursor do Puca gasta ~6%.
 - Swift exigiria reescrever ~8.900 linhas de front; Tauri usa o motor do Safari e pede Rust.
 
 ### 3.2. Estrutura **(proposta)**
@@ -97,7 +98,7 @@ desktop/
   navegador/
     cdp.ts           cliente do protocolo de depuração (webContents.debugger)
     camada.ts        script injetado na página: desenho, cursor, cartões
-    acoes.ts         as ações da Puca (tabela da §4.3)
+    acoes.ts         as ações do Puca (tabela da §4.3)
     fila.ts          fila de ações com cancelamento
     guarda.ts        lista de endereços permitidos e ações que pedem confirmação
     pessoa.ts        o que a pessoa faz na página (cliques, navegação)
@@ -135,10 +136,10 @@ window.orbis = {
 
 ### 3.3. Microfone
 
-- `extendInfo.NSMicrophoneUsageDescription` no `electron-builder.yml` ("A Puca usa o microfone para conversar com você").
+- `extendInfo.NSMicrophoneUsageDescription` no `electron-builder.yml` ("O Puca usa o microfone para conversar com você").
 - No início, `systemPreferences.askForMediaAccess("microphone")`; negado, o app mostra o caminho em Ajustes e a sessão
   segue pelo chat.
-- `session.setPermissionRequestHandler` libera `media` só para a origem do Orbis, nunca para o navegador da Puca.
+- `session.setPermissionRequestHandler` libera `media` só para a origem do Orbis, nunca para o navegador do Puca.
 - O computer use dentro do app **não** pede Acessibilidade nem Gravação de tela.
 
 ### 3.4. Empacotamento e instalação
@@ -185,31 +186,31 @@ curl -fsSL https://raw.githubusercontent.com/nicolecostt/puca-onboarding/main/sc
 
 ---
 
-## 4. Navegador da Puca (computer use)
+## 4. Navegador do Puca (computer use)
 
 Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issue: #123.
 
 ### 4.1. O que é
 
-Uma área da janela do Orbis com um navegador de verdade (um `WebContentsView`), onde a Puca abre o GitHub, o Notion
+Uma área da janela do Orbis com um navegador de verdade (um `WebContentsView`), onde o Puca abre o GitHub, o Notion
 e o Slack da Kota na versão web e opera pelo protocolo de depuração do Chromium (`webContents.debugger`, versão
 `1.3`). A pessoa vê tudo acontecer e pode mexer na mesma página quando quiser.
 
-Provado em 2026-11-08 no `kota-bank` de verdade: cursor da Puca, círculo à mão, cartão com imagem e seta, clique real
+Provado em 2026-11-08 no `kota-bank` de verdade: cursor do Puca, círculo à mão, cartão com imagem e seta, clique real
 que abriu o `README.md`, marca-texto, fila cancelada 0,2 s depois de a pessoa falar por cima, clique da pessoa
 percebido (`{ texto: "Issues", confiavel: true }`).
 
 ### 4.2. Layout
 
-- A tela `live-session` vira a casa do navegador: a barra de call, o chat e a câmera da Puca ficam **em volta** da
+- A tela `live-session` vira a casa do navegador: a barra de call, o chat e a câmera do Puca ficam **em volta** da
   área do navegador, não por cima. O `WebContentsView` é desenhado acima do HTML do Orbis, então nada do front
   consegue ficar por cima dele.
 - O front mede a área reservada (`getBoundingClientRect`) e chama `orbis.navegador.mostrar(bounds)` sempre que ela
   muda (`ResizeObserver`).
-- O que a Puca desenha **dentro** da página (cursor, círculo, cartão) vem da camada da §4.4, então fica por cima do
+- O que o Puca desenha **dentro** da página (cursor, círculo, cartão) vem da camada da §4.4, então fica por cima do
   site e acompanha a rolagem.
 
-### 4.3. As ações da Puca **(proposta de contrato)**
+### 4.3. As ações do Puca **(proposta de contrato)**
 
 Cada ação é um objeto pequeno, no mesmo espírito das ações do quadro (`BoardAction`): a jornada descreve, o app
 executa. O alvo é achado **pelo texto visível ou por seletor**, nunca por coordenada fixa.
@@ -217,7 +218,7 @@ executa. O alvo é achado **pelo texto visível ou por seletor**, nunca por coor
 | Ação | O que faz | Como (protocolo de depuração) |
 |---|---|---|
 | `abrir { url }` | navega | `Page.navigate` + espera `Page.frameStoppedLoading` (até 8 s) |
-| `apontar { alvo }` | leva o cursor da Puca até o elemento | acha o elemento, `scrollIntoView`, move o cursor da camada |
+| `apontar { alvo }` | leva o cursor do Puca até o elemento | acha o elemento, `scrollIntoView`, move o cursor da camada |
 | `circular { alvo }` | círculo à mão em volta | `path` SVG com tremido, animado com `stroke-dashoffset` |
 | `seta { de, para }` | seta curva entre dois pontos ou alvos | `path` quadrático + ponta |
 | `marcar { alvo }` | marca-texto | `div` amarela com `mix-blend-mode: multiply` |
@@ -248,11 +249,11 @@ Regras de execução:
   **antes** de ler a posição (no teste, o clique sem rolar caiu fora da tela).
 - **Clique:** sempre no centro do elemento clicável (`closest("a, button")`). No teste, mirar o bloco da linha
   fez o clique não abrir nada.
-- **Alvo não achado:** a ação falha sem quebrar a fila, o rastro registra e a Puca segue falando ("não achei o botão
+- **Alvo não achado:** a ação falha sem quebrar a fila, o rastro registra e o Puca segue falando ("não achei o botão
   aqui, mas ele fica…").
 - **Sites desenhados em canvas** (ex.: Figma) não têm elementos para achar; ficam fora do MVP.
 
-### 4.4. A camada da Puca
+### 4.4. A camada do Puca
 
 - Injetada com `Runtime.evaluate` e reinjetada em toda página nova com `Page.addScriptToEvaluateOnNewDocument`.
 - Uma `div` com `pointer-events: none` e `z-index` máximo, em coordenadas do **documento** (os desenhos rolam junto).
@@ -260,7 +261,7 @@ Regras de execução:
   não pode bloquear a camada.
 - **Limpar na troca de página:** GitHub e Slack trocam de página sem recarregar. Ouvir `Page.frameNavigated` e
   `Page.navigatedWithinDocument` e limpar a camada. No teste, os desenhos ficaram da página anterior por falta disso.
-- **Estilo:** traço vermelho para círculo, roxo da Puca para seta e cursor, marca-texto amarelo, cartão branco com
+- **Estilo:** traço vermelho para círculo, roxo do Puca para seta e cursor, marca-texto amarelo, cartão branco com
   borda preta (o visual do quadro). Cores em `src/styles/tokens.css`, repassadas na injeção.
 - **Imagens no cartão:** SVG inline (mini-diagramas gerados a partir do quadro) ou imagem por `data:` URL. Conteúdo
   que vem do LLM passa por DOMPurify antes de entrar na página.
@@ -274,19 +275,19 @@ Regras de execução:
   permitida) quando responde uma pergunta, com no máximo 3 ações por resposta.
 - **Interrupção:** quando a pessoa fala por cima (`src/voice/barge-in.ts`), o front chama
   `orbis.navegador.cancelar()`. A fila para antes da próxima ação; a ação em curso termina (todas duram menos de
-  1 s); a camada é limpa; a Puca diz que está ouvindo. Depois da resposta, a jornada retoma do passo.
+  1 s); a camada é limpa; o Puca diz que está ouvindo. Depois da resposta, a jornada retoma do passo.
 - **Ações idempotentes:** repetir `abrir`, `apontar` ou `circular` não causa dano. Ações que publicam algo
   (`digitar` com envio) nunca repetem sozinhas.
 
 ### 4.6. A pessoa também mexe: três modos
 
-| Modo | A Puca | A pessoa | Exemplo |
+| Modo | O Puca | A pessoa | Exemplo |
 |---|---|---|---|
 | **Mostrar** | faz e narra | assiste | "Abro o `CODEOWNERS`… essa linha diz que o Livro-razão é o responsável." |
 | **Apontar** | circula e espera | clica | "O `ledgerwriter` está aqui. Abre ele pra gente?" |
 | **Acompanhar** | observa e reage | faz | "Agora procure a issue da primeira tarefa." → a pessoa abre → "Isso, essa mesma." |
 
-Como a Puca percebe a pessoa:
+Como o Puca percebe a pessoa:
 
 - `Runtime.addBinding({ name: "orbisPessoa" })` + um ouvinte de `click` em captura, injetado em toda página: manda
   `{ texto, href, confiavel }` ao app.
@@ -307,11 +308,11 @@ Como a Puca percebe a pessoa:
 
 ### 4.8. Login nas ferramentas
 
-- O navegador da Puca usa uma partição persistente (`partition: "persist:kota"`): a pessoa entra uma vez e o login
+- O navegador do Puca usa uma partição persistente (`partition: "persist:kota"`): a pessoa entra uma vez e o login
   fica entre aberturas do app.
 - GitHub e Notion da Kota são públicos e não pedem login para ler.
-- O Slack da Kota pede: o jurado entra pelo convite do guia de uso, uma vez, dentro do navegador da Puca. O
-  encaminhamento chega como mensagem direta do bot para ele (§10.1); sem login ou sem Slack, a Puca mostra a mensagem
+- O Slack da Kota pede: o jurado entra pelo convite do guia de uso, uma vez, dentro do navegador do Puca. O
+  encaminhamento chega como mensagem direta do bot para ele (§10.1); sem login ou sem Slack, o Puca mostra a mensagem
   num cartão em vez de abrir o Slack.
 
 ### 4.9. Fora do MVP
@@ -433,7 +434,7 @@ Todas com `pessoa_id uuid references auth.users` e RLS `pessoa_id = auth.uid()` 
 | `pessoas` | nome, perfil, vínculo, time de destino | `puca:profile` (`sessionStorage`) |
 | `calibragens` | o JSON da calibragem, versão | `puca:calibragem` (`sessionStorage`) |
 | `sessoes` | onde parou (momento, passo), objetivos, tempo, tokens | `puca:sessoes` |
-| `rastro` | cada decisão da Puca (`TrailEntry`) | `puca:rastro` |
+| `rastro` | cada decisão do Puca (`TrailEntry`) | `puca:rastro` |
 | `encaminhamentos` | dúvida, destino, fontes, motivo, link da mensagem no Slack | `puca:encaminhamentos` |
 | `primeiras_tarefas` | tarefa escolhida, pedido de aprovação, estado | `puca:primeiras-tarefas` |
 
@@ -495,13 +496,13 @@ Tail, prompt escrito para o Qwen.
   (como `validTool` já faz no bench) e descartar a inválida.
 - **System e mensagens:** as mensagens `system` de `buildMessages` vão para o campo `system`; o resto, para
   `messages`. A conversa começa sempre com `user`.
-- **Cache de prompt:** a parte fixa primeiro (instruções da Puca, ferramentas, a jornada da sessão), a parte que muda
+- **Cache de prompt:** a parte fixa primeiro (instruções do Puca, ferramentas, a jornada da sessão), a parte que muda
   depois (momento, passo, histórico, fala). `cache_control: { type: "ephemeral" }` no fim da parte fixa. Conferir
   `usage.cache_read_input_tokens` > 0 a partir da segunda fala.
 - **Aquecimento:** ao começar a sessão, uma chamada com `max_tokens: 0` e a parte fixa, para a primeira pergunta já
   achar o cache.
 - **Tempo e erros:** o limite de 8 s de hoje continua. Tentar de novo só se nada foi emitido ainda. Timeout, erro,
-  `stop_reason: "refusal"` e resposta vazia **não encaminham**: a Puca diz a frase de falha (não a `FALLBACK_LINE` de
+  `stop_reason: "refusal"` e resposta vazia **não encaminham**: o Puca diz a frase de falha (não a `FALLBACK_LINE` de
   falta de fonte, `server/src/agent/bridges.ts`) e o rastro guarda o motivo da falha, num campo novo do contrato do
   Rastro (decisão 0007, #85). Erros pelas classes do SDK
   (`Anthropic.RateLimitError`, `Anthropic.APIError`), nunca por texto.
@@ -511,7 +512,7 @@ Tail, prompt escrito para o Qwen.
 ### 7.3. Outros usos
 
 - **Checagem de entendimento:** a correção da resposta da pessoa é uma chamada separada (também Haiku 5.5), com a
-  régua que a Puca não vê, devolvendo `certo | parcial | errado | nao_respondeu` por ferramenta. A Puca só recebe o
+  régua que o Puca não vê, devolvendo `certo | parcial | errado | nao_respondeu` por ferramenta. O Puca só recebe o
   resultado.
 - **Visão:** quando o computer use precisar olhar a tela (§4.9), o mesmo modelo recebe o print como imagem.
 
@@ -529,15 +530,15 @@ Sem troca de provedor. O que existe continua; o que muda é onde as chaves ficam
 
 - **Fala da pessoa:** Deepgram, do app direto por WebSocket, com token curto pedido ao servidor
   (`/api/voice/token`). A chave do Deepgram precisa de papel **Member** ou acima (abaixo disso, gerar o token dá 403).
-- **Fala da Puca:** ElevenLabs Flash v2.5 pelo servidor, com o áudio em PCM 24 kHz pelo `/api/tts/:id` e os tempos
+- **Fala do Puca:** ElevenLabs Flash v2.5 pelo servidor, com o áudio em PCM 24 kHz pelo `/api/tts/:id` e os tempos
   de cada palavra pelo `/api/tts/:id/words`. Vozes da biblioteca exigem plano pago (no grátis, 402).
 - **Ganhos de latência (proposta):**
   - manter um WebSocket reserva já aberto com a ElevenLabs, para a próxima fala não pagar a abertura;
   - normalizador de fala em pt-BR antes do TTS ("R$ 1.500" → "mil e quinhentos reais", "ADR-003" → "ADR três", siglas e números);
   - ponte automática se nada sair em 3 s;
   - um registro de tempo por turno (`turn_timing`: fala recebida, rota escolhida, 1º token, 1º áudio) no log.
-- **Interrupção:** o microfone fica aberto enquanto a Puca fala, com o filtro de eco de `src/voice/barge-in.ts`. A
-  mesma interrupção para o áudio, a fila do quadro e a fila do navegador da Puca (§4.5).
+- **Interrupção:** o microfone fica aberto enquanto o Puca fala, com o filtro de eco de `src/voice/barge-in.ts`. A
+  mesma interrupção para o áudio, a fila do quadro e a fila do navegador do Puca (§4.5).
 
 ---
 
@@ -546,7 +547,7 @@ Sem troca de provedor. O que existe continua; o que muda é onde as chaves ficam
 Issues: #25, #26, #27 (com Joaquim). O que está aqui é recomendação de stack para essas issues.
 
 - **Fontes:** o `kota-bank` (clonado no build da imagem do servidor, numa versão fixa) e a cópia do Notion em
-  `kit/kota/notion/` (decisão 0005). A Puca não chama GitHub nem Notion na hora da sessão.
+  `kit/kota/notion/` (decisão 0005). O Puca não chama GitHub nem Notion na hora da sessão.
 - **Pedaços:** por arquivo e por título de Markdown (README, ADR, runbook, página do Notion), e por função ou classe
   no código. Cada pedaço guarda a fonte: repositório, caminho, linhas, commit ou URL da página do Notion, título.
 - **Índice:** busca de texto em memória no servidor, montada no boot a partir dos pedaços (biblioteca leve tipo
@@ -560,7 +561,7 @@ Issues: #25, #26, #27 (com Joaquim). O que está aqui é recomendação de stack
 - **Citação conferida:** a resposta cita a fonte com o trecho exato; se o trecho não existir na fonte, a citação é
   descartada e, sem fonte, vira encaminhamento.
 - **No quadro:** a fonte de cada nó (`info.docs`, `info.adr`) é um arquivo do `kota-bank` ou uma página do Notion
-  (decisão 0005), aberta no navegador da Puca quando a pessoa toca nela.
+  (decisão 0005), aberta no navegador do Puca quando a pessoa toca nela.
 
 ---
 
@@ -570,7 +571,7 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
 
 ### 10.1. Encaminhamento no Slack da Kota
 
-- **Quem envia:** o servidor, com o token do bot do app da Kota (o mesmo de #118). Não é o navegador da Puca
+- **Quem envia:** o servidor, com o token do bot do app da Kota (o mesmo de #118). Não é o navegador do Puca
   digitando: a ação precisa sair sempre, mesmo sem login no Slack.
 - **Para onde:** uma **mensagem direta do bot para o próprio jurado** (`conversations.open` + `chat.postMessage`),
   dizendo a quem ela iria na Kota (a buddy pelo nome, o RH ou o gestor no caso pessoal da #125). As pessoas da Kota não
@@ -578,11 +579,11 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
   num canal compartilhado, porque a dúvida de um jurado (às vezes um caso pessoal) apareceria para os outros (§5 do
   `PRODUCT.md`). A mensagem não leva o nome digitado no login.
 - **Como achar o jurado no Slack (proposta):** a tela de entrada pede, opcional, o e-mail com que ele entrou no Slack
-  da Kota; o servidor acha o id com `users.lookupByEmail`. Sem e-mail ou sem conta no Slack, nada é postado: a Puca
+  da Kota; o servidor acha o id com `users.lookupByEmail`. Sem e-mail ou sem conta no Slack, nada é postado: o Puca
   mostra a mensagem num cartão e o rastro registra "não enviado: sem Slack".
-- **Como aparece:** `chat.postMessage` com `chat:write.customize`, `username: "Puca"` e o ícone da Puca. A mensagem
+- **Como aparece:** `chat.postMessage` com `chat:write.customize`, `username: "Puca"` e o ícone do Puca. A mensagem
   traz a dúvida, um resumo, as fontes consultadas e o motivo de não ter respondido (§4.5 do `PRODUCT.md`).
-- **Depois:** o servidor pede o link (`chat.getPermalink`) e devolve ao app. O app abre o link no navegador da Puca e
+- **Depois:** o servidor pede o link (`chat.getPermalink`) e devolve ao app. O app abre o link no navegador do Puca e
   aponta para a mensagem. Sem login no Slack, mostra a mensagem num cartão.
 - **Sem duplicar:** o app manda um `id` próprio; o servidor grava em `encaminhamentos` com esse id único e, se ele já
   existir, devolve o mesmo resultado sem postar de novo (resolve a corrida da #70).
@@ -607,13 +608,13 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
 
 ### 10.2. GitHub
 
-- Leitura: pública, pelo navegador da Puca e pela cópia no servidor. Sem token.
-- Primeira tarefa (#114): se a Puca precisar agir (comentar ou atribuir a issue da tarefa), um token fine-grained só
+- Leitura: pública, pelo navegador do Puca e pela cópia no servidor. Sem token.
+- Primeira tarefa (#114): se o Puca precisar agir (comentar ou atribuir a issue da tarefa), um token fine-grained só
   com `issues: write` no `kota-bank`, no servidor. Se a tarefa só for aberta e mostrada, nenhum token.
 
 ### 10.3. Notion
 
-- Leitura: cópia local (§9) e o Notion público no navegador da Puca. Sem token no servidor.
+- Leitura: cópia local (§9) e o Notion público no navegador do Puca. Sem token no servidor.
 - O MCP do Notion continua sendo o caminho dos agentes de desenvolvimento para preencher o kit (#115, #116).
 
 ### 10.4. Por que não MCP na hora da sessão
@@ -622,7 +623,7 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
   poucas e fixas.
 - O MCP hospedado do Notion e o do Slack entram com login de pessoa e não servem a um servidor (decisão 0005).
 - Listas grandes de ferramentas pioram a escolha do modelo e aumentam o prompt.
-- Se no futuro a Puca precisar consultar ao vivo, a API da Anthropic conecta direto a servidores MCP remotos, sem
+- Se no futuro o Puca precisar consultar ao vivo, a API da Anthropic conecta direto a servidores MCP remotos, sem
   código nosso. Fica registrado como caminho, fora do MVP.
 
 ---
@@ -634,10 +635,10 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
 | Chave de API vazar pelo app | Nenhuma chave paga no app; só o endereço do servidor e a chave pública do Supabase |
 | Alguém gastar as chaves pelo servidor público | Travas diárias globais por provedor (LLM, TTS, STT); limite por pessoa; limite por IP e captcha no login anônimo (§5.3). O token do Supabase sozinho não basta: contas anônimas são de graça |
 | Um jurado ver dados de outro | Login anônimo por instalação + RLS por `auth.uid()` no Supabase. No Slack, que todos os jurados compartilham, o encaminhamento só vai por mensagem direta ao próprio jurado, sem o nome digitado; nunca em canal (§10.1) |
-| A Puca agir fora do mundo da Kota | Lista de endereços permitidos no navegador da Puca (§4.7) |
+| O Puca agir fora do mundo da Kota | Lista de endereços permitidos no navegador do Puca (§4.7) |
 | Conteúdo do LLM injetar HTML na página | DOMPurify em todo cartão (§4.4) |
 | Mensagem indevida no Slack | Bot com escopos mínimos, só mensagem direta ao próprio jurado, `id` contra duplicata, limite de 10 por hora |
-| Senhas | A Puca nunca digita senha nem guarda teclas |
+| Senhas | O Puca nunca digita senha nem guarda teclas |
 | Avaliação de desempenho | O rastro e o painel descrevem o processo, nunca dão nota à pessoa (`PRODUCT.md` §5 e §12.2) |
 | Dados reais | Só dados sintéticos, e-mails em `kota.example` (decisão 0005) |
 
@@ -647,7 +648,7 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
 
 - **Logs:** Pino do Fastify, lidos com `fly logs`. Sem transcrição completa no log; só ids, rotas e tempos.
 - **Tempo por turno:** `turn_timing` (§8) e os benches existentes (`bench:llm`, `bench:turn`).
-- **Rastro:** cada decisão da Puca, agora com as ações no navegador e o link do encaminhamento.
+- **Rastro:** cada decisão do Puca, agora com as ações no navegador e o link do encaminhamento.
 - **Custo da sessão (#94):** tokens do `usage` do LLM, caracteres do TTS, minutos do Deepgram, somados por sessão.
 - **Custo fixo do mês:** Fly (uma máquina pequena, poucos dólares), Supabase Pro durante a avaliação, ElevenLabs no
   plano pago; LLM e Deepgram por uso.
@@ -733,8 +734,8 @@ Pela prioridade do hackathon: primeiro o que o jurado precisa para abrir o Orbis
 
 | Frente | Entrega | Issue |
 |---|---|---|
-| Navegador da Puca | ações da §4.3, camada, fila interrompível, modos, guarda | #123 |
-| Slack real | `POST /api/encaminhamentos`, mensagem da Puca no canal, link aberto no navegador da Puca | #118, #129 |
+| Navegador do Puca | ações da §4.3, camada, fila interrompível, modos, guarda | #123 |
+| Slack real | `POST /api/encaminhamentos`, mensagem do Puca no canal, link aberto no navegador do Puca | #118, #129 |
 | Conhecimento | índice do kit, citação conferida | #25, #26, #27 |
 | Kota | jornada, perfis e dados da Kota no Orbis | #120 |
 
@@ -765,7 +766,7 @@ de uso (#119), teste de instalação em outro Mac seguindo só o guia.
 | O app não abre no Mac do jurado | teste em outro Mac (Fase 3) | o mesmo front pelo navegador, com computer use simulado |
 | Fly fora do ar ou lento | `/api/health`, `bench:turn` | trocar de região; no limite, servidor local com `npm run dev:server` para a apresentação |
 | Supabase pausado ou fora | sincronização falhando | a sessão segue pelo `localStorage`; sincroniza quando voltar |
-| Slack sem login no navegador da Puca | página de login no navegador | mensagem enviada pelo servidor e mostrada num cartão |
-| Site muda e a Puca não acha o alvo | ação falha no rastro | a Puca fala onde fica sem apontar; alvos por texto, não por coordenada |
+| Slack sem login no navegador do Puca | página de login no navegador | mensagem enviada pelo servidor e mostrada num cartão |
+| Site muda e o Puca não acha o alvo | ação falha no rastro | o Puca fala onde fica sem apontar; alvos por texto, não por coordenada |
 | Latência do LLM sobe | `turn_timing` | ponte + rotas locais da `route.ts` continuam respondendo; a trava diária protege o custo |
 | Gasto fora do previsto | painel dos provedores | trava diária, limites por pessoa, cache de áudio |

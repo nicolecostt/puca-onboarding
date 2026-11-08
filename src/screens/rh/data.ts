@@ -12,7 +12,7 @@ export const OBRIGATORIAS = [
   { id: "contrato", label: "Contrato e documentos", so: null },
   { id: "cultura", label: "Onboarding cultural", so: "novo" },
   { id: "acessos", label: "Acessos das ferramentas", so: null },
-  { id: "sessao", label: "Primeira sessão com a Puca", so: null },
+  { id: "sessao", label: "Primeira sessão com o Puca", so: null },
   { id: "tarefa", label: "Primeira tarefa aprovada", so: null },
 ] as const;
 export type Obrigatoria = (typeof OBRIGATORIAS)[number]["id"];

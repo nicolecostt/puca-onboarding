@@ -113,7 +113,7 @@ describe("runner", () => {
     expect(r.steps).not.toContain("ch-reforco");
   });
 
-  it("checagem por toque: precisar que a Puca revele é rever e passa pelo reforço no quadro", async () => {
+  it("checagem por toque: precisar que o Puca revele é rever e passa pelo reforço no quadro", async () => {
     const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"], ["pos", "gateway"]);
     expect(r.checks).toMatchObject([{ tema: "pagamentos", entendeu: false, tentativas: 2, resposta: "gateway" }]);
     expect(r.steps).toContain("ch-reforco");
