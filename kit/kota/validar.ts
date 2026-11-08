@@ -109,13 +109,14 @@ function adrsERfcs(m: MapaKota): string[] {
 }
 
 function numeracao(tipo: "ADR" | "RFC", numeros: number[]): string[] {
+  const valido = (n: number) => Number.isInteger(n) && n >= 1;
+  const erros = numeros.filter((n) => !valido(n)).map((n) => `${tipo} ${n} inválido: o número é inteiro a partir de 1`);
   const vistos = new Set<number>();
-  const erros: string[] = [];
-  for (const n of numeros) {
+  for (const n of numeros.filter(valido)) {
     if (vistos.has(n)) erros.push(`${tipo} ${n} repetido`);
     vistos.add(n);
   }
-  for (let n = 1; n <= Math.max(0, ...numeros); n++) {
+  for (let n = 1; n <= Math.max(0, ...vistos); n++) {
     if (!vistos.has(n)) erros.push(`${tipo}s fora de sequência: falta ${tipo} ${n}`);
   }
   return erros;

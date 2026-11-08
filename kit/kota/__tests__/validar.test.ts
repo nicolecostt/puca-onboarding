@@ -169,6 +169,15 @@ describe("validarMapa", () => {
     expect(erros(com((m) => { m.rfcs[1].n = 3; }))).toMatch(/falta RFC 2/);
   });
 
+  it("acusa número de ADR ou RFC que não é inteiro a partir de 1", () => {
+    for (const n of [0, -1, 2.5, NaN, Infinity])
+      expect(erros(com((m) => { m.adrs.push({ ...m.adrs[1], n }); }))).toContain(`ADR ${n} inválido`);
+    expect(erros(com((m) => { m.rfcs[0].n = 0; m.adrs[0].rfc = 0; }))).toContain("RFC 0 inválido");
+  });
+
+  it("número inválido não esconde buraco na sequência", () =>
+    expect(erros(com((m) => { m.adrs.push({ ...m.adrs[1], n: NaN }); m.adrs[2].n = 4; m.rfcs[1].adr = 4; }))).toMatch(/falta ADR 3/));
+
   it("acusa pessoa do perfil novo fora do livro-razão e da transição fora de contas", () => {
     expect(erros(com((m) => { m.perfis.novo.pessoa = "clara-dias"; }))).toMatch(/perfil novo: "clara-dias" é de contas, precisa ser de livro-razao/);
     expect(erros(com((m) => { m.perfis.transicao.pessoa = "fabio-lima"; }))).toMatch(/perfil transicao: "fabio-lima" é de livro-razao, precisa ser de contas/);
