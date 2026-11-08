@@ -9,6 +9,7 @@ import { ID_DO_VINCULO } from "../../journey/escolha";
 import { preserveProfileLinks } from "../../lib/navigation";
 import { qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
+import { montarEmailDoSlack } from "./email-slack";
 
 // O app sempre abre aqui: boas-vindas → call inicial → Início → sessão. Perfil salvo de outra vez não pula a entrevista.
 if (new URLSearchParams(location.search).get("perfil")) {
@@ -17,7 +18,8 @@ if (new URLSearchParams(location.search).get("perfil")) {
   const profile = activeProfile("ana");
   qs(document, "#title").textContent = `Oi, ${profile.nickname}.`;
   qs(document, "#who").textContent = profile.name;
-  particulas(".topbar__row > *, .home__title, .home__lead, .home__actions > *");
+  montarEmailDoSlack(qs(document, ".home"));
+  particulas(".topbar__row > *, .home__title, .home__lead, .home__actions > *, .slack-email");
 } else {
   const home = qs(document, ".home");
   home.classList.add("home--escolha");
@@ -25,7 +27,8 @@ if (new URLSearchParams(location.search).get("perfil")) {
   mountEscolhaPerfil(home, {
     aoEscolher: (vinculo) => location.assign(`./?perfil=${ID_DO_VINCULO[vinculo]}`), // escolha → welcome → call
   });
-  particulas(".topbar__row > *, .escolha__titulo, .escolha__texto, .escolha__cartao");
+  montarEmailDoSlack(home);
+  particulas(".topbar__row > *, .escolha__titulo, .escolha__texto, .escolha__cartao, .slack-email");
 }
 
 function particulas(occluders: string): void {

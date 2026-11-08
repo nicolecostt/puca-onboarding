@@ -149,7 +149,7 @@ avisou a pessoa), a não ser que a fala diga que não confirmou. O resumo do `es
 O encaminhamento sai de verdade no Slack da Kota (#129, decisão 0008, `docs/stack.md` §10.1): o servidor manda, com o
 bot da Kota, uma **mensagem direta ao próprio jurado**, nunca num canal (todos os jurados entram no mesmo workspace),
 dizendo a quem a dúvida iria na Kota. A mensagem não leva o nome que a pessoa digitou nem o `resumo` (escrito pelo agente para quem receberia, em terceira pessoa, com o nome e o gênero da pessoa), e lista no máximo 3 fontes ("e mais N"). O jurado é achado pelo e-mail do
-Slack que ele informa, opcional, no início do Orbis (`localStorage` `puca:slack-email`).
+Slack que ele informa, opcional, nas boas-vindas (antes da call inicial) ou depois no Início (`localStorage` `puca:slack-email`).
 
 ```ts
 // POST /api/encaminhamentos   (src/journey/slack-real.ts → server/src/slack/encaminhar.ts)
