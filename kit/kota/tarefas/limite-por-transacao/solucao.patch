@@ -1,0 +1,69 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thiago Nakamura <thiago@kota.example>
+Date: Sun, 8 Nov 2026 09:10:04 -0300
+Subject: [PATCH] =?UTF-8?q?feat(ledgerwriter):=20limite=20de=20r$=2010.000?=
+ =?UTF-8?q?,00=20por=20transa=C3=A7=C3=A3o?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../br/com/kota/ledgerwriter/ExceptionMessages.java   |  2 ++
+ .../com/kota/ledgerwriter/TransactionValidator.java   | 11 ++++++++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/src/ledger/ledgerwriter/src/main/java/br/com/kota/ledgerwriter/ExceptionMessages.java b/src/ledger/ledgerwriter/src/main/java/br/com/kota/ledgerwriter/ExceptionMessages.java
+index fc47bad..0de668c 100644
+--- a/src/ledger/ledgerwriter/src/main/java/br/com/kota/ledgerwriter/ExceptionMessages.java
++++ b/src/ledger/ledgerwriter/src/main/java/br/com/kota/ledgerwriter/ExceptionMessages.java
+@@ -35,6 +35,8 @@ public class ExceptionMessages {
+             EXCEPTION_MESSAGE_SEND_TO_SELF = "can't send to self";
+     public static final String
+             EXCEPTION_MESSAGE_INVALID_AMOUNT = "invalid amount";
++    public static final String
++            EXCEPTION_MESSAGE_AMOUNT_ABOVE_LIMIT = "amount above limit";
+     public static final String EXCEPTION_MESSAGE_DUPLICATE_TRANSACTION =
+             "duplicate transaction uuid";
+ }
+diff --git a/src/ledger/ledgerwriter/src/main/java/br/com/kota/ledgerwriter/TransactionValidator.java b/src/ledger/ledgerwriter/src/main/java/br/com/kota/ledgerwriter/TransactionValidator.java
+index 86e73c4..ea68f46 100644
+--- a/src/ledger/ledgerwriter/src/main/java/br/com/kota/ledgerwriter/TransactionValidator.java
++++ b/src/ledger/ledgerwriter/src/main/java/br/com/kota/ledgerwriter/TransactionValidator.java
+@@ -31,6 +31,8 @@ import static br.com.kota.ledgerwriter.ExceptionMessages.
+         EXCEPTION_MESSAGE_SEND_TO_SELF;
+ import static br.com.kota.ledgerwriter.ExceptionMessages.
+         EXCEPTION_MESSAGE_INVALID_AMOUNT;
++import static br.com.kota.ledgerwriter.ExceptionMessages.
++        EXCEPTION_MESSAGE_AMOUNT_ABOVE_LIMIT;
+ 
+ 
+ /**
+@@ -45,6 +47,8 @@ public class TransactionValidator {
+     private static final Pattern ACCT_REGEX = Pattern.compile("^[0-9]{10}$");
+     // route numbers should be 9 digits between 0 and 9
+     private static final Pattern ROUTE_REGEX = Pattern.compile("^[0-9]{9}$");
++    // R$ 10.000,00, em centavos.
++    private static final int AMOUNT_LIMIT = 1_000_000;
+ 
+     private static final Logger LOGGER =
+         LogManager.getLogger(TransactionValidator.class);
+@@ -53,7 +57,7 @@ public class TransactionValidator {
+      *   - Ensure sender is the same user authenticated by auth token
+      *   - Ensure account and routing numbers are in the correct format
+      *   - Ensure sender and receiver are different accounts
+-     *   - Ensure amount is positive
++     *   - Ensure amount is positive and not above the limit
+      *
+      * @param authedAccount  the currently authenticated user account
+      * @param transaction    the transaction object
+@@ -100,5 +104,10 @@ public class TransactionValidator {
+             throw new IllegalArgumentException(
+                     EXCEPTION_MESSAGE_INVALID_AMOUNT);
+         }
++        if (amount > AMOUNT_LIMIT) {
++            LOGGER.error("Invalid transaction: Transaction amount above limit");
++            throw new IllegalArgumentException(
++                    EXCEPTION_MESSAGE_AMOUNT_ABOVE_LIMIT);
++        }
+     }
+ }

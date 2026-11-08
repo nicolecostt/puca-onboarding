@@ -1,0 +1,59 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thiago Nakamura <thiago@kota.example>
+Date: Sun, 8 Nov 2026 09:10:04 -0300
+Subject: [PATCH] =?UTF-8?q?test(ledgerwriter):=20transa=C3=A7=C3=A3o=20aci?=
+ =?UTF-8?q?ma=20de=20r$=2010.000,00=20=C3=A9=20recusada?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../TransactionValidatorTest.java             | 27 ++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/src/ledger/ledgerwriter/src/test/java/br/com/kota/ledgerwriter/TransactionValidatorTest.java b/src/ledger/ledgerwriter/src/test/java/br/com/kota/ledgerwriter/TransactionValidatorTest.java
+index 08e7823..c899088 100644
+--- a/src/ledger/ledgerwriter/src/test/java/br/com/kota/ledgerwriter/TransactionValidatorTest.java
++++ b/src/ledger/ledgerwriter/src/test/java/br/com/kota/ledgerwriter/TransactionValidatorTest.java
+@@ -78,8 +78,14 @@ class TransactionValidatorTest {
+         "12341545🐻"
+     };
+ 
++    private static final Integer AMOUNT_LIMIT = 1_000_000;
++
+     private static final Integer[] VALID_TRANSACTION_AMOUNT = {
+-        1, VALID_AMOUNT, Integer.MAX_VALUE
++        1, VALID_AMOUNT, AMOUNT_LIMIT
++    };
++
++    private static final Integer[] ABOVE_LIMIT_TRANSACTION_AMOUNT = {
++        AMOUNT_LIMIT + 1, Integer.MAX_VALUE
+     };
+ 
+     private static final Integer[] INVALID_TRANSACTION_AMOUNT = {
+@@ -228,6 +234,25 @@ class TransactionValidatorTest {
+         }
+     }
+ 
++    @Test
++    @DisplayName("Given transaction amount is above the limit, IllegalArgumentException is thrown")
++    void validationFail_WhenTransactionAmount_IsAboveLimit() {
++        for (int i = 0; i < ABOVE_LIMIT_TRANSACTION_AMOUNT.length; i++) {
++            // Given
++            when(transaction.getAmount()).thenReturn(ABOVE_LIMIT_TRANSACTION_AMOUNT[i]);
++
++            // When
++            IllegalArgumentException exceptionThrown = assertThrows(
++                IllegalArgumentException.class, () -> {
++                    transactionValidator.validateTransaction(
++                        LOCAL_ROUTING_NUM, AUTHED_ACCOUNT_NUM, transaction);
++                });
++
++            // Then
++            assertEquals("amount above limit", exceptionThrown.getMessage());
++        }
++    }
++
+     void assertInvalidNumberHelper() {
+         // When
+         IllegalArgumentException exceptionThrown = assertThrows(
