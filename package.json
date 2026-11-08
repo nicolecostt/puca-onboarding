@@ -18,6 +18,7 @@
     "check:contexto": "tsx scripts/check-contexto.ts",
     "check:harness": "tsx scripts/check-harness.ts",
     "kota:codeowners": "tsx kit/kota/gerar/codeowners.ts",
+    "kota:slack": "tsx kit/kota/slack/preencher.ts",
     "check:kota": "tsx kit/kota/checar/cli.ts",
     "contas-demo": "tsx server/scripts/contas-demo.ts"
   },
