@@ -242,6 +242,29 @@ describe("regras das páginas", () => {
     expect(checar(pastaCom({ politicas: "Dúvidas: fulano@kota.example" })))
       .toEqual([expect.stringMatching(/politicas\.md.*fulano@kota\.example/)]));
 
+  it("regra paginas acusa link para outro repo do dono do kota-bank, como a oficina privada, e para outra branch", () => {
+    const erros = checar(pastaCom({
+      "rfc-1": [
+        "[oficina](https://github.com/JucaGF/kota-bank-oficina/blob/main/docs/adr/0001-x.md)",
+        "[branch](https://github.com/jucagf/kota-bank/blob/master/docs/adr/0001-x.md)",
+        "[repo](https://github.com/JucaGF/kota-bank), [ci](https://github.com/JucaGF/kota-bank/actions) e [raiz](https://github.com/JucaGF/kota-bank/tree/main)",
+        "[de fora](https://github.com/spring-projects/spring-boot/blob/v3.3.0/README.md)",
+      ].join("\n"),
+    }));
+    expect(erros).toHaveLength(2);
+    expect(erros).toEqual(expect.arrayContaining([
+      expect.stringMatching(/^\[paginas\] .*rfc-1\.md.*JucaGF\/kota-bank-oficina/),
+      expect.stringMatching(/^\[paginas\] .*rfc-1\.md.*branch master/),
+    ]));
+  });
+
+  it("com repo, confere o caminho também com o dono e o repo escritos em outra caixa", () => {
+    const repo = pastaTemp();
+    mkdirSync(join(repo, "docs/adr"), { recursive: true });
+    const pasta = pastaCom({ "rfc-2": "[ADR](https://github.com/jucagf/Kota-Bank/blob/main/docs/adr/0009-nada.md)" });
+    expect(checar(pasta, { ...ctx, repo })).toEqual([expect.stringMatching(/^\[paginas-repo\] .*rfc-2\.md.*docs\/adr\/0009-nada\.md/)]);
+  });
+
   it("com repo, acusa link do kota-bank para caminho que não existe, inclusive com outra caixa", () => {
     const repo = pastaTemp();
     mkdirSync(join(repo, "src/ledger/balancereader"), { recursive: true });

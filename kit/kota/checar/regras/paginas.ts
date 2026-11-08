@@ -8,6 +8,7 @@ import type { ContextoKota, Regra } from "../contexto";
 const EMAIL = /[\p{L}\p{N}._%+-]+@[\p{L}\p{N}-]+(?:\.[\p{L}\p{N}-]+)+/gu;
 const HANDLE = /(?<![\p{L}\p{N}_.%+-])@[\p{L}\p{N}_-]+/gu;
 const LINK_FIXO_NOTION = /(?:[\w-]+\.)*notion\.(?:so|site)\b[^\s<>()[\]"'`]*/gi;
+const LINK_GITHUB = /github\.com\/([\w-]+)\/([\w-]+(?:\.[\w-]+)*)(?:\/(?:blob|tree)\/([^/\s)#?"'<>\]]+)\/?([^\s)#?"'<>\]]*))?/gi;
 // Comece aqui é o guia de uso do jurado, escrito na C5. Página que agrupa subpáginas mostra a lista delas no Notion,
 // e nenhum grupo da N3 escreve texto para ela.
 const agrupam = new Set(ARVORE.map((n) => n.pai));
@@ -49,13 +50,27 @@ function conferirTexto(arquivo: string, md: string, ctx: ContextoKota): string[]
     ...[...md.matchAll(EMAIL)].map(([e]) => e).filter((e) => !emails.has(e))
       .map((e) => `${arquivo}: e-mail ${e} não é de pessoa do mapa nem alias`),
     ...[...md.matchAll(HANDLE)].map(([h]) => `${arquivo}: ${h} é @handle; cite a pessoa pelo nome ou pelo e-mail do mapa`),
+    ...linksDoDono(md, ctx.mapa.repo).flatMap(({ repo, publico, ref }) =>
+      !publico ? [`${arquivo}: link para github.com/${repo}, que não é o repo público ${ctx.mapa.repo}`]
+      : ref !== undefined && ref !== "main" ? [`${arquivo}: link para a branch ${ref}; aponte para a main, que o check:kota confere`]
+      : []),
   ];
 }
 
 function conferirLinksRepo(arquivo: string, md: string, ctx: ContextoKota): string[] {
-  const links = new RegExp(`github\\.com/${ctx.mapa.repo}/(?:blob|tree)/main/([^\\s)#?"'>\\]]*)`, "g");
-  return [...md.matchAll(links)].map(([, c]) => c).filter((c) => !existeNoRepo(ctx.repo!, c))
+  return linksDoDono(md, ctx.mapa.repo).filter((l) => l.publico && l.ref === "main").map((l) => l.caminho)
+    .filter((c) => !existeNoRepo(ctx.repo!, c))
     .map((c) => `${arquivo}: link para ${c}, que não existe no repo`);
+}
+
+interface LinkGithub { repo: string; publico: boolean; ref?: string; caminho: string }
+
+// O GitHub não diferencia maiúsculas no dono e no nome do repo, só no caminho.
+function linksDoDono(md: string, publico: string): LinkGithub[] {
+  const [dono, nome] = publico.toLowerCase().split("/");
+  return [...md.matchAll(LINK_GITHUB)]
+    .filter(([, d]) => d.toLowerCase() === dono)
+    .map(([, d, n, ref, caminho]) => ({ repo: `${d}/${n}`, publico: n.toLowerCase() === nome, ref, caminho: caminho ?? "" }));
 }
 
 // O GitHub diferencia maiúsculas no caminho; o disco padrão do macOS, não, e existsSync aceitaria src/Ledger.
