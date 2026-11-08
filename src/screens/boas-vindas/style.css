@@ -188,9 +188,3 @@ body {
     display: none;
   }
 }
-
-/* Primeira abertura: a escolha do perfil (components/escolha-perfil) no centro, no lugar do cumprimento */
-.home--escolha {
-  align-items: center;
-  padding-inline: 16px;
-}

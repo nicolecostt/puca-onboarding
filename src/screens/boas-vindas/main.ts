@@ -1,36 +1,25 @@
-// Entrada do Orbis: a call inicial começa nas boas-vindas. Na primeira abertura, a pessoa escolhe com quem entra na
-// Kota (PRODUCT.md §13.1): Ana, entrando na empresa, ou Bruno, mudando de time. A escolha vai para a call como
-// ?perfil= (a call usa a admissão dessa pessoa e não pergunta de novo o vínculo); o perfil só fica salvo no fim da call.
+// Entrada do Orbis: a call inicial começa nas boas-vindas. Quem entra (Ana, entrando na Kota, ou Bruno, mudando de
+// time; PRODUCT.md §13.1) Puca descobre na call. O link de apresentação (?perfil=ana|bruno) cumprimenta a pessoa e
+// leva o vínculo já anotado para a call; o perfil só fica salvo no fim da call.
 import "../../styles/base.css";
 import "./style.css";
 import { activeProfile } from "../../data";
-import { mountEscolhaPerfil } from "../../components/escolha-perfil/escolha-perfil";
-import { ID_DO_VINCULO } from "../../journey/escolha";
 import { loadSavedProfile } from "../../journey/profile";
 import { preserveProfileLinks } from "../../lib/navigation";
 import { qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
 
-const savedProfile = loadSavedProfile();
-if (savedProfile) {
+if (loadSavedProfile()) {
   location.replace("../inicio/"); // depois da call, o Início vem primeiro e leva à sessão
-} else if (new URLSearchParams(location.search).get("perfil")) {
-  // perfil já escolhido no endereço (link de apresentação): cumprimenta e vai direto para a call
-  preserveProfileLinks();
-  const profile = activeProfile("ana");
-  qs(document, "#title").textContent = `Oi, ${profile.nickname}.`;
-  qs(document, "#who").textContent = profile.name;
-  particulas(".topbar__row > *, .home__title, .home__lead, .home__actions > *");
 } else {
-  const home = qs(document, ".home");
-  home.classList.add("home--escolha");
-  home.replaceChildren();
-  mountEscolhaPerfil(home, {
-    aoEscolher: (vinculo) => location.assign(`../onboarding-call/?perfil=${ID_DO_VINCULO[vinculo]}`),
+  if (new URLSearchParams(location.search).get("perfil")) {
+    preserveProfileLinks();
+    const profile = activeProfile("ana");
+    qs(document, "#title").textContent = `Oi, ${profile.nickname}.`;
+    qs(document, "#who").textContent = profile.name;
+  }
+  mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
+    occluders: ".topbar__row > *, .home__title, .home__lead, .home__actions > *",
+    max: 40,
   });
-  particulas(".topbar__row > *, .escolha__titulo, .escolha__texto, .escolha__cartao");
-}
-
-function particulas(occluders: string): void {
-  mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), { occluders, max: 40 });
 }
