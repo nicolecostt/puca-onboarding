@@ -17,7 +17,7 @@ vi.mock("../llm", () => ({
 const { ask } = await import("./ask");
 type AskEvent = Parameters<Parameters<typeof ask>[1]>[0];
 
-const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/tail.journey.json", import.meta.url), "utf8")));
+const journey = loadJourney(JSON.parse(readFileSync(new URL("../../../src/journey/data/kota.journey.json", import.meta.url), "utf8")));
 const trecho: Trecho = { id: "f1", titulo: "Deploy · Do merge à produção", url: "https://exemplo.notion.site/deploy", texto: "O PR entra na main com CI verde." };
 let achados: Trecho[] = [trecho];
 const brain: Brain = { buscar: () => achados };
