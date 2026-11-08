@@ -32,8 +32,9 @@
         <a href="#puca">Puca</a>
         <a href="#problema">O problema</a>
         <a href="#para-quem">Para quem</a>
+        <a href="#instalar">Instalar</a>
       </nav>
-      <a class="btn btn--sm" href="../onboarding-call/">Começar a call</a>
+      <a class="btn btn--sm" href="#instalar">Instalar no Mac</a>
     </div>
   </header>
 
@@ -47,8 +48,8 @@
             as pessoas e as decisões do time. Quando não tem fonte, ela diz e leva a dúvida para a buddy.
           </p>
           <div class="actions">
-            <a class="btn" href="../onboarding-call/">Começar a call inicial</a>
-            <a class="link-arrow" href="../lesson/">Ver uma sessão</a>
+            <a class="btn" href="#instalar">Instalar no Mac</a>
+            <a class="link-arrow" href="#puca">Conhecer a Puca</a>
           </div>
         </div>
       </div>
@@ -131,12 +132,54 @@
       </div>
     </section>
 
+    <section class="install" id="instalar" aria-labelledby="instalar-title">
+      <div class="wrap grid">
+        <div class="install__intro">
+          <h2 id="instalar-title" class="install__title">Instale o Orbis no Mac.</h2>
+          <p>Um comando no Terminal baixa o app, confere o arquivo e abre. Funciona em Mac com chip Apple ou Intel e não pede senha.</p>
+        </div>
+        <ol class="install__steps">
+          <li class="step">
+            <h3>Abra o Terminal</h3>
+            <p>Aperte <kbd>Cmd</kbd> + <kbd>Espaço</kbd>, digite “Terminal” e aperte <kbd>Enter</kbd>.</p>
+          </li>
+          <li class="step">
+            <h3>Cole o comando e aperte Enter</h3>
+            <div class="cmd">
+              <code class="cmd__text" id="cmd-instalar">curl -fsSL https://raw.githubusercontent.com/nicolecostt/puca-onboarding/main/scripts/instalar.sh | bash</code>
+              <button type="button" class="btn btn--sm cmd__copy" data-copy="#cmd-instalar">Copiar comando</button>
+            </div>
+            <p>O app fica em <code>~/Applications/Orbis.app</code> e abre sozinho no fim.</p>
+          </li>
+          <li class="step">
+            <h3>Permita o microfone</h3>
+            <p>Quando o Orbis perguntar, clique em <strong>Permitir</strong> para conversar com a Puca por voz. Sem microfone, a sessão segue pelo chat.</p>
+          </li>
+          <li class="step">
+            <h3>Entre na Kota</h3>
+            <p>A Kota é o banco digital fictício onde a demo acontece. Entre no Slack dela pelo convite e confira as fontes da Puca no Notion e no código.</p>
+            <div class="actions">
+              <a class="link-arrow" data-link="slack" href="#instalar" target="_blank" rel="noopener">Convite do Slack</a>
+              <a class="link-arrow" data-link="kota" href="#instalar" target="_blank" rel="noopener">Notion da Kota</a>
+              <a class="link-arrow" href="https://github.com/JucaGF/kota-bank" target="_blank" rel="noopener">Código da Kota</a>
+            </div>
+          </li>
+        </ol>
+        <p class="install__note">
+          O Orbis não é notarizado pela Apple: o app tem assinatura própria, e o instalador confere a soma SHA-256 publicada no
+          <a href="https://github.com/nicolecostt/puca-onboarding/releases/latest" target="_blank" rel="noopener">Release</a>
+          antes de instalar. O <a href="https://github.com/nicolecostt/puca-onboarding/blob/main/scripts/instalar.sh" target="_blank" rel="noopener">script</a>
+          é legível no repositório. Para remover o app, rode o mesmo comando com <code>| bash -s -- --desinstalar</code> no lugar de <code>| bash</code>.
+        </p>
+      </div>
+    </section>
+
     <section class="close" aria-labelledby="close-title">
       <div class="wrap close__inner">
         <h2 id="close-title">Deixe Puca receber a próxima pessoa do time.</h2>
         <div class="actions">
-          <a class="btn" href="../onboarding-call/">Começar a call inicial</a>
-          <a class="link-arrow" href="../lesson/">Ver uma sessão</a>
+          <a class="btn" href="#instalar">Instalar no Mac</a>
+          <a class="link-arrow" href="#puca">Conhecer a Puca</a>
         </div>
       </div>
     </section>
