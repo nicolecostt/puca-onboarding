@@ -1,4 +1,4 @@
-// Aula no quadro: a Puca conduz a jornada (src/journey/data/*.journey.json) e monta o quadro
+// Sessão no quadro: a Puca conduz a jornada (src/journey/data/*.journey.json) e monta o quadro
 // do Figma (components/whiteboard) enquanto explica. Conversa simulada: a pessoa responde pelas respostas sugeridas, pelo chat
 // ou tocando no quadro. O perfil vem da call de entrevista; ?perfil=ana|bruno (ou novo|transicao)
 // força um perfil da demo; ?auto=1 responde sozinho, para apresentar sem mexer no mouse.
@@ -88,7 +88,7 @@ async function main(): Promise<void> {
   el.lessonName.textContent = journey.title;
 
   const clock = createClock();
-  const chat = mountChatPanel({ title: "Transcrição da aula", messages: [] });
+  const chat = mountChatPanel({ title: "Transcrição da sessão", messages: [] });
   mountCallBar({ chat, draggable: false }); // fixa; sem status: a legenda já mostra o que está acontecendo
   // a Puca aparece na "câmera" do canto, como numa videochamada
   const cam = mountAgentCam({ name: journey.agent.name, visual: await loadAgentVisual() });
@@ -97,7 +97,7 @@ async function main(): Promise<void> {
   const journeyPanel = mountJourneyPanel({ jornada: jornadaDaPessoa, final: "primeira-tarefa" });
   let visitados: string[] = [];
   let painelRecolhido = false; // recolhe sozinho uma vez, quando o quadro aparece; depois, só a pessoa abre e fecha
-  // Voz de verdade (servidor em server/): sem ele, a aula segue só com legenda e chat.
+  // Voz de verdade (servidor em server/): sem ele, a sessão segue só com legenda e chat.
   const voice = await createAgentVoice();
   const faqs = buildFaqs(journey, profile);
   // Rastro de cada fala (caminho, resposta e fonte): a tela de demo src/screens/rastro/ mostra.
@@ -134,7 +134,7 @@ async function main(): Promise<void> {
     const off = paused || ended;
     const voice = off ? "paused" : agentState === "speaking" ? "talk" : "listen";
     el.voice.dataset.state = voice;
-    el.voice.setAttribute("aria-label", ended ? "Aula encerrada" : paused ? "Puca pausada" : voice === "talk" ? "Puca falando" : "Puca ouvindo");
+    el.voice.setAttribute("aria-label", ended ? "Sessão encerrada" : paused ? "Puca pausada" : voice === "talk" ? "Puca falando" : "Puca ouvindo");
     el.liveDot.classList.toggle("is-off", off);
     cam.setPaused(off);
     if (!off) cam.setState(CAM_STATE[agentState]);
@@ -142,7 +142,7 @@ async function main(): Promise<void> {
     el.hint.textContent = ended
       ? "Use “Ligar para a Puca” para continuar de onde parou."
       : paused
-        ? "Aula pausada."
+        ? "Sessão pausada."
         : agentState === "listening"
           ? "Escolha uma opção ou responda pelo chat."
           : agentState === "choosing"
@@ -219,12 +219,12 @@ async function main(): Promise<void> {
   function consultedNow(): string[] {
     const nodes = currentBoard ? (journey.boards[currentBoard]?.nodes ?? []) : [];
     const docs = nodes.flatMap((n) => [...(n.info?.docs ?? []).map((d) => d.title), ...(n.info?.adr ? [n.info.adr.id] : [])]);
-    const knowledge = currentMoment?.knowledge ? [`Conhecimento da aula: ${currentMoment.title}`] : [];
+    const knowledge = currentMoment?.knowledge ? [`Conhecimento da sessão: ${currentMoment.title}`] : [];
     return [...new Set([...docs, ...knowledge])];
   }
 
   let toastTimer = 0;
-  /** Encaminha a dúvida à buddy (§4.5): guarda para o Slack, marca no rastro e avisa na aula. */
+  /** Encaminha a dúvida à buddy (§4.5): guarda para o Slack, marca no rastro e avisa na sessão. */
   function forward(entryId: string, f: { question: string; summary: string; reason: string }): void {
     const created = outbox.add({ ...f, to: { name: buddy, role: "buddy" }, pessoa: profile.nome, consulted: consultedNow(), moment: currentMoment?.id ?? null });
     trail.update(entryId, { forwarding_id: created.id });
@@ -234,7 +234,7 @@ async function main(): Promise<void> {
     toastTimer = window.setTimeout(() => (el.forwardToast.hidden = true), 8000);
   }
 
-  /** O agente pediu outro ponto da aula: resposta do passo atual que leva lá, ou pulo de momento. */
+  /** O agente pediu outro ponto da sessão: resposta do passo atual que leva lá, ou pulo de momento. */
   function goTo(target: string): void {
     const t = currentStep?.transitions?.find((tr) => ("moment" in tr.to ? `moment:${tr.to.moment}` : `step:${tr.to.step}`) === target);
     if (t?.if && "reply" in t.if) return answer(t.if.reply, "chat");
@@ -254,7 +254,7 @@ async function main(): Promise<void> {
   }
 
   // Fala da pessoa (chat ou voz). A ordem está em journey/route.ts: pulo → resposta sugerida → nome de
-  // um item do quadro → conhecimento da aula → FAQ do nó → agente (ponte na hora + LLM no servidor).
+  // um item do quadro → conhecimento da sessão → FAQ do nó → agente (ponte na hora + LLM no servidor).
   async function handleUtterance(text: string, from: "chat" | "voz"): Promise<void> {
     text = text.trim();
     if (!text) return;
@@ -316,6 +316,9 @@ async function main(): Promise<void> {
           onAction: (a) => io.apply(a),
           onGoTo: goTo,
           onEscalate: (summary) => forward(entry.id, { question: text, summary, reason: "Não encontrei fonte confiável para responder." }),
+          // custo da sessão (#52): só no rastro, para auditar; nada em tela
+          onTiming: (t) =>
+            trail.update(entry.id, { llm_ms: t.total_ms, tokens_in: t.tokens_in ?? undefined, tokens_out: t.tokens_out ?? undefined, tokens_estimated: t.tokens_estimated }),
         },
       ));
     // gravado mesmo se a pessoa interrompeu: fica a resposta parcial
@@ -325,12 +328,12 @@ async function main(): Promise<void> {
     const line = "Não achei isso confirmado na documentação, então não quero chutar. Anotei a sua pergunta para a sua buddy responder.";
     trail.update(entry.id, { answer: line });
     // "ok" ou "valeu" não vão para a buddy
-    if (looksLikeQuestion(text)) forward(entry.id, { question: text, summary: text, reason: "Estava sem acesso ao agente e não achei isso na aula." });
+    if (looksLikeQuestion(text)) forward(entry.id, { question: text, summary: text, reason: "Estava sem acesso ao agente e não achei isso na sessão." });
     void speakAside(line);
   }
 
   document.addEventListener("chatpanel:send", (e) => void handleUtterance(e.detail.text, "chat"));
-  // Aula sob demanda: clicar num momento do painel leva ao início dele.
+  // Sessão sob demanda: clicar num momento do painel leva ao início dele.
   document.addEventListener("journeypanel:pick", (e) => {
     const m = journey.moments.find((x) => x.id === e.detail.id);
     if (m && m.id !== currentMoment?.id && !paused && !ended) pularPara(m);
@@ -345,12 +348,14 @@ async function main(): Promise<void> {
   });
   document.addEventListener("callbar:end", () => {
     ended = true;
+    trail.endSession();
     clock.setEnded(true);
     cam.hide();
     render();
   });
   document.addEventListener("callbar:start", () => {
     ended = false;
+    trail.startSession(); // retomar a call reabre a sessão (#52)
     clock.setEnded(false);
     cam.show();
     render();
@@ -511,17 +516,19 @@ async function main(): Promise<void> {
       setAgent("thinking");
       await clock.wait(600);
       runner = createRunner(journey, profile, io);
+      trail.startSession();
       running = true;
       await runner.run();
       running = false;
+      trail.endSession();
       journeyPanel.setProgress(visitados, null);
       setAgent("done");
-      el.moment.textContent = "aula completa";
-      showReplies(["Recomeçar a aula"]);
+      el.moment.textContent = "sessão completa";
+      showReplies(["Recomeçar a sessão"]);
       pending = { kind: "reply", resolve: () => void start(), reject: () => {} };
-      el.hint.textContent = "Fim da aula.";
+      el.hint.textContent = "Fim da sessão.";
     } catch (err) {
-      if (err instanceof Cancelled) return; // a aula recomeçou
+      if (err instanceof Cancelled) return; // a sessão recomeçou
       throw err;
     }
   }
@@ -532,7 +539,7 @@ async function main(): Promise<void> {
   const gate = document.createElement("button");
   gate.type = "button";
   gate.className = "voice-gate";
-  gate.textContent = "Começar aula com voz";
+  gate.textContent = "Começar sessão com voz";
   document.body.append(gate);
   gate.addEventListener("click", async () => {
     gate.remove();

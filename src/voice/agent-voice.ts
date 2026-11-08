@@ -23,6 +23,16 @@ export interface AskHandlers {
   onGoTo(target: string): void;
   /** O agente não achou fonte confiável: a tela encaminha a dúvida à buddy (resumo do agente). */
   onEscalate?(summary: string): void;
+  /** Tempo e tokens do pedido (último evento; não chega se a pessoa interrompeu). Custo da sessão, #52. */
+  onTiming?(timing: AskTimingSummary): void;
+}
+
+/** O que a tela usa do `timing` do /api/ask (docs/contratos.md, "Custo da sessão"). */
+export interface AskTimingSummary {
+  total_ms: number;
+  tokens_in: number | null;
+  tokens_out: number | null;
+  tokens_estimated: boolean;
 }
 
 export interface SpeakOptions {
@@ -176,6 +186,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
             } else if (ev.type === "action") actions.push(ev.action);
             else if (ev.type === "go_to") h.onGoTo(ev.target);
             else if (ev.type === "escalate") h.onEscalate?.(ev.summary);
+            else if (ev.type === "timing") h.onTiming?.(ev.timing);
           }
         }
       } catch {
