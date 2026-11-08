@@ -124,6 +124,8 @@ function render(filtro: Filtro): void {
   qs(document, "#people-count").textContent = `${lista.length} ${lista.length === 1 ? "pessoa" : "pessoas"}`;
   qs(document, "#people").innerHTML = lista
     .map((p) => {
+      // cada pessoa numa cor do espectro da Puca (a mesma de sempre, pela posição na lista completa)
+      const hue = Math.round((INTEGRACOES.indexOf(p) / INTEGRACOES.length) * 360 + 200) % 360;
       const segs = ETAPAS.map((_, i) => `<i class="seg ${i < p.etapa ? "is-done" : i === p.etapa ? "is-now" : ""}"></i>`).join("");
       const pend = p.pendencias.length
         ? `<span class="mark mark--open" aria-hidden="true"></span>${p.pendencias.length} ${p.pendencias.length === 1 ? "pendência" : "pendências"}`
@@ -132,7 +134,7 @@ function render(filtro: Filtro): void {
       <tr>
         <th scope="row">
           <span class="who">
-            <span class="avatar avatar--row" aria-hidden="true">${esc(initials(p.nome))}</span>
+            <span class="avatar avatar--row" style="--hue:${hue}" aria-hidden="true">${esc(initials(p.nome))}</span>
             <span class="who__text"><span class="who__name">${esc(p.nome)}</span><span class="who__sub">${esc(p.cargo)} · ${esc(p.time)}</span></span>
           </span>
         </th>
