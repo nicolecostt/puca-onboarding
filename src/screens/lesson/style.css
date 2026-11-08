@@ -1,15 +1,33 @@
-/* Sessão no quadro (Figma: "03 · Aula no quadro — o wow").
+/* Sessão no quadro (Figma: "03 · Aula no quadro — o wow"), no visual da landing (DESIGN.md):
+   papel branco com pontilhado, quadro à mão (estilo Excalidraw), peças planas com fio fino e sem sombra.
    O quadro ocupa a tela toda abaixo do cabeçalho; os cartões flutuam por cima. */
 body {
   overflow: hidden;
+  background: var(--color-surface);
 }
+/* A página tem três faixas: título no topo, quadro no meio e a fala da Puca embaixo.
+   O pontilhado é da página inteira, então o quadro não tem borda: só fica longe da legenda. */
 .lesson {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --top: 64px; /* título da sessão */
+  --bottom: 172px; /* fala da Puca e respostas */
   position: relative;
   height: calc(100vh - 56px);
+  background-color: var(--color-surface);
+  background-image: radial-gradient(var(--color-board-dot) 1px, transparent 1.2px);
+  background-size: 22px 22px;
 }
 .lesson__board {
   position: absolute;
-  inset: 0;
+  inset: var(--top) 24px var(--bottom);
+}
+/* com a câmera da Puca no canto, o quadro não passa por baixo dela */
+body.has-agent-cam:not(.is-call-off) .lesson__board {
+  right: 300px;
+}
+.lesson__board .wb {
+  overflow: visible; /* cartões dos nós podem passar da faixa do quadro */
+  background: none;
 }
 
 /* ---- Abertura e encerramento (vista "logo") ---- */
@@ -21,11 +39,8 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding-bottom: 120px; /* espaço da legenda e da barra de call */
+  padding-bottom: var(--bottom);
   text-align: center;
-  background-color: var(--color-board);
-  background-image: radial-gradient(var(--color-board-dot) 1px, transparent 1.2px);
-  background-size: 22px 22px;
 }
 .opening[hidden] {
   display: none;
@@ -37,20 +52,21 @@ body {
 }
 .opening__title {
   margin: 0;
-  font-size: var(--text-lg);
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 500;
   color: var(--color-muted);
 }
 .opening__who {
   margin: 10px 0 0;
-  height: 26px;
+  height: 28px;
   padding: 0 12px;
   display: inline-flex;
   align-items: center;
   border-radius: var(--radius-pill);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-chip);
-  font-size: var(--text-sm);
+  border: 1px solid var(--color-text);
+  font-size: 13px;
   font-weight: 500;
 }
 
@@ -60,10 +76,11 @@ body {
   padding: 0 7px;
   display: inline-flex;
   align-items: center;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  background: var(--color-surface-muted);
+  background: var(--color-surface);
   color: var(--color-muted);
-  font-size: var(--text-xs);
+  font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -75,22 +92,24 @@ body {
   left: 50%;
   top: 16px;
   transform: translateX(-50%);
-  height: 40px;
-  padding: 0 10px 0 16px;
+  padding: 10px 18px; /* sem altura fixa: o texto alinha pela linha de base e a pílula abraça */
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 10px;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-text);
   border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-card);
-  font-size: var(--text-md);
+  font-size: 13px;
   white-space: nowrap;
 }
 .lesson-title strong {
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 .lesson-title__dot {
+  align-self: center;
   width: 8px;
   height: 8px;
   flex: none;
@@ -103,118 +122,148 @@ body {
   box-shadow: 0 0 0 3px var(--color-surface-muted);
 }
 .lesson-title__time {
-  font-size: var(--text-sm);
+  font-size: 12px;
   color: var(--color-muted);
   font-variant-numeric: tabular-nums;
 }
+/* selo do momento: some enquanto não há momento (abertura) */
+.lesson-title .chip:empty {
+  display: none;
+}
+/* com o selo do momento, ele encosta mais na borda direita */
+.lesson-title:has(.chip:not(:empty)) {
+  padding-right: 8px;
+}
 .lesson-title .chip {
+  align-self: center;
   padding: 0 9px;
   border-radius: var(--radius-pill); /* acompanha a curva da pílula */
 }
 
-/* ---- Legenda (embaixo, centro) ---- */
+/* ---- Fala da Puca (embaixo, centro), no modelo da call inicial ----
+   Sem caixa: as bolinhas da Puca em cima, a fala centrada em Creato Display, cada palavra entrando
+   com um leve desfoque. Um véu branco por baixo separa a fala do quadro. */
 .caption {
   position: absolute;
-  left: 50%;
-  bottom: 72px; /* 12px acima da barra de call */
-  transform: translateX(-50%);
-  width: min(760px, calc(100% - 32px));
-  min-height: 62px; /* sempre duas linhas: não pula quando a fala quebra a linha */
-  padding: 10px 16px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-float);
-  transition: opacity 0.2s ease;
-}
-.caption:has(.caption__text:empty) {
-  opacity: 0;
-  pointer-events: none;
-}
-.caption__logo {
-  flex: none;
-  width: 22px;
-  height: 22px;
-  margin-top: 1px;
-  border-radius: var(--radius-sm);
-  display: grid;
-  place-items: center;
-  background: var(--color-ink);
-  color: #fafafa;
-  font: 700 12px/1 var(--font-hand);
-}
-.caption__body {
-  flex: 1;
-  min-width: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  min-height: var(--bottom);
+  padding: 28px max(24px, calc(50% - 380px)) 22px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  text-align: center;
+  background: linear-gradient(to top, var(--color-surface) 62%, color-mix(in srgb, var(--color-surface) 0%, transparent));
+  pointer-events: none;
 }
-.caption__body p {
+.caption > * {
+  pointer-events: auto;
+}
+.caption p {
   margin: 0;
+}
+.caption__orb {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 2px;
+}
+/* as bolinhas só aparecem quando a Puca começa a falar */
+.caption__orb {
+  transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
+}
+.caption:has(.caption__text:empty) .caption__orb {
+  opacity: 0;
+  transform: scale(0.8);
 }
 .caption__text {
-  margin: 0;
-  font-size: var(--text-base);
-  line-height: 21px;
+  max-width: 46ch;
+  min-height: 1.3em;
+  font-family: var(--font-display);
+  font-size: clamp(18px, 1.5vw, 21px);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
 }
-.caption__text mark {
-  background: var(--color-highlight);
-  color: inherit;
-  border-radius: 3px;
-  padding: 0 1px;
+.caption__text .word {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(0.3em);
+  transition: opacity 0.32s var(--ease-out), filter 0.32s var(--ease-out), transform 0.32s var(--ease-out);
+}
+.caption__text .word.is-in {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+}
+/* trecho de destaque do passo */
+.caption__text .word {
+  white-space: pre;
+}
+.caption__text .word.is-mark {
+  background: var(--color-highlight-strong);
 }
 .caption__you {
-  font-size: var(--text-md);
+  max-width: 56ch;
+  font-size: 14px;
   color: var(--color-muted);
+}
+.caption__you::before {
+  content: "Você · ";
+  color: var(--color-text);
+  font-weight: 500;
 }
 .caption__you:empty,
 .caption__hint:empty,
 .caption__replies:empty {
   display: none;
 }
-.caption__you::before {
-  content: "Você: ";
-  color: var(--color-subtle);
-}
 .caption__hint {
-  font-size: var(--text-sm);
-  color: var(--color-subtle);
+  font-size: 12px;
+  color: var(--color-muted);
 }
 
-/* respostas sugeridas: pílulas pequenas dentro da legenda */
+/* respostas sugeridas: pílulas centradas embaixo da fala */
 .caption__replies {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding-top: 2px;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 4px;
 }
 .reply {
   all: unset;
   box-sizing: border-box;
-  height: 28px;
-  padding: 0 12px;
+  height: 36px;
+  padding: 0 16px;
   display: inline-flex;
   align-items: center;
   border-radius: var(--radius-pill);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-chip);
-  font-size: var(--text-md);
+  border: 1px solid var(--color-text);
+  font-size: 14px;
   font-weight: 500;
   color: var(--color-text);
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
-  animation: reply-in 0.3s ease both;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.2s var(--ease-out);
+  animation: reply-in 0.35s var(--ease-out) both;
 }
 .reply:hover {
-  border-color: var(--color-subtle);
+  background: var(--color-text);
+  color: var(--color-surface);
+}
+.reply:active {
+  transform: scale(0.97);
 }
 .reply:focus-visible {
-  outline: 2px solid var(--color-info);
+  outline: 2px solid var(--color-text);
   outline-offset: 2px;
 }
 .reply[disabled] {
@@ -231,16 +280,15 @@ body {
 /* ---- Ao lado da barra de call (a barra tem 270px de largura e 42px de altura) ---- */
 .voice {
   position: fixed;
-  bottom: 18px; /* mesma base da barra de call */
-  right: calc(50% + 147px); /* metade da barra (135px) + 12px */
-  height: 42px;
-  padding: 0 14px;
+  bottom: 25px; /* centrado com a barra de call (56px, a 20px da base) */
+  right: calc(50% + 160px); /* metade da barra (~148px) + 12px */
+  height: 46px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-card);
 }
 .voice__bars {
   height: 20px;
@@ -274,27 +322,47 @@ body {
 }
 
 /* ---- Telas menores: tira o que é secundário ---- */
+/* com os controles presos na câmera, a câmera já mostra se a Puca fala: as ondas saem */
+body.has-attached-callbar .voice {
+  display: none;
+}
 @media (max-width: 1180px) {
   .voice {
     display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .caption__text .word {
+    filter: none;
+    transform: none;
+    transition: opacity 0.2s linear;
   }
 }
 @media (max-width: 720px) {
   .lesson-title {
     width: calc(100% - 32px);
   }
+  .lesson {
+    --bottom: 300px; /* fala + câmera e controles */
+  }
   .caption {
-    bottom: 140px;
+    bottom: 110px;
+    min-height: 0;
   }
 }
 
 
+/* call desligada (antes de começar ou depois de encerrar): sem câmera e sem controles */
+body.is-call-off .agent-cam,
+body.is-call-off .call-dock {
+  display: none;
+}
+
 /* Botão de entrada quando há voz: o browser só libera som e microfone depois de um clique. */
 .voice-gate{
   position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;
-  height:44px;padding:0 22px;border:0;border-radius:999px;
-  background:var(--color-fg, #171717);color:#fff;font:inherit;font-weight:600;cursor:pointer;
-  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  height:48px;padding:0 24px;border:0;border-radius:999px;
+  background:var(--color-text);color:var(--color-surface);font:inherit;font-weight:500;cursor:pointer;
 }
 
 /* Aviso de encaminhamento à buddy: a mensagem sai na tela do Slack (live-session). */
@@ -308,12 +376,11 @@ body {
   align-items: center;
   padding: 10px 14px;
   transform: translateX(-50%);
-  border: 1px solid var(--color-success-border);
+  border: 1px solid var(--color-text);
   border-radius: var(--radius-pill);
-  background: var(--color-success-bg);
-  box-shadow: var(--shadow-card);
-  color: var(--color-success);
-  font-size: 14px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 13px;
 }
 
 .forward-toast[hidden] {
