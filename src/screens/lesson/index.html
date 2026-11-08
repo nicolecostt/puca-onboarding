@@ -19,10 +19,10 @@
 </head>
 <body>
   <!-- o cabeçalho (app-header) entra aqui pelo main.ts -->
-  <!-- Aviso de encaminhamento à buddy (§4.5): a mensagem sai na tela do Slack -->
+  <!-- Avisos da sessão: encaminhamento à buddy (§4.5) e pedido/aprovação da primeira tarefa (§4.4). O texto e o link vêm do main.ts -->
   <div class="forward-toast" id="forward-toast" role="status" hidden>
     <span id="forward-text">Encaminhado à buddy no Slack</span>
-    <a href="../live-session/" target="puca-slack">Abrir Slack</a>
+    <a id="forward-link" href="../live-session/" target="puca-slack">Abrir Slack</a>
   </div>
   <main class="lesson">
     <!-- Vista "quadro": a sessão visual -->
