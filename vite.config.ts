@@ -8,8 +8,9 @@ export default defineConfig({
   test: {
     exclude: [...configDefaults.exclude, "**/.claude/**"],
   },
-  // O agente roda em server/ (npm run dev:server); em dev o Vite repassa /api para ele.
-  server: { proxy: { "/api": { target: "http://localhost:8787", changeOrigin: true } } },
+  // Em dev o Vite repassa /api para o servidor: o local (npm run dev:server) ou, com API_TARGET, outro, como o do
+  // Fly (npm run dev:fly), que já tem o Claude e a voz; aí só o front roda na máquina.
+  server: { proxy: { "/api": { target: process.env.API_TARGET || "http://localhost:8787", changeOrigin: true } } },
   build: {
     target: "es2022",
     rollupOptions: {

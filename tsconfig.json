@@ -13,5 +13,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "server", "scripts", "sandbox", "kit", "vite.config.ts"]
+  "include": ["src", "server", "scripts", "sandbox", "kit", "desktop", "vite.config.ts"]
 }
