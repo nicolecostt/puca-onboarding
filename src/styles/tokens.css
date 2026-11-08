@@ -2,6 +2,28 @@
    Mudar aqui muda o app inteiro. Componentes e telas usam só estas variáveis. */
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=Kalam:wght@400;700&display=swap");
 
+/* Creato Display: títulos (src/assets/fonts, licença OFL). Só baixa quando alguma tela usa --font-display. */
+@font-face {
+  font-family: "Creato Display";
+  src: url("../assets/fonts/CreatoDisplay-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Creato Display";
+  src: url("../assets/fonts/CreatoDisplay-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Creato Display";
+  src: url("../assets/fonts/CreatoDisplay-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-display: swap;
+}
+
 /* ângulo do arco-íris da Puca, animável */
 @property --holo-turn {
   syntax: "<angle>";
@@ -20,7 +42,7 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-hand: "Kalam", "Comic Sans MS", cursive; /* letra do quadro */
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --font-display: "Creato Display", "Inter", ui-sans-serif, system-ui, sans-serif; /* títulos da landing (src/assets/fonts) */
+  --font-display: "Creato Display", "Inter", ui-sans-serif, system-ui, sans-serif; /* títulos (landing e telas do app) */
 
   /* ---- Neutros ---- */
   --color-text: #0a0a0a;

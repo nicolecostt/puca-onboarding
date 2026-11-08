@@ -27,6 +27,7 @@ import { mountCallBar } from "../../components/call-bar/call-bar";
 import { mountAgentCam } from "../../components/agent-cam/agent-cam";
 import { mountJourneyPanel } from "../../components/journey-panel/journey-panel";
 import { loadAgentVisual, type AgentVisualState } from "../../lib/agent-visual";
+import { mountPucaDots } from "../../lib/puca-dots";
 import { emit } from "../../lib/events";
 import { esc, qs } from "../../lib/dom";
 import { profiles, type Profile as DemoProfile } from "../../data";
@@ -51,13 +52,29 @@ function headerPerson(p: Profile, fromInterview: boolean): DemoProfile {
   return { ...base, name: p.nome, nickname: p.nome, initials, role: p.cargo ?? base.role, toTeam: p.time ?? base.toTeam, fromTeam: undefined };
 }
 
-/** Legenda até onde já foi falado, com o trecho de destaque marcado (se já chegou nele). */
-function captionHTML(full: string, spokenLength: number, highlight?: string): string {
-  const spoken = full.slice(0, spokenLength);
+/** Legenda da fala, palavra por palavra (como na call inicial): cada palavra guarda onde termina na fala,
+ *  para aparecer quando a voz chegar nela. O trecho de destaque do passo vem marcado. */
+function captionWords(full: string, highlight?: string): string {
   const from = highlight ? full.indexOf(highlight) : -1;
-  if (from < 0 || from >= spoken.length) return esc(spoken);
-  const to = Math.min(spoken.length, from + (highlight?.length ?? 0));
-  return `${esc(spoken.slice(0, from))}<mark>${esc(spoken.slice(from, to))}</mark>${esc(spoken.slice(to))}`;
+  const to = from + (highlight?.length ?? 0);
+  const words = [...full.matchAll(/\S+/g)].map((m) => {
+    const end = m.index + m[0].length;
+    return { text: m[0], end, marked: from >= 0 && m.index < to && end > from };
+  });
+  // dentro do destaque, o espaço vai junto da palavra: a marca fica contínua
+  return words
+    .map((w, i) => {
+      const joined = w.marked && words[i + 1]?.marked;
+      return `<span class="word${w.marked ? " is-mark" : ""}" data-end="${w.end}">${esc(w.text)}${joined ? " " : ""}</span>${joined ? "" : " "}`;
+    })
+    .join("");
+}
+
+/** Mostra as palavras já faladas (até `spoken` caracteres). */
+function revealWords(host: HTMLElement, spoken: number): void {
+  for (const w of host.querySelectorAll<HTMLElement>(".word:not(.is-in)")) {
+    if (Number(w.dataset.end) <= spoken) w.classList.add("is-in");
+  }
 }
 
 async function main(): Promise<void> {
@@ -88,17 +105,18 @@ async function main(): Promise<void> {
     forwardLink: qs<HTMLAnchorElement>(document, "#forward-link"),
   };
   el.lessonName.textContent = journey.title;
+  mountPucaDots(qs(document, "#caption-orb")); // a Puca na legenda: as bolinhas dela se mexendo
 
   const clock = createClock();
   const chat = mountChatPanel({ title: "Transcrição da sessão", messages: [] });
-  mountCallBar({ chat, draggable: false }); // fixa; sem status: a legenda já mostra o que está acontecendo
-  // a Puca aparece na "câmera" do canto, como numa videochamada
+  // a Puca aparece na "câmera" do canto, como numa videochamada; os controles ficam presos embaixo dela
   const cam = mountAgentCam({ name: journey.agent.name, visual: await loadAgentVisual() });
+  const bar = mountCallBar({ chat, attachTo: cam }); // sem status: a legenda já mostra o que está acontecendo
   // Jornada da pessoa: a calibragem da call inicial marca cada momento (aprender, revisar, fora) e o painel mostra.
   // A checagem da sessão atualiza a calibragem e o painel (§4.2 e §12.1: atualiza os objetivos que faltam).
   const calibrada = resolveCalibragem(location.search);
   let calibragem = calibrada.calibragem;
-  const journeyPanel = mountJourneyPanel({ jornada: montarJornadaDaPessoa(journey, calibragem), final: "primeira-tarefa" });
+  const journeyPanel = mountJourneyPanel({ jornada: montarJornadaDaPessoa(journey, calibragem) });
   let visitados: string[] = [];
   let painelRecolhido = false; // recolhe sozinho uma vez, quando o quadro aparece; depois, só a pessoa abre e fecha
   // Voz de verdade (servidor em server/): sem ele, a sessão segue só com legenda e chat.
@@ -150,7 +168,7 @@ async function main(): Promise<void> {
     if (!off) cam.setState(CAM_STATE[agentState]);
     for (const b of el.replies.querySelectorAll<HTMLButtonElement>("button")) b.disabled = off;
     el.hint.textContent = ended
-      ? "Use “Ligar para a Puca” para continuar de onde parou."
+      ? ""
       : paused
         ? "Sessão pausada."
         : agentState === "listening"
@@ -219,7 +237,8 @@ async function main(): Promise<void> {
 
   /** Fala dita fora do roteiro (resposta da knowledge/FAQ ou do agente): legenda, chat e voz. */
   async function speakAside(text: string, play: () => Promise<void> = () => voice.speak(text)): Promise<void> {
-    el.captionAgent.textContent = text;
+    el.captionAgent.innerHTML = captionWords(text);
+    requestAnimationFrame(() => revealWords(el.captionAgent, text.length));
     chat.addMessage({ from: "agent", text });
     remember("assistant", text);
     await play();
@@ -433,6 +452,14 @@ async function main(): Promise<void> {
     clock.setEnded(true);
     cam.hide();
     render();
+    // nesta tela não há "Ligar para a Puca" no canto: a call some e um botão no centro retoma a sessão
+    document.body.classList.add("is-call-off");
+    showGate("Voltar para a sessão", () => {
+      document.body.classList.remove("is-call-off");
+      bar.start();
+      emit("callbar:start", {});
+      window.setTimeout(() => cam.sync(), 300);
+    });
   });
   document.addEventListener("callbar:start", () => {
     ended = false;
@@ -494,10 +521,11 @@ async function main(): Promise<void> {
       const ends = [...text.matchAll(/\S+/g)].map((m) => m.index + m[0].length);
       let spoken = 0;
       let next = 0;
+      el.captionAgent.innerHTML = captionWords(text, highlight);
       const advance = (to: number) => {
         if (to <= spoken) return;
         spoken = to;
-        el.captionAgent.innerHTML = captionHTML(text, spoken, highlight);
+        revealWords(el.captionAgent, spoken);
         while (next < cues.length && cues[next].at < spoken) io.apply(cues[next++].action);
       };
       let heard = false; // chegou o tempo de alguma palavra do áudio
@@ -588,6 +616,20 @@ async function main(): Promise<void> {
     },
   };
 
+  /** Botão no centro da tela, enquanto a call não está ligada. Some ao clicar. */
+  function showGate(label: string, onClick: () => void): void {
+    document.querySelector(".voice-gate")?.remove();
+    const gate = document.createElement("button");
+    gate.type = "button";
+    gate.className = "voice-gate";
+    gate.textContent = label;
+    document.body.append(gate);
+    gate.addEventListener("click", () => {
+      gate.remove();
+      onClick();
+    });
+  }
+
   // ---- Rodar / recomeçar ----
   async function start(): Promise<void> {
     clock.cancel(); // derruba esperas da execução anterior
@@ -623,14 +665,11 @@ async function main(): Promise<void> {
 
   render();
   if (!voice.tts && !voice.stt) return void start();
-  // O browser só libera som e microfone depois de um clique.
-  const gate = document.createElement("button");
-  gate.type = "button";
-  gate.className = "voice-gate";
-  gate.textContent = "Começar sessão com voz";
-  document.body.append(gate);
-  gate.addEventListener("click", async () => {
-    gate.remove();
+  // O browser só libera som e microfone depois de um clique. Até lá, a câmera e os controles da call não aparecem.
+  document.body.classList.add("is-call-off");
+  showGate("Começar sessão com voz", async () => {
+    document.body.classList.remove("is-call-off");
+    window.setTimeout(() => cam.sync(), 300);
     await voice.unlock();
     void voice.listen((t) => void handleUtterance(t, "voz"), (t) => (el.captionUser.textContent = t)).catch((e) => console.warn("microfone:", e));
     void start();

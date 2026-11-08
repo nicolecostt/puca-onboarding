@@ -46,7 +46,7 @@ body.has-agent-cam .chat-panel:not(.is-placed){
   right:var(--chat-right, 24px);
   bottom:var(--chat-bottom, 212px);
   top:var(--chat-top, auto);
-  height:min(560px, var(--chat-space, 560px));
+  height:min(500px, var(--chat-space, 500px));
 }
 
 @media (max-width:760px){
@@ -54,7 +54,7 @@ body.has-agent-cam .chat-panel:not(.is-placed){
 }
 /* com a barra de call presa embaixo: a câmera sobe para dar lugar e fica da largura da barra compacta */
 body.has-attached-callbar .agent-cam{--cam-size:230px} /* largura da barra com espaço igual entre os botões */
-body.has-attached-callbar .agent-cam:not(.is-placed){bottom:74px}
+body.has-attached-callbar .agent-cam:not(.is-placed){right:40px;bottom:90px} /* longe do canto; a barra fica a 40px da base */
 @media (prefers-reduced-motion:reduce){
   .agent-cam,.agent-cam__view{transition:none}
 }

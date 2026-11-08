@@ -37,7 +37,9 @@ src/
     lessons/             sessões do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css
     landing/             apresentação do Orbis e da Puca (só preto, branco e a cor da Puca)
-    onboarding-call/     call inicial: o agente entrevista a pessoa e grava a calibragem
+    onboarding-call/     call inicial: a Puca conversa com a pessoa e grava a calibragem; no fim, abre as boas-vindas
+    boas-vindas/         "Oi, {nome}": ir para o início ou refazer a call inicial
+    inicio/              início do Orbis: progresso, perfil, tarefas, acessos e ligar para a Puca
     lesson/              sessão no quadro: o quadro se monta junto com a fala
     live-session/        tela de auxílio: barra de call, chat e câmera por cima de uma tela
     primeira-tarefa/     página da primeira tarefa (estilo Notion): o que é, quem ajuda e a aprovação do gestor
@@ -116,7 +118,7 @@ A tela `src/screens/lesson/` roda a jornada em JSON (`src/journey/data/tail.jour
 Pelo chat ela também pode pedir para mudar de assunto ou fazer perguntas, que a Puca responde com o conhecimento da sessão.
 A conversa ainda é simulada (sem LLM nem voz); o motor (`src/journey/runner.ts`) não depende da tela.
 
-- O perfil vem da call de entrevista: o link "Começar a sessão →" no fim dela abre a sessão.
+- O perfil vem da call inicial: no fim dela, as boas-vindas levam ao início, e "Começar a sessão" abre a sessão.
 - `?perfil=ana` (recém-contratada: passa pela parte institucional) ou `?perfil=bruno` (mudando de time: vai direto ao time).
 - `?auto=1` responde sozinho, para apresentar sem mexer no mouse.
 

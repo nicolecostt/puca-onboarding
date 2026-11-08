@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boas-vindas · Orbis</title>
+<meta name="theme-color" content="#ffffff">
+<script>
+  // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
+  if (location.protocol === "file:") {
+    addEventListener("DOMContentLoaded", function () {
+      document.body.innerHTML =
+        '<div style="max-width:440px;margin:15vh auto;padding:24px;font:15px/1.6 system-ui,sans-serif;color:#171717;background:#fff;border:1px solid #e5e5e5;border-radius:12px">' +
+        "<strong>Esta página precisa do servidor do projeto.</strong><br>" +
+        "No terminal, na pasta do projeto, rode <code>npm run dev</code> e abra " +
+        '<a href="http://localhost:5173/">http://localhost:5173</a>.</div>';
+    });
+  }
+</script>
+</head>
+<body>
+  <canvas class="particles" id="particles" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <div class="topbar__row">
+      <a class="brand" href="../landing/" aria-label="Orbis, início">
+        <img class="brand__mark" src="../../assets/orbis-logo.png" alt="" width="26" height="26">
+        <span class="brand__name">Orbis</span>
+      </a>
+      <span class="who" id="who"></span>
+    </div>
+  </header>
+
+  <main class="home">
+    <h1 class="home__title" id="title">Oi.</h1>
+    <p class="home__lead" id="lead">Sua primeira semana está pronta.</p>
+    <div class="home__actions">
+      <a class="btn" id="go-inicio" href="../inicio/">Ir para o início</a>
+      <a class="link" id="go-call" href="../onboarding-call/">Refazer call inicial</a>
+    </div>
+  </main>
+
+<script type="module" src="./main.ts"></script>
+</body>
+</html>

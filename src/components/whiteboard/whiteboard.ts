@@ -66,7 +66,7 @@ function nodeHTML(n: BoardNode): string {
 function edgeSVG(e: BoardEdge): string {
   const style = e.style ?? "solid";
   return `<g class="wb-edge wb-edge--${style}" data-id="${e.id}">
-      <path class="wb-edge__line" d="${e.path}" pathLength="1"/>
+      <path class="wb-edge__line" d="${e.path}"${style === "solid" ? ' pathLength="1"' : ""}/>
       <path class="wb-edge__head" d="${e.head}"/>
     </g>`;
 }
@@ -119,13 +119,38 @@ export function mountWhiteboard(parent: HTMLElement, lesson: WhiteboardSpec): Wh
     }
   }
 
-  // ajusta o quadro à área disponível, mantendo a proporção do Figma
+  // Ajusta o quadro à área disponível pelo que está desenhado nele (todos os nós e rótulos, inclusive os que
+  // ainda vão aparecer, para o zoom não mudar no meio da sessão), e não pela folha inteira de 1440×844.
+  let content: { x: number; y: number; w: number; h: number } | null = null;
+  function measure(): { x: number; y: number; w: number; h: number } {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const el of stage.querySelectorAll<HTMLElement>(":scope > :not(svg)")) {
+      if (!el.offsetWidth) continue;
+      x0 = Math.min(x0, el.offsetLeft);
+      y0 = Math.min(y0, el.offsetTop);
+      x1 = Math.max(x1, el.offsetLeft + el.offsetWidth);
+      y1 = Math.max(y1, el.offsetTop + el.offsetHeight);
+    }
+    if (!Number.isFinite(x0)) return { x: 0, y: 0, w: BOARD_W, h: BOARD_H };
+    const pad = 32;
+    return { x: x0 - pad, y: y0 - pad, w: x1 - x0 + pad * 2, h: y1 - y0 + pad * 2 };
+  }
   function fit(): void {
-    const s = Math.min(root.clientWidth / BOARD_W, root.clientHeight / BOARD_H);
-    stage.style.transform = `translate(-50%, -50%) scale(${s})`;
+    content ??= measure();
+    const s = Math.min(root.clientWidth / content.w, root.clientHeight / content.h, 1.6);
+    const tx = root.clientWidth / 2 - (content.x + content.w / 2) * s;
+    const ty = root.clientHeight / 2 - (content.y + content.h / 2) * s;
+    stage.style.transformOrigin = "0 0";
+    stage.style.left = stage.style.top = "0";
+    stage.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
   }
   const resize = new ResizeObserver(fit);
   resize.observe(root);
+  // a fonte à mão muda a largura dos nós: mede de novo quando as fontes terminam de carregar
+  void document.fonts?.ready.then(() => {
+    content = null;
+    fit();
+  });
 
   // ---- detalhes ao clicar num nó ----
   function closePop(): void {
@@ -136,16 +161,23 @@ export function mountWhiteboard(parent: HTMLElement, lesson: WhiteboardSpec): Wh
   function openPop(btn: HTMLElement, n: BoardNode): void {
     const owner = n.ownerId ? company.people[n.ownerId] : undefined;
     const d = n.details;
-    const row = (label: string, value: string) => `<p class="wb-pop__row"><span>${esc(label)}</span>${value}</p>`;
+    const row = (label: string, value: string) => `<div class="wb-pop__row"><dt>${esc(label)}</dt><dd>${value}</dd></div>`;
+    const rows = [
+      owner ? row("Dono", `${esc(owner.name)} · ${esc(owner.team)}`) : "",
+      ...(d?.rows ?? []).map((r) => row(r.label, esc(r.value))),
+      d?.docs?.length ? row("Fontes", d.docs.map(esc).join("<br>")) : "",
+      d?.help ? row("Ajuda", esc(d.help)) : "",
+    ].join("");
+    // cabeçalho (nome e legenda do nó), o que é, os dados em linhas e o que vale saber
     pop.innerHTML = `
-      <p class="wb-pop__title">${esc(n.label.replace("\n", " "))}</p>
+      <header class="wb-pop__head">
+        <p class="wb-pop__title">${esc(n.label.replace("\n", " "))}</p>
+        ${n.caption ? `<p class="wb-pop__caption">${esc(n.caption)}</p>` : ""}
+      </header>
       ${d?.what ? `<p class="wb-pop__what">${esc(d.what)}</p>` : ""}
-      ${owner ? row("Dono", `${esc(owner.name)} · ${esc(owner.team)}`) : ""}
-      ${(d?.rows ?? []).map((r) => row(r.label, esc(r.value))).join("")}
+      ${rows ? `<dl class="wb-pop__rows">${rows}</dl>` : ""}
       ${d?.warn ? `<p class="wb-pop__warn">${esc(d.warn)}</p>` : ""}
-      ${d?.list?.length ? `<ul class="wb-pop__list">${d.list.map((li) => `<li>${esc(li)}</li>`).join("")}</ul>` : ""}
-      ${d?.docs?.length ? row("Fontes", d.docs.map(esc).join("<br>")) : ""}
-      ${d?.help ? row("Ajuda", esc(d.help)) : ""}`;
+      ${d?.list?.length ? `<ul class="wb-pop__list">${d.list.map((li) => `<li>${esc(li)}</li>`).join("")}</ul>` : ""}`;
     pop.hidden = false;
     btn.classList.add("is-open");
     // posiciona perto do nó (em px da tela)

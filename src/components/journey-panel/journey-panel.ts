@@ -1,7 +1,8 @@
-// Painel "Sua jornada" (sessão no quadro, canto de cima à esquerda): o objetivo da pessoa, os momentos da jornada
-// marcados pela calibragem (aprender, revisar, já conhece, fora) e os próximos passos. Não está no Figma;
+// Painel "Sua jornada" (sessão no quadro, canto de cima à esquerda): barra de progresso, o objetivo da pessoa e
+// os momentos numa linha do tempo, marcados pela calibragem (aprender, revisar, já conhece, pulado), com o atual
+// (ou o próximo) em destaque. Não está no Figma;
 // segue o visual dos cartões da sessão. Recolhe para não tampar o quadro.
-//   const panel = mountJourneyPanel({ jornada, final: "primeira-tarefa" });
+//   const panel = mountJourneyPanel({ jornada });
 //   panel.setProgress(["boas-vindas"], "seu-time");
 //   panel.setJornada(montarJornadaDaPessoa(journey, calibragemNova)); // depois de uma checagem
 // Evento no document: journeypanel:pick { id } quando a pessoa clica num momento (a tela faz o pulo).
@@ -14,8 +15,6 @@ import type { EstadoMomento, JornadaDaPessoa, MomentoDaPessoa } from "../../jour
 
 export interface JourneyPanelOptions {
   jornada: JornadaDaPessoa;
-  /** Momento que sempre aparece nos próximos passos enquanto não foi visto (ex.: a primeira tarefa). */
-  final?: string;
   /** Começa recolhido. Padrão: aberto. */
   collapsed?: boolean;
   parent?: HTMLElement;
@@ -34,25 +33,28 @@ const ESTADO_LABEL: Record<EstadoMomento, string> = {
   aprender: "aprender",
   revisar: "revisar",
   ja_conhece: "já conhece",
-  fora: "fora",
+  fora: "pulado",
 };
-
-/** Quantos próximos passos mostrar (o resto está na lista de momentos). */
-const MAX_PROXIMOS = 3;
 
 type Progresso = "feito" | "agora" | "a-seguir";
 
-function momentoHTML(m: MomentoDaPessoa, p: Progresso): string {
-  const mark = p === "feito" ? "✓" : "";
+const CHECK = `<svg width="8" height="8" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.3 2.3 4.7-4.9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+/** Um momento na linha do tempo. O motivo da calibragem só aparece no momento atual (e no próximo, antes de começar). */
+function momentoHTML(m: MomentoDaPessoa, p: Progresso, proximo: boolean, terminou: boolean): string {
   const current = p === "agora" ? ' aria-current="step"' : "";
-  const motivo = m.motivo ? `<span class="jp-moment__why">${esc(m.motivo)}</span>` : "";
+  const destaque = p === "agora" || proximo;
+  const motivo = destaque && m.motivo && m.estado !== "fora" ? `<span class="jp-moment__why">${esc(m.motivo)}</span>` : "";
+  // depois do fim da sessão, o próximo não é "a seguir": é o que ficou para rever (ou que não deu tempo de ver)
+  const quando = p === "agora" ? "agora" : !proximo ? "" : !terminou ? "a seguir" : m.estado === "revisar" ? "para rever" : "ainda não visto";
   // selo só onde a calibragem disse algo (momentos sem tema, como a checagem, são parte da sessão para todos)
   const tag = m.temas.length || m.estado !== "aprender" ? `<span class="jp-tag jp-tag--${m.estado}">${ESTADO_LABEL[m.estado]}</span>` : "";
   return `
-    <li class="jp-moment jp-moment--${p} jp-moment--${m.estado}"${current}>
-      <button class="jp-moment__btn" data-moment="${esc(m.id)}" title="Ir para ${esc(m.titulo)}">
-        <span class="jp-moment__mark" aria-hidden="true">${mark}</span>
+    <li class="jp-moment jp-moment--${p} jp-moment--${m.estado}${proximo ? " is-next" : ""}"${current}>
+      <button class="jp-moment__btn" data-moment="${esc(m.id)}" title="${m.estado === "fora" && m.motivo ? esc(m.motivo) : `Ir para ${esc(m.titulo)}`}">
+        <span class="jp-moment__mark" aria-hidden="true">${p === "feito" ? CHECK : ""}</span>
         <span class="jp-moment__text">
+          ${quando ? `<span class="jp-moment__when">${quando}</span>` : ""}
           <span class="jp-moment__title">${esc(m.titulo)}</span>
           ${motivo}
         </span>
@@ -73,12 +75,13 @@ export function mountJourneyPanel(opts: JourneyPanelOptions): JourneyPanel {
       <span class="jp-head__count"></span>
       <span class="jp-head__chev" aria-hidden="true"></span>
     </button>
+    <div class="jp-bar" aria-hidden="true"></div>
     <div class="jp-body" id="jp-body">
       ${
         jornada.objetivos.length
-          ? `<section class="jp-section">
+          ? `<section class="jp-goal">
               <h3 class="jp-label">Seu objetivo</h3>
-              ${jornada.objetivos.map((o) => `<p class="jp-goal">${esc(o)}</p>`).join("")}
+              ${jornada.objetivos.map((o) => `<p class="jp-goal__text">${esc(o)}</p>`).join("")}
             </section>`
           : ""
       }
@@ -86,43 +89,25 @@ export function mountJourneyPanel(opts: JourneyPanelOptions): JourneyPanel {
         <h3 class="jp-label">Momentos</h3>
         <ol class="jp-moments"></ol>
       </section>
-      <section class="jp-section jp-next">
-        <h3 class="jp-label">Próximos passos</h3>
-        <ol class="jp-next__list"></ol>
-      </section>
     </div>`;
   (opts.parent ?? document.body).appendChild(panel);
 
   const head = qs<HTMLButtonElement>(panel, ".jp-head");
   const count = qs(panel, ".jp-head__count");
+  const bar = qs(panel, ".jp-bar");
   const list = qs(panel, ".jp-moments");
-  const next = qs(panel, ".jp-next__list");
-  const nextSection = qs(panel, ".jp-next");
   function setProgress(visitados: readonly string[], atual: string | null): void {
     progresso = { visitados: [...visitados], atual };
-    const total = jornada.momentos.filter((m) => m.estado !== "fora").length;
     const vistos = new Set(visitados);
-    list.innerHTML = jornada.momentos
-      .map((m) => momentoHTML(m, m.id === atual ? "agora" : vistos.has(m.id) ? "feito" : "a-seguir"))
-      .join("");
-    const feitos = jornada.momentos.filter((m) => m.estado !== "fora" && vistos.has(m.id) && m.id !== atual).length;
-    count.textContent = `${feitos}/${total}`;
-
-    const proximos = proximosPassos(jornada, visitados, atual);
-    const mostrar = proximos.slice(0, MAX_PROXIMOS);
-    const final = proximos.find((m) => m.id === opts.final);
-    if (final && !mostrar.includes(final)) mostrar.push(final);
-    nextSection.hidden = mostrar.length === 0;
-    next.innerHTML = mostrar
-      .map(
-        (m, i) => `<li class="jp-next__item">
-          <button class="jp-next__btn" data-moment="${esc(m.id)}">
-            <span class="jp-next__when">${i === 0 ? "a seguir" : m.id === opts.final ? "depois" : "e então"}</span>
-            ${esc(m.titulo)}
-          </button>
-        </li>`,
-      )
-      .join("");
+    const estado = (id: string): Progresso => (id === atual ? "agora" : vistos.has(id) ? "feito" : "a-seguir");
+    // o próximo momento da jornada da pessoa (pula o que ela já conhece), marcado na própria lista
+    const proximo = atual ? null : (proximosPassos(jornada, visitados, atual)[0]?.id ?? null);
+    const terminou = !atual && visitados.length > 0;
+    list.innerHTML = jornada.momentos.map((m) => momentoHTML(m, estado(m.id), m.id === proximo, terminou)).join("");
+    const contam = jornada.momentos.filter((m) => m.estado !== "fora");
+    const feitos = contam.filter((m) => estado(m.id) === "feito").length;
+    count.textContent = `${feitos} de ${contam.length}`;
+    bar.innerHTML = contam.map((m) => `<i class="jp-bar__seg is-${estado(m.id)}"></i>`).join("");
   }
 
   function setJornada(j: JornadaDaPessoa): void {

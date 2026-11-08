@@ -1,19 +1,18 @@
-/* Painel "Sua jornada": canto de cima à esquerda, abaixo do cabeçalho (56px). Não está no Figma;
-   segue os cartões da sessão (borda, raio e sombra dos tokens). Recolhido, fica só o cabeçalho. */
+/* Painel "Sua jornada": canto de cima à esquerda, abaixo do cabeçalho (56px), no visual da landing
+   (DESIGN.md): plano, fio fino, título em Creato Display, estado pela marca. Recolhido, fica só o cabeçalho. */
 .journey-panel {
   position: fixed;
   left: 16px;
   top: 72px;
   z-index: 996; /* abaixo do cursor da Puca, da câmera, do chat e da barra de call */
   width: 280px;
-  max-height: calc(100vh - 72px - 120px); /* não chega na legenda nem na barra de call */
+  max-height: calc(100vh - 72px - 190px); /* não chega na fala da Puca */
   display: flex;
   flex-direction: column;
   overflow: hidden;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-xl);
   font-family: var(--font-sans);
   color: var(--color-text);
 }
@@ -24,12 +23,11 @@
   box-sizing: border-box;
   cursor: pointer;
   flex: none;
-  height: 40px;
-  padding: 0 12px 0 14px;
+  padding: 14px 16px 10px; /* sem altura fixa: título e contagem alinham pela linha de base */
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 8px;
-  font-size: var(--text-md);
+  font-size: 13px;
 }
 .jp-head:hover {
   background: var(--color-surface-muted);
@@ -39,7 +37,10 @@
   outline-offset: -2px;
 }
 .jp-head__title {
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 .jp-head__count {
   font-size: var(--text-sm);
@@ -47,6 +48,7 @@
   font-variant-numeric: tabular-nums;
 }
 .jp-head__chev {
+  align-self: center;
   margin-left: auto;
   width: 7px;
   height: 7px;
@@ -62,161 +64,184 @@
   display: none;
 }
 
+/* Barra de progresso: um segmento por momento (os pulados não contam). Fica visível mesmo recolhido. */
+.jp-bar {
+  flex: none;
+  display: flex;
+  gap: 3px;
+  padding: 0 16px 14px;
+}
+.jp-bar__seg {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-border);
+}
+.jp-bar__seg.is-feito {
+  background: var(--color-text);
+}
+.jp-bar__seg.is-agora {
+  background: linear-gradient(to right, var(--color-text) 50%, var(--color-border) 50%);
+}
+
 .jp-body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 2px 0 10px;
+  padding: 0 0 14px;
   border-top: 1px solid var(--color-border);
 }
-.jp-section {
-  padding: 10px 14px 0;
-}
-.jp-section[hidden] {
-  display: none;
-}
 .jp-label {
-  margin: 0 0 6px;
-  font-size: var(--text-xs);
+  margin: 0 0 8px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--color-muted);
 }
+
+/* Objetivo: a frase da pessoa, em destaque */
 .jp-goal {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+.jp-goal__text {
   margin: 0;
-  font-size: var(--text-md);
-  line-height: 1.45;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+.jp-section {
+  padding: 14px 16px 0;
 }
 
-/* Momentos */
-.jp-moments,
-.jp-next__list {
+/* Momentos: linha do tempo com um trilho fino ligando as marcas */
+.jp-moments {
+  position: relative;
   list-style: none;
   margin: 0 -6px;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
 }
-.jp-moment__btn,
-.jp-next__btn {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-  width: 100%;
-  border-radius: var(--radius-sm);
+.jp-moments::before {
+  content: "";
+  position: absolute;
+  left: 13.5px; /* centro da marca */
+  top: 14px;
+  bottom: 14px;
+  width: 1px;
+  background: var(--color-border);
 }
 .jp-moment__btn {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  cursor: pointer;
+  width: 100%;
   padding: 6px;
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 10px;
+  border-radius: var(--radius-md);
 }
-.jp-moment__btn:hover,
-.jp-next__btn:hover {
+.jp-moment__btn:hover {
   background: var(--color-surface-muted);
 }
-.jp-moment__btn:focus-visible,
-.jp-next__btn:focus-visible {
+.jp-moment__btn:focus-visible {
   outline: 2px solid var(--color-ink);
   outline-offset: -2px;
 }
+/* marca: visto cheio (feito), anel com ponto (agora), vazada (a seguir), traço (pulado) */
 .jp-moment__mark {
   flex: none;
   width: 16px;
   height: 16px;
   margin-top: 1px;
-  border-radius: var(--radius-pill);
-  border: 1.5px solid var(--color-border);
   display: grid;
   place-items: center;
-  font-size: var(--text-xs);
-  line-height: 1;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-subtle);
+  background: var(--color-surface); /* tampa o trilho */
   color: var(--color-surface);
 }
 .jp-moment--feito .jp-moment__mark {
-  background: var(--color-success);
-  border-color: var(--color-success);
+  border-color: var(--color-text);
+  background: var(--color-text);
 }
-.jp-moment--agora .jp-moment__mark {
-  border-color: var(--color-ink);
-  box-shadow: inset 0 0 0 3px var(--color-surface), inset 0 0 0 8px var(--color-ink);
+.jp-moment--agora .jp-moment__mark,
+.jp-moment.is-next .jp-moment__mark {
+  border-color: var(--color-text);
 }
-.jp-moment--agora .jp-moment__btn {
-  background: var(--color-highlight);
+.jp-moment--agora .jp-moment__mark::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-text);
+}
+.jp-moment--fora .jp-moment__mark {
+  border-style: dashed;
 }
 .jp-moment__text {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
+}
+.jp-moment__when {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-muted);
 }
 .jp-moment__title {
-  font-size: var(--text-md);
+  font-size: 13px;
   line-height: 18px;
   font-weight: 500;
 }
-.jp-moment--feito .jp-moment__title {
+.jp-moment--a-seguir:not(.is-next) .jp-moment__title {
   color: var(--color-muted);
-}
-.jp-moment__why {
-  font-size: var(--text-xs);
-  line-height: 15px;
-  color: var(--color-muted);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-/* Já feito: some o motivo, para a lista encurtar enquanto a sessão anda */
-.jp-moment--feito .jp-moment__why {
-  display: none;
 }
 .jp-moment--fora .jp-moment__title {
   color: var(--color-subtle);
-  text-decoration: line-through;
+}
+.jp-moment__why {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* o momento atual (ou o próximo) ganha um fundo leve */
+.jp-moment--agora .jp-moment__btn,
+.jp-moment.is-next .jp-moment__btn {
+  background: var(--color-surface-muted);
+}
+.jp-moment--agora .jp-moment__mark,
+.jp-moment.is-next .jp-moment__mark {
+  background: var(--color-surface-muted);
 }
 
-/* Selo do estado */
+/* Selo do estado: texto pequeno à direita, sem caixa; o estado vem do traço embaixo */
 .jp-tag {
   flex: none;
-  height: 18px;
-  padding: 0 6px;
-  display: inline-flex;
-  align-items: center;
-  border-radius: var(--radius-pill);
-  font-size: var(--text-xs);
+  margin-top: 2px;
+  font-size: 11px;
   font-weight: 500;
+  line-height: 16px;
   white-space: nowrap;
+  color: var(--color-muted);
 }
 .jp-tag--aprender {
-  background: var(--color-info-bg);
-  color: var(--color-info-text);
+  color: var(--color-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .jp-tag--revisar {
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
-}
-.jp-tag--ja_conhece {
-  background: var(--color-success-bg);
-  color: var(--color-success);
+  text-decoration: underline dashed;
+  text-underline-offset: 3px;
 }
 .jp-tag--fora {
-  background: var(--color-surface-muted);
-  color: var(--color-muted);
-}
-
-/* Próximos passos */
-.jp-next__btn {
-  padding: 5px 6px;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  font-size: var(--text-md);
-}
-.jp-next__when {
-  flex: none;
-  width: 52px;
-  font-size: var(--text-xs);
-  color: var(--color-muted);
+  color: var(--color-subtle);
 }

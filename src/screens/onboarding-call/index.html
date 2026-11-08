@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Call inicial</title>
+<title>Call inicial · Orbis</title>
+<meta name="theme-color" content="#ffffff">
 <script>
   // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
   if (location.protocol === "file:") {
@@ -18,22 +19,27 @@
 </script>
 </head>
 <body>
+  <canvas class="particles" id="particles" aria-hidden="true"></canvas>
+
   <!-- Topo: marca, call em andamento e tempo -->
   <header class="topbar">
-    <div class="brand">
-      <span class="brand__mark" aria-hidden="true"></span>
-      <span class="brand__name">Orbis</span>
+    <div class="topbar__row">
+      <a class="brand" href="../landing/" aria-label="Orbis, início">
+        <img class="brand__mark" src="../../assets/orbis-logo.png" alt="" width="26" height="26">
+        <span class="brand__name">Orbis</span>
+      </a>
+      <div class="callinfo">
+        <span class="callinfo__dot" aria-hidden="true"></span>
+        <span class="callinfo__label">Call inicial</span>
+        <span class="callinfo__time" id="timer">00:00</span>
+      </div>
+      <span class="topbar__right" aria-hidden="true"></span>
     </div>
-    <div class="callinfo">
-      <span class="callinfo__label">Call inicial</span>
-      <span class="callinfo__time" id="timer">00:00</span>
-    </div>
-    <div class="topbar__right" aria-hidden="true"></div>
   </header>
 
   <main class="stage">
-    <!-- A Puca no centro (visual ainda em definição) -->
-    <section class="agent" aria-live="polite">
+    <!-- A Puca à esquerda; à direita, o que ela fala e o que a pessoa responde -->
+    <section class="agent" aria-label="Puca">
       <div class="agent__orb" id="orb" data-state="idle">
         <span class="agent__ring agent__ring--1"></span>
         <span class="agent__ring agent__ring--2"></span>
@@ -46,11 +52,12 @@
         <span class="agent__name">Puca</span>
         <span class="agent__state" id="agent-state">Conectando…</span>
       </div>
-      <div class="caption">
-        <p class="caption__agent" id="caption-agent"></p>
-        <p class="caption__user" id="caption-user"></p>
-        <p class="caption__hint" id="caption-hint"></p>
-      </div>
+    </section>
+
+    <section class="caption" aria-live="polite" aria-label="Conversa">
+      <p class="caption__agent" id="caption-agent"></p>
+      <p class="caption__user" id="caption-user"></p>
+      <p class="caption__hint" id="caption-hint"></p>
     </section>
   </main>
 
