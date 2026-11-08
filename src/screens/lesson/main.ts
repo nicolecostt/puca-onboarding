@@ -36,6 +36,8 @@ import { completeSession, sessionCompleted } from "../../journey/session-progres
 import { emit } from "../../lib/events";
 import { esc, qs } from "../../lib/dom";
 import { profiles, type Profile as DemoProfile } from "../../data";
+import { montarPalcoNavegador } from "./palco-navegador";
+import { acoesQueAindaValem } from "./cortes";
 
 type AgentState = "speaking" | "listening" | "choosing" | "thinking" | "done";
 
@@ -118,6 +120,9 @@ async function main(): Promise<void> {
     forwardLink: qs<HTMLAnchorElement>(document, "#forward-link"),
   };
   el.lessonName.textContent = journey.title;
+  // navegador do Puca (só no app para Mac); sem window.orbis, palco é null e a sessão segue igual
+  const navegadorHost = qs(document, "#navegador-host");
+  const palco = montarPalcoNavegador(navegadorHost, qs(document, "#palco-abas"), el.boardHost, window.orbis?.navegador);
   mountPucaDots(qs(document, "#caption-orb")); // o Puca na legenda: as bolinhas dele se mexendo
 
   const clock = createClock();
@@ -284,6 +289,7 @@ async function main(): Promise<void> {
 
   function tomarAVez(): void {
     voice.stop();
+    palco?.cancelar();
     if (!falando || vez) return;
     let resolve = () => {};
     const promise = new Promise<void>((r) => (resolve = r));
@@ -779,6 +785,7 @@ async function main(): Promise<void> {
 
   // ---- Vistas ----
   function showLogo(): void {
+    palco?.mostrarQuadro(); // a vista mudou: o navegador sai
     el.boardHost.hidden = true;
     el.logoView.hidden = false;
     el.logoCompany.textContent = journey.company;
@@ -787,8 +794,11 @@ async function main(): Promise<void> {
   }
 
   function showBoard(name: string, fresh: boolean): void {
+    // a vista mudou (quadro novo ou saída da abertura): o navegador volta ao quadro; senão ele segue na vista
+    const muda = fresh || name !== currentBoard || !el.logoView.hidden;
+    if (muda) palco?.mostrarQuadro();
     el.logoView.hidden = true;
-    el.boardHost.hidden = false;
+    if (muda || navegadorHost.hidden) el.boardHost.hidden = false;
     if (fresh || name !== currentBoard) {
       board?.destroy();
       board = mountWhiteboard(el.boardHost, whiteboardFromJourney(interpolateDeep(journey.boards[name], profile)));
@@ -856,9 +866,12 @@ async function main(): Promise<void> {
       falando = false;
       finished = true;
       // fala cortada ou áudio que falhou: o quadro chega ao estado final do passo. Num pulo, a legenda
-      // já é a resposta do pulo; com a pessoa tomando a vez, a legenda para onde o Puca parou: só as ações que faltavam.
-      if (cut() || vez) while (next < cues.length) io.apply(cues[next++].action);
-      else advance(text.length);
+      // já é a resposta do pulo; com a pessoa tomando a vez, a legenda para onde o Puca parou: só as ações que faltavam,
+      // e as do navegador não (a pessoa falou por cima, o Puca para de mexer na página).
+      if (cut() || vez) {
+        for (const a of acoesQueAindaValem(cues, next)) io.apply(a);
+        next = cues.length;
+      } else advance(text.length);
     }
     if (cut()) throw new Cancelled();
     if (vez) return; // cortada pela pessoa: say() repete depois de responder
@@ -877,6 +890,12 @@ async function main(): Promise<void> {
       }
     },
     apply(a) {
+      if (a.type === "navegador") {
+        palco?.executar(a.acao); // vale em qualquer vista, até sem quadro
+        return;
+      }
+      // passo sem navegador: o palco volta ao quadro, para a pessoa ver o que a ação mexe
+      if (!currentStep?.actions?.some((x) => x.type === "navegador")) palco?.mostrarQuadro();
       if (!board) return;
       switch (a.type) {
         case "reveal": return board.reveal(a.targets);

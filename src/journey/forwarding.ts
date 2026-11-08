@@ -101,7 +101,7 @@ export function destinatario(destino: DestinoDoEncaminhamento | undefined, nomes
   return { name: nomes.buddy, role: "buddy" };
 }
 
-/** Por que Puca não respondeu, pelo destino: verdade nos dois casos, sem afirmar que é caso pessoal. */
+/** Por que o Puca não respondeu, pelo destino: verdade nos dois casos, sem afirmar que é caso pessoal. */
 export function motivoDoEncaminhamento(destino: DestinoDoEncaminhamento | undefined): string {
   if (destino === "rh") return "Quem responde isso é People, não as fontes que eu tenho.";
   if (destino === "gestor") return "Quem responde isso é a gestão do seu time, não as fontes que eu tenho.";

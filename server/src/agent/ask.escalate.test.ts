@@ -84,7 +84,7 @@ describe("ask: encaminhamento", () => {
     }
   });
 
-  it("Puca diz que encaminha sem chamar a tool: encaminha de fato, com o destino da fala", async () => {
+  it("o Puca diz que encaminha sem chamar a tool: encaminha de fato, com o destino da fala", async () => {
     const falas = ["Isso é uma dúvida pessoal. Escalo para o seu gestor ou para a equipe de People.", "Vou te encaminhar para a equipe de People.", "Vou encaminhar sua dúvida para a sua gestora."];
     for (const fala of falas) {
       script = [{ type: "text", text: fala }, { type: "done", finishReason: "stop" }];
