@@ -310,6 +310,14 @@ describe("regra notion-urls", () => {
     ]));
   });
 
+  it("acusa URL que não é pública também em chave fora da árvore", () =>
+    expect(checar({ ...todas(), "ferias-antiga": "https://www.notion.so/Ferias-0a1b" }))
+      .toEqual([expect.stringMatching(/\bferias-antiga\b.*www\.notion\.so/)]));
+
+  it("acusa duas chaves com a mesma URL", () =>
+    expect(checar({ ...todas(), promocao: "https://kota.notion.site/bonus-0123abcd" }))
+      .toEqual([expect.stringMatching(/\bbonus, promocao\b.*kota\.notion\.site\/bonus-0123abcd/)]));
+
   it("acusa URLs em mais de um domínio", () =>
     expect(checar({ ...todas(), rituais: "https://outra.notion.site/rituais-0123abcd" }))
       .toEqual([expect.stringMatching(/kota\.notion\.site.*outra\.notion\.site/)]));

@@ -6,18 +6,17 @@ export const regraNotionUrls: Regra = {
   nome: "notion-urls",
   precisaRepo: false,
   checar({ notionUrls }) {
-    const erros: string[] = [];
-    const dominios = new Set<string>();
-    for (const { chave } of ARVORE) {
-      if (!Object.hasOwn(notionUrls, chave)) {
-        erros.push(`chave ${chave}: sem URL em kit/kota/notion/urls.json`);
-        continue;
-      }
-      const dominio = URL_PUBLICA.exec(notionUrls[chave])?.[1];
-      if (dominio) dominios.add(dominio);
-      else erros.push(`chave ${chave}: "${notionUrls[chave]}" não é URL pública https://<domínio>.notion.site/...`);
-    }
-    if (dominios.size > 1) erros.push(`URLs em mais de um domínio: ${[...dominios].map((d) => `${d}.notion.site`).join(", ")}`);
-    return erros;
+    const entradas = Object.entries(notionUrls);
+    const chavesPorUrl = new Map<string, string[]>();
+    for (const [chave, url] of entradas) chavesPorUrl.set(url, [...(chavesPorUrl.get(url) ?? []), chave]);
+    const dominios = new Set(entradas.flatMap(([, url]) => URL_PUBLICA.exec(url)?.[1] ?? []));
+    return [
+      ...ARVORE.filter((n) => !Object.hasOwn(notionUrls, n.chave)).map((n) => `chave ${n.chave}: sem URL em kit/kota/notion/urls.json`),
+      ...entradas.filter(([, url]) => !URL_PUBLICA.test(url))
+        .map(([chave, url]) => `chave ${chave}: "${url}" não é URL pública https://<domínio>.notion.site/...`),
+      ...[...chavesPorUrl].filter(([, chaves]) => chaves.length > 1)
+        .map(([url, chaves]) => `chaves ${chaves.sort().join(", ")} com a mesma URL ${url}`),
+      ...(dominios.size > 1 ? [`URLs em mais de um domínio: ${[...dominios].map((d) => `${d}.notion.site`).join(", ")}`] : []),
+    ];
   },
 };
