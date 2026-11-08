@@ -79,7 +79,7 @@ export function preencherSlack(api: SlackApi, m: MapaKota, historico: MensagemKo
 ```
 
 - Canais: `#geral`, `#people` (o canal do RH) e `canal` e `canalAjuda` de cada time do mapa. O encaminhamento da Puca não passa por esses canais: vai por mensagem direta ao próprio jurado, dizendo a quem iria na Kota (`docs/stack.md` §10.1, `PRODUCT.md` §5). Todos os jurados entram no mesmo workspace.
-- Só posta em canal criado na mesma execução. Se a execução cair no meio de um canal, arquive o canal no Slack e rode de novo.
+- Só posta em canal criado na mesma execução. Se a execução cair no meio de um canal, apague o canal no Slack (arquivado, o nome continua ocupado) e rode de novo.
 - Histórico: 5 a 10 mensagens por canal de time, coerentes com o Notion e o repo (aviso de deploy, uma dúvida respondida com link para um ADR, um incidente leve citando o runbook `ledger-db-cheio`). Ninguém marca ninguém com `@`.
 
 - [ ] **Step 1: Testes com uma `SlackApi` falsa em memória; ver falhar**
