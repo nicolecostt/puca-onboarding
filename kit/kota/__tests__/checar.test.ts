@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { checarKota } from "../checar/checar";
 import { carregarContexto, type ContextoKota, type Regra } from "../checar/contexto";
+import { regras } from "../checar/regras";
 import { regraCodeowners } from "../checar/regras/codeowners";
 import { regraMapa } from "../checar/regras/mapa";
 import { gerarCodeowners } from "../gerar/codeowners";
@@ -29,6 +30,21 @@ describe("checarKota", () => {
   it("pula regra que precisa de repo quando não há repo e avisa", () =>
     expect(checarKota({ ...ctx, repo: undefined }, [regra("mapa", false, ["x"]), regra("codeowners", true, ["não devia rodar"])]))
       .toEqual({ erros: ["[mapa] x"], pulas: ["codeowners: sem --repo"] }));
+
+  it("regra que lança vira erro dela e não cala as outras", () => {
+    const quebra: Regra = { nome: "runbooks", precisaRepo: true, checar: () => { throw new Error("ENOENT: docker-compose.yml"); } };
+    expect(checarKota(ctx, [regra("mapa", false, ["x"]), quebra, regra("adrs", true, ["y"])]).erros)
+      .toEqual(["[mapa] x", "[runbooks] falhou: ENOENT: docker-compose.yml", "[adrs] y"]);
+  });
+
+  it("mapa com referência solta: o erro do mapa aparece mesmo com --repo", () => {
+    const repo = pastaTemp();
+    gravarCodeowners(repo, gerarCodeowners(mapa));
+    const solto = { ...mapa, times: mapa.times.map((t) => (t.id === "livro-razao" ? { ...t, techLead: "thiago-n" } : t)) };
+    const { erros } = checarKota({ ...ctx, mapa: solto, repo }, regras);
+    expect(erros).toContain('[mapa] time livro-razao: tech lead "thiago-n" não existe');
+    expect(erros).toContainEqual(expect.stringMatching(/^\[codeowners\] falhou: /));
+  });
 });
 
 describe("regra mapa", () => {
