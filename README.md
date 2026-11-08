@@ -59,6 +59,8 @@ src/
     draggable.ts         arrastar elementos fixos pela tela
     agent-visual.ts      contrato do visual do agente + carregador opcional
     dom.ts               utilitários de DOM
+kit/kota/                kit da Kota (docs/kit-da-kota.md): o mapa (pessoas, times, sistemas, ADRs e RFCs), o
+                         gerador do CODEOWNERS e o check:kota (npm run check:kota -- --repo <checkout do Kota>)
 sandbox/                 testes locais, fora do git (ex.: visual da Puca)
 ```
 
