@@ -352,10 +352,9 @@ async function main(): Promise<void> {
   });
 }
 
-/** Fim da call: a conversa e os controles somem (style.css, body.is-leaving) antes de abrir o Início, que leva à sessão. */
+/** Abre o Início mantendo a call visível até a troca de página. */
 function leaveToSession(): void {
-  document.body.classList.add("is-leaving");
-  window.setTimeout(() => location.replace("../inicio/"), 460);
+  location.replace("../inicio/");
 }
 
 void main();
