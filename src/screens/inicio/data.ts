@@ -12,13 +12,14 @@ export interface Tool {
   status: AccessStatus;
 }
 
-/** Ferramentas do time de Livro-razão. A que está "missing" Puca percebe ao abrir o início e pede ao gestor. */
+/** Ferramentas do time de Livro-razão. A que está "missing" Puca percebe ao abrir o início e pede ao gestor.
+ *  Só acesso que o gestor aprova nas duas listas da primeira semana do Notion da Kota (data.test.ts). */
 export const TOOLS: Tool[] = [
   { id: "github", name: "GitHub", use: "Código do kota-bank", status: "ok" },
   { id: "slack", name: "Slack", use: "Canal #livro-razao", status: "ok" },
   { id: "notion", name: "Notion", use: "Jeito de trabalhar e RFCs", status: "ok" },
-  { id: "docker", name: "Docker", use: "Subir o banco na sua máquina", status: "pending" },
-  { id: "producao", name: "Ambiente de produção", use: "Sistemas do Livro-razão", status: "missing" },
+  { id: "docker", name: "Docker", use: "Subir o banco na sua máquina", status: "ok" },
+  { id: "rituais", name: "Convites dos rituais", use: "Daily, planning e retro do Livro-razão", status: "missing" },
 ];
 
 export type TaskState = "done" | "now" | "next";

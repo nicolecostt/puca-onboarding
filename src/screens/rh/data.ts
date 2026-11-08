@@ -53,7 +53,7 @@ export const RH_PESSOA = { nome: people.nome, papel: people.cargo };
 export const INTEGRACOES: Integracao[] = [
   {
     nome: profiles.ana.name, cargo: profiles.ana.role, time: profiles.ana.toTeam, vinculo: "novo", dia: 3, etapa: 1,
-    feitas: ["contrato", "cultura", "acessos"], pendencias: [{ label: "Acesso a produção do Livro-razão", quem: "Gestor" }],
+    feitas: ["contrato", "cultura", "acessos"], pendencias: [{ label: "Convites dos rituais do Livro-razão", quem: "Gestor" }],
     sessoes: 1, encaminhamentosAbertos: 1, buddy,
   },
   {
