@@ -91,6 +91,21 @@ FAQ do nó (nó + intenção) → conhecimento da sessão → FAQ só pelo nome 
 
 Sem chave de TTS, a tela usa a voz do browser. Sem chave de STT, use o campo de texto.
 
+### Servidor no Fly.io
+
+Para o jurado, o servidor fica em `https://orbis-puca.fly.dev`: uma máquina sempre ligada (`fly.toml`, `server/Dockerfile`,
+`docs/stack.md` §5). Lá toda rota, menos `/api/health`, exige o token do Supabase, com limite por pessoa e trava
+diária por provedor (contrato "API do servidor" em `docs/contratos.md`). Localmente, sem `SUPABASE_URL` no `server/.env`,
+nada disso vale e tudo continua como acima.
+
+```bash
+fly secrets import -a orbis-puca < <(grep -E '^[A-Z_]+=.' server/.env)   # chaves só por fly secrets, nunca no repo
+fly deploy           # gera a imagem, pré-gera o áudio da jornada no Supabase Storage (release_command) e sobe
+fly logs             # logs (só ids, rotas e tempos)
+npm run bench:turn -- --url https://orbis-puca.fly.dev --token <access_token>   # mede o servidor no ar
+npm run contas-demo  # cria ou atualiza as contas fixas da apresentação no Supabase (senha em SENHA_DEMO)
+```
+
 ## Nova tela
 
 1. Criar `src/screens/<nome>/` com `index.html`, `main.ts` e `style.css`.
