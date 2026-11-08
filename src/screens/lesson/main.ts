@@ -1,11 +1,12 @@
-// Sessão no quadro: Puca conduz a jornada (src/journey/data/*.journey.json) e monta o quadro
+// Sessão no quadro: o Puca conduz a jornada (src/journey/data/*.journey.json) e monta o quadro
 // do Figma (components/whiteboard) enquanto explica. Conversa simulada: a pessoa responde pelas respostas sugeridas, pelo chat
 // ou tocando no quadro. O perfil vem da call de entrevista; ?perfil=ana|bruno (ou novo|transicao)
 // força um perfil da demo; ?auto=1 responde sozinho, para apresentar sem mexer no mouse.
 import "../../styles/base.css";
 import "./style.css";
 import demo from "../../journey/data/kota.journey.json";
-import { loadJourney } from "../../journey/validate";
+import { effectiveViews, loadJourney } from "../../journey/validate";
+import { nextPosition, type Posicao } from "../../journey/pauta";
 import { createRunner, type Runner, type RunnerIO } from "../../journey/runner";
 import { createClock, Cancelled } from "../../journey/clock";
 import { mountWhiteboard, type Whiteboard } from "../../components/whiteboard/whiteboard";
@@ -17,11 +18,11 @@ import { browserStore } from "../../journey/storage";
 import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
 import { createPedidos, PEDIDOS_KEY, tarefaDaPessoa, tarefaDoPasso } from "../../journey/primeira-tarefa";
 import { createTrail, sourcesFor } from "../../journey/trail";
-import { createAgentVoice, MIC_AVISO } from "../../voice/agent-voice";
+import { createAgentVoice, MIC_AVISO, type SpeakOptions, type TurnRequest } from "../../voice/agent-voice";
 import { interpolate, interpolateDeep, resolveProfile } from "../../journey/profile";
 import { atualizarCalibragem, resolveCalibragem, saveCalibragem } from "../../journey/calibragem";
 import { montarJornadaDaPessoa } from "../../journey/jornada-da-pessoa";
-import type { Moment, Profile, SpeechCue, Step, Vinculo } from "../../journey/types";
+import type { Moment, Profile, ResultadoDaChecagem, SpeechCue, Step, Vinculo } from "../../journey/types";
 import { mountAppHeader } from "../../components/app-header/app-header";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
@@ -118,14 +119,14 @@ async function main(): Promise<void> {
     forwardLink: qs<HTMLAnchorElement>(document, "#forward-link"),
   };
   el.lessonName.textContent = journey.title;
-  // navegador de Puca (só no app para Mac); sem window.orbis, palco é null e a sessão segue igual
+  // navegador do Puca (só no app para Mac); sem window.orbis, palco é null e a sessão segue igual
   const navegadorHost = qs(document, "#navegador-host");
   const palco = montarPalcoNavegador(navegadorHost, qs(document, "#palco-abas"), el.boardHost, window.orbis?.navegador);
-  mountPucaDots(qs(document, "#caption-orb")); // Puca na legenda: as bolinhas dela se mexendo
+  mountPucaDots(qs(document, "#caption-orb")); // o Puca na legenda: as bolinhas dele se mexendo
 
   const clock = createClock();
   const chat = mountChatPanel({ title: "Transcrição da sessão", messages: [] });
-  // Puca aparece na "câmera" do canto, como numa videochamada; os controles ficam presos embaixo dela
+  // o Puca aparece na "câmera" do canto, como numa videochamada; os controles ficam presos embaixo dela
   const cam = mountAgentCam({ name: journey.agent.name, visual: await loadAgentVisual() });
   const bar = mountCallBar({ chat, attachTo: cam }); // sem status: a legenda já mostra o que está acontecendo
   // Jornada da pessoa: a calibragem da call inicial marca cada momento (aprender, revisar, fora) e o painel mostra.
@@ -152,8 +153,11 @@ async function main(): Promise<void> {
   const history: { role: "user" | "assistant"; content: string }[] = [];
   const remember = (role: "user" | "assistant", content: string) => {
     history.push({ role, content });
-    if (history.length > 6) history.shift();
+    if (history.length > 12) history.shift();
   };
+  // O LLM conduz a sessão (decisão 0012); sem LLM no servidor, com ?auto=1 ou ?modo=roteiro, a jornada vira roteiro.
+  const roteiro = auto || new URLSearchParams(location.search).get("modo") === "roteiro";
+  let conversa = voice.llm && !roteiro;
 
   const homeLink = Object.assign(document.createElement("a"), {
     className: "orbis-link",
@@ -188,7 +192,7 @@ async function main(): Promise<void> {
     const off = paused || ended;
     const voice = off ? "paused" : agentState === "speaking" ? "talk" : "listen";
     el.voice.dataset.state = voice;
-    el.voice.setAttribute("aria-label", ended ? "Sessão encerrada" : paused ? "Puca pausada" : voice === "talk" ? "Puca falando" : micOk ? "Puca ouvindo" : "Puca esperando pelo chat");
+    el.voice.setAttribute("aria-label", ended ? "Sessão encerrada" : paused ? "O Puca pausado" : voice === "talk" ? "O Puca falando" : micOk ? "O Puca ouvindo" : "O Puca esperando pelo chat");
     el.liveDot.classList.toggle("is-off", off);
     cam.setPaused(off);
     if (!off) cam.setState(CAM_STATE[agentState]);
@@ -228,6 +232,13 @@ async function main(): Promise<void> {
 
   /** Resposta da pessoa chegou (botão, chat ou modo auto). */
   function answer(text: string, from: "chip" | "chat" | "auto"): void {
+    if (conversa && from === "chip") {
+      if (paused || ended) return;
+      el.replies.replaceChildren();
+      if (!running) return void start(); // "Recomeçar a sessão"
+      chat.addMessage({ from: "user", text });
+      return void falaNaConversa(text, "chat");
+    }
     if (!pending || pending.kind !== "reply" || paused || ended) return;
     const p = pending;
     pending = null;
@@ -248,11 +259,16 @@ async function main(): Promise<void> {
 
   function onBoardSelect(id: string): void {
     const label = (journey.boards[currentBoard ?? ""]?.nodes.find((n) => n.id === id)?.label ?? id).replace("\n", " ");
+    if (conversa) {
+      if (paused || ended || !running) return;
+      chat.addMessage({ from: "user", text: `(tocou em ${label})` });
+      return void falaNaConversa(`Toquei em ${label} (${id}).`, "chat");
+    }
     if (pending?.kind === "select") chat.addMessage({ from: "user", text: `(tocou em ${label})` });
     pickNode(id, label);
   }
 
-  /** Interrompe o que Puca está fazendo (fala, espera de resposta ou de clique) para pular de momento. */
+  /** Interrompe o que o Puca está fazendo (fala, espera de resposta ou de clique) para pular de momento. */
   function interrupt(): void {
     clock.interrupt();
     encerrarVez(); // a fala que esperava a vez cai no Cancelled do pulo
@@ -264,7 +280,7 @@ async function main(): Promise<void> {
   }
 
   // ---- A vez de falar ----
-  // A pessoa toma a vez quando fala por cima de Puca ou manda uma pergunta: a fala do passo para, Puca responde e
+  // A pessoa toma a vez quando fala por cima do Puca ou manda uma pergunta: a fala do passo para, o Puca responde e
   // depois repete a fala cortada. `vez` existe enquanto uma fala do passo espera a pessoa ser atendida.
   let falando = false; // uma fala do passo está tocando agora
   let atendendo = 0; // falas da pessoa sendo respondidas agora
@@ -285,7 +301,7 @@ async function main(): Promise<void> {
     v?.resolve();
   }
 
-  /** Espera a pessoa ser atendida; sem fala completa em 4 s de call ativa, foi um barulho e Puca retoma. */
+  /** Espera a pessoa ser atendida; sem fala completa em 4 s de call ativa, foi um barulho e o Puca retoma. */
   async function esperarAVez(): Promise<void> {
     const v = vez;
     if (!v) return;
@@ -294,15 +310,30 @@ async function main(): Promise<void> {
   }
 
   /** Fala dita fora do roteiro (resposta da knowledge/FAQ ou do agente): legenda, chat e voz. */
-  async function speakAside(text: string, play: () => Promise<void> = () => voice.speak(text)): Promise<void> {
-    el.captionAgent.innerHTML = captionWords(text);
-    requestAnimationFrame(() => revealWords(el.captionAgent, text.length));
-    chat.addMessage({ from: "agent", text });
-    remember("assistant", text);
-    await play();
+  // A legenda entra quando a frase começa a tocar e segue as palavras do áudio (não quando a frase chega do servidor).
+  async function speakAside(text: string, play: (o?: SpeakOptions) => Promise<void> = (o) => voice.speak(text, o)): Promise<void> {
+    const ends = [...text.matchAll(/\S+/g)].map((m) => m.index + m[0].length);
+    let shown = false;
+    const show = () => {
+      if (shown) return;
+      shown = true;
+      el.captionUser.textContent = "";
+      el.captionAgent.innerHTML = captionWords(text);
+      chat.addMessage({ from: "agent", text });
+      remember("assistant", text);
+    };
+    await play({
+      onStart: show,
+      onWord: (i) => {
+        show();
+        if (i >= 0) revealWords(el.captionAgent, ends[Math.min(i, ends.length - 1)]);
+      },
+    });
+    // sem os tempos das palavras (ou sem som): a frase inteira aparece no fim; frase descartada não aparece
+    if (shown) revealWords(el.captionAgent, text.length);
   }
 
-  /** Fontes que Puca tinha à mão: as do quadro na tela e o conhecimento do momento. */
+  /** Fontes que o Puca tinha à mão: as do quadro na tela e o conhecimento do momento. */
   function consultedNow(): string[] {
     const nodes = currentBoard ? (journey.boards[currentBoard]?.nodes ?? []) : [];
     const docs = nodes.flatMap((n) => [...(n.info?.docs ?? []).map((d) => d.title), ...(n.info?.adr ? [n.info.adr.id] : [])]);
@@ -375,10 +406,17 @@ async function main(): Promise<void> {
   }
 
   /** Pulo pedido pela pessoa (chat, voz ou clique no painel "Sua jornada"): vai ao início do momento. */
-  /** Pula para o início do momento; devolve o que Puca disse (null se o pulo não aconteceu). */
+  /** Pula para o início do momento; devolve o que o Puca disse (null se o pulo não aconteceu). */
   function pularPara(m: Moment): string | null {
     if (ended) return null;
     const line = `Claro, vamos para ${m.title.toLowerCase()}.`;
+    if (conversa) {
+      if (!running) return null;
+      voice.stop();
+      entrarNoPasso({ moment: journey.moments.indexOf(m), step: 0 });
+      void turno("seguir");
+      return line;
+    }
     if (!runner || iniciando) {
       // a sessão ainda não rodou: guarda o pulo; o start() aplica e fala quando ela começar
       puloPendente = m;
@@ -401,6 +439,13 @@ async function main(): Promise<void> {
   async function handleUtterance(text: string, from: "chat" | "voz"): Promise<void> {
     text = text.trim();
     if (!text || paused || ended) return;
+    if (conversa && running) {
+      if (from === "voz") {
+        el.captionUser.textContent = text;
+        chat.addMessage({ from: "user", text });
+      }
+      return falaNaConversa(text, from);
+    }
     atendendo++;
     try {
       await atenderFala(text, from);
@@ -435,7 +480,7 @@ async function main(): Promise<void> {
       moment: currentMoment?.id ?? null,
       step: currentStep?.id ?? null,
     });
-    // resposta sugerida e clique no quadro só respondem o passo; o resto Puca responde, então a pessoa toma a vez
+    // resposta sugerida e clique no quadro só respondem o passo; o resto o Puca responde, então a pessoa toma a vez
     if (route.kind !== "reply" && route.kind !== "select") tomarAVez();
     switch (route.kind) {
       case "jump": {
@@ -458,7 +503,7 @@ async function main(): Promise<void> {
           // a tarefa não diz isso: não chuta, encaminha à buddy com o motivo (§4.5)
           const line = "Isso não está na tarefa, então não quero chutar. Já encaminhei a sua pergunta no Slack.";
           trail.update(entry.id, { answer: line });
-          // a tarefa foi o que Puca consultou (§4.5: o encaminhamento leva o que já foi consultado)
+          // a tarefa foi o que o Puca consultou (§4.5: o encaminhamento leva o que já foi consultado)
           const daTarefa = tarefaDaSessao ? [`Primeira tarefa · ${tarefaDaSessao.titulo}`] : [];
           forward(entry.id, { question: text, summary: text, reason: r.motivo, consulted: daTarefa });
           return speakAside(line);
@@ -511,7 +556,7 @@ async function main(): Promise<void> {
       ));
     // gravado mesmo se a pessoa interrompeu: fica a resposta parcial
     if (asked) return trail.update(entry.id, { answer: said.join(" "), ms: Math.round(performance.now() - t0) });
-    // numa checagem só chega aqui pergunta (resposta vai pela rota): não conta como resposta, Puca repete a pergunta
+    // numa checagem só chega aqui pergunta (resposta vai pela rota): não conta como resposta, o Puca repete a pergunta
     if (pending?.kind === "reply" && currentStep?.check) {
       const line = `Sem problema, repito: ${interpolate(currentStep.line, profile)}`;
       trail.update(entry.id, { answer: line });
@@ -524,6 +569,149 @@ async function main(): Promise<void> {
     // "ok" ou "valeu" não vão para a buddy
     if (looksLikeQuestion(text)) forward(entry.id, { question: text, summary: text, reason: "Estava sem acesso ao agente e não achei isso na sessão." });
     await speakAside(line);
+  }
+
+  // ---- Conversa (decisão 0012): o LLM conduz cada turno e a jornada é a pauta ----
+  // A tela guarda onde a sessão está; cada turno (/api/turn) diz o que o Puca fala e se o passo acabou.
+  const views = effectiveViews(journey.moments);
+  let pos: Posicao = { moment: 0, step: 0 };
+  let turnoAtual = 0; // um turno novo (a pessoa falou, pulo) faz o anterior parar de decidir
+  let silencio = 0;
+  let checagemDoPasso: ResultadoDaChecagem | null = null;
+  let fraseAtual = ""; // a frase do Puca tocando agora
+  let cortada = ""; // a frase que a pessoa cortou falando por cima
+
+  type Movimento = { tipo: "passo"; reply?: string } | { tipo: "momento"; id: string };
+
+  /** Entra num passo da pauta: vista do momento, ações do passo no quadro e respostas sugeridas. */
+  function entrarNoPasso(next: Posicao): void {
+    const mudouMomento = next.moment !== pos.moment || !currentMoment;
+    pos = next;
+    checagemDoPasso = null;
+    const m = journey.moments[pos.moment];
+    const s = m.steps[pos.step];
+    if (mudouMomento) {
+      const view = views[pos.moment];
+      if (view) io.enterView(view, m.view !== undefined);
+      io.onMoment?.(m, pos.moment);
+    }
+    io.onStep?.(s, m);
+    for (const a of s.actions ?? []) io.apply(a); // o quadro chega ao estado do passo
+    showReplies(s.suggested_replies ?? []);
+    board?.setSelectable(s.decision === "select");
+  }
+
+  /** Um turno da sessão. Turno do Puca que fecha o passo leva ao próximo e pede outro; senão, espera a pessoa. */
+  async function turno(kind: TurnRequest["kind"], text?: string, interrupted?: string, entryId?: string): Promise<void> {
+    const meu = ++turnoAtual;
+    clearTimeout(silencio);
+    const m = journey.moments[pos.moment];
+    const s = m.steps[pos.step];
+    let movimento = null as Movimento | null;
+    const said: string[] = [];
+    setAgent("thinking");
+    // a fala deste turno vai no `text`, não no histórico
+    const passado = kind === "fala" ? history.slice(0, -1) : history.slice();
+    const ok = await voice.turn(
+      { kind, text, moment_id: m.id, step_id: s.id, perfil: profile.vinculo, profile, history: passado, interrupted: interrupted ? { said: interrupted } : undefined },
+      {
+        onSpeak: (t, play) => {
+          said.push(t);
+          return speakAside(t, async (o) => {
+            if (meu !== turnoAtual) return;
+            await play({
+              ...o,
+              onStart: () => {
+                setAgent("speaking");
+                fraseAtual = t;
+                o?.onStart?.();
+              },
+            });
+            if (fraseAtual === t) fraseAtual = "";
+          });
+        },
+        onAction: (a) => io.apply(a),
+        onGoTo: (target) => {
+          if (target.startsWith("moment:")) movimento = { tipo: "momento", id: target.slice(7) };
+        },
+        onNextStep: (reply) => (movimento = { tipo: "passo", reply }),
+        onCheck: (entendeu) => {
+          checagemDoPasso = entendeu ? "entendeu" : "rever";
+          if (s.check) io.onCheck?.({ tema: s.check.tema, passo: s.id, entendeu, tentativas: 1, resposta: text ?? "" });
+        },
+        onEscalate: (summary) => entryId && forward(entryId, { question: text ?? "", summary, reason: "Não encontrei fonte confiável para responder." }),
+        onTiming: (t) =>
+          entryId && trail.update(entryId, { llm_ms: t.total_ms, tokens_in: t.tokens_in ?? undefined, tokens_out: t.tokens_out ?? undefined, tokens_estimated: t.tokens_estimated }),
+      },
+    );
+    if (entryId) trail.update(entryId, { answer: said.join(" ") });
+    if (meu !== turnoAtual || ended) return; // a pessoa falou ou pulou: outro turno decide
+    if (!ok) {
+      // sem servidor ao abrir: a sessão segue como roteiro; no meio dela, o Puca avisa e espera
+      if (kind === "inicio") {
+        conversa = false;
+        return void start();
+      }
+      await speakAside("Perdi a conexão para pensar agora. Pode repetir?");
+      return setAgent("listening");
+    }
+    // rede de segurança: passo que não espera resposta e turno do Puca sem pergunta seguem a pauta
+    const esperaResposta = s.decision === "wait" || s.decision === "select" || !!s.check;
+    if (!movimento && (kind === "inicio" || kind === "seguir") && !esperaResposta && !said.at(-1)?.trim().endsWith("?")) movimento = { tipo: "passo" };
+    if (movimento?.tipo === "passo") {
+      const next = nextPosition(journey, profile, pos, { reply: movimento.reply ?? (kind === "fala" ? text : null), checagem: checagemDoPasso });
+      if (!next) return fimDaConversa();
+      entrarNoPasso(next);
+      return void turno("seguir");
+    }
+    if (movimento?.tipo === "momento") {
+      const id = movimento.id;
+      const mi = journey.moments.findIndex((x) => x.id === id);
+      if (mi >= 0) {
+        entrarNoPasso({ moment: mi, step: 0 });
+        return void turno("seguir");
+      }
+    }
+    setAgent(s.decision === "select" ? "choosing" : "listening");
+    // ninguém respondeu: o Puca pergunta de novo ou segue (uma vez por espera)
+    if (kind !== "silencio") silencio = window.setTimeout(() => meu === turnoAtual && !paused && !ended && void turno("silencio"), 15000);
+  }
+
+  /** Fala da pessoa na conversa: corta o Puca e vira um turno, levando a frase que ela cortou. */
+  async function falaNaConversa(text: string, from: "chat" | "voz"): Promise<void> {
+    const interrompida = cortada || fraseAtual;
+    cortada = "";
+    voice.stop();
+    const entry = trail.record({ from, utterance: text, route: "ask", answer: "", sources: [], moment: currentMoment?.id ?? null, step: currentStep?.id ?? null });
+    remember("user", text);
+    await turno("fala", text, interrompida || undefined, entry.id);
+  }
+
+  /** A pessoa falou por cima: a voz já parou; o turno em andamento para de decidir até a fala dela chegar. */
+  function bargeInConversa(): void {
+    cortada = fraseAtual || cortada;
+    turnoAtual++;
+    clearTimeout(silencio);
+    setAgent("listening");
+  }
+
+  async function startConversa(): Promise<void> {
+    iniciando = false;
+    running = true;
+    trail.startSession();
+    currentMoment = null;
+    entrarNoPasso({ moment: 0, step: 0 });
+    await turno("inicio");
+  }
+
+  function fimDaConversa(): void {
+    running = false;
+    trail.endSession();
+    journeyPanel.setProgress(visitados, null);
+    setAgent("done");
+    el.moment.textContent = "sessão completa";
+    showReplies(["Recomeçar a sessão"]);
+    el.hint.textContent = "Fim da sessão.";
   }
 
   document.addEventListener("chatpanel:send", (e) => void handleUtterance(e.detail.text, "chat"));
@@ -551,7 +739,7 @@ async function main(): Promise<void> {
     clock.setEnded(true);
     cam.hide();
     render();
-    // nesta tela não há "Ligar para Puca" no canto: a call some e um botão no centro retoma a sessão
+    // nesta tela não há "Ligar para o Puca" no canto: a call some e um botão no centro retoma a sessão
     document.body.classList.add("is-call-off");
     showGate("Voltar para a sessão", () => {
       document.body.classList.remove("is-call-off");
@@ -568,14 +756,15 @@ async function main(): Promise<void> {
     ouvir();
     encerrarVez(); // a fala cortada pelo encerramento volta já, sem esperar
     render();
+    if (conversa && running) void turno("seguir"); // na conversa, o Puca retoma o passo onde estava
   });
 
-  /** Liga o microfone (de novo, ao retomar a call). Se não der, Puca avisa no chat e a conversa segue por ele. */
+  /** Liga o microfone (de novo, ao retomar a call). Se não der, o Puca avisa no chat e a conversa segue por ele. */
   function ouvir(): void {
     void voice.listen({
       onFinal: (t) => void handleUtterance(t, "voz"),
       onCaption: (t) => (el.captionUser.textContent = t),
-      onBargeIn: tomarAVez,
+      onBargeIn: () => (conversa && running ? bargeInConversa() : tomarAVez()),
       onState: (s) => {
         micOk = s === "ouvindo";
         if (s !== "ouvindo") chat.addMessage({ from: "agent", text: MIC_AVISO[s] });
@@ -667,8 +856,8 @@ async function main(): Promise<void> {
       falando = false;
       finished = true;
       // fala cortada ou áudio que falhou: o quadro chega ao estado final do passo. Num pulo, a legenda
-      // já é a resposta do pulo; com a pessoa tomando a vez, a legenda para onde Puca parou: só as ações que faltavam,
-      // e as do navegador não (a pessoa falou por cima, Puca para de mexer na página).
+      // já é a resposta do pulo; com a pessoa tomando a vez, a legenda para onde o Puca parou: só as ações que faltavam,
+      // e as do navegador não (a pessoa falou por cima, o Puca para de mexer na página).
       if (cut() || vez) {
         for (const a of acoesQueAindaValem(cues, next)) io.apply(a);
         next = cues.length;
@@ -793,6 +982,7 @@ async function main(): Promise<void> {
     try {
       setAgent("thinking");
       await clock.wait(600);
+      if (conversa) return await startConversa();
       runner = createRunner(journey, profile, io);
       trail.startSession();
       running = true;

@@ -20,5 +20,5 @@ mac:
   # Sem conta da Apple: o afterPack assina com assinatura própria (ad hoc). Sem isso o Mac com chip Apple não abre.
   identity: null
   extendInfo:
-    NSMicrophoneUsageDescription: Puca usa o microfone para conversar com você.
+    NSMicrophoneUsageDescription: O Puca usa o microfone para conversar com você.
 afterPack: desktop/assinar.cjs

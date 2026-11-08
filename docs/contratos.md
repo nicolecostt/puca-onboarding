@@ -12,19 +12,19 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | Voz ↔ quadro | `BoardAction.at` em `src/journey/types.ts` + `RunnerIO.say(text, cues)` + `GET /api/tts/:id/words` — [seção abaixo](#voz--quadro) | `runner.ts`, `screens/lesson` (`io.say`), `src/voice/agent-voice.ts`, quem escreve jornadas | `validate.test.ts`, `runner.test.ts`, `server/src/voice/tts/service.test.ts` |
 | Jornada da pessoa | `src/journey/types.ts` (`JornadaDaPessoa`) + `src/journey/jornada-da-pessoa.ts` (`montarJornadaDaPessoa`, `proximosPassos`) — [seção abaixo](#jornada-da-pessoa) | sessão, painel "Sua jornada" (#17) → progresso (#18), painel do buddy (#19), checagem (#24) | `__tests__/jornada-da-pessoa.test.ts` |
 | Rota da fala | `src/journey/route.ts` (`Route`: jump → reply → tarefa → select → knowledge → faq → ask; numa checagem, `waiting.check`: o que não é pergunta nem pulo é `reply`; `tarefa`: pergunta que cita a primeira tarefa, respondida pelos campos dela em `src/journey/duvidas-da-tarefa.ts`, com `RouteContext.tarefa`/`tarefaApresentada` opcionais) | `screens/lesson`, voz e chat | `__tests__/route.test.ts` |
-| API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask` (eventos SSE `speak`, `action`, `go_to`, `escalate`, `fontes` e `timing`), `/api/voice/token`, `/api/encaminhamentos`; token do Supabase, limites e CORS — [seção abaixo](#api-do-servidor) | `src/voice/agent-voice.ts`, `src/voice/pcm-player.ts`, `screens/lesson`, `server/bench/turn-latency.ts` | `server/src/app.test.ts`, `server/src/**/*.test.ts` |
+| API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask` (eventos SSE `speak`, `action`, `go_to`, `escalate`, `fontes` e `timing`), `/api/turn` ([turno](#turno-da-sessão)), `/api/call` ([call inicial](#call-inicial)), `/api/voice/token`, `/api/encaminhamentos`; token do Supabase, limites e CORS — [seção abaixo](#api-do-servidor) | `src/voice/agent-voice.ts`, `src/voice/pcm-player.ts`, `screens/lesson`, `server/bench/turn-latency.ts` | `server/src/app.test.ts`, `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
-| Rastro (decisões de Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
+| Rastro (decisões do Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
 | Company brain | `server/src/brain/brain.ts` (`Trecho`, `Brain`). O brain mínimo lê as páginas do Notion e o mapa do kit da Kota, busca em memória, e a resposta do `/api/ask` cita `[fN]`, que vira o evento `fontes` (título e URL) | `server/src/agent/ask.ts`, rastro (`sources` da entrada `ask`, em `screens/lesson`) | `server/src/brain/brain.test.ts`, `server/src/agent/ask.fontes.test.ts` |
 | Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` | `screens/lesson` (cria e pede o envio no Slack da Kota pelo servidor, `src/journey/slack-real.ts`), `screens/live-session` (envia no Slack simulado o que ficou pendente), rastro (`forwarding_id`, `forwarding_link`), `screens/rh` (conta os abertos pelo `status`); envio real: [seção abaixo](#encaminhamento-no-slack-da-kota) | `__tests__/forwarding.test.ts`, `__tests__/slack-real.test.ts`, `server/src/slack/encaminhar.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
 | Primeira tarefa | `src/journey/primeira-tarefa.ts` (`TarefaDoTime`, `PedidoDeAprovacao`, chave `puca:primeiras-tarefas` no `localStorage`) e os nós `kind: "task"` da jornada — [seção abaixo](#primeira-tarefa) | `screens/lesson` (cria o pedido quando o cartão da tarefa abre), `screens/live-session` (pede a aprovação ao gestor no Slack e grava a aprovação), `screens/primeira-tarefa` (página da tarefa), `screens/rh` (conta pessoas com pedido não aprovado, por `status` e `pessoa`) | `__tests__/primeira-tarefa.test.ts`, `screens/primeira-tarefa/pagina.test.ts` |
 | App para Mac (`window.orbis`) | `desktop/preload.ts` + `src/orbis.d.ts` — [seção abaixo](#app-para-mac) | telas que testam `if (window.orbis)` | `tsc` |
 | Computer use (`window.orbis.navegador`) | `src/lib/orbis.ts` (`AcaoDaPuca`, `ResultadoDaFila`, `OrbisNavegador`) + ação `navegador` da jornada em `src/journey/types.ts` — [seção abaixo](#computer-use) | `desktop/navegador/` (executa), `screens/lesson` (palco do navegador), quem escreve jornadas | `__tests__/validate.test.ts`, `desktop/navegador/*.test.ts`, `tsc` |
-| Visual de Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
+| Visual do Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
 
-Exemplo válido de `TrailEntry` (uma fala da pessoa e o que Puca fez com ela):
+Exemplo válido de `TrailEntry` (uma fala da pessoa e o que o Puca fez com ela):
 
 ```json
 {
@@ -79,12 +79,12 @@ respondem as mesmas rotas. O que muda é o que cada requisição precisa levar:
   Sem `SUPABASE_URL` no ambiente (dev local), nenhuma rota exige token. `EXIGE_TOKEN=1` exige o token e impede o
   servidor de subir sem Supabase; `EXIGE_TOKEN=0` não exige, mesmo com Supabase. **Hoje o Fly está com `0`**: o app
   ainda não faz login, e o token volta com a #159.
-- **Limite por pessoa** (pelo id do token; sem token, pelo IP), por minuto: `POST /api/ask` 30, `POST /api/speak`
+- **Limite por pessoa** (pelo id do token; sem token, pelo IP), por minuto: `POST /api/ask` 30, `POST /api/turn` 60, `POST /api/call` 60, `POST /api/speak`
   120, `POST /api/voice/token` 20.
 - **Travas diárias globais** (meia-noite de São Paulo; reiniciar o servidor zera), por `LIMITE_DIARIO_*`, sem valor =
-  sem trava: `LLM` conta chamadas ao `/api/ask`; `TTS` conta caracteres sintetizados de verdade (áudio que já está no
-  cache não conta nem é barrado); `STT` conta tokens do `/api/voice/token`. Com a do TTS ou a do STT esgotada, o
-  `/api/health` responde `tts: false` ou `stt: false`.
+  sem trava: `LLM` conta chamadas ao `/api/ask`, ao `/api/turn` e ao `/api/call`; `TTS` conta caracteres sintetizados de verdade (áudio que já está no
+  cache não conta nem é barrado); `STT` conta tokens do `/api/voice/token`. Com a do TTS, a do STT ou a do LLM esgotada, o
+  `/api/health` responde `tts: false`, `stt: false` ou `llm: false`.
 - **CORS:** só `app://orbis` (o app) e `http://localhost:5173` (o Vite), com `Authorization` e `Content-Type`.
 
 Erros que o app trata como "sem servidor" (`ask()` de `src/voice/agent-voice.ts` devolve `false` e a sessão segue como
@@ -112,7 +112,7 @@ O brain mínimo (`server/src/brain/brain.ts`) sobe com o servidor: lê as págin
 parte em trechos (`Trecho` = `{ id, titulo, url, texto }`) e busca em memória. A fala que cai no `/api/ask` ganha os
 melhores trechos no prompt como `[f1]`, `[f2]`…; o modelo cita `[fN]` na resposta, o servidor tira a marca da fala e
 manda o evento SSE `fontes` no fim do turno, depois dos `speak` e antes do `escalate` e do `timing` (o encaminhamento leva as fontes consultadas). A marca também pode vir como `[1]`, `(f2)` ou `[fonte 3]`: sai da fala do mesmo jeito. Trecho abaixo do corte de relevância não entra no prompt; sem trecho
-relevante, a Puca diz que não confirmou e encaminha. Aditivo: cliente antigo ignora o evento.
+relevante, o Puca diz que não confirmou e encaminha. Aditivo: cliente antigo ignora o evento.
 
 ```
 data: {"type":"fontes","fontes":[{"titulo":"Deploy · Do merge à produção","url":"https://…notion.site/deploy"}]}
@@ -121,7 +121,7 @@ data: {"type":"fontes","fontes":[{"titulo":"Deploy · Do merge à produção","u
 O app guarda cada fonte no rastro como `"<título> · <url>"` (`sources` da entrada `ask`). Sem `fontes`, `sources` fica
 como estava.
 
-Caso pessoal da pessoa ("qual vai ser o meu bônus?", férias, salário, avaliação, promoção): a Puca explica a regra
+Caso pessoal da pessoa ("qual vai ser o meu bônus?", férias, salário, avaliação, promoção): o Puca explica a regra
 geral com a fonte e o servidor emite `escalate` (resumo = a fala) se o modelo não chamou `escalate_to_buddy`.
 
 ## Encaminhamento no Slack da Kota
@@ -140,7 +140,7 @@ interface PedidoDeEncaminhamento {
   pergunta: string;
   resumo: string;
   fontes_consultadas: string[];     // títulos, como em Forwarding.consulted
-  motivo: string;                   // por que Puca não respondeu (Forwarding.reason)
+  motivo: string;                   // por que o Puca não respondeu (Forwarding.reason)
   email?: string;                   // e-mail do jurado no Slack da Kota; sem ele, nada é postado
 }
 // 200
@@ -230,7 +230,7 @@ Exemplo válido de ação num passo:
 
 ## Calibragem
 
-O que Puca concluiu na call inicial sobre o que a pessoa já sabe e o que ela quer (glossário: **calibragem**).
+O que o Puca concluiu na call inicial sobre o que a pessoa já sabe e o que ela quer (glossário: **calibragem**).
 A call inicial grava no fim da conversa; quem lê usa `resolveCalibragem(location.search)`
 (`?perfil=` → calibragem salva pela call → demo do Bruno), no mesmo padrão do perfil.
 Enquanto a sua parte não lê de verdade, use `DEMO_CALIBRAGENS.novo` (Ana) e `DEMO_CALIBRAGENS.transicao` (Bruno) como mock.
@@ -278,11 +278,86 @@ Exemplo (Bruno, transição; saída de `DEMO_CALIBRAGENS.transicao`):
 A Ana (novo) sai com `empresa`, `rituais` e `pagamentos` em `nao_conhece`, `mensageria` e `falhas` em `ja_ouviu`,
 e sem os campos da transição.
 
+## Turno da sessão
+
+O LLM conduz a sessão (decisão 0012): cada turno, do Puca ou da pessoa, é um `POST /api/turn` que responde em SSE,
+com os mesmos eventos do `/api/ask` e mais três. A tela guarda onde a sessão está (momento e passo) e o histórico; o
+servidor não guarda estado. Sem servidor, sem LLM (`/api/health` com `llm: false`) ou com a trava esgotada, a tela
+segue a jornada como roteiro, pela `route.ts`.
+
+- **Entrada** (`TurnRequest` em `src/voice/agent-voice.ts`):
+  - `kind`: `inicio` (abre a sessão), `seguir` (o Puca segue a pauta no passo atual), `fala` (a pessoa falou ou
+    escreveu; vem com `text`) ou `silencio` (o Puca perguntou e ninguém respondeu).
+  - `moment_id`, `step_id`: onde a sessão está. `perfil`: o vínculo; `profile` (opcional): o perfil que a call
+    inicial gravou, para o Puca chamar a pessoa pelo nome (sem ele, vale o perfil de demo do vínculo).
+  - `history`: até 12 falas já ditas (`user`/`assistant`), da mais antiga à mais nova, sem a deste turno.
+  - `interrupted` (opcional): a pessoa cortou o Puca; `said` é a frase que estava tocando.
+- **Saída** (`TurnEvent` em `server/src/agent/turn.ts`): `speak`, `action` (qualquer ação do quadro, com ids que
+  existem na jornada), `escalate` e `timing`, como no `/api/ask`, e:
+  - `next_step`: o Puca terminou o passo; a tela vai ao próximo pela transição da jornada (`nextPosition` em
+    `src/journey/pauta.ts`) e pede outro turno `seguir`.
+  - `go_to` com `target` = `moment:<id>`: pulo para o início do momento; a tela pede um turno `seguir` lá.
+  - `check` com `entendeu`: resultado da checagem do passo atual (vira `onCheck`, como no motor).
+  Turno que termina sem `next_step` nem `go_to` espera a pessoa.
+- **Quadro:** ao entrar num passo, a tela aplica as `actions` dele (o quadro nunca fica pela metade); o LLM só
+  destaca, abre cartão ou revela além disso.
+- **Fontes:** o Notion da Kota (`kit/kota/notion/paginas/`) vai inteiro na parte fixa do prompt, com cache. Resposta
+  que vem dele cita a página; sem fonte, `escalate`.
+
+Exemplo válido:
+
+```http
+POST /api/turn HTTP/1.1
+Content-Type: application/json
+
+{"kind":"fala","text":"como funciona o home office?","moment_id":"seu-time","step_id":"st-rituais","perfil":"novo",
+ "history":[{"role":"assistant","content":"No seu time, a daily é às dez."}],
+ "interrupted":{"said":"No seu time, a daily é às dez."}}
+```
+
+```text
+data: {"type":"speak","id":"9b…","text":"Boa pergunta.","audio_url":"/api/tts/9b…","source":"llm"}
+data: {"type":"speak","id":"a1…","text":"Na Kota todo mundo trabalha de casa, e das dez às quatro todo mundo fica disponível.","audio_url":"/api/tts/a1…","source":"llm"}
+data: {"type":"speak","id":"c4…","text":"Posso voltar aos rituais do time?","audio_url":"/api/tts/c4…","source":"llm"}
+data: {"type":"timing","timing":{"first_speak_ms":640,"llm_first_token_ms":610,"llm_first_sentence_ms":640,"total_ms":1900,"llm_error":null,"tokens_in":31000,"tokens_out":120,"tokens_estimated":false}}
+```
+
+## Call inicial
+
+A call inicial também é conduzida pelo LLM (#57, decisão 0012): `POST /api/call`, SSE, sem estado no servidor. A pauta
+são perguntas norteadoras (em `server/src/agent/call.ts`), e o LLM faz os follow-ups; a cultura vem do Notion da Kota
+(empresa para quem é novo, time para quem está mudando de time).
+
+- **Entrada** (`CallRequest` em `src/voice/agent-voice.ts`): `kind` (`inicio`, `fala` com `text`, `silencio`),
+  `history` (até 16 falas), `interrupted` opcional (como no turno), `admissao` (`cargo`, `time`, `gestor`: o Puca
+  confirma, não pergunta), `anotado` (o que já foi anotado, chave → texto) e `cultura` (assuntos culturais já contados).
+- **Saída** (`CallEvent` em `server/src/agent/call.ts`): `speak` e `timing` como no turno, e:
+  - `answer` com `key` (as chaves de `profileFromAnswers` e `calibragemFromAnswers`: `nome`, `vinculo`, `cargo`,
+    `time`, `gestor`, `time_anterior`, `experiencia`, `aproveita`, `diferencas`, `pagamentos`, `mensageria`, `falhas`,
+    `objetivos`, `aprender`) e `value` (o que a pessoa disse). A tela junta em `anotado` e emite `onboarding:answer`.
+  - `culture` com `topic` (`missao`, `valores`, `jeito_de_trabalhar` ou `rituais_do_time`, `combinados_do_time`,
+    `pessoas_de_referencia`).
+  - `done`: a call acabou; a tela grava o perfil e a calibragem (`puca:profile`, `puca:calibragem`) e vai para as boas-vindas.
+
+Exemplo válido:
+
+```json
+{"kind":"fala","text":"Pode me chamar de Ju, é minha primeira vez","history":[{"role":"assistant","content":"Como você prefere ser chamada?"}],
+ "admissao":{"cargo":"Engenheira de software","time":"Terminais","gestor":"Marcos Vidal"},"anotado":{},"cultura":[]}
+```
+
+```text
+data: {"type":"speak","id":"1f…","text":"Prazer, Ju!","audio_url":"/api/tts/1f…","source":"llm"}
+data: {"type":"answer","key":"nome","value":"Ju"}
+data: {"type":"answer","key":"vinculo","value":"novo"}
+data: {"type":"timing","timing":{"first_speak_ms":700,"llm_first_token_ms":680,"llm_first_sentence_ms":700,"total_ms":1300,"llm_error":null,"tokens_in":30000,"tokens_out":90,"tokens_estimated":false}}
+```
+
 ## Voz ↔ quadro
 
-Cada ação do quadro acontece na palavra em que Puca fala dela (PRODUCT.md §4.1: o quadro é construído progressivamente).
+Cada ação do quadro acontece na palavra em que o Puca fala dela (PRODUCT.md §4.1: o quadro é construído progressivamente).
 
-- **Na jornada:** qualquer ação de `actions` aceita `at`, um trecho da `line` do passo. A ação sai quando Puca chega
+- **Na jornada:** qualquer ação de `actions` aceita `at`, um trecho da `line` do passo. A ação sai quando o Puca chega
   nesse trecho; sem `at`, sai antes da fala (como sempre foi). O validador exige que o trecho exista na fala.
   ```json
   { "type": "reveal", "targets": ["valor-dono", "m-dono"], "at": "dono do problema" }
@@ -382,7 +457,7 @@ ele é, para o FAQ e o agente não falarem da tarefa do outro perfil:
 `Problema: …` · `Por que importa: …` · `Sistemas: …` · `Onde ler: …` · `Quem ajuda: …`
 
 Quando o cartão de um nó `task` abre, a sessão cria um **pedido de aprovação** para o gestor. A tela do Slack pega o pedido,
-Puca escreve na DM do gestor, e o gestor aprova com um clique. A página da tarefa e a sessão escutam o evento `storage`.
+O Puca escreve na DM do gestor, e o gestor aprova com um clique. A página da tarefa e a sessão escutam o evento `storage`.
 
 - Status: `pendente` (a sessão criou) → `enviando` (uma aba do Slack pegou; `claimed_by`/`claimed_at`, com a mesma regra de 30 s
   do encaminhamento) → `aguardando` (mensagem enviada na DM do gestor) → `aprovada` (o gestor clicou; `aprovada_por` e `aprovada_em`).

@@ -12,7 +12,7 @@ export interface Tool {
   status: AccessStatus;
 }
 
-/** Ferramentas do time de Livro-razão. A que está "missing" Puca percebe ao abrir o início e pede ao gestor. */
+/** Ferramentas do time de Livro-razão. A que está "missing" o Puca percebe ao abrir o início e pede ao gestor. */
 export const TOOLS: Tool[] = [
   { id: "github", name: "GitHub", use: "Código do kota-bank", status: "ok" },
   { id: "slack", name: "Slack", use: "Canal #livro-razao", status: "ok" },

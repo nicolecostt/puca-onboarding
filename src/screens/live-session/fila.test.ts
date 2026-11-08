@@ -41,7 +41,7 @@ function montar() {
 }
 
 describe("drenar (fila do Slack)", () => {
-  it("encaminhamento criado enquanto Puca digita o pedido também sai", async () => {
+  it("encaminhamento criado enquanto o Puca digita o pedido também sai", async () => {
     const t = montar();
     t.pedidos.add({ pessoa: "Bruno", gestor: "Natália Brandão", tarefa: tarefaDoNo(task403)!, moment: "primeira-tarefa" });
     await drenar({
@@ -52,7 +52,7 @@ describe("drenar (fila do Slack)", () => {
       },
       pedir: async (p) => {
         t.feitos.push(`pediu: ${p.tarefa.no}`);
-        // a pessoa pergunta algo sem fonte enquanto Puca ainda digita o pedido
+        // a pessoa pergunta algo sem fonte enquanto o Puca ainda digita o pedido
         t.outbox.add(duvida("Quando o ledgermonolith sai do repositório?"));
         t.pedidos.setStatus(p.id, "aguardando");
       },
