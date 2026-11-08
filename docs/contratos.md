@@ -7,8 +7,8 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 |---|---|---|---|
 | Jornada da sessão (JSON) | `src/journey/types.ts` + [`journey-format.md`](journey-format.md) | `runner.ts`, `whiteboard/from-journey.ts`, `screens/lesson`, quem escreve jornadas | `validate.ts` + `__tests__/validate.test.ts` |
 | Eventos entre componentes | `src/lib/events.ts` (`DocumentEventMap`) | telas e componentes que escutam `callbar:*`, `chatpanel:*`, `onboarding:*`, `journey:*`, `journeypanel:*`, `agentcam:*` | `tsc` |
-| Perfil da pessoa | `src/journey/profile.ts` e `src/data/types.ts` | call inicial (grava `sessionStorage` `puca:profile`) → sessão → `POST /api/ask` | `__tests__/validate.test.ts` |
-| Calibragem | `src/journey/types.ts` (`Calibragem`) + `src/journey/calibragem.ts` (temas, regras, `sessionStorage` `puca:calibragem`) — [seção abaixo](#calibragem) | call inicial escreve (#16) e a checagem da sessão atualiza (#24) → jornada (#17) e adaptação das explicações (#23) leem | `__tests__/calibragem.test.ts` |
+| Perfil da pessoa | `src/journey/profile.ts`, `src/journey/escolha.ts` e `src/data/types.ts` | escolha antes da call (`screens/escolha`, ou por cima da sessão quando ninguém escolheu) e call inicial gravam `localStorage` `puca:profile` (vale nas próximas aberturas, decisão 0006) → sessão → `POST /api/ask` | `__tests__/validate.test.ts`, `__tests__/escolha.test.ts` |
+| Calibragem | `src/journey/types.ts` (`Calibragem`) + `src/journey/calibragem.ts` (temas, regras, `localStorage` `puca:calibragem`) — [seção abaixo](#calibragem) | call inicial escreve (#16), a escolha do perfil grava o exemplo da pessoa escolhida, e a checagem da sessão atualiza (#24) → jornada (#17) e adaptação das explicações (#23) leem | `__tests__/calibragem.test.ts` |
 | Voz ↔ quadro | `BoardAction.at` em `src/journey/types.ts` + `RunnerIO.say(text, cues)` + `GET /api/tts/:id/words` — [seção abaixo](#voz--quadro) | `runner.ts`, `screens/lesson` (`io.say`), `src/voice/agent-voice.ts`, quem escreve jornadas | `validate.test.ts`, `runner.test.ts`, `server/src/voice/tts/service.test.ts` |
 | Jornada da pessoa | `src/journey/types.ts` (`JornadaDaPessoa`) + `src/journey/jornada-da-pessoa.ts` (`montarJornadaDaPessoa`, `proximosPassos`) — [seção abaixo](#jornada-da-pessoa) | sessão, painel "Sua jornada" (#17) → progresso (#18), painel do buddy (#19), checagem (#24) | `__tests__/jornada-da-pessoa.test.ts` |
 | Rota da fala | `src/journey/route.ts` (`Route`: jump → reply → tarefa → select → knowledge → faq → ask; numa checagem, `waiting.check`: o que não é pergunta nem pulo é `reply`; `tarefa`: pergunta que cita a primeira tarefa, respondida pelos campos dela em `src/journey/duvidas-da-tarefa.ts`, com `RouteContext.tarefa`/`tarefaApresentada` opcionais) | `screens/lesson`, voz e chat | `__tests__/route.test.ts` |
@@ -60,7 +60,7 @@ escreve o formato aqui (tipo + um exemplo válido) **antes** de implementar; o o
 | Contrato | Liga | Ponto de partida hoje |
 |---|---|---|
 | Company brain | pergunta → trechos com **fonte** (ADR, código, doc cultural) | `knowledge` dos passos e `info.docs`/`info.adr` dos nós |
-| Progresso e memória | o que a pessoa estudou, dúvidas e onde parou, entre sessões | perfil em `sessionStorage` (`puca:profile`) |
+| Progresso e memória | o que a pessoa estudou, dúvidas e onde parou, entre sessões | perfil e calibragem em `localStorage` (`puca:profile`, `puca:calibragem`) |
 | Painel buddy/gestor/RH | marcos, pendências e pedidos de suporte | etapas da jornada em `src/data/company.ts` |
 | Computer use | o agente mexendo nas ferramentas | cursor em `components/agent-cursor`; primeiro uso real: o envio do encaminhamento no Slack (`screens/live-session/slack-dm.ts`) |
 

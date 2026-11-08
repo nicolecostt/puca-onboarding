@@ -2,7 +2,7 @@
 // A call inicial escreve; a jornada e a adaptação das explicações leem. Formato em docs/contratos.md.
 // Por enquanto o nível sai de regras por palavras (funciona sem servidor e é sempre igual na demo).
 import { normalize } from "./conditions";
-import { DEMO_PROFILES } from "./profile";
+import { DEMO_PROFILES, loadSavedProfile } from "./profile";
 import { callAnswers } from "../data/call-answers";
 import type { Calibragem, Certeza, ItemCalibragem, Nivel, Profile, ResultadoChecagem, Tema, Vinculo } from "./types";
 
@@ -125,7 +125,7 @@ export function atualizarCalibragem(c: Calibragem, r: ResultadoChecagem, agora =
 
 export function saveCalibragem(c: Calibragem): void {
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(c));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(c));
   } catch {
     // sem storage (aba privada, preview): quem lê cai no exemplo da demo
   }
@@ -133,7 +133,7 @@ export function saveCalibragem(c: Calibragem): void {
 
 export function loadCalibragem(): Calibragem | null {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const c = JSON.parse(raw) as Partial<Calibragem>;
     if (c.versao !== 1 || !c.perfil || !Array.isArray(c.conhecimentos) || !Array.isArray(c.objetivos)) return null;
@@ -151,11 +151,14 @@ export const DEMO_CALIBRAGENS: Record<Vinculo, Calibragem> = {
 
 const URL_VINCULO: Record<string, Vinculo> = { novo: "novo", transicao: "transicao", ana: "novo", bruno: "transicao" };
 
-/** Mesma ordem do perfil: ?perfil= na URL → calibragem salva pela call → demo do Bruno. */
+/**
+ * Mesma ordem do perfil: ?perfil= na URL → calibragem salva (call ou escolha) → exemplo do vínculo do perfil salvo →
+ * demo do Bruno. Assim quem escolheu a Ana nunca cai na calibragem do Bruno.
+ */
 export function resolveCalibragem(search: string): { calibragem: Calibragem; source: "url" | "call" | "demo" } {
   const fromUrl = URL_VINCULO[new URLSearchParams(search).get("perfil") ?? ""];
   if (fromUrl) return { calibragem: DEMO_CALIBRAGENS[fromUrl], source: "url" };
   const saved = loadCalibragem();
   if (saved) return { calibragem: saved, source: "call" };
-  return { calibragem: DEMO_CALIBRAGENS.transicao, source: "demo" };
+  return { calibragem: DEMO_CALIBRAGENS[loadSavedProfile()?.vinculo ?? "transicao"], source: "demo" };
 }

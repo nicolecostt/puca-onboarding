@@ -10,10 +10,11 @@ import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../
 import { emit } from "../../lib/events";
 import { esc, qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
-import { activeProfile, company } from "../../data";
+import { activeProfile, company, profiles } from "../../data";
 import { callAnswers } from "../../data/call-answers";
 import { normalize } from "../../journey/conditions";
-import { profileFromAnswers, saveProfile, vinculoFromAnswer } from "../../journey/profile";
+import { profileFromAnswers, resolveProfile, saveProfile, vinculoFromAnswer } from "../../journey/profile";
+import { ID_DO_VINCULO } from "../../journey/escolha";
 import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem";
 
 // ---- Roteiro ----
@@ -35,15 +36,19 @@ interface Field {
   sample: string;
 }
 
-// Dados da admissão e respostas de exemplo vêm do perfil da demo (?perfil=bruno | ana)
-const profile = activeProfile();
+// Com quem a pessoa entra: a escolha antes da call (src/screens/escolha/, salva) ou o ?perfil= da URL. Com ela, a call
+// usa a admissão dessa pessoa e não pergunta de novo se é a primeira vez na empresa ou uma troca de time.
+const escolha = resolveProfile(location.search);
+const vinculoEscolhido = escolha.source === "demo" ? null : escolha.profile.vinculo;
+// Dados da admissão e respostas de exemplo vêm do perfil da demo escolhido (sem escolha: ?perfil= ou o Bruno)
+const profile = vinculoEscolhido ? (profiles[ID_DO_VINCULO[vinculoEscolhido]] ?? activeProfile()) : activeProfile();
 const sample = callAnswers[profile.id] ?? {};
 const admissao = {
   cargo: profile.role,
   time: profile.toTeam,
   gestor: company.people[profile.managerId]?.name ?? "",
 };
-const transicao = (a: Answers) => vinculoFromAnswer(a.vinculo) === "transicao";
+const transicao = (a: Answers) => (vinculoEscolhido ?? vinculoFromAnswer(a.vinculo)) === "transicao";
 const corrigir = (a: Answers) => /^(nao|errado)\b/.test(normalize(a.confirma ?? ""));
 
 const FIELDS: Field[] = [
@@ -55,13 +60,14 @@ const FIELDS: Field[] = [
   },
   {
     key: "vinculo",
+    when: () => !vinculoEscolhido,
     question: (a) => `Prazer, ${a.nome}! É a sua primeira vez aqui na empresa ou você está mudando de time?`,
     sample: sample.vinculo ?? "",
   },
   {
     key: "confirma",
-    question: () =>
-      `Vi aqui que você vai entrar como ${admissao.cargo.toLowerCase()} no time ${admissao.time}, com ${admissao.gestor} na gestão. Está certo?`,
+    question: (a) =>
+      `${vinculoEscolhido ? `Prazer, ${a.nome}! ` : ""}Vi aqui que você vai entrar como ${admissao.cargo.toLowerCase()} no time ${admissao.time}, com ${admissao.gestor} na gestão. Está certo?`,
     sample: sample.confirma ?? "Sim",
   },
   { key: "cargo", when: corrigir, question: () => "Me corrige então: qual vai ser o seu cargo?", sample: admissao.cargo },
@@ -307,7 +313,7 @@ async function main(): Promise<void> {
   setAgent("done");
 
   // Entrega o perfil e a calibragem para a sessão no quadro e sai da call para as boas-vindas.
-  const perfil = profileFromAnswers(answers);
+  const perfil = profileFromAnswers(answers, vinculoEscolhido ?? undefined);
   saveProfile(perfil);
   saveCalibragem(calibragemFromAnswers(perfil, answers));
   await wait(1400);

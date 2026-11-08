@@ -163,8 +163,9 @@ localizar, `knowledge` para responder, pulo sempre pelo primeiro passo de um mom
 
 A sessão escolhe o perfil nesta ordem:
 1. `?perfil=ana` (ou `novo`) e `?perfil=bruno` (ou `transicao`) na URL;
-2. o perfil salvo pela call de entrevista (sessionStorage `puca:profile`);
-3. o perfil de demonstração do Bruno (mudando de time).
+2. o perfil salvo pela escolha antes da call ou pela call inicial (`localStorage` `puca:profile`);
+3. sem nenhum dos dois, a sessão pede a escolha (Ana ou Bruno) antes de começar; quem lê o perfil fora da sessão cai
+   no perfil de demonstração do Bruno (mudando de time).
 
 ## Regras que o validador aplica
 

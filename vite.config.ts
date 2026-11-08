@@ -16,6 +16,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: page("./index.html"),
+        escolha: page("./src/screens/escolha/index.html"),
         onboarding: page("./src/screens/onboarding-call/index.html"),
         liveSession: page("./src/screens/live-session/index.html"),
         lesson: page("./src/screens/lesson/index.html"),
