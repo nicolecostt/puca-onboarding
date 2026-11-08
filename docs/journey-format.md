@@ -45,6 +45,8 @@ Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json)
 - Nó `kind: "task"` é uma **primeira tarefa** do catálogo do time: `info.role` é o título e `info.bullets` são exatamente
   `Problema: …`, `Por que importa: …`, `Sistemas: …`, `Onde ler: …` e `Quem ajuda: …`. Abrir o cartão dele na sessão
   cria o pedido de aprovação ao gestor ([contratos](contratos.md#primeira-tarefa)).
+- `info.vinculo` (`"novo"` ou `"transicao"`, opcional): o nó só existe para esse vínculo. O FAQ e o agente no servidor
+  ignoram o nó para o outro vínculo. Use quando o quadro tem uma versão de um nó para cada perfil, como a primeira tarefa.
 - `owner_confirmed: false` faz o cartão dizer que não há responsável confirmado e indicar a buddy. É a regra de não inventar quem cuida de um sistema.
 - Arestas: `{ "id", "from", "to", "label"? }`. Ids de nós e arestas não podem se repetir no mesmo quadro.
   Opcionais: `style` (`"inferred"` tracejada cinza, `"retry"` tracejada vermelha), `path`/`head` (desenho exato da linha e da ponta em SVG; sem eles, a seta é calculada), `label_at` e `label_font` (`"hand"` ou `"mono"`), `evidence` (`{ "kind": "proven" | "inferred", "x", "y" }`: selo "✓ provado" ou "inferido").

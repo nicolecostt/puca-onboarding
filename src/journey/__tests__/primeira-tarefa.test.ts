@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 import demo from "../data/tail.journey.json";
 import { createPedidos, pedidoMessage, PEDIDOS_KEY, tarefaDoNo, tarefaDoPasso, type PedidoDeAprovacao } from "../primeira-tarefa";
+import { matchFaq } from "../conditions";
+import { buildFaqs } from "../faq";
+import { DEMO_PROFILES } from "../profile";
 import { memoryStore } from "../storage";
+import { visibleNodes } from "../../../server/src/agent/prompt";
 import type { BoardNode } from "../types";
-import { loadJourney } from "../validate";
+import { loadJourney, validateJourney } from "../validate";
 
 const journey = loadJourney(demo);
 const nodes = Object.values(journey.boards).flatMap((b) => b.nodes);
@@ -50,6 +54,38 @@ describe("tarefa do catálogo", () => {
     expect(tarefaDoPasso(journey, step("pt-tarefa-transicao"))?.no).toBe("task-dlq");
     expect(tarefaDoPasso(journey, step("pt-escopo"))).toBeNull();
     expect(tarefaDoPasso(journey, step("pt-tarefa"))).toBeNull();
+  });
+});
+
+describe("tarefa de cada vínculo (revisão final, I3)", () => {
+  it("o FAQ de quem está em transição só conhece a tarefa dela", () => {
+    const faqs = buildFaqs(journey, DEMO_PROFILES.transicao).filter((f) => f.board === "pagamentos");
+    expect(faqs.some((f) => f.node === "task")).toBe(false);
+    expect(matchFaq("o que é a primeira tarefa?", faqs).faq?.node).toBe("task-dlq");
+  });
+
+  it("o FAQ de quem é novo só conhece a tarefa dela", () => {
+    const faqs = buildFaqs(journey, DEMO_PROFILES.novo).filter((f) => f.board === "pagamentos");
+    expect(faqs.some((f) => f.node === "task-dlq")).toBe(false);
+    expect(matchFaq("o que é a primeira tarefa?", faqs).faq?.node).toBe("task");
+  });
+
+  it("o agente no servidor só vê a tarefa do vínculo da pessoa", () => {
+    const ids = (profile: typeof DEMO_PROFILES.novo) =>
+      visibleNodes({ journey, profile, momentId: "primeira-tarefa", stepId: "pt-aprovacao" }).map((n) => n.id);
+    expect(ids(DEMO_PROFILES.transicao)).toContain("task-dlq");
+    expect(ids(DEMO_PROFILES.transicao)).not.toContain("task");
+    expect(ids(DEMO_PROFILES.novo)).toContain("task");
+    expect(ids(DEMO_PROFILES.novo)).not.toContain("task-dlq");
+  });
+
+  it("o validador recusa vínculo desconhecido num nó", () => {
+    const bad = structuredClone(demo) as typeof demo;
+    const n = bad.boards.pagamentos.nodes.find((x) => x.id === "task")!;
+    (n.info as Record<string, unknown>).vinculo = "estagio";
+    const r = validateJourney(bad);
+    expect(r.ok).toBe(false);
+    expect(r.ok ? "" : r.errors.join(" ")).toContain("vinculo");
   });
 });
 

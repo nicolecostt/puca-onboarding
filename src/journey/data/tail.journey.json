@@ -451,7 +451,8 @@
               "Sistemas: só o terminal-config-api (validação e testes)",
               "Onde ler: README do terminal-config-api",
               "Quem ajuda: Lucas Melo e Paula Nunes"
-            ]
+            ],
+            "vinculo": "novo"
           },
           "w": 190
         },
@@ -470,7 +471,8 @@
               "Sistemas: terminal-config-api e config-topic",
               "Onde ler: README do terminal-config-api",
               "Quem ajuda: Lucas Melo e Paula Nunes"
-            ]
+            ],
+            "vinculo": "transicao"
           },
           "w": 190
         }

@@ -207,7 +207,8 @@ Tempo e tokens de cada sessão, para o time auditar a demo (#52, PRODUCT.md §12
 
 A primeira tarefa (PRODUCT.md §4.4 e §12.1, passo 5) sai do catálogo que o time aprovou: os nós `kind: "task"` da jornada.
 O momento `primeira-tarefa` escolhe uma pelo vínculo e abre o cartão dela. Cada nó `task` tem `info.role` (o título) e
-exatamente estes `bullets`, nesta forma, que viram a `TarefaDoTime` (`tarefaDoNo`):
+exatamente estes `bullets`, nesta forma, que viram a `TarefaDoTime` (`tarefaDoNo`). O `info.vinculo` de cada nó diz de quem
+ele é, para o FAQ e o agente não falarem da tarefa do outro perfil:
 
 `Problema: …` · `Por que importa: …` · `Sistemas: …` · `Onde ler: …` · `Quem ajuda: …`
 
