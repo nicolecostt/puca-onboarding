@@ -1,10 +1,9 @@
-# A cada merge na main: confere o projeto e publica uma versão nova do app para Mac (scripts/publicar-app.sh).
-# Rodado à mão (Actions → Publicar o app → Run workflow) fora da main, só gera o app, sem publicar.
+# Publicar uma versão nova do app para Mac, à mão: Actions → Publicar o app → Run workflow (branch main).
+# Confere o projeto e roda scripts/publicar-app.sh. Em outra branch, só gera o app, sem publicar.
+# Não roda sozinho a cada merge: a versão que o jurado instala só muda quando alguém pede.
 name: Publicar o app
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
