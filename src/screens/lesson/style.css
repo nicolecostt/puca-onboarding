@@ -95,8 +95,8 @@ body {
   height: 8px;
   flex: none;
   border-radius: 4px;
-  background: var(--color-danger);
-  box-shadow: 0 0 0 3px var(--color-danger-bg);
+  background: var(--color-ink);
+  box-shadow: 0 0 0 3px var(--color-surface-muted);
 }
 .lesson-title__dot.is-off {
   background: var(--color-subtle);
