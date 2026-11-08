@@ -62,11 +62,23 @@ export interface AskInput {
 }
 
 // Marca de citação do LLM ("... pelo CI [f1]."): sai do texto falado, com o espaço antes.
-// Aceita [f1], [F1], [f1, f2] e [f1][f2] (cada colchete é uma marca); guarda todos os ids citados.
-const CITACAO = /\s*\[\s*f\d+(?:\s*,\s*f\d+)*\s*\]/gi;
+// Aceita [f1], [F1], [f1, f2], [f1][f2] (cada colchete é uma marca), e também [1], (f2), [fonte 3] e (fonte 3);
+// o número é o do trecho (f1 = 1). Guarda todos os ids citados. Número solto só vale entre colchetes: "(3)" fica.
+const REF = "(?:f(?:onte)?\\s*)?\\d+";
+const CITACAO = new RegExp(
+  `\\s*(?:\\[\\s*${REF}(?:\\s*,\\s*${REF})*\\s*\\]|\\(\\s*(?:f(?:onte)?\\s*)\\d+(?:\\s*,\\s*(?:f(?:onte)?\\s*)?\\d+)*\\s*\\))`,
+  "gi",
+);
 
 // O LLM às vezes admite que não confirmou sem chamar escalate_to_buddy: vale como encaminhamento.
 const NO_SOURCE = /não (consegui|consigo) confirmar|não (achei|tenho) (isso )?confirmad/i;
+
+// Caso pessoal da pessoa ("qual vai ser o meu bônus?"): a regra geral vem do kit, mas o caso dela vai para a buddy.
+// Se o LLM não encaminhou, o código encaminha (nunca em falha técnica).
+const CASO_PESSOAL = /\b(meu|minha|meus|minhas)\s+(?:\S+\s+)?(bonus|salario|ferias|promocao|avaliacao|desempenho|aumento|plr)\b/;
+export function isCasoPessoal(text: string): boolean {
+  return CASO_PESSOAL.test(text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase());
+}
 
 export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promise<AskTiming> {
   const t0 = performance.now();
@@ -160,16 +172,17 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   if (input.signal?.aborted && !timing.llm_error) timing.llm_error = "interrupted";
   const empty = !spoke && !wentTo && !escalationSummary && !input.signal?.aborted && !timing.llm_error;
   if (empty) timing.llm_error = "empty_response";
-  if (timing.llm_error && timing.llm_error !== "interrupted") {
-    say(FAILURE_LINE, "fallback");
-  } else if (!input.signal?.aborted && looksLikeQuestion(input.text)) {
-    if (escalationSummary) emit({ type: "escalate", summary: escalationSummary });
-    else if (saidNoSource) emit({ type: "escalate", summary: input.text });
-  }
+  // as fontes saem antes do encaminhamento: a tela leva o que foi consultado junto com a dúvida
   const fontes = [...citados].sort((a, b) => a - b).map((n) => trechos[n - 1]).filter(Boolean)
     .map((t) => ({ titulo: t.titulo, url: t.url }))
     .filter((f, i, all) => all.findIndex((g) => g.titulo === f.titulo && g.url === f.url) === i);
   if (fontes.length) emit({ type: "fontes", fontes });
+  if (timing.llm_error && timing.llm_error !== "interrupted") {
+    say(FAILURE_LINE, "fallback");
+  } else if (!input.signal?.aborted && looksLikeQuestion(input.text)) {
+    if (escalationSummary) emit({ type: "escalate", summary: escalationSummary });
+    else if (saidNoSource || isCasoPessoal(input.text)) emit({ type: "escalate", summary: input.text });
+  }
   timing.total_ms = ms();
   emit({ type: "timing", timing });
   return timing;

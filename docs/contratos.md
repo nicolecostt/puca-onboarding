@@ -110,7 +110,7 @@ Content-Type: application/json
 O brain mínimo (`server/src/brain/brain.ts`) sobe com o servidor: lê as páginas do Notion e o mapa do kit da Kota,
 parte em trechos (`Trecho` = `{ id, titulo, url, texto }`) e busca em memória. A fala que cai no `/api/ask` ganha os
 melhores trechos no prompt como `[f1]`, `[f2]`…; o modelo cita `[fN]` na resposta, o servidor tira a marca da fala e
-manda o evento SSE `fontes` no fim do turno, depois dos `speak` e antes do `timing`. Trecho abaixo do corte de relevância não entra no prompt; sem trecho
+manda o evento SSE `fontes` no fim do turno, depois dos `speak` e antes do `escalate` e do `timing` (o encaminhamento leva as fontes consultadas). A marca também pode vir como `[1]`, `(f2)` ou `[fonte 3]`: sai da fala do mesmo jeito. Trecho abaixo do corte de relevância não entra no prompt; sem trecho
 relevante, a Puca diz que não confirmou e encaminha. Aditivo: cliente antigo ignora o evento.
 
 ```
@@ -119,6 +119,9 @@ data: {"type":"fontes","fontes":[{"titulo":"Deploy · Do merge à produção","u
 
 O app guarda cada fonte no rastro como `"<título> · <url>"` (`sources` da entrada `ask`). Sem `fontes`, `sources` fica
 como estava.
+
+Caso pessoal da pessoa ("qual vai ser o meu bônus?", férias, salário, avaliação, promoção): a Puca explica a regra
+geral com a fonte e o servidor emite `escalate` (resumo = a fala) se o modelo não chamou `escalate_to_buddy`.
 
 ## Encaminhamento no Slack da Kota
 
