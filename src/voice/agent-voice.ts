@@ -189,7 +189,9 @@ export async function createAgentVoice(): Promise<AgentVoice> {
                 frase.started = true;
                 frase.actions.forEach((a) => h.onAction(a));
               };
-              const play = () => (url ? enqueue(ev.text, async () => ({ audio_url: url }), { onStart: start }) : Promise.resolve(start()));
+              // som bloqueado: a frase sai na hora, só na legenda, sem esperar o player
+              const play = () =>
+                url && !somBloqueado ? enqueue(ev.text, async () => ({ audio_url: url }), { onStart: start }) : Promise.resolve(start());
               spoken.push(h.onSpeak(ev.text, play));
             } else if (ev.type === "action") actions.push(ev.action);
             else if (ev.type === "go_to") h.onGoTo(ev.target);
