@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Iris — onboarding com a Puca</title>
 <meta name="description" content="A Puca conversa com quem chega no time e monta, enquanto fala, um quadro com os sistemas, as pessoas e as decisões que importam.">
+<meta name="theme-color" content="#ffffff">
 <script>
   // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
   if (location.protocol === "file:") {
@@ -19,172 +20,134 @@
 </script>
 </head>
 <body>
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+  <canvas class="particles" id="particles" aria-hidden="true"></canvas>
+
   <header class="nav">
-    <a class="brand" href="#topo" aria-label="Iris, início">
-      <span class="brand-mark" aria-hidden="true">i</span>Iris
-    </a>
-    <nav class="nav-links" aria-label="Seções">
-      <a href="#problema">Problema</a>
-      <a href="#solucao">Solução</a>
-      <a href="#como-funciona">Como funciona</a>
-    </nav>
-    <a class="btn btn-dark btn-sm" href="../onboarding-call/">Ver a demo</a>
+    <div class="wrap nav__row">
+      <a class="brand" href="#topo" aria-label="Iris, início">
+        <span class="brand__mark" aria-hidden="true">i</span>Iris
+      </a>
+      <nav class="nav__links" aria-label="Seções">
+        <a href="#puca">A Puca</a>
+        <a href="#problema">O problema</a>
+        <a href="#para-quem">Para quem</a>
+      </nav>
+      <a class="btn btn--sm" href="../onboarding-call/">Ver a demo</a>
+    </div>
   </header>
 
-  <main id="topo">
-    <!-- Hero -->
-    <section class="hero">
-      <h1>A primeira semana,<br>explicada no <span class="mark">quadro</span>.</h1>
-      <p class="lead">
-        A Puca conversa por voz com quem chega no time e, enquanto fala, monta um quadro com os sistemas,
-        as pessoas e as decisões que importam. Sem fonte confiável, ela não inventa: leva a dúvida ao buddy.
-      </p>
-      <div class="actions">
-        <a class="btn btn-dark" href="../onboarding-call/">Começar a call inicial</a>
-        <a class="btn btn-ghost" href="../lesson/">Ver uma aula <span aria-hidden="true">→</span></a>
-      </div>
-
-      <figure class="board" aria-label="Exemplo de quadro: o caminho de uma venda na Tail">
-        <div class="board-bar">
-          <span class="board-title">Aula · O caminho de uma venda</span>
-          <span class="board-hint">Clique num nó</span>
-          <span class="live"><span class="dot dot-pink"></span>Puca falando</span>
-        </div>
-        <div class="board-canvas">
-          <svg class="edges" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M12 30 L49.5 30" class="edge proven" />
-            <path d="M49.5 30 L84 30" class="edge proven" />
-            <path d="M12 30 L12 76 L41.5 76" class="edge proven" />
-          </svg>
-          <button type="button" class="node" data-node="gateway" style="left:4%;top:20%"><small>serviço</small>pos-gateway</button>
-          <button type="button" class="node node-focus" data-node="topic" style="left:39.5%;top:20%;width:20%"><small>fila</small>transactions.authorized</button>
-          <button type="button" class="node node-box" data-node="settlement" style="left:75%;top:20%;width:18%"><small>caixa preta</small>settlement-worker</button>
-          <button type="button" class="node" data-node="authorizer" style="left:41.5%;top:66%"><small>serviço</small>authorizer</button>
-
-          <div class="card" aria-live="polite">
-            <strong data-card="title"></strong>
-            <span data-card="role"></span>
-            <span data-card="owner"></span>
-            <span class="tag tag-sky" data-card="tag"></span>
-          </div>
-
-          <div class="cursor" aria-hidden="true">
-            <svg viewBox="0 0 16 16" width="16" height="16"><path d="M1 1l5 14 2-6 6-2z" /></svg>
-            <span>Puca</span>
-          </div>
-        </div>
-        <figcaption class="caption">
-          <div class="orb" id="puca-orb" aria-hidden="true"></div>
-          <p>“Quando o pos-gateway aprova uma venda, ele publica na fila <b>transactions.authorized</b>. O settlement-worker lê dali. Quer ver o que acontece se falhar?”</p>
-        </figcaption>
-      </figure>
-    </section>
-
-    <!-- Problema -->
-    <section class="section" id="problema">
-      <h2>Todo começo depende de alguém ter tempo para explicar.</h2>
-      <ol class="problems">
-        <li>
-          <span class="num">01</span>
-          <h3>Conhecimento espalhado</h3>
-          <p>Notion, repositórios, ADRs, mensagens e conversas de corredor. Ninguém sabe por onde começar.</p>
-        </li>
-        <li>
-          <span class="num">02</span>
-          <h3>Buddy sobrecarregado</h3>
-          <p>As mesmas explicações introdutórias, repetidas a cada pessoa que entra.</p>
-        </li>
-        <li>
-          <span class="num">03</span>
-          <h3>Quem cuida do quê?</h3>
-          <p>Descobrir o responsável por um sistema vira investigação.</p>
-        </li>
-        <li>
-          <span class="num">04</span>
-          <h3>Mudar de time é recomeçar</h3>
-          <p>Quem já conhece a empresa passa por tudo de novo, sem pular o que já sabe.</p>
-        </li>
-      </ol>
-    </section>
-
-    <!-- Solução -->
-    <section class="section" id="solucao">
-      <div class="split">
-        <div>
-          <h2>Uma aula, não um chatbot.</h2>
-          <p class="lead">
-            A Puca transforma o conhecimento do time numa aula guiada: explica, desenha, pergunta se ficou claro e
-            adapta o ritmo a quem está aprendendo.
+  <main id="conteudo">
+    <section class="hero" id="topo">
+      <div class="wrap grid">
+        <h1 class="hero__title" data-enter>A primeira semana no time, explicada no quadro.</h1>
+        <div class="hero__side" data-enter>
+          <p class="hero__lead">
+            A Puca conversa com quem chega, por voz ou texto, e monta na hora um quadro com os sistemas,
+            as pessoas e as decisões do time. Quando não tem fonte, ela diz e leva a dúvida para a buddy.
           </p>
+          <div class="actions">
+            <a class="btn" href="../onboarding-call/">Começar a call inicial</a>
+            <a class="link-arrow" href="../lesson/">Ver uma aula</a>
+          </div>
         </div>
-        <ul class="pillars">
-          <li><b>Conversa.</b> Por voz ou texto. A pessoa interrompe, pergunta e muda de assunto quando quiser.</li>
-          <li><b>Quadro.</b> Serviços, filas, times e pessoas aparecem enquanto a Puca explica.</li>
-          <li><b>Fontes.</b> ADRs, código e docs, com a evidência de cada ligação: <span class="u-sky">provado</span> ou inferido.</li>
-          <li><b>Encaminhamento.</b> Sem fonte confiável, a dúvida vai ao buddy com contexto, nunca um palpite.</li>
-        </ul>
       </div>
 
-      <div class="profiles">
-        <article>
-          <span class="tag">Novo</span>
-          <h3>Quem acabou de entrar</h3>
-          <p>Começa pela cultura e pela parte institucional, depois chega ao time.</p>
-        </article>
-        <article>
-          <span class="tag">Transição</span>
-          <h3>Quem muda de time</h3>
-          <p>Pula o institucional e vai direto aos sistemas e às pessoas do time novo.</p>
-        </article>
+      <div class="wrap">
+        <figure class="board" aria-label="Exemplo de quadro: o caminho de uma venda na Tail">
+          <div class="board__bar">
+            <span>Aula · O caminho de uma venda</span>
+            <span class="board__hint">Clique num nó</span>
+          </div>
+          <div class="board__canvas">
+            <svg class="edges" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M12 30 L49.5 30" />
+              <path d="M49.5 30 L84 30" />
+              <path d="M12 30 L12 76 L41.5 76" />
+            </svg>
+            <button type="button" class="node" data-node="gateway" style="left:4%;top:20%"><small>serviço</small>pos-gateway</button>
+            <button type="button" class="node is-focus" data-node="topic" style="left:39.5%;top:20%;width:20%"><small>fila</small>transactions.authorized</button>
+            <button type="button" class="node node--box" data-node="settlement" style="left:75%;top:20%;width:18%"><small>caixa preta</small>settlement-worker</button>
+            <button type="button" class="node" data-node="authorizer" style="left:41.5%;top:66%"><small>serviço</small>authorizer</button>
+
+            <div class="card" aria-live="polite">
+              <strong data-card="title"></strong>
+              <span data-card="role"></span>
+              <span class="card__owner" data-card="owner"></span>
+              <span class="tag" data-card="tag"></span>
+            </div>
+          </div>
+          <figcaption class="board__caption">
+            <div class="orb" id="puca-orb" aria-hidden="true"></div>
+            <p>“Quando o pos-gateway aprova uma venda, ele publica na fila <b>transactions.authorized</b>. O settlement-worker lê dali. Quer ver o que acontece se falhar?”</p>
+          </figcaption>
+        </figure>
       </div>
     </section>
 
-    <!-- Como funciona -->
-    <section class="section" id="como-funciona">
-      <h2>Da primeira conversa à primeira tarefa.</h2>
-      <ol class="steps">
-        <li>
-          <span class="num">1</span>
-          <h3>Call inicial</h3>
-          <p>A Puca acolhe a pessoa, apresenta a cultura e entende o que ela já sabe.</p>
-        </li>
-        <li>
-          <span class="num">2</span>
-          <h3>Jornada</h3>
-          <p>Com o perfil, monta o roteiro: o que explicar, em que ordem e o que pular.</p>
-        </li>
-        <li>
-          <span class="num">3</span>
-          <h3>Aula no quadro</h3>
-          <p>Explica falando e desenhando. Uma pergunta no meio muda o rumo da aula.</p>
-        </li>
-        <li>
-          <span class="num">4</span>
-          <h3>Verificação</h3>
-          <p>Uma pergunta leve confirma se ficou claro antes de seguir.</p>
-        </li>
-        <li>
-          <span class="num">5</span>
-          <h3>Primeira tarefa</h3>
-          <p>O aprendizado vira prática, e buddy e gestor acompanham o progresso.</p>
-        </li>
-      </ol>
+    <section class="puca" id="puca" aria-labelledby="puca-title">
+      <div class="wrap grid">
+        <div class="puca__stage" aria-hidden="true">
+          <div class="puca__sphere" id="puca-sphere"></div>
+        </div>
+        <div class="puca__copy">
+          <h2 id="puca-title">O que a Puca faz</h2>
+          <ol class="skills" id="skills">
+            <li><button type="button" class="skill" data-state="talk"><span class="skill__name">Faz a call inicial</span><span class="skill__line">Acolhe a pessoa e descobre o que ela já sabe.</span></button></li>
+            <li><button type="button" class="skill" data-state="think"><span class="skill__name">Monta a jornada</span><span class="skill__line">Escolhe o que explicar e o que pular, pelo perfil.</span></button></li>
+            <li><button type="button" class="skill" data-state="talk"><span class="skill__name">Explica no quadro</span><span class="skill__line">Desenha sistemas, pessoas e decisões enquanto fala.</span></button></li>
+            <li><button type="button" class="skill" data-state="think"><span class="skill__name">Confere se ficou claro</span><span class="skill__line">Faz uma pergunta leve antes de seguir.</span></button></li>
+            <li><button type="button" class="skill" data-state="talk"><span class="skill__name">Mostra a fonte</span><span class="skill__line">ADR, código ou doc, dizendo se é provado ou inferido.</span></button></li>
+            <li><button type="button" class="skill" data-state="think"><span class="skill__name">Encaminha a dúvida</span><span class="skill__line">Sem fonte confiável, leva a dúvida à buddy com contexto.</span></button></li>
+            <li><button type="button" class="skill" data-state="talk"><span class="skill__name">Entrega a primeira tarefa</span><span class="skill__line">Liga o que foi aprendido a uma tarefa real do time.</span></button></li>
+          </ol>
+          <button type="button" class="pause" id="skills-pause" aria-pressed="false">Pausar</button>
+        </div>
+      </div>
     </section>
 
-    <!-- CTA -->
-    <section class="cta">
-      <h2>Deixe a Puca receber a <span class="mark">próxima pessoa</span> do time.</h2>
-      <p>Experimente a call inicial com a Tail, a empresa da demo.</p>
-      <div class="actions">
-        <a class="btn btn-dark" href="../onboarding-call/">Começar a call inicial</a>
-        <a class="btn btn-ghost" href="../lesson/">Ver uma aula <span aria-hidden="true">→</span></a>
+    <section class="problem" id="problema" aria-labelledby="problema-title">
+      <div class="wrap grid">
+        <h2 id="problema-title" class="problem__title">Todo começo depende de alguém ter tempo para explicar.</h2>
+        <dl class="rows">
+          <div class="row"><dt>Conhecimento espalhado</dt><dd>Notion, repositórios, ADRs e conversas de corredor. Ninguém sabe por onde começar.</dd></div>
+          <div class="row"><dt>Buddy sobrecarregada</dt><dd>As mesmas explicações introdutórias, repetidas a cada pessoa que entra.</dd></div>
+          <div class="row"><dt>Quem cuida do quê</dt><dd>Descobrir o responsável por um sistema vira investigação.</dd></div>
+          <div class="row"><dt>Mudar de time é recomeçar</dt><dd>Quem já conhece a empresa passa por tudo de novo, sem pular o que já sabe.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="who" id="para-quem" aria-labelledby="who-title">
+      <div class="wrap grid">
+        <h2 id="who-title" class="who__title">Para quem entra na empresa e para quem muda de time.</h2>
+        <div class="who__col">
+          <h3>Novo</h3>
+          <p>Começa pela cultura e pela parte institucional, conhece a buddy e o gestor, depois chega aos sistemas do time.</p>
+        </div>
+        <div class="who__col">
+          <h3>Transição</h3>
+          <p>Já conhece a empresa: a Puca pula o institucional e vai direto às pessoas, aos sistemas e aos combinados do time novo.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="close" aria-labelledby="close-title">
+      <div class="wrap close__inner">
+        <h2 id="close-title">Deixe a Puca receber a próxima pessoa do time.</h2>
+        <div class="actions">
+          <a class="btn" href="../onboarding-call/">Começar a call inicial</a>
+          <a class="link-arrow" href="../lesson/">Ver uma aula</a>
+        </div>
       </div>
     </section>
   </main>
 
   <footer class="footer">
-    <span class="brand"><span class="brand-mark" aria-hidden="true">i</span>Iris</span>
-    <span>Onboarding com a Puca · Converge Challenge</span>
+    <div class="wrap footer__row">
+      <span class="brand"><span class="brand__mark" aria-hidden="true">i</span>Iris</span>
+      <span>Onboarding com a Puca · Converge Challenge · Tail é uma empresa fictícia</span>
+    </div>
   </footer>
 
   <script type="module" src="./main.ts"></script>

@@ -153,7 +153,7 @@
   box-shadow: var(--shadow-sketch), 0 0 0 4px rgba(23, 23, 23, 0.06);
 }
 .wb-node.is-open {
-  box-shadow: var(--shadow-sketch), 0 0 0 4px rgba(25, 113, 194, 0.18);
+  box-shadow: var(--shadow-sketch), 0 0 0 4px rgba(23, 23, 23, 0.14);
 }
 
 .wb-node--topic {
@@ -181,9 +181,24 @@
   color: var(--color-danger-text);
 }
 
-/* foco: anel amarelo (o que o agente está explicando agora) */
-.wb-node.is-focus {
-  box-shadow: 0 0 0 6px var(--color-highlight), var(--shadow-sketch);
+/* foco: anel com a cor da Puca (o que ela está explicando agora) */
+.wb-node.is-focus::after {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: calc(var(--radius-lg) + 7px);
+  padding: 3px;
+  background: var(--puca-holo);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: holo-spin 6s linear infinite;
+  pointer-events: none;
+}
+.wb-node--topic.is-focus::after,
+.wb-node--dlq.is-focus::after {
+  border-radius: calc(var(--radius-node-pill) + 7px);
 }
 
 .wb-node__lock {
@@ -328,7 +343,9 @@
   border-color: var(--color-info);
   background: var(--color-info-bg);
 }
+/* sem cor: o alerta se lê pelo tracejado */
 .wb-node.tone-warn {
+  border-style: dashed;
   border-color: var(--color-warning);
   background: var(--color-warning-bg);
 }
@@ -341,6 +358,7 @@
 }
 .wb-edge.tone-warn path {
   stroke: var(--color-warning);
+  stroke-dasharray: 6 5;
 }
 .wb-edge.tone-ok path {
   stroke: var(--color-success-strong);
@@ -351,7 +369,6 @@
   fill: var(--color-info);
   opacity: 0;
   transition: opacity 0.2s ease;
-  filter: drop-shadow(0 0 6px rgba(25, 113, 194, 0.5));
 }
 .wb-pulse.is-on {
   opacity: 1;
@@ -363,6 +380,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .wb-node.is-focus::after {
+    animation: none;
+  }
   .wb-node,
   .wb-label,
   .wb-badge,
