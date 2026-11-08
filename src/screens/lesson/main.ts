@@ -16,11 +16,11 @@ import { browserStore } from "../../journey/storage";
 import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
 import { createPedidos, PEDIDOS_KEY, tarefaDaPessoa, tarefaDoPasso } from "../../journey/primeira-tarefa";
 import { createTrail, sourcesFor } from "../../journey/trail";
-import { createAgentVoice } from "../../voice/agent-voice";
+import { createAgentVoice, MIC_AVISO } from "../../voice/agent-voice";
 import { interpolate, interpolateDeep, resolveProfile } from "../../journey/profile";
 import { atualizarCalibragem, resolveCalibragem, saveCalibragem } from "../../journey/calibragem";
 import { montarJornadaDaPessoa } from "../../journey/jornada-da-pessoa";
-import type { Moment, Profile, Step, Vinculo } from "../../journey/types";
+import type { Moment, Profile, SpeechCue, Step, Vinculo } from "../../journey/types";
 import { mountAppHeader } from "../../components/app-header/app-header";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
@@ -143,6 +143,7 @@ async function main(): Promise<void> {
 
   let paused = false;
   let ended = false;
+  let micOk = false; // o microfone está ouvindo (sem ele, a conversa segue pelo chat)
   let agentState: AgentState = "thinking";
   let currentBoard: string | null = null;
   let board: Whiteboard | null = null;
@@ -167,7 +168,7 @@ async function main(): Promise<void> {
     const off = paused || ended;
     const voice = off ? "paused" : agentState === "speaking" ? "talk" : "listen";
     el.voice.dataset.state = voice;
-    el.voice.setAttribute("aria-label", ended ? "Sessão encerrada" : paused ? "Puca pausada" : voice === "talk" ? "Puca falando" : "Puca ouvindo");
+    el.voice.setAttribute("aria-label", ended ? "Sessão encerrada" : paused ? "Puca pausada" : voice === "talk" ? "Puca falando" : micOk ? "Puca ouvindo" : "Puca esperando pelo chat");
     el.liveDot.classList.toggle("is-off", off);
     cam.setPaused(off);
     if (!off) cam.setState(CAM_STATE[agentState]);
@@ -233,11 +234,41 @@ async function main(): Promise<void> {
   /** Interrompe o que a Puca está fazendo (fala, espera de resposta ou de clique) para pular de momento. */
   function interrupt(): void {
     clock.interrupt();
+    encerrarVez(); // a fala que esperava a vez cai no Cancelled do pulo
     const p = pending;
     pending = null;
     el.replies.replaceChildren();
     board?.setSelectable(false);
     p?.reject(new Cancelled());
+  }
+
+  // ---- A vez de falar ----
+  // A pessoa toma a vez quando fala por cima da Puca ou manda uma pergunta: a fala do passo para, a Puca responde e
+  // depois repete a fala cortada. `vez` existe enquanto uma fala do passo espera a pessoa ser atendida.
+  let falando = false; // uma fala do passo está tocando agora
+  let atendendo = 0; // falas da pessoa sendo respondidas agora
+  let vez: { promise: Promise<void>; resolve: () => void } | null = null;
+
+  function tomarAVez(): void {
+    voice.stop();
+    if (!falando || vez) return;
+    let resolve = () => {};
+    const promise = new Promise<void>((r) => (resolve = r));
+    vez = { promise, resolve };
+  }
+
+  function encerrarVez(): void {
+    const v = vez;
+    vez = null;
+    v?.resolve();
+  }
+
+  /** Espera a pessoa ser atendida; sem fala completa em 4 s de call ativa, foi um barulho e a Puca retoma. */
+  async function esperarAVez(): Promise<void> {
+    const v = vez;
+    if (!v) return;
+    void clock.wait(4000).then(() => vez === v && atendendo === 0 && encerrarVez(), () => {});
+    await v.promise;
   }
 
   /** Fala dita fora do roteiro (resposta da knowledge/FAQ ou do agente): legenda, chat e voz. */
@@ -336,7 +367,17 @@ async function main(): Promise<void> {
   // tarefa → nome de um item do quadro → FAQ do nó → conhecimento da sessão → agente (ponte na hora + LLM no servidor).
   async function handleUtterance(text: string, from: "chat" | "voz"): Promise<void> {
     text = text.trim();
-    if (!text) return;
+    if (!text || paused || ended) return;
+    atendendo++;
+    try {
+      await atenderFala(text, from);
+    } finally {
+      atendendo--;
+      if (atendendo === 0) encerrarVez(); // a fala do passo que foi cortada pode voltar
+    }
+  }
+
+  async function atenderFala(text: string, from: "chat" | "voz"): Promise<void> {
     if (from === "voz") {
       el.captionUser.textContent = text;
       chat.addMessage({ from: "user", text });
@@ -361,6 +402,8 @@ async function main(): Promise<void> {
       moment: currentMoment?.id ?? null,
       step: currentStep?.id ?? null,
     });
+    // resposta sugerida e clique no quadro só respondem o passo; o resto a Puca responde, então a pessoa toma a vez
+    if (route.kind !== "reply" && route.kind !== "select") tomarAVez();
     switch (route.kind) {
       case "jump": {
         const line = pularPara(route.moment);
@@ -432,7 +475,7 @@ async function main(): Promise<void> {
     if (pending?.kind === "reply" && currentStep?.check) {
       const line = `Sem problema, repito: ${interpolate(currentStep.line, profile)}`;
       trail.update(entry.id, { answer: line });
-      return void speakAside(line);
+      return speakAside(line);
     }
     if (pending?.kind === "reply") return answer(text, "chat");
     // sem servidor e sem fonte confiável: a dúvida fica anotada (§4.5, encaminhamento para uma pessoa)
@@ -440,7 +483,7 @@ async function main(): Promise<void> {
     trail.update(entry.id, { answer: line });
     // "ok" ou "valeu" não vão para a buddy
     if (looksLikeQuestion(text)) forward(entry.id, { question: text, summary: text, reason: "Estava sem acesso ao agente e não achei isso na sessão." });
-    void speakAside(line);
+    await speakAside(line);
   }
 
   document.addEventListener("chatpanel:send", (e) => void handleUtterance(e.detail.text, "chat"));
@@ -455,10 +498,15 @@ async function main(): Promise<void> {
   document.addEventListener("callbar:pause", (e) => {
     paused = !!e.detail.on;
     clock.setPaused(paused);
+    // a voz para na mesma palavra (o quadro, que segue as palavras, para junto) e o microfone fica mudo
+    if (paused) voice.pause();
+    else voice.resume();
     render();
   });
   document.addEventListener("callbar:end", () => {
     ended = true;
+    tomarAVez(); // corta a voz; a fala do passo que estava tocando volta quando a call voltar
+    voice.stopListening(); // e o microfone desliga (para de mandar áudio ao STT)
     trail.endSession();
     clock.setEnded(true);
     cam.hide();
@@ -477,8 +525,24 @@ async function main(): Promise<void> {
     trail.startSession(); // retomar a call reabre a sessão (#52)
     clock.setEnded(false);
     cam.show();
+    ouvir();
+    encerrarVez(); // a fala cortada pelo encerramento volta já, sem esperar
     render();
   });
+
+  /** Liga o microfone (de novo, ao retomar a call). Se não der, a Puca avisa no chat e a conversa segue por ele. */
+  function ouvir(): void {
+    void voice.listen({
+      onFinal: (t) => void handleUtterance(t, "voz"),
+      onCaption: (t) => (el.captionUser.textContent = t),
+      onBargeIn: tomarAVez,
+      onState: (s) => {
+        micOk = s === "ouvindo";
+        if (s !== "ouvindo") chat.addMessage({ from: "agent", text: MIC_AVISO[s] });
+        render();
+      },
+    });
+  }
 
   // ---- Vistas ----
   function showLogo(): void {
@@ -498,6 +562,75 @@ async function main(): Promise<void> {
       board.onSelect(onBoardSelect);
       currentBoard = name;
     }
+  }
+
+  /** Uma fala do passo: voz, legenda palavra a palavra e as ações marcadas com `at`. Para se a pessoa tomar a vez. */
+  async function falar(text: string, cues: SpeechCue[]): Promise<void> {
+    setAgent("speaking");
+    el.captionUser.textContent = "";
+    // trecho em amarelo: o highlight do passo, se esta fala for a fala do passo
+    const highlight = currentStep?.highlight && text.includes(currentStep.highlight) ? currentStep.highlight : undefined;
+    // Até onde a fala já chegou (em caracteres): move a legenda e dispara as ações marcadas com `at`.
+    const ends = [...text.matchAll(/\S+/g)].map((m) => m.index + m[0].length);
+    let spoken = 0;
+    let next = 0;
+    el.captionAgent.innerHTML = captionWords(text, highlight);
+    const advance = (to: number) => {
+      if (to <= spoken) return;
+      spoken = to;
+      revealWords(el.captionAgent, spoken);
+      while (next < cues.length && cues[next].at < spoken) io.apply(cues[next++].action);
+    };
+    let heard = false; // chegou o tempo de alguma palavra do áudio
+    let finished = false;
+    // Pulo ou reinício no meio da fala: o relógio muda de geração. Com voz, nada do relógio fica esperando
+    // durante o áudio, então `watch` derruba a espera e `cut()` impede de seguir com a fala antiga.
+    const gen = clock.generation;
+    const cut = () => clock.generation !== gen;
+    const watch = (async () => {
+      while (!finished) await clock.wait(100);
+    })();
+    watch.catch(() => {});
+    // estimativa de 150 ms por palavra, a partir de onde a fala está; uma só por vez
+    let estimating: Promise<void> | null = null;
+    const estimate = () =>
+      (estimating ??= (async () => {
+        for (const end of ends) {
+          if (heard || finished || vez) return; // a pessoa tomou a vez: a legenda para onde a fala parou
+          if (end <= spoken) continue;
+          advance(end);
+          await clock.wait(150);
+        }
+      })());
+    falando = true;
+    try {
+      // com voz, a legenda e o quadro seguem as palavras do áudio; sem voz, a estimativa de 150 ms por palavra
+      const audio = voice.speak(text, {
+        onWord: (i) => {
+          if (i < 0 || finished) return;
+          heard = true;
+          advance(ends[Math.min(i, ends.length - 1)]);
+        },
+      });
+      if (voice.tts) {
+        // áudio sem tempo das palavras: depois de 2 s sem nenhuma, volta para a estimativa
+        void clock.wait(2000).then(() => (heard || finished ? undefined : estimate())).catch(() => {});
+        await Promise.race([audio, watch]);
+        if (cut()) throw new Cancelled();
+        if (!heard && !vez) await estimate(); // áudio falhou ou veio sem os tempos: termina no ritmo da estimativa
+      } else await estimate();
+    } finally {
+      falando = false;
+      finished = true;
+      // fala cortada ou áudio que falhou: o quadro chega ao estado final do passo. Num pulo, a legenda
+      // já é a resposta do pulo; com a pessoa tomando a vez, a legenda para onde a Puca parou: só as ações que faltavam.
+      if (cut() || vez) while (next < cues.length) io.apply(cues[next++].action);
+      else advance(text.length);
+    }
+    if (cut()) throw new Cancelled();
+    if (vez) return; // cortada pela pessoa: say() repete depois de responder
+    chat.addMessage({ from: "agent", text });
+    await clock.wait(voice.tts ? 250 : 700);
   }
 
   // ---- io do motor ----
@@ -524,68 +657,16 @@ async function main(): Promise<void> {
       }
     },
     async say(text, cues = []) {
-      setAgent("speaking");
-      el.captionUser.textContent = "";
-      // trecho em amarelo: o highlight do passo, se esta fala for a fala do passo
-      const highlight = currentStep?.highlight && text.includes(currentStep.highlight) ? currentStep.highlight : undefined;
-      // Até onde a fala já chegou (em caracteres): move a legenda e dispara as ações marcadas com `at`.
-      const ends = [...text.matchAll(/\S+/g)].map((m) => m.index + m[0].length);
-      let spoken = 0;
-      let next = 0;
-      el.captionAgent.innerHTML = captionWords(text, highlight);
-      const advance = (to: number) => {
-        if (to <= spoken) return;
-        spoken = to;
-        revealWords(el.captionAgent, spoken);
-        while (next < cues.length && cues[next].at < spoken) io.apply(cues[next++].action);
-      };
-      let heard = false; // chegou o tempo de alguma palavra do áudio
-      let finished = false;
-      // Pulo ou reinício no meio da fala: o relógio muda de geração. Com voz, nada do relógio fica esperando
-      // durante o áudio, então `watch` derruba a espera e `cut()` impede de seguir com a fala antiga.
       const gen = clock.generation;
-      const cut = () => clock.generation !== gen;
-      const watch = (async () => {
-        while (!finished) await clock.wait(100);
-      })();
-      watch.catch(() => {});
-      // estimativa de 150 ms por palavra, a partir de onde a fala está; uma só por vez
-      let estimating: Promise<void> | null = null;
-      const estimate = () =>
-        (estimating ??= (async () => {
-          for (const end of ends) {
-            if (heard || finished) return;
-            if (end <= spoken) continue;
-            advance(end);
-            await clock.wait(150);
-          }
-        })());
-      try {
-        // com voz, a legenda e o quadro seguem as palavras do áudio; sem voz, a estimativa de 150 ms por palavra
-        const audio = voice.speak(text, {
-          onWord: (i) => {
-            if (i < 0 || finished) return;
-            heard = true;
-            advance(ends[Math.min(i, ends.length - 1)]);
-          },
-        });
-        if (voice.tts) {
-          // áudio sem tempo das palavras: depois de 2 s sem nenhuma, volta para a estimativa
-          void clock.wait(2000).then(() => (heard || finished ? undefined : estimate())).catch(() => {});
-          await Promise.race([audio, watch]);
-          if (cut()) throw new Cancelled();
-          if (!heard) await estimate(); // áudio falhou ou veio sem os tempos: termina no ritmo da estimativa
-        } else await estimate();
-      } finally {
-        finished = true;
-        // fala cortada ou áudio que falhou: o quadro chega ao estado final do passo. Num pulo, a legenda
-        // já é a resposta do pulo, então só as ações que faltavam.
-        if (cut()) while (next < cues.length) io.apply(cues[next++].action);
-        else advance(text.length);
+      await falar(text, cues);
+      // a pessoa tomou a vez no meio da fala: espera a resposta e repete a fala (o quadro já está no estado final)
+      while (vez) {
+        await esperarAVez();
+        if (clock.generation !== gen) throw new Cancelled(); // foi um pulo
+        await clock.whenRunning();
+        await falar("Voltando ao que eu falava.", []);
+        if (!vez) await falar(text, []);
       }
-      if (cut()) throw new Cancelled();
-      chat.addMessage({ from: "agent", text });
-      await clock.wait(voice.tts ? 250 : 700);
     },
     listen(replies) {
       setAgent("listening");
@@ -690,7 +771,7 @@ async function main(): Promise<void> {
     window.setTimeout(() => cam.sync(), 300);
     // sem gesto reconhecido, o navegador pode segurar o áudio: a sessão começa assim mesmo, com legenda
     if (!(await voice.unlock())) chat.addMessage({ from: "agent", text: SOM_BLOQUEADO });
-    void voice.listen((t) => void handleUtterance(t, "voz"), (t) => (el.captionUser.textContent = t)).catch((e) => console.warn("microfone:", e));
+    ouvir();
     void start();
   });
 }
