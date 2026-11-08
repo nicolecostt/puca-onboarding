@@ -33,9 +33,9 @@ com `| bash -s -- --desinstalar`.
 Desenvolver (decisão 0004, `docs/stack.md` §3):
 
 ```bash
-VITE_API_URL=https://orbis-puca.fly.dev npm run dev   # terminal 1: o front, falando com o servidor do Fly
-npm run dev:app                                       # terminal 2: o app Electron abrindo o Vite
-npm run build:app                                     # Orbis-mac-arm64.zip e Orbis-mac-x64.zip em release/
+npm run dev:fly       # terminal 1: o front, usando o servidor do Fly
+npm run dev:app       # terminal 2: o app Electron abrindo o Vite
+npm run build:app     # Orbis-mac-arm64.zip e Orbis-mac-x64.zip em release/
 ```
 
 Em `npm run dev:app`, o macOS pede o microfone em nome do terminal que abriu o app (no VS Code, libere o Visual Studio
