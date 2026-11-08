@@ -41,7 +41,7 @@ Não é deixar o código perfeito.
 |---|---|---|
 | Não funciona: CI vermelho, erro no fluxo que a mudança toca, quebra um passo de `docs/demo.md` | Conflito mecânico com a `main` | Estilo, nomes, formatação |
 | Não integra: conflito com a `main` sem resolução, base fora do padrão depois do merge | Falta `Closes #<issue>` ou o "como testar" | Refatoração ou abstração que "seria melhor" |
-| Quebra contrato (`docs/contratos.md`) sem ajustar os usos | Texto de interface com termo que o glossário evita | Falta de teste em tela ou dado de demo fixo (Tail) |
+| Quebra contrato (`docs/contratos.md`) sem ajustar os usos | Texto de interface com termo que o glossário evita | Falta de teste em tela ou dado de demo fixo (Kota) |
 | Viola regra do produto: inventar fonte ou responsável, privacidade do §5, chave de API no browser | Doc que ficou desatualizado pela mudança | Duplicação pequena, TODO, código simples demais |
 | Segredo ou `.env` commitado | | Coisa fora do escopo do PR que já estava assim |
 
