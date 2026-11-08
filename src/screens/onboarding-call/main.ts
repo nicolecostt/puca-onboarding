@@ -4,6 +4,7 @@
 // "por voz" (resposta de exemplo depois de alguns segundos) ou digitando no chat.
 import "../../styles/base.css";
 import "./style.css";
+import { preserveProfileLinks } from "../../lib/navigation";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
 import { loadAgentVisual, type AgentVisual, type AgentVisualState } from "../../lib/agent-visual";
@@ -13,8 +14,12 @@ import { mountPucaParticles } from "../../lib/puca-particles";
 import { activeProfile, company } from "../../data";
 import { callAnswers } from "../../data/call-answers";
 import { normalize } from "../../journey/conditions";
-import { profileFromAnswers, saveProfile, vinculoFromAnswer } from "../../journey/profile";
+import { loadSavedProfile, profileFromAnswers, saveProfile, vinculoFromAnswer } from "../../journey/profile";
 import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem";
+
+const savedProfile = loadSavedProfile();
+if (!savedProfile) qs<HTMLAnchorElement>(document, ".brand").href = "../boas-vindas/";
+preserveProfileLinks();
 
 // ---- Roteiro ----
 // Puca confirma os dados da admissão (não pergunta o que a empresa já sabe) e gasta a conversa com o que
@@ -36,7 +41,7 @@ interface Field {
 }
 
 // Dados da admissão e respostas de exemplo vêm do perfil da demo (?perfil=bruno | ana)
-const profile = activeProfile();
+const profile = activeProfile(savedProfile?.vinculo === "transicao" ? "bruno" : "ana");
 const sample = callAnswers[profile.id] ?? {};
 const admissao = {
   cargo: profile.role,
@@ -105,8 +110,7 @@ const FIELDS: Field[] = [
   },
 ];
 
-/** Boas-vindas, aberta no fim da call; de lá a pessoa vai para o início ou refaz a call. */
-const HOME_URL = `../boas-vindas/${location.search}`; // leva o ?perfil= junto
+
 
 const OUTRO = (a: Answers) =>
   `Perfeito, ${a.nome}. Já tenho o que preciso. Vou montar sua primeira semana com o time ${a.time} e te mostro em seguida.`;
@@ -306,19 +310,18 @@ async function main(): Promise<void> {
   state.done = true;
   setAgent("done");
 
-  // Entrega o perfil e a calibragem para a sessão no quadro e sai da call para as boas-vindas.
+  // Entrega o perfil e a calibragem para a sessão no quadro e abre o quadro.
   const perfil = profileFromAnswers(answers);
-  saveProfile(perfil);
   saveCalibragem(calibragemFromAnswers(perfil, answers));
+  saveProfile(perfil);
   await wait(1400);
-  leaveToHome();
+  leaveToSession();
 }
 
-/** Fim da call: a conversa e os controles somem (style.css, body.is-leaving) e a página
- *  "estoura" para as boas-vindas (view transition, boas-vindas/style.css). */
-function leaveToHome(): void {
+/** Fim da call: a conversa e os controles somem (style.css, body.is-leaving) antes de abrir o quadro. */
+function leaveToSession(): void {
   document.body.classList.add("is-leaving");
-  window.setTimeout(() => location.assign(HOME_URL), 460);
+  window.setTimeout(() => location.replace("../lesson/"), 460);
 }
 
 void main();
