@@ -230,3 +230,48 @@ describe("POST /api/encaminhamentos (#129)", () => {
     await app.close();
   });
 });
+
+describe("POST /api/conversas/resumo", () => {
+  const url = "/api/conversas/resumo";
+  const payload = { falas: [{ role: "user", content: "Onde está a primeira tarefa?" }] };
+  const criarApp = (texto: string, limite = 1) => buildApp({
+    journey, tts: null, verificaToken: null, limiteDiario: { llm: limite },
+    async *streamResumo(req) {
+      expect(req.model).toBe("claude-haiku-5-5");
+      expect(req.messages.at(-1)?.content).toBe(JSON.stringify(payload.falas));
+      yield { type: "text", text: texto };
+      yield { type: "done", finishReason: "end_turn" };
+    },
+  });
+
+  it("resume as falas com Haiku e aplica a trava diária", async () => {
+    const app = criarApp('{"topicos":["A pessoa perguntou pela primeira tarefa."]}');
+    try {
+      const ok = await app.inject({ method: "POST", url, payload });
+      expect(ok.statusCode).toBe(200);
+      expect(ok.json()).toEqual({ topicos: ["A pessoa perguntou pela primeira tarefa."] });
+      const limite = await app.inject({ method: "POST", url, payload });
+      expect(limite.statusCode).toBe(503);
+      expect(limite.json()).toEqual({ error: "limite_diario" });
+    } finally {
+      await app.close();
+    }
+  });
+
+  it("rejeita pedidos inválidos ou grandes demais e trata uma saída inválida do Haiku", async () => {
+    const app = criarApp('{"topicos":[]}');
+    try {
+      const invalido = await app.inject({ method: "POST", url, payload: { falas: [null] } });
+      expect(invalido.statusCode).toBe(400);
+      const grande = await app.inject({
+        method: "POST", url, payload: { falas: [{ role: "user", content: "a".repeat(256 * 1024) }] },
+      });
+      expect(grande.statusCode).toBe(413);
+      const falha = await app.inject({ method: "POST", url, payload });
+      expect(falha.statusCode).toBe(503);
+      expect(falha.json()).toEqual({ error: "resumo_indisponivel" });
+    } finally {
+      await app.close();
+    }
+  });
+});

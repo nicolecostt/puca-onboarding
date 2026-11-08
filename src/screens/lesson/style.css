@@ -396,7 +396,7 @@ body.is-call-off .agent-cam,
 body.is-call-off .call-dock {
   display: none;
 }
-/* o botão do centro é a única coisa a fazer: a legenda e a abertura (que ficam no mesmo lugar) saem, o quadro esmaece */
+/* Ao encerrar, a legenda e a abertura saem e o quadro esmaece. */
 body.is-call-off .caption,
 body.is-call-off .opening {
   visibility: hidden;

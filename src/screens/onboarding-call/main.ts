@@ -1,6 +1,7 @@
 // Call inicial: Puca acolhe, faz o onboarding cultural e conhece a pessoa (a calibragem), numa conversa de voz.
 // O LLM conduz pelo /api/call (#57, decisão 0012): perguntas norteadoras, follow-ups dele e a cultura vinda do
 // Notion da Kota. O que a pessoa conta chega como anotações, que viram o perfil e a calibragem da sessão.
+import { avisarFalhaAoSalvarConversa, criarRegistro } from "../../journey/conversas";
 import "../../styles/base.css";
 import "./style.css";
 import { preserveProfileLinks } from "../../lib/navigation";
@@ -83,6 +84,7 @@ async function main(): Promise<void> {
 
   const answers: Record<string, string> = vinculoEscolhido ? { vinculo: vinculoEscolhido } : {};
   const cultura: string[] = [];
+  const registro = criarRegistro("call-inicial");
   const history: { role: "user" | "assistant"; content: string }[] = [];
   const state = { paused: false, ended: false, muted: false, seconds: 0, done: false, started: false };
   let agentState: AgentState = "idle";
@@ -121,6 +123,7 @@ async function main(): Promise<void> {
       saveProfile(perfil);
       saveCalibragem(calibragem);
       seguir?.remove();
+      salvarConversa();
       leaveToSession();
     });
   }
@@ -139,6 +142,7 @@ async function main(): Promise<void> {
   // A pessoa vive uma conversa: o que está sendo coletado não aparece na tela. Fica em window.onboardingAnswers e no evento.
   window.onboardingAnswers = answers;
   const remember = (role: "user" | "assistant", content: string) => {
+    registro.anotar(role, content);
     history.push({ role, content });
     if (history.length > 16) history.shift();
   };
@@ -269,7 +273,13 @@ async function main(): Promise<void> {
     const perfil = profileFromAnswers(answers, vinculoEscolhido ?? undefined);
     saveCalibragem(calibragemFromAnswers(perfil, answers));
     saveProfile(perfil);
+    salvarConversa();
     window.setTimeout(leaveToSession, 1400);
+  }
+
+  function salvarConversa(): void {
+    // O Início abre sem query e usa o perfil que a call acabou de salvar.
+    if (!registro.salvar(resolveProfile("").profile)) avisarFalhaAoSalvarConversa();
   }
 
   function ouvir(): void {

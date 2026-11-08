@@ -574,3 +574,39 @@ h2 {
   .slack-email__save:hover { transform: translateY(-1px); }
   .slack-email__save:active { transform: scale(0.98); }
 }
+
+/* ---- Conversas com o Puca ---- */
+.conversas {
+  margin-top: 32px;
+  padding: 20px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-xl);
+  background: var(--paper);
+  overflow-wrap: anywhere;
+}
+
+.conversa {
+  padding: 14px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.conversa summary {
+  cursor: pointer;
+}
+
+.conversa time {
+  margin-inline-start: 8px;
+  color: var(--grey);
+  font-size: 13px;
+}
+
+.conversa__falas {
+  max-height: 24rem;
+  overflow: auto;
+  padding-inline-start: 24px;
+}
+
+.conversa__falas p {
+  margin-top: 4px;
+  white-space: pre-wrap;
+}
