@@ -193,4 +193,11 @@ describe("slackDeVerdade", () => {
     expect((erro as Error).message).toMatch(/invalid_auth/);
     expect((erro as Error).message).not.toMatch(/token-secreto/);
   });
+
+  it("token com quebra de linha no meio vira erro que aponta a variável e não mostra o token", async () => {
+    const erro = await (async () => slackDeVerdade("token-de-teste\nsegredo-colado").authTest())().catch((e: Error) => e);
+    expect(erro).toBeInstanceOf(Error);
+    expect((erro as Error).message).toMatch(/SLACK_BOT_TOKEN/);
+    expect((erro as Error).message).not.toMatch(/token-de-teste|segredo-colado/);
+  });
 });

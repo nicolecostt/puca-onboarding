@@ -13,7 +13,12 @@ interface RespostaSlack {
 
 const esperar = (ms: number) => new Promise((fim) => setTimeout(fim, ms));
 
-export function slackDeVerdade(token: string): SlackApi {
+export function slackDeVerdade(tokenDoAmbiente: string): SlackApi {
+  const token = tokenDoAmbiente.trim();
+  // O fetch recusa cabeçalho com quebra de linha e põe o valor inteiro, token junto, na mensagem do erro.
+  if (!/^[!-~]+$/.test(token)) {
+    throw new Error("SLACK_BOT_TOKEN tem espaço, quebra de linha ou acento no meio. Confira a variável; o valor não aparece aqui para não vazar.");
+  }
   async function chamar(metodo: string, corpo: object = {}): Promise<RespostaSlack> {
     for (;;) {
       const r = await fetch(`https://slack.com/api/${metodo}`, {
