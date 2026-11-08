@@ -158,6 +158,20 @@ Exemplo (Bruno, transição; saída de `montarJornadaDaPessoa(journey, DEMO_CALI
 }
 ```
 
+## Custo da sessão
+
+Tempo e tokens de cada sessão, para o time auditar a demo (#52, PRODUCT.md §12.2). **Nada disso aparece em tela.**
+
+- **`timing` do `/api/ask`** (`AskTiming` em `server/src/agent/ask.ts`), último evento do SSE. Campos novos, aditivos:
+  `tokens_in` e `tokens_out` (tokens de entrada e de saída da chamada ao LLM; `null` só se o LLM não foi chamado) e
+  `tokens_estimated` (`true` quando o provedor não informou e o servidor estimou, à razão de 4 caracteres por token).
+  ```json
+  { "type": "timing", "timing": { "first_speak_ms": 2, "llm_first_token_ms": 3185, "llm_first_sentence_ms": 3333,
+    "total_ms": 3584, "llm_error": null, "tokens_in": 1912, "tokens_out": 38, "tokens_estimated": false } }
+  ```
+- **Log do servidor:** uma linha por `/api/ask`, com `msg: "ask"`, `moment`, `step` e o `timing`, inclusive quando a
+  pessoa interrompe e o navegador não recebe o `timing`. Nunca leva o texto da pessoa.
+
 ## Ao mudar um contrato
 
 1. **Compatível** (campo novo opcional, evento novo): atualize o tipo, o doc e o validador se for jornada.
