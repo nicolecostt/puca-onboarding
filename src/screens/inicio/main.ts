@@ -29,8 +29,10 @@ import { TOOLS, tasksFor, type AccessStatus, type TaskState, type Tool } from ".
 // ---- Quem é a pessoa: o que a call inicial salvou (ou o ?perfil=), completado pelo perfil da demo do mesmo vínculo ----
 const { profile, source } = resolveProfile(location.search);
 
-if (!sessionCompleted(profile)) {
-  location.replace(screenHref(source === "demo" ? "../boas-vindas/" : "../lesson/"));
+// Sem perfil nenhum, as boas-vindas pedem a escolha. Vindo da call inicial, o Início abre antes da sessão e leva a ela.
+const sessaoFeita = sessionCompleted(profile);
+if (source === "demo") {
+  location.replace(screenHref("../boas-vindas/"));
 } else {
   renderHome();
 }
@@ -38,6 +40,10 @@ if (!sessionCompleted(profile)) {
 function renderHome(): void {
   preserveProfileLinks();
   qs(document, "main").removeAttribute("hidden");
+  if (!sessaoFeita) {
+    const link = document.querySelector<HTMLAnchorElement>('.orbis-link[href^="../lesson/"]');
+    if (link) link.textContent = "Começar sessão";
+  }
   const base = profile.vinculo === "transicao" ? profiles.bruno : profiles.ana;
   const gestor = profile.gestor || company.people[base.managerId]?.name || "";
   const buddy = company.people[base.buddyId]?.name ?? "sua buddy";
@@ -72,7 +78,7 @@ function renderHome(): void {
     const pedido = tarefa ? pedidos.list().filter(
       (p) => p?.tarefa?.no === tarefa.no && p.pessoa === profile.nome && p.gestor === gestor,
     ).sort((a, b) => Date.parse(b.at) - Date.parse(a.at))[0] ?? null : null;
-    const tasks = tasksFor(tarefa, tarefaNo?.sublabel, pedido);
+    const tasks = tasksFor(tarefa, tarefaNo?.sublabel, pedido, sessaoFeita);
     const next = tasks.find((task) => task.state === "now" && task.action);
     const nextStep = qs(document, "#next-step");
     nextStep.hidden = !next?.action;
@@ -268,7 +274,7 @@ function renderHome(): void {
         case "knowledge":
           return route.text;
         case "jump":
-          return `Você pode rever isso em “${route.moment.title}”. É só clicar em Rever sessão.`;
+          return `Você pode rever isso em “${route.moment.title}”. É só clicar em ${sessaoFeita ? "Rever sessão" : "Começar sessão"}.`;
         case "tarefa":
           return route.resposta.kind === "sem_fonte"
             ? `A tarefa não diz isso. Pergunta para ${buddy}, sua buddy, no Slack.`
@@ -294,12 +300,14 @@ function renderHome(): void {
           : "Você já tem acesso a todas as ferramentas do time.";
       }
       if (/sessao|aula|quadro|comecar/.test(q)) {
-        return "Em Rever sessão, você pode voltar ao caminho de uma transação e aos momentos do quadro.";
+        return sessaoFeita
+          ? "Em Rever sessão, você pode voltar ao caminho de uma transação e aos momentos do quadro."
+          : "Em Começar sessão, eu te mostro no quadro o caminho de uma transação e o seu time.";
       }
       if (/buddy|beatriz/.test(q)) return `Sua buddy é ${buddy}. Ela te acompanha nas primeiras semanas.`;
       if (/gestor|natalia|natália|chefe/.test(q)) return `Seu gestor é ${gestor}, do time ${time}.`;
       if (/^(oi|ola|bom dia|boa tarde|boa noite)\b|obrigad/.test(q)) return "Estou por aqui. Pode perguntar sobre seus acessos, suas tarefas ou o time.";
-      return `Isso eu não tenho confirmado aqui no início. Você pode rever o quadro ou perguntar para ${buddy}, sua buddy, no Slack.`;
+      return `Isso eu não tenho confirmado aqui no início. Você pode ${sessaoFeita ? "rever o quadro" : "começar a sessão"} ou perguntar para ${buddy}, sua buddy, no Slack.`;
     }
   }
 

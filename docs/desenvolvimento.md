@@ -167,7 +167,7 @@ conta. Se a pessoa afastar o quadro e o Puca falar de algo fora da tela, o quadr
 
 - O perfil vem da escolha nas boas-vindas (dois cartões, que mandam `?perfil=` para a call) e da call inicial, que o
   salva (`onboardingStore()`: `localStorage` no app para Mac, `sessionStorage` no navegador); no fim da call, o app abre
-  a sessão. Aberta sem perfil salvo e sem `?perfil=`, a sessão mostra a mesma escolha antes de o Puca começar. Sem LLM, a call mostra "Ir para a sessão", que segue com o perfil de exemplo de quem foi escolhido.
+  o Início, com a sessão como próximo passo. Aberta sem perfil salvo e sem `?perfil=`, a sessão mostra a mesma escolha antes de o Puca começar. Sem LLM, a call mostra "Seguir para o Início", que segue com o perfil de exemplo de quem foi escolhido.
 - `?perfil=ana` (recém-contratada: passa pela parte institucional) ou `?perfil=bruno` (mudando de time: vai direto ao time).
 - `?auto=1` responde sozinho, para apresentar sem mexer no mouse.
 
