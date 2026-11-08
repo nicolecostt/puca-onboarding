@@ -1,4 +1,4 @@
-// Visual da Puca: esfera de pontos com uma faixa em onda, sem rosto.
+// Visual de Puca: esfera de pontos com uma faixa em onda, sem rosto.
 // Carregado por loadAgentVisual() (agent-visual.ts) em todas as telas. Cor dos pontos de fundo em tokens.css (--puca-sphere-dot).
 //
 // Mouse: a esfera inclina na direção do cursor e os pontos perto dele crescem e ganham a cor da faixa.

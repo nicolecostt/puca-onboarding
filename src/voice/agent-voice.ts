@@ -1,4 +1,4 @@
-// Voz da Puca na tela: fala com áudio do servidor (fila, um por vez), pergunta ao agente (ponte + LLM)
+// Voz de Puca na tela: fala com áudio do servidor (fila, um por vez), pergunta ao agente (ponte + LLM)
 // e microfone (Deepgram) com barge-in. Sem servidor ou sem chaves, cada parte desliga sozinha e a
 // tela segue como antes (legenda e chat).
 import type { BoardAction } from "../journey/types";
@@ -18,7 +18,7 @@ export interface AskRequest {
 }
 
 export interface AskHandlers {
-  /** Cada frase da Puca, na ordem: a ponte primeiro, depois o LLM. Resolve quando terminou de falar. */
+  /** Cada frase de Puca, na ordem: a ponte primeiro, depois o LLM. Resolve quando terminou de falar. */
   onSpeak(text: string, play: () => Promise<void>): Promise<void>;
   onAction(action: BoardAction): void;
   onGoTo(target: string): void;
@@ -50,13 +50,13 @@ export interface ListenHandlers {
   onFinal(text: string): void;
   /** Legenda ao vivo do que a pessoa está dizendo. */
   onCaption?(text: string): void;
-  /** A pessoa falou por cima da Puca: a fala já foi cortada; a tela decide o que fazer com o roteiro. */
+  /** A pessoa falou por cima de Puca: a fala já foi cortada; a tela decide o que fazer com o roteiro. */
   onBargeIn?(): void;
   /** O microfone ligou ("ouvindo") ou não vai ouvir (motivo). */
   onState?(state: MicState): void;
 }
 
-/** O que a Puca diz no chat quando o microfone não vai ouvir. */
+/** O que Puca diz no chat quando o microfone não vai ouvir. */
 export const MIC_AVISO: Record<Exclude<MicState, "ouvindo">, string> = {
   negado: "O microfone está bloqueado. Sigo pelo chat; para falar comigo, libere o microfone e recarregue a página.",
   "sem-microfone": "Não achei um microfone funcionando. Sigo pelo chat.",
@@ -183,7 +183,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       onEvent: (ev) => {
         if (ev.type !== "caption" || paused) return;
         const c = ev.caption;
-        // Mic aberto enquanto a Puca fala: o eco dela é ignorado; fala nova da pessoa corta.
+        // Mic aberto enquanto Puca fala: o eco dela é ignorado; fala nova da pessoa corta.
         if (speaking) {
           const d = classifyBargeIn({ transcript: c.text, kind: c.kind, agentText: speaking });
           if (d.decision === "echo" || d.decision === "wait") return;

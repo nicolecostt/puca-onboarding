@@ -37,7 +37,7 @@ export interface RouteContext {
   faqs: Faq[];
   /** A primeira tarefa da pessoa (tarefaDaPessoa); sem ela, a fala segue o caminho de sempre. */
   tarefa?: TarefaDoTime | null;
-  /** A tarefa já foi apresentada na sessão; antes disso a Puca não adianta a tarefa. */
+  /** A tarefa já foi apresentada na sessão; antes disso Puca não adianta a tarefa. */
   tarefaApresentada?: boolean;
 }
 

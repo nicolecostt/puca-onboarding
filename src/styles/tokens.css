@@ -24,7 +24,7 @@
   font-display: swap;
 }
 
-/* ângulo do arco-íris da Puca, animável */
+/* ângulo do arco-íris de Puca, animável */
 @property --holo-turn {
   syntax: "<angle>";
   inherits: true;
@@ -61,7 +61,7 @@
 
   /* ---- Estados ----
      Só preto, branco e cinza: o estado se lê pela marca (cheio, vazado, tracejado), não pela cor.
-     A única cor do app é a da Puca (--puca-holo-stops). Vermelho fica só para erro e encerrar. */
+     A única cor do app é a de Puca (--puca-holo-stops). Vermelho fica só para erro e encerrar. */
   --color-success: #171717;
   --color-success-bg: #ffffff;
   --color-success-border: #171717;
@@ -80,13 +80,13 @@
   --color-info-bg: #f5f5f5;
   --color-info-text: #171717;
 
-  --color-puca: #171717; /* cursor da Puca mexendo na tela */
+  --color-puca: #171717; /* cursor de Puca mexendo na tela */
   --color-puca-text: #ffffff;
-  /* avatar de pessoa numa cor do espectro da Puca: o tom (--hue) vem da tela; saturação e luz ficam aqui */
+  /* avatar de pessoa numa cor do espectro de Puca: o tom (--hue) vem da tela; saturação e luz ficam aqui */
   --person-saturation: 80%;
   --person-lightness: 72%;
 
-  /* A cor da Puca: o arco-íris metálico da faixa da esfera, para poucos pontos especiais
+  /* A cor de Puca: o arco-íris metálico da faixa da esfera, para poucos pontos especiais
      (o foco dela no quadro, partículas). Use dentro da regra animada:
      background: conic-gradient(from var(--holo-turn), var(--puca-holo-stops)); animation: holo-spin ... */
   --puca-holo-stops:
@@ -98,7 +98,7 @@
     hsl(270 70% 68%),
     hsl(330 75% 64%);
 
-  /* esfera da Puca (src/lib/puca-sphere.ts): só #rrggbb, o canvas lê estes valores */
+  /* esfera de Puca (src/lib/puca-sphere.ts): só #rrggbb, o canvas lê estes valores */
   --puca-sphere-dot: #c9c9c9; /* pontos de fundo, cinza claro (a faixa é arco-íris, gerada no canvas) */
 
   --color-highlight: rgba(0, 0, 0, 0.07); /* trecho sendo falado / foco no quadro */
