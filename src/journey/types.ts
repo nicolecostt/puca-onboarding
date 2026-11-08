@@ -196,7 +196,7 @@ export type BoardAction = (
   | { type: "card"; target: string }
   | { type: "close_card" }
   | { type: "reset" }
-  /** Ação no navegador de Puca (contrato "Computer use", src/lib/orbis.ts); sem o app, é ignorada. */
+  /** Ação no navegador do Puca (contrato "Computer use", src/lib/orbis.ts); sem o app, é ignorada. */
   | { type: "navegador"; acao: AcaoDaPuca }
 ) & {
   /** Trecho da fala do passo: a ação acontece quando o Puca chega nele. Sem `at`, acontece antes da fala. */

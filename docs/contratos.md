@@ -179,7 +179,7 @@ O app Electron (decisão 0004, `docs/stack.md` §3, #158) abre o mesmo front por
 interface Orbis {
   /** Versão do app (a do package.json), ex.: "0.1.0". */
   versao: string;
-  /** Navegador de Puca: ver "Computer use" abaixo. */
+  /** Navegador do Puca: ver "Computer use" abaixo. */
   navegador?: OrbisNavegador;
 }
 declare global { interface Window { orbis?: Orbis } }
@@ -195,8 +195,8 @@ No app para Mac, perfil, calibragem e conclusão da sessão usam `localStorage` 
 
 ## Computer use
 
-O navegador de Puca (decisão 0008, `docs/stack.md` §4, #123): uma área da sessão com um navegador de verdade dentro do
-app, onde Puca abre o mundo da Kota e aponta, circula, marca e clica no ritmo da fala. Só existe no app; sem
+O navegador do Puca (decisão 0008, `docs/stack.md` §4, #123): uma área da sessão com um navegador de verdade dentro do
+app, onde o Puca abre o mundo da Kota e aponta, circula, marca e clica no ritmo da fala. Só existe no app; sem
 `window.orbis.navegador` (`npm run dev` no navegador comum), a ação `navegador` da jornada é ignorada e o simulado segue.
 
 ```ts

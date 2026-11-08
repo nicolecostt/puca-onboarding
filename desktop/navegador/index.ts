@@ -1,4 +1,4 @@
-// Navegador de Puca (decisão 0008, docs/stack.md §4, contrato "Computer use"): uma área da janela do Orbis com um
+// Navegador do Puca (decisão 0008, docs/stack.md §4, contrato "Computer use"): uma área da janela do Orbis com um
 // navegador de verdade, controlado pelo protocolo de depuração do Chromium. A sessão pede ações pelo IPC; elas rodam
 // numa fila serial que para quando a pessoa fala por cima.
 import { BrowserWindow, ipcMain, WebContentsView } from "electron";
@@ -57,8 +57,9 @@ export function ligarNavegador(win: BrowserWindow): void {
     await cdp("Page.addScriptToEvaluateOnNewDocument", { source: CAMADA });
     wc.debugger.on("message", (_e, metodo, p: { frame?: { parentId?: string } }) => {
       if (metodo === "Page.frameStoppedLoading" || metodo === "Page.loadEventFired") carregou?.();
-      // página nova (inclusive sem recarregar, como GitHub e Notion): os desenhos da anterior somem
-      if ((metodo === "Page.frameNavigated" && !p.frame?.parentId) || metodo === "Page.navigatedWithinDocument") {
+      // página nova: os desenhos da anterior somem. Navegação dentro do documento não limpa: o Notion reescreve a
+      // URL sozinho logo depois de carregar e apagaria a marca que o Puca acabou de fazer.
+      if (metodo === "Page.frameNavigated" && !p.frame?.parentId) {
         void js("window.__puca?.limpar()").catch(() => {});
       }
     });
@@ -67,14 +68,20 @@ export function ligarNavegador(win: BrowserWindow): void {
 
   async function achar(alvo: Alvo): Promise<Achado | null> {
     await garantirCamada();
-    const r = await js<Achado | null>(`__puca.achar(${JSON.stringify(alvo)})`);
+    let r = await js<Achado | null>(`__puca.achar(${JSON.stringify(alvo)})`);
+    // GitHub e Notion montam a página depois de carregar: espera o alvo aparecer, até 3 s
+    for (let t = 0; !r && t < 12; t++) {
+      await espera(250);
+      await garantirCamada();
+      r = await js<Achado | null>(`__puca.achar(${JSON.stringify(alvo)})`);
+    }
     if (r) await espera(250); // deixa a rolagem assentar e mede de novo
     return r ? js<Achado | null>(`__puca.achar(${JSON.stringify(alvo)})`) : null;
   }
 
   async function levarCursor(a: Achado): Promise<void> {
     await js(`__puca.cursor(${a.doc.x + a.doc.w - 6}, ${a.doc.y + a.doc.h / 2})`);
-    await espera(900);
+    await espera(600);
   }
 
   async function abrir(url: string): Promise<void> {
@@ -83,7 +90,7 @@ export function ligarNavegador(win: BrowserWindow): void {
     // sites de página única às vezes não avisam que pararam de carregar: teto de 8 s
     await Promise.race([parou, espera(8000)]);
     carregou = null;
-    await espera(600);
+    await espera(300);
   }
 
   async function clicar(a: Achado): Promise<void> {
@@ -147,7 +154,7 @@ export function ligarNavegador(win: BrowserWindow): void {
       v.setBounds(bounds);
       v.setVisible(true);
     };
-    void obter().then(aplicar).catch((e) => console.warn("navegador de Puca:", e));
+    void obter().then(aplicar).catch((e) => console.warn("navegador do Puca:", e));
   });
   ipcMain.on("orbis:navegador:esconder", () => view?.setVisible(false));
   ipcMain.on("orbis:navegador:cancelar", () => {

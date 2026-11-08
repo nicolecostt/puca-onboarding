@@ -30,9 +30,11 @@ body.has-agent-cam:not(.is-call-off) .lesson__board {
   background: none;
 }
 
-/* ---- Navegador de Puca (só no app para Mac) ----
+/* ---- Navegador do Puca (só no app para Mac) ----
    A área tem a mesma posição do quadro; o app põe a página por cima dela, então nada da sessão entra aqui. */
 .lesson__navegador {
+  /* começa abaixo do painel "Sua jornada": o navegador fica por cima do HTML e cobriria o painel */
+  top: calc(var(--top) + 80px);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
