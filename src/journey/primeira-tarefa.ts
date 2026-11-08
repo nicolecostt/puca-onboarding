@@ -30,6 +30,8 @@ export interface PedidoDeAprovacao extends Reivindicavel {
   gestor: string;
   tarefa: TarefaDoTime;
   moment: string | null;
+  /** Sessão da tela que criou o pedido (id do rastro). Recomeçar na mesma página mantém a sessão; página nova, sessão nova. */
+  sessao?: string;
   status: StatusDoPedido;
   aprovada_por?: string;
   /** ISO 8601. */
@@ -82,10 +84,15 @@ export function createPedidos(store: KeyValueStore, opts: { now?: () => Date } =
   const write = (list: PedidoDeAprovacao[]) => writeJson(store, PEDIDOS_KEY, list);
 
   return {
-    /** A mesma pessoa e a mesma tarefa devolvem o pedido que já existe (recomeçar a sessão não pede de novo). */
+    /**
+     * A mesma pessoa, a mesma tarefa e a mesma sessão devolvem o pedido que já existe (recomeçar ou voltar ao momento não
+     * pede de novo). Sessão nova pede de novo: um ensaio aprovado no mesmo navegador não engole o passo 5 da apresentação.
+     */
     add(p: Omit<PedidoDeAprovacao, "id" | "at" | "status">): PedidoDeAprovacao {
       const list = read();
-      const same = list.find((x) => normalize(x.pessoa) === normalize(p.pessoa) && x.tarefa?.no === p.tarefa.no);
+      const same = list.find(
+        (x) => normalize(x.pessoa) === normalize(p.pessoa) && x.tarefa?.no === p.tarefa.no && x.sessao === p.sessao,
+      );
       if (same) return same;
       const created: PedidoDeAprovacao = { ...p, id: uid(), at: now().toISOString(), status: "pendente" };
       write([...list, created]);

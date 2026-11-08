@@ -218,7 +218,9 @@ a Puca escreve na DM do gestor, e o gestor aprova com um clique. A página da ta
 - Status: `pendente` (a sessão criou) → `enviando` (uma aba do Slack pegou; `claimed_by`/`claimed_at`, com a mesma regra de 30 s
   do encaminhamento) → `aguardando` (mensagem enviada na DM do gestor) → `aprovada` (o gestor clicou; `aprovada_por` e `aprovada_em`).
 - A sessão só escreve `pendente`; o Slack escreve o resto.
-- A mesma pessoa e a mesma tarefa geram um pedido só: recomeçar a sessão devolve o pedido que já existe, mesmo aprovado.
+- `sessao` (opcional) é o id da sessão da tela que criou o pedido, o mesmo do rastro. A mesma pessoa, a mesma tarefa e a
+  mesma sessão geram um pedido só: recomeçar ou voltar ao momento devolve o pedido que já existe, mesmo aprovado. Página
+  nova é sessão nova e pede de novo, para um ensaio aprovado no mesmo navegador não apagar o passo 5 da apresentação.
 
 Exemplo válido de `PedidoDeAprovacao`:
 
@@ -228,12 +230,12 @@ Exemplo válido de `PedidoDeAprovacao`:
   "pessoa": "Bruno", "gestor": "Marcos Vidal",
   "tarefa": {
     "no": "task-dlq", "titulo": "Fazer a publicação de configuração tentar de novo e, se continuar falhando, ir para uma DLQ.",
-    "problema": "se o config-topic fica fora do ar, a configuração publicada se perde sem aviso",
+    "problema": "se o terminal.config.updated fica fora do ar, a configuração publicada se perde sem aviso",
     "porque": "a maquininha fica com a configuração antiga e ninguém sabe",
-    "sistemas": "terminal-config-api e config-topic", "onde_ler": "README do terminal-config-api",
+    "sistemas": "terminal-config-api e terminal.config.updated", "onde_ler": "README do terminal-config-api",
     "quem_ajuda": "Lucas Melo e Paula Nunes"
   },
-  "moment": "primeira-tarefa", "status": "aprovada",
+  "moment": "primeira-tarefa", "sessao": "a91e…", "status": "aprovada",
   "aprovada_por": "Marcos Vidal", "aprovada_em": "2026-11-08T14:31:12.000Z"
 }
 ```

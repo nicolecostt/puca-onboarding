@@ -466,9 +466,9 @@
           "info": {
             "role": "Fazer a publicação de configuração tentar de novo e, se continuar falhando, ir para uma DLQ.",
             "bullets": [
-              "Problema: se o config-topic fica fora do ar, a configuração publicada se perde sem aviso",
+              "Problema: se o terminal.config.updated fica fora do ar, a configuração publicada se perde sem aviso",
               "Por que importa: a maquininha fica com a configuração antiga e ninguém sabe",
-              "Sistemas: terminal-config-api e config-topic",
+              "Sistemas: terminal-config-api e terminal.config.updated",
               "Onde ler: README do terminal-config-api",
               "Quem ajuda: Lucas Melo e Paula Nunes"
             ],
@@ -1631,12 +1631,12 @@
               "at": "O cartão explica"
             }
           ],
-          "knowledge": "A tarefa mexe no terminal-config-api e no config-topic: a publicação de configuração ganha retry e, esgotadas as tentativas, vai para uma DLQ. O README do terminal-config-api explica o fluxo de configuração das maquininhas. O Lucas Melo revisa a mudança."
+          "knowledge": "A tarefa mexe no terminal-config-api e no terminal.config.updated: a publicação de configuração ganha retry e, esgotadas as tentativas, vai para uma DLQ. O README do terminal-config-api explica o fluxo de configuração das maquininhas. O Lucas Melo revisa a mudança."
         },
         {
           "id": "pt-escopo-transicao",
           "goal": "Mostrar onde a tarefa de quem está em transição mexe",
-          "line": "Ela mexe no terminal-config-api e no config-topic. Se travar, o Lucas e a Paula podem te ajudar.",
+          "line": "Ela mexe no terminal-config-api e no terminal.config.updated. Se travar, o Lucas e a Paula podem te ajudar.",
           "actions": [
             {
               "type": "close_card"
