@@ -274,7 +274,9 @@ function renderHome(): void {
         case "knowledge":
           return route.text;
         case "jump":
-          return `Você pode rever isso em “${route.moment.title}”. É só clicar em ${sessaoFeita ? "Rever sessão" : "Começar sessão"}.`;
+          return sessaoFeita
+            ? `Você pode rever isso em “${route.moment.title}”. É só clicar em Rever sessão.`
+            : `Você vê isso em “${route.moment.title}”. É só clicar em Começar sessão.`;
         case "tarefa":
           return route.resposta.kind === "sem_fonte"
             ? `A tarefa não diz isso. Pergunta para ${buddy}, sua buddy, no Slack.`
