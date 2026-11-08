@@ -54,6 +54,24 @@ describe("createOutbox", () => {
     store.setItem(FORWARDING_KEY, "{lixo");
     expect(createOutbox(store).list()).toEqual([]);
   });
+
+  it("encaminhamento malformado é descartado e não quebra o add", () => {
+    const store = memoryStore();
+    const valido = { ...draft("Quem cuida do tail-common?"), id: "ok", at: "2026-11-08T05:00:00.000Z", status: "pendente" };
+    store.setItem(FORWARDING_KEY, JSON.stringify([null, { id: "sem-pergunta" }, valido]));
+    const out = createOutbox(store);
+    expect(() => out.add(draft("Qual a política de home office?"))).not.toThrow();
+    expect(out.list().map((f) => f.question)).toEqual(["Quem cuida do tail-common?", "Qual a política de home office?"]);
+  });
+
+  it("encaminhamento antigo sem consulted continua na lista e a mensagem do slack sai", () => {
+    const store = memoryStore();
+    const { consulted: _, ...antigo } = { ...draft("Quem cuida do tail-common?"), id: "velho", at: "2026-11-08T05:00:00.000Z", status: "pendente" };
+    store.setItem(FORWARDING_KEY, JSON.stringify([antigo]));
+    const [f] = createOutbox(store).list();
+    expect(f.id).toBe("velho");
+    expect(() => forwardingMessage(f)).not.toThrow();
+  });
 });
 
 describe("buddyOf", () => {
