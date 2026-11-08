@@ -12,7 +12,7 @@ const pedido = (id: string, at: string, extra: Partial<PedidoDeAprovacao> = {}):
     titulo: "Fazer a publicação de configuração tentar de novo.",
     problema: "a configuração se perde",
     porque: "a maquininha fica desatualizada",
-    sistemas: "terminal-config-api e config-topic",
+    sistemas: "terminal-config-api e terminal.config.updated",
     onde_ler: "README do terminal-config-api",
     quem_ajuda: "Lucas Melo e Paula Nunes",
   },

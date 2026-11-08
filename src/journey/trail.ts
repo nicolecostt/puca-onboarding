@@ -77,6 +77,8 @@ export function createTrail(store: KeyValueStore, opts: { now?: () => Date; sess
   const writeSessions = (list: TrailSession[]) => writeJson(store, SESSIONS_KEY, list);
 
   return {
+    /** Id desta sessão: o mesmo enquanto a página não recarrega (recomeçar mantém). */
+    session,
     record(e: Omit<TrailEntry, "id" | "at" | "session">): TrailEntry {
       const entry: TrailEntry = { ...e, id: uid(), at: now().toISOString(), session };
       write([...read(), entry]);

@@ -263,8 +263,8 @@ async function main(): Promise<void> {
       console.warn("primeira tarefa: perfil sem gestor, o pedido de aprovação não foi criado");
       return;
     }
-    // a mesma pessoa e a mesma tarefa devolvem o pedido que já existe: recomeçar a sessão não pede de novo
-    const p = pedidos.add({ pessoa: profile.nome, gestor, tarefa, moment: momentId });
+    // a mesma pessoa, tarefa e sessão devolvem o pedido que já existe: recomeçar não pede de novo, página nova pede
+    const p = pedidos.add({ pessoa: profile.nome, gestor, tarefa, moment: momentId, sessao: trail.session });
     pedidoDaSessao = p.id;
     if (p.status === "aprovada") aprovacaoAvisada.add(p.id);
     else showToast(`Pedido de aprovação enviado a ${gestor} no Slack`, SLACK);

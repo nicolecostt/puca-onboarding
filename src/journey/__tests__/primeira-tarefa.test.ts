@@ -111,6 +111,17 @@ describe("createPedidos", () => {
     expect(pedidos.list()).toHaveLength(2);
   });
 
+  it("reaproveita o pedido só na mesma sessão: o ensaio aprovado não engole o pedido da apresentação", () => {
+    const pedidos = createPedidos(memoryStore());
+    const ensaio = pedidos.add({ ...draft(), sessao: "ensaio" });
+    pedidos.aprovar(ensaio.id, "Marcos Vidal");
+    expect(pedidos.add({ ...draft(), sessao: "ensaio" }).id).toBe(ensaio.id); // recomeçar na mesma página
+    const apresentacao = pedidos.add({ ...draft(), sessao: "apresentacao" });
+    expect(apresentacao.id).not.toBe(ensaio.id);
+    expect(apresentacao.status).toBe("pendente");
+    expect(pedidos.pending().map((x) => x.id)).toEqual([apresentacao.id]);
+  });
+
   it("pending e nextRetryIn seguem a regra de 30 s", () => {
     const c = clock();
     const pedidos = createPedidos(memoryStore(), { now: c.now });
@@ -158,8 +169,8 @@ describe("pedidoMessage", () => {
     expect(text).toContain("Oi, Marcos Vidal!");
     expect(text).toContain("Pedido de aprovação da primeira tarefa de Bruno");
     expect(text).toContain("Fazer a publicação de configuração tentar de novo");
-    expect(text).toContain("Problema: se o config-topic fica fora do ar");
-    expect(text).toContain("Sistemas: terminal-config-api e config-topic");
+    expect(text).toContain("Problema: se o terminal.config.updated fica fora do ar");
+    expect(text).toContain("Sistemas: terminal-config-api e terminal.config.updated");
     expect(text).toContain("Quem ajuda: Lucas Melo e Paula Nunes");
     expect(text).toContain("Posso passar para a pessoa?");
     expect(text).not.toMatch(/\b(ele|ela|o Bruno|a Bruno)\b/);
