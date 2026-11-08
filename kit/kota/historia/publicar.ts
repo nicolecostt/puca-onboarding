@@ -10,9 +10,16 @@ import { arquivosSemPasso, type PassoHistoria, PLANO_HISTORIA, passoDoArquivo } 
 const git = (raiz: string, args: string[], env?: NodeJS.ProcessEnv, input?: string) =>
   execFileSync("git", args, { cwd: raiz, encoding: "utf8", env: env && { ...process.env, ...env }, input });
 
-export function publicarHistoria(oficina: string, publico: string, plano: PassoHistoria[], m: MapaKota): { commits: string[] } {
+export interface OrigemDaPublicacao { branch: string; commit: string; branchesFora: string[] }
+
+export function publicarHistoria(
+  oficina: string,
+  publico: string,
+  plano: PassoHistoria[],
+  m: MapaKota,
+): { commits: string[]; oficina: OrigemDaPublicacao } {
   const arquivos = arquivosDoRepo(oficina);
-  const pessoas = conferirAntes(arquivos, publico, plano, m);
+  const pessoas = conferirAntes(oficina, arquivos, publico, plano, m);
   const doPasso = plano.map(() => [] as string[]);
   for (const a of arquivos) doPasso[passoDoArquivo(a, plano)].push(a);
   const naOficina = new Set(arquivos);
@@ -38,17 +45,28 @@ export function publicarHistoria(oficina: string, publico: string, plano: PassoH
   if (diferencas.length) {
     throw new Error(`a árvore do público ficou diferente da oficina (commits locais, não faça push):\n${diferencas.join("\n")}`);
   }
-  return { commits };
+  return { commits, oficina: origem(oficina) };
 }
 
-function conferirAntes(arquivos: string[], publico: string, plano: PassoHistoria[], m: MapaKota): PessoaKota[] {
+// O que não está num commit da oficina não tem como ser conferido depois, e o push público não volta atrás.
+function conferirAntes(oficina: string, arquivos: string[], publico: string, plano: PassoHistoria[], m: MapaKota): PessoaKota[] {
   const sem = arquivosSemPasso(arquivos, plano);
   if (sem.length) throw new Error(`arquivos da oficina sem passo no plano; nada foi commitado:\n${sem.join("\n")}`);
   const pessoas = plano.map((p) => m.pessoas.find((x) => x.id === p.autor));
   const fora = plano.filter((_, i) => !pessoas[i]).map((p) => p.autor);
   if (fora.length) throw new Error(`autores fora do mapa: ${fora.join(", ")}; nada foi commitado`);
+  const sujo = git(oficina, ["status", "--porcelain", "--untracked-files=all"]).trimEnd();
+  if (sujo) throw new Error(`a oficina tem alterações fora de commit; commite ou tire antes de publicar. Nada foi commitado:\n${sujo}`);
   if (git(publico, ["status", "--porcelain"])) throw new Error(`${publico} tem alterações não commitadas; nada foi commitado`);
   return pessoas as PessoaKota[];
+}
+
+function origem(oficina: string): OrigemDaPublicacao {
+  return {
+    branch: git(oficina, ["rev-parse", "--abbrev-ref", "HEAD"]).trim(),
+    commit: git(oficina, ["rev-parse", "HEAD"]).trim(),
+    branchesFora: git(oficina, ["branch", "--no-merged", "HEAD", "--format=%(refname:short)"]).split("\n").filter(Boolean),
+  };
 }
 
 function rastreados(raiz: string): string[] {
@@ -77,9 +95,14 @@ function main() {
     process.exit(1);
   }
   try {
-    const { commits } = publicarHistoria(resolve(oficina), resolve(publico), PLANO_HISTORIA, mapa);
+    const { commits, oficina: o } = publicarHistoria(resolve(oficina), resolve(publico), PLANO_HISTORIA, mapa);
     for (const c of commits) console.log(git(publico, ["log", "-1", "--format=%h %an <%ae> %s", c]).trim());
-    console.log(`\n${commits.length} commit(s) novo(s) em ${publico}. Push só por fast-forward e com o OK do Joaquim.`);
+    console.log(`\n${commits.length} commit(s) novo(s) em ${publico}, da oficina em ${o.branch} @ ${o.commit}.`);
+    if (o.branchesFora.length) {
+      console.log(`Atenção: estas branches da oficina não entraram: ${o.branchesFora.join(", ")}.`);
+      console.log("Se alguma devia entrar, integre na oficina, clone o público de novo e publique outra vez.");
+    }
+    console.log("Push só por fast-forward e com o OK do Joaquim.");
   } catch (e) {
     console.error(e instanceof Error ? e.message : String(e));
     process.exit(1);

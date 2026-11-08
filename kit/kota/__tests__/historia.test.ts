@@ -39,6 +39,7 @@ function oficina(extra: Record<string, string> = {}): string {
     ...extra,
   });
   chmodSync(join(raiz, "scripts/testar.sh"), 0o755);
+  commitar(raiz, GITHUB);
   return raiz;
 }
 
@@ -75,6 +76,26 @@ describe("publicarHistoria", () => {
     expect(git(pub, "rev-list", "--count", "HEAD")).toBe("1");
   });
 
+  it("para antes do primeiro commit se a oficina tem alteração fora de commit", () => {
+    const of = oficina();
+    writeFileSync(join(of, "docs/adr/0002-y.md"), "# ADR-0002: y\n");
+    writeFileSync(join(of, "LICENSE"), "licença nova\n");
+    const pub = publico();
+    expect(() => publicarHistoria(of, pub, PLANO, mapa)).toThrow(/LICENSE[\s\S]*docs\/adr\/0002-y\.md/);
+    expect(git(pub, "rev-list", "--count", "HEAD")).toBe("1");
+  });
+
+  it("diz a branch e o commit da oficina publicados e as branches locais que ficaram de fora", () => {
+    const of = oficina();
+    git(of, "checkout", "-q", "-b", "onda");
+    git(of, "branch", "integrada");
+    git(of, "checkout", "-q", "-b", "fix");
+    commitar(of, GITHUB);
+    git(of, "checkout", "-q", "onda");
+    const { oficina: origem } = publicarHistoria(of, publico(), PLANO, mapa);
+    expect(origem).toEqual({ branch: "onda", commit: git(of, "rev-parse", "HEAD"), branchesFora: ["fix"] });
+  });
+
   it("um commit por passo com diferença, com autor e committer do mapa", () => {
     const pub = publico();
     const { commits } = publicarHistoria(oficina(), pub, PLANO, mapa);
@@ -108,6 +129,7 @@ describe("publicarHistoria", () => {
     const pub = publico();
     publicarHistoria(of, pub, PLANO, mapa);
     writeFileSync(join(of, "CODEOWNERS"), "* plataforma@kota.example\n");
+    commitar(of, GITHUB);
     const novo: PassoHistoria = { autor: "eduardo", mensagem: "chore(plataforma): codeowners", caminhos: ["CODEOWNERS"] };
     expect(publicarHistoria(of, pub, [...PLANO, novo], mapa).commits).toHaveLength(1);
     expect(depoisDaRaiz(pub).at(-1)).toBe(`${assinatura("eduardo")}|${assinatura("eduardo")}|${novo.mensagem}`);
