@@ -148,6 +148,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       const spoken: Promise<void>[] = [];
       // ações do agente esperam a frase seguinte começar a tocar (contrato Voz ↔ quadro)
       let actions: BoardAction[] = [];
+      let last: { started: boolean; actions: BoardAction[] } | null = null;
       try {
         for (;;) {
           const { done, value } = await reader.read();
@@ -161,9 +162,13 @@ export async function createAgentVoice(): Promise<AgentVoice> {
             const ev = JSON.parse(block.slice(6));
             if (ev.type === "speak") {
               const url: string | null = ev.audio_url;
-              const before = actions;
+              const frase = { started: false, actions };
               actions = [];
-              const start = () => before.forEach((a) => h.onAction(a));
+              last = frase;
+              const start = () => {
+                frase.started = true;
+                frase.actions.forEach((a) => h.onAction(a));
+              };
               const play = () => (url ? enqueue(ev.text, async () => ({ audio_url: url }), { onStart: start }) : Promise.resolve(start()));
               spoken.push(h.onSpeak(ev.text, play));
             } else if (ev.type === "action") actions.push(ev.action);
@@ -173,7 +178,12 @@ export async function createAgentVoice(): Promise<AgentVoice> {
       } catch {
         /* interrompida */
       }
-      if (!ac.signal.aborted) actions.forEach((a) => h.onAction(a)); // ações depois da última frase
+      // ações depois da última frase: com ela, se ainda não começou a tocar (mantém a ordem); senão, já
+      const tail = last as { started: boolean; actions: BoardAction[] } | null;
+      if (!ac.signal.aborted) {
+        if (tail && !tail.started) tail.actions.push(...actions);
+        else actions.forEach((a) => h.onAction(a));
+      }
       await Promise.all(spoken);
       return true;
     },

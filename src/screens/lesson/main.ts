@@ -350,6 +350,14 @@ async function main(): Promise<void> {
       };
       let heard = false; // chegou o tempo de alguma palavra do áudio
       let finished = false;
+      // Pulo ou reinício no meio da fala: o relógio muda de geração. Com voz, nada do relógio fica esperando
+      // durante o áudio, então `watch` derruba a espera e `cut()` impede de seguir com a fala antiga.
+      const gen = clock.generation;
+      const cut = () => clock.generation !== gen;
+      const watch = (async () => {
+        while (!finished) await clock.wait(100);
+      })();
+      watch.catch(() => {});
       // estimativa de 150 ms por palavra, a partir de onde a fala está; uma só por vez
       let estimating: Promise<void> | null = null;
       const estimate = () =>
@@ -373,13 +381,18 @@ async function main(): Promise<void> {
         if (voice.tts) {
           // áudio sem tempo das palavras: depois de 2 s sem nenhuma, volta para a estimativa
           void clock.wait(2000).then(() => (heard || finished ? undefined : estimate())).catch(() => {});
-          await audio;
+          await Promise.race([audio, watch]);
+          if (cut()) throw new Cancelled();
           if (!heard) await estimate(); // áudio falhou ou veio sem os tempos: termina no ritmo da estimativa
         } else await estimate();
       } finally {
         finished = true;
-        advance(text.length); // fala cortada ou áudio que falhou: o quadro chega ao estado final do passo
+        // fala cortada ou áudio que falhou: o quadro chega ao estado final do passo. Num pulo, a legenda
+        // já é a resposta do pulo, então só as ações que faltavam.
+        if (cut()) while (next < cues.length) io.apply(cues[next++].action);
+        else advance(text.length);
       }
+      if (cut()) throw new Cancelled();
       chat.addMessage({ from: "agent", text });
       await clock.wait(voice.tts ? 250 : 700);
     },
