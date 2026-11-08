@@ -6,6 +6,11 @@ import type { Calibragem, EstadoMomento, ItemCalibragem, Journey, JornadaDaPesso
 
 const ORDEM_NIVEL: Record<Nivel, number> = { nao_conhece: 0, ja_ouviu: 1, usa: 2, domina: 3 };
 
+const MOTIVO_CHECAGEM = {
+  entendeu: "Na checagem da aula, ficou claro.",
+  rever: "Na checagem da aula, vale rever este assunto.",
+};
+
 const MOTIVO_FIXO: Record<EstadoMomento, string> = {
   aprender: "Assunto novo para você.",
   revisar: "Você já conhece: passamos mais rápido.",
@@ -48,6 +53,10 @@ export function montarJornadaDaPessoa(journey: Journey, calibragem: Calibragem):
     const base = { id: m.id, titulo: m.title, objetivo: m.goal, temas };
     // quem já é da empresa não passa pela parte institucional (o passo bv-oi desvia dela)
     if (transicao && temas.includes("empresa")) return { ...base, estado: "fora", motivo: MOTIVO_FIXO.fora };
+    // a checagem da aula vale mais que a call: rever em qualquer tema do momento marca "revisar"
+    const checados = temas.map((t) => itemDoTema(calibragem, t)?.checagem).filter((x) => x !== undefined);
+    if (checados.includes("rever")) return { ...base, estado: "revisar", motivo: MOTIVO_CHECAGEM.rever };
+    if (checados.includes("entendeu")) return { ...base, estado: "ja_conhece", motivo: MOTIVO_CHECAGEM.entendeu };
     const item = itemQueDecide(calibragem, temas);
     if (!item) return { ...base, estado: "aprender", motivo: "" };
     const estado = estadoDoItem(item);

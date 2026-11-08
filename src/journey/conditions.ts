@@ -1,6 +1,6 @@
 // Avalia as condições estruturadas das transições e compara respostas livres
 // com as respostas sugeridas do passo.
-import type { Condition, Profile } from "./types";
+import type { Condition, Profile, ResultadoDaChecagem } from "./types";
 
 /** Minúsculas, sem acento, sem pontuação, espaços simples. */
 export function normalize(text: string): string {
@@ -119,9 +119,12 @@ export interface ConditionContext {
   profile: Profile;
   /** Resposta sugerida escolhida (ou reconhecida no texto) no passo atual. */
   reply: string | null;
+  /** Resultado da checagem do passo atual (null se o passo não é checagem). */
+  checagem?: ResultadoDaChecagem | null;
 }
 
 export function evaluate(cond: Condition, ctx: ConditionContext): boolean {
+  if ("checagem" in cond) return ctx.checagem === cond.checagem;
   if ("reply" in cond) return ctx.reply !== null && normalize(ctx.reply) === normalize(cond.reply);
   const value = ctx.profile[cond.profile];
   return value !== undefined && normalize(String(value)) === normalize(cond.eq);

@@ -3,6 +3,7 @@
 // segue o visual dos cartões da aula. Recolhe para não tampar o quadro.
 //   const panel = mountJourneyPanel({ jornada, final: "primeira-tarefa" });
 //   panel.setProgress(["boas-vindas"], "seu-time");
+//   panel.setJornada(montarJornadaDaPessoa(journey, calibragemNova)); // depois de uma checagem
 // Evento no document: journeypanel:pick { id } quando a pessoa clica num momento (a tela faz o pulo).
 import "../../styles/tokens.css";
 import "./journey-panel.css";
@@ -24,6 +25,8 @@ export interface JourneyPanel {
   el: HTMLElement;
   /** Momentos já vistos e o atual (null antes de começar ou depois do fim). */
   setProgress(visitados: readonly string[], atual: string | null): void;
+  /** Troca a jornada (a calibragem mudou numa checagem) e mantém o progresso. */
+  setJornada(jornada: JornadaDaPessoa): void;
   toggle(force?: boolean): void;
 }
 
@@ -59,7 +62,8 @@ function momentoHTML(m: MomentoDaPessoa, p: Progresso): string {
 }
 
 export function mountJourneyPanel(opts: JourneyPanelOptions): JourneyPanel {
-  const { jornada } = opts;
+  let jornada = opts.jornada;
+  let progresso: { visitados: readonly string[]; atual: string | null } = { visitados: [], atual: null };
   const panel = document.createElement("aside");
   panel.className = "journey-panel";
   panel.setAttribute("aria-label", "Sua jornada");
@@ -94,9 +98,9 @@ export function mountJourneyPanel(opts: JourneyPanelOptions): JourneyPanel {
   const list = qs(panel, ".jp-moments");
   const next = qs(panel, ".jp-next__list");
   const nextSection = qs(panel, ".jp-next");
-  const total = jornada.momentos.filter((m) => m.estado !== "fora").length;
-
   function setProgress(visitados: readonly string[], atual: string | null): void {
+    progresso = { visitados: [...visitados], atual };
+    const total = jornada.momentos.filter((m) => m.estado !== "fora").length;
     const vistos = new Set(visitados);
     list.innerHTML = jornada.momentos
       .map((m) => momentoHTML(m, m.id === atual ? "agora" : vistos.has(m.id) ? "feito" : "a-seguir"))
@@ -121,6 +125,11 @@ export function mountJourneyPanel(opts: JourneyPanelOptions): JourneyPanel {
       .join("");
   }
 
+  function setJornada(j: JornadaDaPessoa): void {
+    jornada = j;
+    setProgress(progresso.visitados, progresso.atual);
+  }
+
   function toggle(force?: boolean): void {
     const open = force ?? panel.classList.contains("is-collapsed");
     panel.classList.toggle("is-collapsed", !open);
@@ -135,5 +144,5 @@ export function mountJourneyPanel(opts: JourneyPanelOptions): JourneyPanel {
 
   setProgress([], null);
   if (opts.collapsed) toggle(false);
-  return { el: panel, setProgress, toggle };
+  return { el: panel, setProgress, setJornada, toggle };
 }

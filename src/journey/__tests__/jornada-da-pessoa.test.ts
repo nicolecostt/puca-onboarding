@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import demo from "../data/tail.journey.json";
 import { loadJourney } from "../validate";
-import { DEMO_CALIBRAGENS } from "../calibragem";
+import { DEMO_CALIBRAGENS, atualizarCalibragem } from "../calibragem";
 import { montarJornadaDaPessoa, proximosPassos } from "../jornada-da-pessoa";
 import type { Calibragem, Certeza, Nivel, Tema } from "../types";
 
@@ -62,6 +62,27 @@ describe("montarJornadaDaPessoa", () => {
     const j = montarJornadaDaPessoa(journey, DEMO_CALIBRAGENS.novo);
     expect(j.momentos.find((m) => m.id === "pagamentos")!.temas).toEqual(["pagamentos", "mensageria"]);
     expect(j.momentos.find((m) => m.id === "boas-vindas")!.temas).toEqual([]);
+  });
+});
+
+describe("montarJornadaDaPessoa depois da checagem", () => {
+  const checa = (c: Calibragem, tema: Tema, entendeu: boolean) =>
+    atualizarCalibragem(c, { tema, passo: "x", entendeu, tentativas: 1, resposta: "r" });
+
+  it("entendeu marca o momento como já conhece; rever marca revisar, mesmo para quem não conhecia", () => {
+    const ana = DEMO_CALIBRAGENS.novo; // pagamentos e falhas começam em aprender
+    expect(estados(checa(ana, "pagamentos", true)).pagamentos).toBe("ja_conhece");
+    expect(estados(checa(ana, "falhas", false)).falha).toBe("revisar");
+  });
+
+  it("rever em um tema do momento vale mais que entendeu em outro", () => {
+    const c = checa(checa(DEMO_CALIBRAGENS.novo, "pagamentos", true), "mensageria", false);
+    expect(estados(c).pagamentos).toBe("revisar");
+  });
+
+  it("o motivo fala da checagem, sem nota", () => {
+    const m = montarJornadaDaPessoa(journey, checa(DEMO_CALIBRAGENS.novo, "falhas", false)).momentos.find((x) => x.id === "falha")!;
+    expect(m.motivo).toBe("Na checagem da aula, vale rever este assunto.");
   });
 });
 

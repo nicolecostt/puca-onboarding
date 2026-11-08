@@ -17,7 +17,7 @@ import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwardi
 import { createTrail, sourcesFor } from "../../journey/trail";
 import { createAgentVoice } from "../../voice/agent-voice";
 import { interpolateDeep, resolveProfile } from "../../journey/profile";
-import { resolveCalibragem } from "../../journey/calibragem";
+import { atualizarCalibragem, resolveCalibragem, saveCalibragem } from "../../journey/calibragem";
 import { montarJornadaDaPessoa } from "../../journey/jornada-da-pessoa";
 import type { Moment, Profile, Step, Vinculo } from "../../journey/types";
 import { mountAppHeader } from "../../components/app-header/app-header";
@@ -93,8 +93,10 @@ async function main(): Promise<void> {
   // a Puca aparece na "câmera" do canto, como numa videochamada
   const cam = mountAgentCam({ name: journey.agent.name, visual: await loadAgentVisual() });
   // Jornada da pessoa: a calibragem da call inicial marca cada momento (aprender, revisar, fora) e o painel mostra.
-  const jornadaDaPessoa = montarJornadaDaPessoa(journey, resolveCalibragem(location.search).calibragem);
-  const journeyPanel = mountJourneyPanel({ jornada: jornadaDaPessoa, final: "primeira-tarefa" });
+  // A checagem da aula atualiza a calibragem e o painel (§4.2 e §12.1: atualiza os objetivos que faltam).
+  const calibrada = resolveCalibragem(location.search);
+  let calibragem = calibrada.calibragem;
+  const journeyPanel = mountJourneyPanel({ jornada: montarJornadaDaPessoa(journey, calibragem), final: "primeira-tarefa" });
   let visitados: string[] = [];
   let painelRecolhido = false; // recolhe sozinho uma vez, quando o quadro aparece; depois, só a pessoa abre e fecha
   // Voz de verdade (servidor em server/): sem ele, a aula segue só com legenda e chat.
@@ -488,6 +490,12 @@ async function main(): Promise<void> {
       journeyPanel.setProgress(visitados, m.id);
       el.moment.textContent = m.title;
       emit("journey:moment", { id: m.id, title: m.title });
+    },
+    onCheck(r) {
+      calibragem = atualizarCalibragem(calibragem, r);
+      // perfil de demo pela URL não sobrescreve a calibragem que a call inicial gravou
+      if (calibrada.source !== "url") saveCalibragem(calibragem);
+      journeyPanel.setJornada(montarJornadaDaPessoa(journey, calibragem));
     },
     onStep(s, m) {
       currentStep = s;

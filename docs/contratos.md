@@ -75,6 +75,15 @@ Enquanto a sua parte não lê de verdade, use `DEMO_CALIBRAGENS.novo` (Ana) e `D
 - **Certeza** (`Certeza`): `alta` (a pessoa disse com clareza), `media` (deduzido do que ela contou),
   `baixa` (palpite: a aula confirma na checagem).
 - **Origem**: `call` (respondeu na call), `vinculo` (deduzido de ser novo ou de transição), `aula` (atualizado na checagem).
+- **Checagem** (`checagem?`, só com origem `aula`): `entendeu` ou `rever`, o resultado da última checagem do tema na aula.
+  Quem escreve é `atualizarCalibragem(calibragem, resultado)`, uma função pura (a tela grava com `saveCalibragem`):
+  - `entendeu`: nível pelo menos `usa`, certeza `alta`, evidência = o que a pessoa respondeu ou tocou.
+  - `rever`: o nível **não muda** (não é nota); a certeza vira `alta` e o tema fica marcado para rever.
+  ```json
+  { "tema": "falhas", "nivel": "usa", "certeza": "alta", "evidencia": "Para a settlement.dlq", "origem": "aula", "checagem": "entendeu" }
+  ```
+- **Resultado no motor**: `RunnerIO.onCheck?(r)`, com `r = { tema, passo, entendeu, tentativas, resposta }`
+  (`resposta` é o texto dito ou o id do nó tocado). Formato da checagem na jornada em `journey-format.md`.
 - `conhecimentos` tem sempre um item por tema. `time_anterior`, `aproveita` e `diferencas` só existem na transição.
 
 Exemplo (Bruno, transição; saída de `DEMO_CALIBRAGENS.transicao`):
@@ -129,14 +138,17 @@ Quem lê chama `montarJornadaDaPessoa(journey, calibragem)`, uma função pura q
 (feito, agora, a seguir) é estado da tela; salvar o progresso é a #18.
 
 - **Nenhum momento sai da jornada.** O estado só marca; o runner segue o mesmo JSON.
-- **Estado** (`EstadoMomento`), nesta ordem de checagem:
+- **Estado** (`EstadoMomento`), nesta ordem:
   - `fora`: vínculo `transicao` e momento do tema `empresa` (é o desvio que o passo `bv-oi` já faz).
+  - Resultado da checagem na aula (`checagem` de algum tema do momento): `rever` → `revisar`; senão, `entendeu` → `ja_conhece`.
   - `ja_conhece`: nível `domina` com certeza `alta`.
   - `revisar`: nível `usa`, ou `domina` com certeza menor.
   - `aprender`: `nao_conhece` ou `ja_ouviu`, e todo momento sem tema (boas-vindas, quem cuida, checagem…).
 - Momento com mais de um tema (`pagamentos` cobre pagamentos e mensageria): vale o **menor** nível, para não
   marcar como revisão o que a pessoa ainda não sabe.
-- **Motivo**: a frase da pessoa na call (`evidencia` do tema que decidiu) quando existe; senão, uma frase fixa por estado.
+- **Motivo**: depois de uma checagem, uma frase fixa sobre ela ("Na checagem da aula, ficou claro." / "Na checagem da aula,
+  vale rever este assunto."); senão, a frase da pessoa na call (`evidencia` do tema que decidiu) quando existe; senão, uma frase fixa por estado.
+- O painel "Sua jornada" remonta com `JourneyPanel.setJornada(jornada)` quando a calibragem muda, mantendo o progresso.
 - `proximosPassos(jornada, visitados, atual)`: os momentos que faltam, sem os `fora`, na ordem.
 
 Exemplo (Bruno, transição; saída de `montarJornadaDaPessoa(journey, DEMO_CALIBRAGENS.transicao)`, momentos cortados):
