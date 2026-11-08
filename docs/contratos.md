@@ -242,6 +242,11 @@ interface OrbisNavegador {
   no trecho, como as do quadro; vale em momento sem quadro. Se a pessoa toma a vez, as ações do navegador que
   faltavam **não** rodam (as do quadro, sim).
 
+- **Pelo LLM da sessão** (`/api/turn`): a ferramenta `mostrar_no_navegador { fonte }` escolhe pelo título uma das fontes
+  do kit (`fontesDoNavegador` em `server/src/agent/turn.ts`: as `docs` dos nós, a pasta de código de cada serviço e o
+  repositório). O servidor troca o título pela URL do kit e emite `{ type: "action", action: { type: "navegador", acao:
+  { tipo: "abrir", url } } }`; o modelo nunca escreve URL. A página fica na tela até o próximo passo.
+
 Exemplo válido de ação num passo:
 
 ```json

@@ -142,6 +142,7 @@ async function main(): Promise<void> {
   el.lessonName.textContent = journey.title;
   // navegador de Puca (só no app para Mac); sem window.orbis, palco é null e a sessão segue igual
   const navegadorHost = qs(document, "#navegador-host");
+  let navegadorPedido = false; // o Puca abriu uma fonte no navegador neste passo (pedido da pessoa)
   const palco = montarPalcoNavegador(navegadorHost, qs(document, "#palco-abas"), el.boardHost, window.orbis?.navegador);
   mountPucaDots(qs(document, "#caption-orb")); // Puca na legenda: as bolinhas dele se mexendo
 
@@ -943,10 +944,11 @@ async function main(): Promise<void> {
     apply(a) {
       if (a.type === "navegador") {
         palco?.executar(a.acao); // vale em qualquer vista, até sem quadro
+        navegadorPedido = true; // fica na tela até o próximo passo, mesmo que o turno também mexa no quadro
         return;
       }
       // passo sem navegador: o palco volta ao quadro, para a pessoa ver o que a ação mexe
-      if (!currentStep?.actions?.some((x) => x.type === "navegador")) palco?.mostrarQuadro();
+      if (!navegadorPedido && !currentStep?.actions?.some((x) => x.type === "navegador")) palco?.mostrarQuadro();
       if (!board) return;
       switch (a.type) {
         case "reveal": return board.reveal(a.targets);
@@ -1008,6 +1010,7 @@ async function main(): Promise<void> {
     },
     onStep(s, m) {
       currentStep = s;
+      navegadorPedido = false;
       entregarTarefa(s, m.id);
       emit("journey:step", { id: s.id, moment: m.id });
     },
