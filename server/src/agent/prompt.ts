@@ -86,7 +86,7 @@ export function buildTools(ctx: TurnContext): ToolSpec[] {
   if (targets.length) {
     tools.push({
       type: "function",
-      function: { name: "go_to", description: "Segue a aula para outro ponto quando a pessoa pedir.", parameters: { type: "object", properties: { target: { type: "string", enum: targets } }, required: ["target"] } },
+      function: { name: "go_to", description: "Segue a sessão para outro ponto quando a pessoa pedir.", parameters: { type: "object", properties: { target: { type: "string", enum: targets } }, required: ["target"] } },
     });
   }
   return tools;

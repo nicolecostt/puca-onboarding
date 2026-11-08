@@ -21,7 +21,7 @@ const app = buildApp({ journey, tts: values.tts ? tryCreateTts() : null });
 await app.listen({ port: 0, host: "127.0.0.1" });
 const base = `http://127.0.0.1:${(app.server.address() as AddressInfo).port}`;
 
-// Falas reais de quem está numa aula, cada uma no ponto da jornada onde costuma aparecer.
+// Falas reais de quem está numa sessão, cada uma no ponto da jornada onde costuma aparecer.
 const script: { moment: string; step: string; text: string }[] = [
   { moment: "empresa-e-cultura", step: "ec-pergunta", text: "O que é ser dono do problema?" },
   { moment: "empresa-e-cultura", step: "ec-pergunta", text: "pode seguir" },

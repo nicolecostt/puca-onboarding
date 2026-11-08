@@ -1,7 +1,7 @@
 {
   "version": 1,
   "id": "tail-terminais",
-  "title": "Sua primeira aula",
+  "title": "Sua primeira sessão",
   "company": "Tail",
   "agent": {
     "name": "Puca",
@@ -611,7 +611,7 @@
     {
       "id": "boas-vindas",
       "title": "Boas-vindas",
-      "goal": "Cumprimentar e explicar o roteiro da aula conforme o momento da pessoa",
+      "goal": "Cumprimentar e explicar o roteiro da sessão conforme o momento da pessoa",
       "view": {
         "mode": "logo"
       },
@@ -619,7 +619,7 @@
         {
           "id": "bv-oi",
           "goal": "Cumprimentar pelo nome",
-          "line": "Oi, {nome}! Agora que eu já te conheço um pouco, vamos para a sua primeira aula.",
+          "line": "Oi, {nome}! Agora que eu já te conheço um pouco, vamos para a sua primeira sessão.",
           "transitions": [
             {
               "to": {
@@ -1443,7 +1443,7 @@
     {
       "id": "encerramento",
       "title": "Encerramento",
-      "goal": "Resumir a aula e dizer o que a buddy recebe",
+      "goal": "Resumir a sessão e dizer o que a buddy recebe",
       "view": {
         "mode": "logo"
       },

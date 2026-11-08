@@ -1,6 +1,6 @@
 // Onde a Lousa guarda o que precisa sobreviver entre telas (rastro, encaminhamentos): o localStorage
 // do navegador, atrás de uma interface simples para os testes rodarem em node. Nada aqui pode
-// quebrar a aula: aba anônima, cota cheia ou JSON corrompido viram "não guardou" / "lista vazia".
+// quebrar a sessão: aba anônima, cota cheia ou JSON corrompido viram "não guardou" / "lista vazia".
 
 export interface KeyValueStore {
   getItem(key: string): string | null;
@@ -36,6 +36,6 @@ export function writeJson(store: KeyValueStore, key: string, value: unknown): vo
   try {
     store.setItem(key, JSON.stringify(value));
   } catch {
-    // cota cheia ou bloqueado: a aula segue sem guardar
+    // cota cheia ou bloqueado: a sessão segue sem guardar
   }
 }

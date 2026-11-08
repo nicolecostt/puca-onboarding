@@ -15,7 +15,7 @@ export type SpeakSource = "bridge" | "llm" | "fallback";
 export type AskEvent =
   | { type: "speak"; id: string; text: string; audio_url: string | null; source: SpeakSource }
   | { type: "action"; action: BoardAction }
-  /** A pessoa pediu outro ponto da aula: "moment:<id>" ou "step:<id>" (transições do passo atual). */
+  /** A pessoa pediu outro ponto da sessão: "moment:<id>" ou "step:<id>" (transições do passo atual). */
   | { type: "go_to"; target: string }
   /** Sem fonte confiável: a tela encaminha a dúvida à buddy (no máximo um por pedido, antes do timing). */
   | { type: "escalate"; summary: string }

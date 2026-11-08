@@ -102,7 +102,7 @@ body{overflow:hidden}
   .agent__orb[data-state="speaking"] .agent__ring--1{opacity:1}
 }
 
-/* Link para a aula no quadro, depois da entrevista */
+/* Link para a sessão no quadro, depois da entrevista */
 .caption__next{
   display:inline-flex;align-items:center;height:36px;padding:0 16px;border-radius:999px;
   background:var(--fg);color:#fff;font-size:13px;font-weight:500;text-decoration:none;

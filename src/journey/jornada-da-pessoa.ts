@@ -10,7 +10,7 @@ const MOTIVO_FIXO: Record<EstadoMomento, string> = {
   aprender: "Assunto novo para você.",
   revisar: "Você já conhece: passamos mais rápido.",
   ja_conhece: "Você disse que domina esse assunto.",
-  fora: "Você já é da Tail: a aula vai direto ao seu time.",
+  fora: "Você já é da Tail: a sessão vai direto ao seu time.",
 };
 
 /** Temas de cada momento, na ordem de CALIBRAGEM_TEMAS. */

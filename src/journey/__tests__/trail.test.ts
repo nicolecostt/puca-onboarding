@@ -42,7 +42,7 @@ describe("createTrail", () => {
     expect(trail.list()).toHaveLength(1);
   });
 
-  it("navegador sem espaço (setItem lança) não quebra a aula", () => {
+  it("navegador sem espaço (setItem lança) não quebra a sessão", () => {
     const full: KeyValueStore = { getItem: () => null, setItem: () => { throw new Error("QuotaExceededError"); } };
     expect(() => createTrail(full).record(entry("x"))).not.toThrow();
   });
@@ -85,8 +85,8 @@ describe("sourcesFor", () => {
     expect(sourcesFor({ kind: "faq", faq: unconfirmed }, journey, pagamentos)).toEqual([]);
   });
 
-  it("conhecimento da aula: aponta o momento", () => {
-    expect(sourcesFor({ kind: "knowledge", text: "x" }, journey, pagamentos)).toEqual([`Conhecimento da aula: ${pagamentos.title}`]);
+  it("conhecimento da sessão: aponta o momento", () => {
+    expect(sourcesFor({ kind: "knowledge", text: "x" }, journey, pagamentos)).toEqual([`Conhecimento da sessão: ${pagamentos.title}`]);
   });
 
   it("pulo, resposta sugerida, toque e agente: sem fonte", () => {

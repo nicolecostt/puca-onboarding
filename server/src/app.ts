@@ -1,5 +1,5 @@
 // API do agente (sem estado): fala → áudio, pergunta → ponte + LLM por SSE, token do STT e áudio do TTS.
-// Quem conduz a aula é a tela (src/screens/lesson), com o runner da jornada.
+// Quem conduz a sessão é a tela (src/screens/lesson), com o runner da jornada.
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import Fastify, { type FastifyReply } from "fastify";

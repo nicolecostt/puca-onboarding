@@ -1,4 +1,4 @@
-// Cabeçalho do app (Figma: topo das telas da aula): marca do produto (Lousa), empresa, etapas da jornada e a pessoa.
+// Cabeçalho do app (Figma: topo das telas da sessão): marca do produto (Lousa), empresa, etapas da jornada e a pessoa.
 // Lousa é o produto; Puca é a agente que fala com a pessoa.
 //   mountAppHeader({ current: "lesson", profile })
 import "../../styles/tokens.css";

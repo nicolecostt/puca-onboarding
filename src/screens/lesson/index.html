@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Aula no quadro</title>
+<title>Sessão no quadro</title>
 <script>
   // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
   if (location.protocol === "file:") {
@@ -25,7 +25,7 @@
     <a href="../live-session/" target="puca-slack">Abrir Slack</a>
   </div>
   <main class="lesson">
-    <!-- Vista "quadro": a aula visual -->
+    <!-- Vista "quadro": a sessão visual -->
     <div class="lesson__board" id="board-host" hidden></div>
 
     <!-- Vista "logo": abertura e encerramento -->
@@ -35,7 +35,7 @@
       <p class="opening__who" id="logo-who"></p>
     </section>
 
-    <!-- Título da aula: momento atual e tempo -->
+    <!-- Título da sessão: momento atual e tempo -->
     <div class="lesson-title" role="status">
       <span class="lesson-title__dot" id="live-dot" aria-hidden="true"></span>
       <strong id="lesson-name"></strong>

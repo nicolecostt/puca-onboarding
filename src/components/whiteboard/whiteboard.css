@@ -1,4 +1,4 @@
-/* Quadro da aula. Tudo dentro de .wb__stage está em px do Figma (1440×844)
+/* Quadro da sessão. Tudo dentro de .wb__stage está em px do Figma (1440×844)
    e é escalado pelo JS para caber na área. */
 .wb {
   position: relative;

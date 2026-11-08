@@ -1,9 +1,9 @@
-// Relógio da aula: o tempo só corre com a call ativa (pausar e encerrar seguram tudo).
-// Mesmo padrão do wait() da call de entrevista, com cancelamento para reiniciar a aula.
+// Relógio da sessão: o tempo só corre com a call ativa (pausar e encerrar seguram tudo).
+// Mesmo padrão do wait() da call de entrevista, com cancelamento para reiniciar a sessão.
 
 export class Cancelled extends Error {
   constructor() {
-    super("aula reiniciada");
+    super("sessão reiniciada");
   }
 }
 
@@ -11,13 +11,13 @@ export interface Clock {
   readonly running: boolean;
   setPaused(on: boolean): void;
   setEnded(on: boolean): void;
-  /** Espera `ms` de tempo de call ativa. Rejeita com Cancelled se a aula for reiniciada. */
+  /** Espera `ms` de tempo de call ativa. Rejeita com Cancelled se a sessão for reiniciada. */
   wait(ms: number): Promise<void>;
   /** Espera a call voltar a ficar ativa. */
   whenRunning(): Promise<void>;
   /** Cancela todas as esperas pendentes (troca de perfil, reinício). */
   cancel(): void;
-  /** Interrompe as esperas pendentes sem zerar o tempo da aula (pulo de momento). */
+  /** Interrompe as esperas pendentes sem zerar o tempo da sessão (pulo de momento). */
   interrupt(): void;
   /** Segundos de call ativa desde o início. */
   readonly seconds: number;

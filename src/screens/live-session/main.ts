@@ -1,4 +1,4 @@
-// Tela de auxílio (sessão ao vivo): barra de call, chat e câmera da Puca por cima de outra ferramenta.
+// Tela de auxílio: barra de call, chat e câmera da Puca por cima de outra ferramenta.
 // A tela inteira imita o Slack (tema claro) com os dados da Tail; o conteúdo está no index.html.
 import "../../styles/base.css";
 import "./style.css";
@@ -51,7 +51,7 @@ async function main(): Promise<void> {
     cursor.setPaused(paused);
   });
 
-  // Encaminhamentos que a aula deixou para a buddy (#28): a Puca abre a DM, digita e envia.
+  // Encaminhamentos que a sessão deixou para a buddy (#28): a Puca abre a DM, digita e envia.
   // "enviando" antes da animação: outra aba do Slack, ou um recarregar, não manda de novo.
   const outbox = createOutbox(browserStore());
   const tab = uid();

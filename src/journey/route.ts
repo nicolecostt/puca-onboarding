@@ -3,7 +3,7 @@
 //   jump      → pediu outro assunto            → pula para o início do momento
 //   reply     → bateu numa resposta sugerida   → segue o roteiro
 //   select    → disse o nome de um nó          → conta como o toque no quadro
-//   knowledge → o conhecimento da aula responde
+//   knowledge → o conhecimento da sessão responde
 //   faq       → pergunta sobre um nó do quadro ("quem cuida do X?")
 //   ask       → nada disso: pergunta ao agente
 import { matchFaq, scoreReply, normalize } from "./conditions";

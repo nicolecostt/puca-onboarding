@@ -68,7 +68,7 @@ export type Trail = ReturnType<typeof createTrail>;
  * porque as docs do nó não dizem quem cuida.
  */
 export function sourcesFor(route: Route, journey: Journey, moment: Moment | null): string[] {
-  if (route.kind === "knowledge") return [`Conhecimento da aula: ${moment?.title ?? journey.title}`];
+  if (route.kind === "knowledge") return [`Conhecimento da sessão: ${moment?.title ?? journey.title}`];
   if (route.kind !== "faq") return [];
   const info = journey.boards[route.faq.board]?.nodes.find((n) => n.id === route.faq.node)?.info;
   if (route.faq.intent === "why") return info?.adr ? [info.adr.id] : [];

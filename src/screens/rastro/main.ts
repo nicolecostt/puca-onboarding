@@ -1,4 +1,4 @@
-// Tela só para a demo (#51): lista o rastro guardado neste navegador pela aula e baixa em JSON.
+// Tela só para a demo (#51): lista o rastro guardado neste navegador pela sessão e baixa em JSON.
 // Não faz parte do produto; serve para mostrar à banca que dá para auditar o que a Puca fez e por quê.
 import "../../styles/base.css";
 import "./style.css";
@@ -11,7 +11,7 @@ const ROUTE_LABEL: Record<TrailRoute, string> = {
   jump: "Pulo de assunto",
   reply: "Resposta sugerida",
   select: "Toque no quadro",
-  knowledge: "Conhecimento da aula",
+  knowledge: "Conhecimento da sessão",
   faq: "Cartão do nó",
   ask: "Agente (LLM)",
 };
@@ -68,7 +68,7 @@ qs(document, "#clear").addEventListener("click", () => {
   trail.clear();
   render();
 });
-// a aula, aberta em outra aba, grava enquanto esta tela está aberta
+// a sessão, aberta em outra aba, grava enquanto esta tela está aberta
 addEventListener("storage", (e) => {
   if (e.key === TRAIL_KEY || e.key === FORWARDING_KEY) render();
 });

@@ -23,7 +23,7 @@ export function pickBridge(intent: FaqIntent | null): string {
   return list[n % list.length];
 }
 
-/** Todos os textos que dá para gerar antes da aula (falas da jornada, FAQ, pontes) para um perfil. */
+/** Todos os textos que dá para gerar antes da sessão (falas da jornada, FAQ, pontes) para um perfil. */
 export function allScriptedTexts(journey: Journey, profile: Profile): string[] {
   const texts = new Set<string>();
   for (const m of journey.moments) {

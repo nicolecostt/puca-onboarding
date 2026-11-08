@@ -1,4 +1,4 @@
-// Gera antes da aula o áudio de tudo o que é previsível (falas da jornada × perfis de demo, FAQ dos nós,
+// Gera antes da sessão o áudio de tudo o que é previsível (falas da jornada × perfis de demo, FAQ dos nós,
 // pontes). Fica no cache de TTS por hash do texto; em runtime o mesmo texto sai do disco em ~0 ms.
 // Uso: npm run precompute [-- --only pontes|faq|roteiro] [--dry]
 // Free tier do ElevenLabs = 10k caracteres/mês: rode --dry para ver o custo antes.
