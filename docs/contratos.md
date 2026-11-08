@@ -105,6 +105,21 @@ Content-Type: application/json
 {"text":"Quem cuida do balancereader?","moment_id":"pagamentos","step_id":"pg-pergunta","perfil":"novo"}
 ```
 
+## Company brain
+
+O brain mínimo (`server/src/brain/brain.ts`) sobe com o servidor: lê as páginas do Notion e o mapa do kit da Kota,
+parte em trechos (`Trecho` = `{ id, titulo, url, texto }`) e busca em memória. A fala que cai no `/api/ask` ganha os
+melhores trechos no prompt como `[f1]`, `[f2]`…; o modelo cita `[fN]` na resposta, o servidor tira a marca da fala e
+manda o evento SSE `fontes` no fim do turno, depois dos `speak` e antes do `timing`. Trecho abaixo do corte de relevância não entra no prompt; sem trecho
+relevante, a Puca diz que não confirmou e encaminha. Aditivo: cliente antigo ignora o evento.
+
+```
+data: {"type":"fontes","fontes":[{"titulo":"Deploy · Do merge à produção","url":"https://…notion.site/deploy"}]}
+```
+
+O app guarda cada fonte no rastro como `"<título> · <url>"` (`sources` da entrada `ask`). Sem `fontes`, `sources` fica
+como estava.
+
 ## Encaminhamento no Slack da Kota
 
 O encaminhamento sai de verdade no Slack da Kota (#129, decisão 0008, `docs/stack.md` §10.1): o servidor manda, com o
