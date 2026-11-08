@@ -1,5 +1,5 @@
-// Benchmark de latência do LLM (Featherless) em cenários reais da jornada Orla.
-// Uso: npm run bench:llm -- [--n 3] [--models Qwen/Qwen3-32B,Qwen/Qwen3-14B] [--configs min-nothink,min-default,full-nothink]
+// Benchmark de latência do LLM em cenários reais da jornada Orla.
+// Uso: npm run bench:llm -- [--provider anthropic|featherless] [--n 3] [--models ...] [--configs min-nothink,min-default,full-nothink]
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -13,11 +13,16 @@ import { DEMO_PROFILES } from "../../src/journey/profile";
 const { values } = parseArgs({
   options: {
     n: { type: "string", default: "3" },
-    models: { type: "string", default: "Qwen/Qwen3-32B,Qwen/Qwen3.5-27B,Qwen/Qwen3-14B" },
+    provider: { type: "string", default: "anthropic" },
+    models: { type: "string" },
     configs: { type: "string", default: "min-nothink,min-default,full-nothink" },
     label: { type: "string", default: "" },
   },
 });
+
+const DEFAULT_MODELS: Record<string, string> = { anthropic: "claude-haiku-5-5", featherless: "Qwen/Qwen3-32B,Qwen/Qwen3.5-27B,Qwen/Qwen3-14B" };
+const models = values.models ?? DEFAULT_MODELS[values.provider!];
+if (!models) throw new Error(`--provider deve ser anthropic ou featherless`);
 
 const journey = loadJourney(JSON.parse(readFileSync(new URL("../../src/journey/data/tail.journey.json", import.meta.url), "utf8")));
 const base: Omit<TurnContext, "momentId" | "stepId"> = { journey, profile: DEMO_PROFILES.novo };
@@ -50,6 +55,7 @@ interface Sample {
   firstSentenceMs: number | null;
   totalMs: number;
   reasoningChars: number;
+  cacheRead: number | null;
   text: string;
   tools: { name: string; valid: boolean }[];
   expectedToolHit: boolean | null;
@@ -70,7 +76,7 @@ function validTool(name: string, args: any, sc: Scenario): boolean {
 async function runOne(model: string, config: string, sc: Scenario): Promise<Sample> {
   const c = configs[config];
   const t0 = performance.now();
-  const s: Sample = { model, config, scenario: sc.id, ttftMs: null, firstSentenceMs: null, totalMs: 0, reasoningChars: 0, text: "", tools: [], expectedToolHit: null, error: null };
+  const s: Sample = { model, config, scenario: sc.id, ttftMs: null, firstSentenceMs: null, totalMs: 0, reasoningChars: 0, cacheRead: null, text: "", tools: [], expectedToolHit: null, error: null };
   const splitter = new SentenceSplitter();
   const ac = new AbortController();
   const timer = setTimeout(() => ac.abort(), 30_000);
@@ -78,6 +84,7 @@ async function runOne(model: string, config: string, sc: Scenario): Promise<Samp
     for await (const ev of streamChat({ model, messages: buildMessages(sc.ctx, sc.text, c.mode), tools: buildTools(sc.ctx), thinking: c.thinking, maxTokens: 250, signal: ac.signal })) {
       const ms = performance.now() - t0;
       if (ev.type === "reasoning") s.reasoningChars += ev.text.length;
+      if (ev.type === "usage") s.cacheRead = ev.cacheRead ?? null;
       if (ev.type === "text") {
         s.ttftMs ??= ms;
         s.text += ev.text;
@@ -107,14 +114,14 @@ const pct = (xs: number[], p: number) => {
 
 const n = Number(values.n);
 const samples: Sample[] = [];
-for (const model of values.models!.split(",")) {
+for (const model of models.split(",")) {
   for (const config of values.configs!.split(",")) {
     for (const sc of scenarios) {
       for (let i = 0; i < n; i++) {
         const s = await runOne(model, config, sc);
         samples.push(s);
         const tools = s.tools.map((t) => `${t.name}${t.valid ? "" : "✗"}`).join(",");
-        console.log(`${model.padEnd(18)} ${config.padEnd(13)} ${sc.id.padEnd(18)} ttft=${s.ttftMs?.toFixed(0) ?? "-"} 1ªfrase=${s.firstSentenceMs?.toFixed(0) ?? "-"} total=${s.totalMs.toFixed(0)} think=${s.reasoningChars} tools=[${tools}] ${s.error ?? ""} | ${s.text.replace(/\s+/g, " ").slice(0, 70)}`);
+        console.log(`${model.padEnd(18)} ${config.padEnd(13)} ${sc.id.padEnd(18)} ttft=${s.ttftMs?.toFixed(0) ?? "-"} 1ªfrase=${s.firstSentenceMs?.toFixed(0) ?? "-"} total=${s.totalMs.toFixed(0)} think=${s.reasoningChars} cache=${s.cacheRead ?? "-"} tools=[${tools}] ${s.error ?? ""} | ${s.text.replace(/\s+/g, " ").slice(0, 70)}`);
       }
     }
   }
