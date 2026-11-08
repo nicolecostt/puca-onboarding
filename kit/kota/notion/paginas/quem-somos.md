@@ -41,7 +41,7 @@ Na prática, o Gustavo Schmitt achou no ambiente local um contato salvo com a co
 
 Quem sobe uma mudança cuida do efeito dela no cliente, antes e depois do deploy.
 
-Na prática, depois do deploy do `contacts`, o Bruno Siqueira ficou olhando os erros por uma hora antes de dar o assunto por encerrado. E antes da troca programada da chave do JWT, que derruba as sessões abertas, a Raíssa Bentes avisou o atendimento.
+Na prática, depois do deploy do `userservice`, o Rodrigo Queiroz só deu o assunto por encerrado quando viu que os logins com sucesso continuavam no mesmo patamar do dia anterior. E antes da troca programada da chave do JWT, que derruba as sessões abertas, a Raíssa Bentes avisou o atendimento.
 
 ## Para continuar
 

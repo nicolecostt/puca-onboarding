@@ -359,5 +359,23 @@ describe("regra kota-people", () => {
   it("pasta sem as páginas: não lança e deixa a falta para a paginas-escritas", () =>
     expect(checar(join(pastaTemp(), "paginas"))).toEqual([]));
 
+  it("acusa página que serve de régua do ciclo e cita a pessoa de um perfil do jurado", () => {
+    const erros = checar(pastaCom({
+      "quem-somos": "# Quem somos\n\nNa prática, o Bruno Siqueira ficou olhando os erros por uma hora.\n",
+      "ciclo-de-desempenho": "# Ciclo de desempenho\n\nA Ana entrou no ciclo do ano seguinte.\n",
+      "onboarding-transicao": "# Mudando de time\n\nGustavo Schmitt e Ana Lacerda completam o time.\n",
+    }));
+    expect(erros).toHaveLength(2);
+    expect(erros).toEqual(expect.arrayContaining([
+      expect.stringMatching(/^\[kota-people\] .*quem-somos\.md.*Bruno Siqueira/),
+      expect.stringMatching(/^\[kota-people\] .*ciclo-de-desempenho\.md.*Ana Lacerda/),
+    ]));
+  });
+
+  it("aceita a régua com outras pessoas da Kota e com palavras que contêm o nome", () =>
+    expect(checar(pastaCom({
+      "quem-somos": "# Quem somos\n\nNa semana do deploy, o Rodrigo Queiroz conferiu os logins e a Anabela, do atendimento, foi avisada.\n",
+    }))).toEqual([]));
+
   it("o check:kota roda a regra kota-people", () => expect(regras.map((r) => r.nome)).toContain("kota-people"));
 });
