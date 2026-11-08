@@ -1,9 +1,23 @@
 /* Landing da Iris: cartaz suíço. Grade de 12 colunas, preto no branco, fios de 1px.
    A única cor é a da Puca (--puca-holo e a esfera), em poucos pontos. */
 @font-face {
-  font-family: "Geologica";
-  src: url("../../assets/fonts/Geologica-Variable.ttf") format("truetype");
-  font-weight: 100 900;
+  font-family: "Creato Display";
+  src: url("../../assets/fonts/CreatoDisplay-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Creato Display";
+  src: url("../../assets/fonts/CreatoDisplay-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Creato Display";
+  src: url("../../assets/fonts/CreatoDisplay-Bold.otf") format("opentype");
+  font-weight: 700;
   font-display: swap;
 }
 
@@ -52,7 +66,7 @@ h3 {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 
@@ -497,7 +511,7 @@ main,
   font-size: clamp(19px, 1.7vw, 24px);
   font-weight: 500;
   line-height: 1.2;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
 }
 
 /* linha da habilidade: sempre no mesmo lugar, aberta só na ativa */

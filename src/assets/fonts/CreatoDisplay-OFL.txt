@@ -1,8 +1,8 @@
-Copyright 2020 The Geologisk Project Authors (https://github.com/monokromskriftforlag/geologisk)
+Copyright (c) 2021 by Anugrah Pasau (anugrahpasau@gmail.com), with Reserved Font Name 'Creato Display'
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
-https://openfontlicense.org
+http://scripts.sil.org/OFL
 
 
 -----------------------------------------------------------

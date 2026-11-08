@@ -21,19 +21,19 @@ colors:
   danger-bg: "#fef2f2"
 typography:
   display:
-    fontFamily: "Geologica, Inter, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Creato Display, Inter, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(44px, 6.6vw, 92px)"
     fontWeight: 500
     lineHeight: 0.98
     letterSpacing: "-0.035em"
   headline:
-    fontFamily: "Geologica, Inter, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Creato Display, Inter, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(32px, 3.6vw, 52px)"
     fontWeight: 500
     lineHeight: 1.04
     letterSpacing: "-0.035em"
   title:
-    fontFamily: "Geologica, Inter, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Creato Display, Inter, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(19px, 1.7vw, 24px)"
     fontWeight: 500
     lineHeight: 1.2
@@ -118,7 +118,7 @@ components:
 
 Um cartaz tipográfico suíço: papel branco, tinta preta, cinzas só para o que é secundário ou inativo, fios de 1px marcando a grade, e um único objeto colorido: a Puca. Tudo o que não é a Puca é monocromático; o arco-íris metálico dela (a faixa da esfera de pontos, o anel `--puca-holo`, as partículas) aparece em poucos pontos, e é justamente essa raridade que faz o olho achar a Puca na tela.
 
-Na landing o mundo é plano e editorial: Geologica grande alinhada à esquerda numa grade de 12 colunas, listas separadas por fios, nenhum fundo colorido, nenhuma sombra. Nas telas do app (aula, call) o mesmo mundo vale para cor e acabamento, com uma densidade de ferramenta: quadro pontilhado, nós contornados em tinta, e sombras suaves só nos componentes que flutuam sobre o quadro.
+Na landing o mundo é plano e editorial: Creato Display grande alinhada à esquerda numa grade de 12 colunas, listas separadas por fios, nenhum fundo colorido, nenhuma sombra. Nas telas do app (aula, call) o mesmo mundo vale para cor e acabamento, com uma densidade de ferramenta: quadro pontilhado, nós contornados em tinta, e sombras suaves só nos componentes que flutuam sobre o quadro.
 
 O estado nunca depende de cor: lê-se pela marca. Nó cheio é o escolhido pela pessoa, contorno sólido é provado, tracejado é caixa preta ou inferido, e o anel arco-íris é o que a Puca está explicando agora. Vermelho fica reservado para erro e para encerrar a call.
 
@@ -126,7 +126,7 @@ O estado nunca depende de cor: lê-se pela marca. Nó cheio é o escolhido pela 
 - Preto, branco e cinza; a cor é só a da Puca, em poucos pontos.
 - Estado pela marca (cheio, vazado, tracejado), nunca pela cor.
 - Grade de 12 colunas com fios de 1px; tipo display grande alinhado à esquerda.
-- Títulos em Geologica (self-hosted), corpo em Inter, nomes de sistema em JetBrains Mono.
+- Títulos em Creato Display (self-hosted), corpo em Inter, nomes de sistema em JetBrains Mono.
 - Superfícies da landing planas; sombras suaves só em componentes flutuantes do app.
 
 ## Colors
@@ -161,11 +161,11 @@ Monocromático com uma única voz colorida: a Puca.
 
 ## Typography
 
-**Display Font:** Geologica (variável, 100–900, self-hosted em `src/assets/fonts`), com Inter de fallback
+**Display Font:** Creato Display (OTF 400, 500 e 700, self-hosted em `src/assets/fonts`, licença OFL), com Inter de fallback
 **Body Font:** Inter (com ui-sans-serif, system-ui)
 **Label/Mono Font:** JetBrains Mono para nomes de sistema nos nós e no cartão do nó; Kalam é a letra à mão do quadro no app
 
-**Character:** Geologica dá o peso de cartaz, apertada (−0.035em) e balanceada; Inter faz o trabalho calado do texto; o mono marca o que é nome técnico real (`pos-gateway`, `transactions.authorized`).
+**Character:** Creato Display dá o peso de cartaz, apertada (−0.02em) e balanceada; Inter faz o trabalho calado do texto; o mono marca o que é nome técnico real (`pos-gateway`, `transactions.authorized`).
 
 ### Hierarchy
 - **Display** (500, clamp(44px, 6.6vw, 92px), 0.98): o título do hero e o do fechamento; até 8 de 12 colunas ou ~14ch. Uma variante de seção atravessa a grade em clamp(40px, 5.6vw, 80px), linha 1, até 18ch.
@@ -175,7 +175,7 @@ Monocromático com uma única voz colorida: a Puca.
 - **Label** (500, 13–15px): barra do quadro, botões (15px; 14px no pequeno), etiquetas (12px), legendas do nó (11px).
 
 ### Named Rules
-**The Geologica Só No Título Rule.** Geologica é para títulos, marca e nomes grandes de lista; corpo, botões e rótulos ficam em Inter.
+**The Creato Só No Título Rule.** Creato Display é para títulos, marca e nomes grandes de lista; corpo, botões e rótulos ficam em Inter.
 
 ## Layout
 
@@ -210,7 +210,7 @@ Preto, cheio, decidido; um só tipo de botão.
 - **Link com seta:** texto 500 15px com um traço de 14px depois, que cresce para 26px no hover; altura mínima de 44px. É a ação secundária ao lado do botão.
 
 ### Navigation
-Fixa no topo, 64px, papel translúcido com blur e fio embaixo. Marca à esquerda (quadrado preto de 24px com a letra, nome em Geologica 600). Links em Inter 14px cinza, tinta no hover; botão pequeno à direita. No celular, só marca e botão.
+Fixa no topo, 64px, papel translúcido com blur e fio embaixo. Marca à esquerda (quadrado preto de 24px com a letra, nome em Creato Display 600). Links em Inter 14px cinza, tinta no hover; botão pequeno à direita. No celular, só marca e botão.
 
 ### Lista de habilidades (Signature)
 Lista ordenada entre fios de 1px. Cada item é um botão: nome em Title; inativos em cinza apagado, ativo em tinta, com a linha de apoio abrindo embaixo (cinza, 15px). Um fio preto corre sob o item ativo marcando o tempo até a próxima; a esfera ao lado muda de estado (fala / pensa) junto. Pausa é um link sublinhado em cinza.
@@ -233,7 +233,7 @@ Esfera de pontos cinza-claros com uma faixa em onda em arco-íris metálico, ger
 - **Do** marcar estado por cheio, contorno sólido, tracejado e anel da Puca.
 - **Do** reservar o arco-íris para a Puca: esfera, foco no quadro, orbe, partículas.
 - **Do** separar conteúdo com fios de 1px (#e5e5e5) e marcar o topo de listas e colunas com fio em tinta.
-- **Do** alinhar títulos Geologica à esquerda na grade de 12 colunas, com tracking negativo.
+- **Do** alinhar títulos Creato Display à esquerda na grade de 12 colunas, com tracking negativo.
 - **Do** desligar entrada, anel girando e transições com `prefers-reduced-motion`.
 
 ### Don't:
@@ -241,4 +241,4 @@ Esfera de pontos cinza-claros com uma faixa em onda em arco-íris metálico, ger
 - **Don't** usar verde, amarelo ou azul para sucesso, aviso ou info: os tokens de estado são preto e cinza de propósito.
 - **Don't** usar vermelho fora de erro e do botão de encerrar.
 - **Don't** colocar sombra em superfícies da landing.
-- **Don't** usar Geologica em texto corrido, botões ou rótulos.
+- **Don't** usar Creato Display em texto corrido, botões ou rótulos.
