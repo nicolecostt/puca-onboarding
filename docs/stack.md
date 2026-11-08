@@ -148,9 +148,9 @@ window.orbis = {
 - **Assinatura própria (ad hoc):** `mac.identity: null` e um `afterPack` que roda
   `codesign --force --deep --sign - Orbis.app`. Sem isso o Mac com Apple Silicon recusa abrir. Sem conta da Apple,
   sem notarização.
-- **Releases:** um workflow do GitHub Actions em `macos-14` roda a cada tag `v*`: `npm ci`, `npm run build`,
-  `npm run build:app`, e sobe `Orbis-mac-arm64.zip` e `Orbis-mac-x64.zip`, cada um com o seu `.sha256`, no Release. O repositório é público, então
-  os minutos de macOS saem de graça.
+- **Releases:** `npm run publicar-app -- <versão>` (`scripts/publicar-app.sh`), rodado num Mac a partir da `main`:
+  gera e assina os dois `.zip` com os `.sha256`, cria a tag `v<versão>` e sobe o Release. O workflow por tag saiu:
+  o GitHub deixou de aceitar o runner `macos-14`.
 - **`scripts/instalar.sh`** (o guia de uso só pede este comando):
 
 ```bash
@@ -181,7 +181,7 @@ curl -fsSL https://raw.githubusercontent.com/nicolecostt/puca-onboarding/main/sc
 |---|---|
 | `npm run dev:app` | `npm run dev` + Electron apontando para `localhost:5173`, recarregando ao salvar |
 | `npm run build:app` | `vite build` + `esbuild desktop/` + `electron-builder --mac zip` |
-| `npm run release -- <versão>` | cria a tag `v<versão>` e faz push; o workflow publica |
+| `npm run publicar-app -- <versão>` | gera, assina, cria a tag `v<versão>` e publica o Release |
 
 ---
 
@@ -664,7 +664,6 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
 | `scripts/instalar.sh` | o instalador pelo terminal |
 | `server/Dockerfile`, `fly.toml` | o deploy do servidor |
 | `supabase/migrations/` | as tabelas e as regras de acesso |
-| `.github/workflows/release-mac.yml` | o build do app a cada tag |
 
 ### 13.2. Dependências novas
 

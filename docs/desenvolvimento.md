@@ -30,8 +30,8 @@ npm run build:app     # Orbis-mac-arm64.zip e Orbis-mac-x64.zip em release/
 ```
 
 Em `npm run dev:app`, o macOS pede o microfone em nome do terminal que abriu o app (no VS Code, libere o Visual Studio
-Code em Ajustes → Privacidade e Segurança → Microfone). Release: uma tag `v*` (ex.: `git tag v0.1.0 && git push origin v0.1.0`)
-roda o workflow `Release do app`, que publica os `.zip` e as somas. Testar o instalador sem Release: sirva `release/`
+Code em Ajustes → Privacidade e Segurança → Microfone). Versão nova do app: com a `main` atualizada, `npm run publicar-app -- 0.1.2` gera os
+`.zip`, assina, cria a tag `v0.1.2` e sobe o Release; quem já tem o app roda o comando de instalar de novo. Testar o instalador sem Release: sirva `release/`
 (`python3 -m http.server 8000`) e rode `ORBIS_BASE_URL=http://localhost:8000 bash scripts/instalar.sh`.
 
 ## Estrutura

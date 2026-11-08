@@ -21,6 +21,7 @@
     "build:desktop": "esbuild desktop/main.ts desktop/preload.ts --bundle --platform=node --format=cjs --target=node20 --external:electron --outdir=dist-desktop --out-extension:.js=.cjs",
     "dev:app": "npm run build:desktop && ORBIS_DEV_URL=http://localhost:5173 electron .",
     "build:app": "VITE_API_URL=https://orbis-puca.fly.dev npm run build && npm run build:desktop && electron-builder --config desktop/electron-builder.yml --mac zip --arm64 --x64 && sh scripts/somas-sha256.sh",
+    "publicar-app": "bash scripts/publicar-app.sh",
     "check": "npm run typecheck && npm test && npm run check:contexto && npm run check:harness && vite build",
     "check:contexto": "tsx scripts/check-contexto.ts",
     "check:harness": "tsx scripts/check-harness.ts",
