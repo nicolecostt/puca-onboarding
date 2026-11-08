@@ -33,6 +33,31 @@ describe("validateJourney", () => {
     expect(errorsOf(j).join("\n")).toMatch(/at "trecho que ninguém fala", que não é trecho da fala/);
   });
 
+  it("recusa check fora de wait/select, com tema que não existe ou com replies fora das sugeridas", () => {
+    const j = clone(demo);
+    const auto = j.moments[3].steps[0];
+    auto.check = { tema: "pagamentos" };
+    const wait = j.moments[0].steps.find((s) => s.decision === "wait") ?? j.moments[3].steps.find((s) => s.decision === "wait")!;
+    wait.check = { tema: "nada" as never, replies: ["não existe"] };
+    const erros = errorsOf(j).join("\n");
+    expect(erros).toMatch(/check só vale em passo "wait" ou "select"/);
+    expect(erros).toMatch(/tema "nada"/);
+    expect(erros).toMatch(/check.replies cita "não existe"/);
+  });
+
+  it("recusa transição por checagem num passo sem check", () => {
+    const j = clone(demo);
+    j.moments[3].steps[0].transitions = [{ to: { moment: "checagem" }, if: { checagem: "rever" } }];
+    expect(errorsOf(j).join("\n")).toMatch(/transição por checagem num passo sem check/);
+  });
+
+  it("recusa when numa transição por checagem", () => {
+    const j = clone(demo);
+    const checa = j.moments.flatMap((m) => m.steps).find((s) => s.id === "fa-checa")!;
+    checa.transitions![0].when = "a pessoa entendeu";
+    expect(errorsOf(j).join("\n")).toMatch(/transição por checagem não leva when/);
+  });
+
   it("recusa transição para momento inexistente", () => {
     const j = clone(demo);
     j.moments[0].steps[1].transitions = [{ to: { moment: "sumiu" } }];

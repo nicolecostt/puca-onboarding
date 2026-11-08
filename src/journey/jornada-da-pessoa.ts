@@ -6,6 +6,11 @@ import type { Calibragem, EstadoMomento, ItemCalibragem, Journey, JornadaDaPesso
 
 const ORDEM_NIVEL: Record<Nivel, number> = { nao_conhece: 0, ja_ouviu: 1, usa: 2, domina: 3 };
 
+const MOTIVO_CHECAGEM = {
+  entendeu: "Na checagem da sessão, ficou claro.",
+  rever: "Na checagem da sessão, vale rever este assunto.",
+};
+
 const MOTIVO_FIXO: Record<EstadoMomento, string> = {
   aprender: "Assunto novo para você.",
   revisar: "Você já conhece: passamos mais rápido.",
@@ -48,6 +53,10 @@ export function montarJornadaDaPessoa(journey: Journey, calibragem: Calibragem):
     const base = { id: m.id, titulo: m.title, objetivo: m.goal, temas };
     // quem já é da empresa não passa pela parte institucional (o passo bv-oi desvia dela)
     if (transicao && temas.includes("empresa")) return { ...base, estado: "fora", motivo: MOTIVO_FIXO.fora };
+    // a checagem da sessão vale mais que a call: rever em qualquer tema do momento marca "revisar"
+    const checados = temas.map((t) => itemDoTema(calibragem, t)?.checagem).filter((x) => x !== undefined);
+    if (checados.includes("rever")) return { ...base, estado: "revisar", motivo: MOTIVO_CHECAGEM.rever, rever: true };
+    if (checados.includes("entendeu")) return { ...base, estado: "ja_conhece", motivo: MOTIVO_CHECAGEM.entendeu };
     const item = itemQueDecide(calibragem, temas);
     if (!item) return { ...base, estado: "aprender", motivo: "" };
     const estado = estadoDoItem(item);
@@ -58,8 +67,11 @@ export function montarJornadaDaPessoa(journey: Journey, calibragem: Calibragem):
   return { versao: 1, objetivos: [...calibragem.objetivos], momentos };
 }
 
-/** O que falta: momentos não vistos, sem o atual e sem os que ficaram fora, na ordem da jornada. */
+/**
+ * O que falta: momentos não vistos e os que a checagem pediu para rever, sem o atual e sem os que ficaram fora,
+ * na ordem da jornada (§12.1: a checagem atualiza o que ainda falta).
+ */
 export function proximosPassos(jornada: JornadaDaPessoa, visitados: readonly string[], atual: string | null): MomentoDaPessoa[] {
   const vistos = new Set(visitados);
-  return jornada.momentos.filter((m) => m.estado !== "fora" && m.id !== atual && !vistos.has(m.id));
+  return jornada.momentos.filter((m) => m.estado !== "fora" && m.id !== atual && (!vistos.has(m.id) || m.rever));
 }

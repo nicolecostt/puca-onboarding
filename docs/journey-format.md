@@ -70,9 +70,32 @@ Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json)
 | `decision` | `auto` (padrão: segue sozinho), `wait` (espera resposta) ou `select` (espera um toque num nó). |
 | `suggested_replies` | Botões de resposta para passos `wait`. O texto livre do chat é comparado com eles por palavras-chave. |
 | `expect` | Para `select`: `{ nodes, on_correct, on_wrong, retries?, on_reveal? }`. Errou: fala `on_wrong` e deixa tentar de novo; esgotou as tentativas: destaca a resposta e fala `on_reveal`. |
+| `check` | Faz do passo uma **checagem** de um tema da calibragem: `{ "tema", "replies"? }` (abaixo). |
 | `transitions` | Para onde ir depois do passo (abaixo). |
 
 Um passo `wait` precisa terminar em pergunta ou ter `suggested_replies`, senão a pessoa fica sem saber que é a vez dela.
+
+### Checagem
+
+Um passo `wait` ou `select` com `check` confere se a pessoa entendeu um tema (PRODUCT.md §4.2). Não é nota: o resultado
+só diz se o tema está entendido ou se vale rever, e atualiza a calibragem e a jornada da pessoa.
+
+```jsonc
+{ "id": "fa-checa", "decision": "wait", "goal": "conferir o caminho de erro",
+  "line": "Uma pergunta rápida: depois das três tentativas, para onde vai a venda?",
+  "suggested_replies": ["Para a settlement.dlq", "Ela se perde", "Volta para a maquininha"],
+  "check": { "tema": "falhas", "replies": ["Para a settlement.dlq"] },
+  "transitions": [{ "to": { "step": "fa-reforco" }, "if": { "checagem": "rever" } }] }
+```
+
+- `tema`: um dos temas da calibragem (`empresa`, `rituais`, `pagamentos`, `mensageria`, `falhas`).
+- Num `select`, entendeu = tocou num dos `expect.nodes` **sem** precisar que a Puca revelasse a resposta.
+- Num `wait`, `replies` diz quais `suggested_replies` mostram que entendeu. Texto livre e voz valem pelo mesmo casamento de palavras
+  das respostas sugeridas: enquanto a checagem espera, o que a pessoa diz vai inteiro para ela (não para o `knowledge`, que
+  entregaria a resposta). Pergunta ("pode repetir?") e pedido de mudar de assunto continuam funcionando.
+- Não escreva `when` nas transições por `checagem`: o `when` vira opção para o agente, e a checagem só o motor decide.
+- A transição pode depender do resultado: `if: { "checagem": "entendeu" }` ou `{ "checagem": "rever" }`. Use isso para reforçar
+  no quadro (explicar de novo, mais simples) ou para oferecer aprofundar.
 
 ### Ações no quadro
 
@@ -111,7 +134,8 @@ para o quadro acompanhar a explicação; sem `at`, ela acontece antes da fala. O
 - Vale a **primeira** transição cuja condição for verdadeira; sem `if`, ela sempre vale.
 - Sem nenhuma transição válida, o passo segue para o próximo passo e, no fim do momento, para o próximo momento.
 - `{ "step": … }` só aponta para passos do mesmo momento. `{ "moment": … }` sempre entra pelo **primeiro passo** do momento de destino, porque passos se apoiam uns nos outros.
-- `if` é o que o motor local avalia: `{ "reply": "<uma das suggested_replies>" }` ou `{ "profile": "<campo>", "eq": "<valor>" }`.
+- `if` é o que o motor local avalia: `{ "reply": "<uma das suggested_replies>" }`, `{ "profile": "<campo>", "eq": "<valor>" }`
+  ou, num passo com `check`, `{ "checagem": "entendeu" | "rever" }`.
 - `when` é a mesma condição em linguagem natural. Hoje é documentação; quando um LLM conduzir a sessão, é o que ele vai ler.
 
 ## Perguntas e pulos
@@ -145,5 +169,7 @@ A sessão escolhe o perfil nesta ordem:
 - Ações, `expect` e `flow` citam só nós e arestas do quadro em vigor; o `at` de uma ação é trecho da `line` do passo.
 - Transições apontam para destinos que existem; `if.reply` está nas `suggested_replies` do passo.
 - Passo `wait` com pergunta ou respostas sugeridas; passo `select` com `expect` completo.
+- `check` só em passo `wait` ou `select`, com um tema que existe; num `wait`, `check.replies` estão nas `suggested_replies`;
+  `if.checagem` só em passo com `check` e sem `when`.
 
 Rode `npm test` depois de editar uma jornada: o primeiro teste valida a jornada de demo.

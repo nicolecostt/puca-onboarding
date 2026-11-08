@@ -8,6 +8,9 @@ export type ValidationResult = { ok: true; journey: Journey } | { ok: false; err
 
 const ACTION_TYPES = new Set(["reveal", "highlight", "clear_highlight", "focus", "flow", "card", "close_card", "reset"]);
 const DECISIONS = new Set(["auto", "wait", "select"]);
+/** Os temas da calibragem (mesma lista de CALIBRAGEM_TEMAS; um teste confere). */
+export const TEMAS = new Set(["empresa", "rituais", "pagamentos", "mensageria", "falhas"]);
+const RESULTADOS_CHECAGEM = new Set(["entendeu", "rever"]);
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const isStr = (v: unknown): v is string => typeof v === "string" && v.trim().length > 0;
@@ -147,6 +150,19 @@ export function validateJourney(input: unknown): ValidationResult {
         }
       }
 
+      if (s.check !== undefined) {
+        const c = s.check as { tema?: unknown; replies?: unknown };
+        if (decision !== "wait" && decision !== "select") errors.push(`${where(s)}: check só vale em passo "wait" ou "select"`);
+        if (!isStr(c.tema) || !TEMAS.has(c.tema)) errors.push(`${where(s)}: check com tema "${String(c.tema)}", que não é tema da calibragem`);
+        if (decision === "wait") {
+          const replies = Array.isArray(c.replies) ? c.replies : [];
+          if (!replies.length) errors.push(`${where(s)}: check num passo "wait" precisa de replies (as respostas que mostram que entendeu)`);
+          for (const r of replies) {
+            if (!s.suggested_replies?.includes(r)) errors.push(`${where(s)}: check.replies cita "${String(r)}", que não está em suggested_replies`);
+          }
+        }
+      }
+
       for (const t of s.transitions ?? []) {
         // Ir para outro momento sempre entra pelo primeiro passo dele (passos se apoiam uns nos outros).
         if ("step" in t.to) {
@@ -158,6 +174,11 @@ export function validateJourney(input: unknown): ValidationResult {
           if (!momentIds.has(t.to.moment)) errors.push(`${where(s)}: transição para momento inexistente "${t.to.moment}"`);
         } else {
           errors.push(`${where(s)}: transição sem destino`);
+        }
+        if (t.if && "checagem" in t.if) {
+          if (!s.check) errors.push(`${where(s)}: transição por checagem num passo sem check`);
+          if (t.when) errors.push(`${where(s)}: transição por checagem não leva when (o when vira opção para o agente; a checagem é do motor)`);
+          if (!RESULTADOS_CHECAGEM.has(t.if.checagem)) errors.push(`${where(s)}: checagem "${String(t.if.checagem)}" desconhecida (use "entendeu" ou "rever")`);
         }
         if (t.if && "reply" in t.if && !s.suggested_replies?.includes(t.if.reply)) {
           errors.push(`${where(s)}: transição espera a resposta "${t.if.reply}", que não está em suggested_replies`);

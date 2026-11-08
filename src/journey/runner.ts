@@ -4,7 +4,7 @@
 import { evaluate, matchReply } from "./conditions";
 import { interpolate } from "./profile";
 import { effectiveViews } from "./validate";
-import type { BoardAction, Journey, Moment, Profile, SpeechCue, Step, Transition, View } from "./types";
+import type { BoardAction, Journey, Moment, Profile, ResultadoChecagem, ResultadoDaChecagem, SpeechCue, Step, Transition, View } from "./types";
 
 export interface RunnerIO {
   /** Mostra a vista do momento. fresh = o momento declara a vista (recomeça o quadro); false = herda o estado. */
@@ -21,6 +21,8 @@ export interface RunnerIO {
   select(nodes: string[]): Promise<string>;
   onMoment?(moment: Moment, index: number): void;
   onStep?(step: Step, moment: Moment): void;
+  /** Resultado de um passo com `check` (checagem de entendimento), antes da transição. */
+  onCheck?(result: ResultadoChecagem): void;
 }
 
 /** O que o runner devolve: rodar a jornada e pedir um pulo para outro momento no meio dela. */
@@ -63,16 +65,17 @@ export function createRunner(journey: Journey, profile: Profile, io: RunnerIO, o
     io.onMoment?.(m, mi);
   }
 
-  /** Passo "select": tenta até acertar ou esgotar as tentativas. */
-  async function runSelect(step: Step): Promise<void> {
+  /** Passo "select": tenta até acertar ou esgotar as tentativas. Entendeu = acertou sem a Puca revelar. */
+  async function runSelect(step: Step): Promise<{ entendeu: boolean; tentativas: number; resposta: string }> {
     const expect = step.expect!;
     const retries = expect.retries ?? 1;
     for (let attempt = 0; ; attempt++) {
       const picked = await io.select(expect.nodes);
+      const done = { tentativas: attempt + 1, resposta: picked };
       if (expect.nodes.includes(picked)) {
         io.apply({ type: "highlight", targets: [picked], tone: "ok" });
         await say(expect.on_correct);
-        return;
+        return { entendeu: true, ...done };
       }
       if (attempt < retries) {
         io.apply({ type: "highlight", targets: [picked], tone: "warn" });
@@ -82,7 +85,7 @@ export function createRunner(journey: Journey, profile: Profile, io: RunnerIO, o
       }
       io.apply({ type: "highlight", targets: expect.nodes, tone: "ok" });
       await say(expect.on_reveal ?? expect.on_correct);
-      return;
+      return { entendeu: false, ...done };
     }
   }
 
@@ -103,6 +106,7 @@ export function createRunner(journey: Journey, profile: Profile, io: RunnerIO, o
       io.onStep?.(step, moment);
 
       let reply: string | null = null;
+      let checagem: ResultadoDaChecagem | null = null;
       try {
         // ações sem `at` antes da fala; as com `at` viram marcas na fala, na ordem em que aparecem
         const line = interpolate(step.line, profile);
@@ -119,8 +123,17 @@ export function createRunner(journey: Journey, profile: Profile, io: RunnerIO, o
           const replies = step.suggested_replies ?? [];
           const said = await io.listen(replies);
           reply = matchReply(said, replies);
+          if (step.check) {
+            const entendeu = reply !== null && (step.check.replies ?? []).includes(reply);
+            checagem = entendeu ? "entendeu" : "rever";
+            io.onCheck?.({ tema: step.check.tema, passo: step.id, entendeu, tentativas: 1, resposta: said });
+          }
         } else if (decision === "select") {
-          await runSelect(step);
+          const r = await runSelect(step);
+          if (step.check) {
+            checagem = r.entendeu ? "entendeu" : "rever";
+            io.onCheck?.({ tema: step.check.tema, passo: step.id, ...r });
+          }
         }
         if (jumpRequest !== null) throw new Error("pulo pedido");
       } catch (err) {
@@ -135,7 +148,7 @@ export function createRunner(journey: Journey, profile: Profile, io: RunnerIO, o
 
       // Primeira transição cuja condição vale; sem nenhuma, segue a ordem.
       const t: Transition | undefined = (step.transitions ?? []).find(
-        (tr) => !tr.if || evaluate(tr.if, { profile, reply }),
+        (tr) => !tr.if || evaluate(tr.if, { profile, reply, checagem }),
       );
       if (t && "step" in t.to) {
         const target = t.to.step;

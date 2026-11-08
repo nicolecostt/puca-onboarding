@@ -16,8 +16,8 @@ import { browserStore } from "../../journey/storage";
 import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
 import { createTrail, sourcesFor } from "../../journey/trail";
 import { createAgentVoice } from "../../voice/agent-voice";
-import { interpolateDeep, resolveProfile } from "../../journey/profile";
-import { resolveCalibragem } from "../../journey/calibragem";
+import { interpolate, interpolateDeep, resolveProfile } from "../../journey/profile";
+import { atualizarCalibragem, resolveCalibragem, saveCalibragem } from "../../journey/calibragem";
 import { montarJornadaDaPessoa } from "../../journey/jornada-da-pessoa";
 import type { Moment, Profile, Step, Vinculo } from "../../journey/types";
 import { mountAppHeader } from "../../components/app-header/app-header";
@@ -93,8 +93,10 @@ async function main(): Promise<void> {
   // a Puca aparece na "câmera" do canto, como numa videochamada
   const cam = mountAgentCam({ name: journey.agent.name, visual: await loadAgentVisual() });
   // Jornada da pessoa: a calibragem da call inicial marca cada momento (aprender, revisar, fora) e o painel mostra.
-  const jornadaDaPessoa = montarJornadaDaPessoa(journey, resolveCalibragem(location.search).calibragem);
-  const journeyPanel = mountJourneyPanel({ jornada: jornadaDaPessoa, final: "primeira-tarefa" });
+  // A checagem da sessão atualiza a calibragem e o painel (§4.2 e §12.1: atualiza os objetivos que faltam).
+  const calibrada = resolveCalibragem(location.search);
+  let calibragem = calibrada.calibragem;
+  const journeyPanel = mountJourneyPanel({ jornada: montarJornadaDaPessoa(journey, calibragem), final: "primeira-tarefa" });
   let visitados: string[] = [];
   let painelRecolhido = false; // recolhe sozinho uma vez, quando o quadro aparece; depois, só a pessoa abre e fecha
   // Voz de verdade (servidor em server/): sem ele, a sessão segue só com legenda e chat.
@@ -262,7 +264,7 @@ async function main(): Promise<void> {
       el.captionUser.textContent = text;
       chat.addMessage({ from: "user", text });
     }
-    const waiting = pending?.kind === "reply" ? { kind: "reply" as const, replies: pending.replies ?? [] } : pending?.kind === "select" ? { kind: "select" as const } : null;
+    const waiting = pending?.kind === "reply" ? { kind: "reply" as const, replies: pending.replies ?? [], check: !!currentStep?.check } : pending?.kind === "select" ? { kind: "select" as const } : null;
     const route = routeUtterance(text, { journey, moment: currentMoment, step: currentStep, waiting, board: currentBoard, faqs });
     const entry = trail.record({
       from,
@@ -323,6 +325,12 @@ async function main(): Promise<void> {
       ));
     // gravado mesmo se a pessoa interrompeu: fica a resposta parcial
     if (asked) return trail.update(entry.id, { answer: said.join(" "), ms: Math.round(performance.now() - t0) });
+    // numa checagem só chega aqui pergunta (resposta vai pela rota): não conta como resposta, a Puca repete a pergunta
+    if (pending?.kind === "reply" && currentStep?.check) {
+      const line = `Sem problema, repito: ${interpolate(currentStep.line, profile)}`;
+      trail.update(entry.id, { answer: line });
+      return void speakAside(line);
+    }
     if (pending?.kind === "reply") return answer(text, "chat");
     // sem servidor e sem fonte confiável: a dúvida fica anotada (§4.5, encaminhamento para uma pessoa)
     const line = "Não achei isso confirmado na documentação, então não quero chutar. Anotei a sua pergunta para a sua buddy responder.";
@@ -493,6 +501,12 @@ async function main(): Promise<void> {
       journeyPanel.setProgress(visitados, m.id);
       el.moment.textContent = m.title;
       emit("journey:moment", { id: m.id, title: m.title });
+    },
+    onCheck(r) {
+      calibragem = atualizarCalibragem(calibragem, r);
+      // perfil de demo pela URL não sobrescreve a calibragem que a call inicial gravou
+      if (calibrada.source !== "url") saveCalibragem(calibragem);
+      journeyPanel.setJornada(montarJornadaDaPessoa(journey, calibragem));
     },
     onStep(s, m) {
       currentStep = s;

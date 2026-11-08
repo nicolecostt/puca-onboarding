@@ -3,7 +3,7 @@ import demo from "../data/tail.journey.json";
 import { loadJourney } from "../validate";
 import { createRunner, type RunnerIO } from "../runner";
 import { DEMO_PROFILES } from "../profile";
-import type { BoardAction, Journey, Profile, SpeechCue } from "../types";
+import type { BoardAction, Journey, Profile, ResultadoChecagem, SpeechCue } from "../types";
 
 const journey = loadJourney(demo);
 
@@ -12,7 +12,9 @@ function fakeIO(replies: string[], clicks: string[] = []) {
   const said: string[] = [];
   const actions: BoardAction[] = [];
   const views: string[] = [];
+  const checks: ResultadoChecagem[] = [];
   const io: RunnerIO = {
+    onCheck: (c) => checks.push(c),
     enterView: (v, fresh) => views.push(`${v.mode === "board" ? v.board : "logo"}${fresh ? "" : " (herdada)"}`),
     apply: (a) => actions.push(a),
     say: async (t) => {
@@ -29,7 +31,7 @@ function fakeIO(replies: string[], clicks: string[] = []) {
       return c;
     },
   };
-  return { io, said, actions, views };
+  return { io, said, actions, views, checks };
 }
 
 const run = (profile: Profile, replies: string[], clicks: string[] = ["settlement"]) => {
@@ -58,6 +60,7 @@ describe("runner", () => {
     const r = await run(DEMO_PROFILES.transicao, [
       "Ficou claro",
       "E se a liquidação falhar?", // pagamentos → falha
+      "Para a settlement.dlq", // checagem do caminho de erro
       "quem cuida disso?", // falha → quem-cuida (texto livre)
       "Terminar por hoje",
     ]);
@@ -65,7 +68,7 @@ describe("runner", () => {
   });
 
   it("momento sem vista herda o quadro sem recomeçar", async () => {
-    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "E se a liquidação falhar?", "Pode seguir", "Terminar por hoje"]);
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "E se a liquidação falhar?", "Para a settlement.dlq", "Pode seguir", "Terminar por hoje"]);
     expect(r.views).toEqual(["logo", "time", "pagamentos", "pagamentos (herdada)", "pagamentos (herdada)", "pagamentos (herdada)", "logo"]);
   });
 
@@ -82,6 +85,34 @@ describe("runner", () => {
     const expect_ = journey.moments.find((m) => m.id === "checagem")!.steps[0].expect!;
     expect(r.said).toContain(expect_.on_reveal);
     expect(r.actions).toContainEqual({ type: "highlight", targets: expect_.nodes, tone: "ok" });
+  });
+
+  it("checagem por toque: acertar (mesmo na segunda tentativa) é entendeu e pula o reforço", async () => {
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"], ["pos", "settlement"]);
+    expect(r.checks).toEqual([{ tema: "pagamentos", passo: "ch-pergunta", entendeu: true, tentativas: 2, resposta: "settlement" }]);
+    expect(r.steps).not.toContain("ch-reforco");
+  });
+
+  it("checagem por toque: precisar que a Puca revele é rever e passa pelo reforço no quadro", async () => {
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "Pode seguir", "Terminar por hoje"], ["pos", "gateway"]);
+    expect(r.checks).toMatchObject([{ tema: "pagamentos", entendeu: false, tentativas: 2, resposta: "gateway" }]);
+    expect(r.steps).toContain("ch-reforco");
+    expect(r.moments.at(-2)).toBe("primeira-tarefa");
+  });
+
+  it("checagem por resposta: texto livre que casa com a resposta certa é entendeu", async () => {
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "E se a liquidação falhar?", "vai pra settlement.dlq", "Pode seguir", "Terminar por hoje"]);
+    expect(r.checks[0]).toMatchObject({ tema: "falhas", passo: "fa-checa", entendeu: true, resposta: "vai pra settlement.dlq" });
+    expect(r.steps).toContain("fa-certo");
+    expect(r.steps).not.toContain("fa-reforco");
+  });
+
+  it("checagem por resposta: resposta errada é rever, reforça e segue sem confirmar", async () => {
+    const r = await run(DEMO_PROFILES.transicao, ["Ficou claro", "E se a liquidação falhar?", "Ela se perde", "Pode seguir", "Terminar por hoje"]);
+    expect(r.checks[0]).toMatchObject({ tema: "falhas", entendeu: false });
+    expect(r.steps).toContain("fa-reforco");
+    expect(r.steps).not.toContain("fa-certo");
+    expect(r.steps).toContain("fa-caixa-preta");
   });
 
   it("rever o caminho volta ao início do momento de pagamentos", async () => {

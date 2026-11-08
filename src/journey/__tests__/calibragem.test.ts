@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { CALIBRAGEM_TEMAS, DEMO_CALIBRAGENS, calibragemFromAnswers, itemDoTema, nivelFromAnswer } from "../calibragem";
+import { CALIBRAGEM_TEMAS, DEMO_CALIBRAGENS, atualizarCalibragem, calibragemFromAnswers, itemDoTema, nivelFromAnswer } from "../calibragem";
+import { TEMAS } from "../validate";
 import { DEMO_PROFILES } from "../profile";
 import demo from "../data/tail.journey.json";
 import type { Tema } from "../types";
@@ -62,5 +63,32 @@ describe("calibragens da demo", () => {
   it("os momentos de cada tema existem na jornada da Tail", () => {
     const ids = new Set(demo.moments.map((m) => m.id));
     for (const t of Object.values(CALIBRAGEM_TEMAS)) for (const m of t.momentos) expect(ids).toContain(m);
+  });
+});
+
+describe("atualizarCalibragem (checagem da sessão)", () => {
+  const agora = new Date("2026-11-10T10:00:00-03:00");
+  const ana = DEMO_CALIBRAGENS.novo;
+
+  it("entendeu: o tema sobe para pelo menos usa, com certeza alta e origem sessao", () => {
+    const c = atualizarCalibragem(ana, { tema: "pagamentos", passo: "ch-pergunta", entendeu: true, tentativas: 1, resposta: "settlement" }, agora);
+    expect(itemDoTema(c, "pagamentos")).toEqual({ tema: "pagamentos", nivel: "usa", certeza: "alta", evidencia: "settlement", origem: "sessao", checagem: "entendeu" });
+    expect(c.atualizada_em).toBe(agora.toISOString());
+  });
+
+  it("rever: o nível não muda (não é nota), só marca o tema", () => {
+    const antes = itemDoTema(ana, "falhas")!;
+    const c = atualizarCalibragem(ana, { tema: "falhas", passo: "fa-checa", entendeu: false, tentativas: 1, resposta: "Ela se perde" }, agora);
+    expect(itemDoTema(c, "falhas")).toMatchObject({ nivel: antes.nivel, origem: "sessao", checagem: "rever" });
+  });
+
+  it("não mexe nos outros temas nem na calibragem original", () => {
+    const c = atualizarCalibragem(ana, { tema: "falhas", passo: "fa-checa", entendeu: true, tentativas: 1, resposta: "dlq" }, agora);
+    expect(c.conhecimentos.filter((i) => i.tema !== "falhas")).toEqual(ana.conhecimentos.filter((i) => i.tema !== "falhas"));
+    expect(itemDoTema(ana, "falhas")?.origem).not.toBe("sessao");
+  });
+
+  it("a lista de temas do validador é a mesma da calibragem", () => {
+    expect([...TEMAS].sort()).toEqual(Object.keys(CALIBRAGEM_TEMAS).sort());
   });
 });

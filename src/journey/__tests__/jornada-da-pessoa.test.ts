@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import demo from "../data/tail.journey.json";
 import { loadJourney } from "../validate";
-import { DEMO_CALIBRAGENS } from "../calibragem";
+import { DEMO_CALIBRAGENS, atualizarCalibragem } from "../calibragem";
 import { montarJornadaDaPessoa, proximosPassos } from "../jornada-da-pessoa";
 import type { Calibragem, Certeza, Nivel, Tema } from "../types";
 
@@ -65,6 +65,27 @@ describe("montarJornadaDaPessoa", () => {
   });
 });
 
+describe("montarJornadaDaPessoa depois da checagem", () => {
+  const checa = (c: Calibragem, tema: Tema, entendeu: boolean) =>
+    atualizarCalibragem(c, { tema, passo: "x", entendeu, tentativas: 1, resposta: "r" });
+
+  it("entendeu marca o momento como já conhece; rever marca revisar, mesmo para quem não conhecia", () => {
+    const ana = DEMO_CALIBRAGENS.novo; // pagamentos e falhas começam em aprender
+    expect(estados(checa(ana, "pagamentos", true)).pagamentos).toBe("ja_conhece");
+    expect(estados(checa(ana, "falhas", false)).falha).toBe("revisar");
+  });
+
+  it("rever em um tema do momento vale mais que entendeu em outro", () => {
+    const c = checa(checa(DEMO_CALIBRAGENS.novo, "pagamentos", true), "mensageria", false);
+    expect(estados(c).pagamentos).toBe("revisar");
+  });
+
+  it("o motivo fala da checagem, sem nota", () => {
+    const m = montarJornadaDaPessoa(journey, checa(DEMO_CALIBRAGENS.novo, "falhas", false)).momentos.find((x) => x.id === "falha")!;
+    expect(m.motivo).toBe("Na checagem da sessão, vale rever este assunto.");
+  });
+});
+
 describe("proximosPassos", () => {
   const bruno = montarJornadaDaPessoa(journey, DEMO_CALIBRAGENS.transicao);
 
@@ -78,6 +99,12 @@ describe("proximosPassos", () => {
   it("no meio: só o que vem depois do atual e ainda não foi visto", () => {
     const ids = proximosPassos(bruno, ["boas-vindas", "seu-time", "pagamentos"], "pagamentos").map((m) => m.id);
     expect(ids).toEqual(["falha", "quem-cuida", "checagem", "primeira-tarefa", "encerramento"]);
+  });
+
+  it("o que a checagem pediu para rever volta aos próximos passos, mesmo já visto", () => {
+    const c = atualizarCalibragem(DEMO_CALIBRAGENS.transicao, { tema: "falhas", passo: "fa-checa", entendeu: false, tentativas: 1, resposta: "Ela se perde" });
+    const ids = proximosPassos(montarJornadaDaPessoa(journey, c), ["boas-vindas", "seu-time", "pagamentos", "falha", "checagem"], "primeira-tarefa").map((m) => m.id);
+    expect(ids).toEqual(["falha", "quem-cuida", "encerramento"]);
   });
 
   it("depois de um pulo para frente, os pulados continuam como próximos", () => {

@@ -50,3 +50,23 @@ describe("routeUtterance: dono não confirmado vira encaminhamento", () => {
     expect(r.kind === "faq" && r.faq.unconfirmed).toBeFalsy();
   });
 });
+
+describe("routeUtterance: checagem por resposta", () => {
+  const falha = journey.moments.find((m) => m.id === "falha")!;
+  const checa = falha.steps.find((s) => s.id === "fa-checa")!;
+  const cctx: RouteContext = { ...ctx, moment: falha, step: checa, waiting: { kind: "reply", replies: checa.suggested_replies ?? [], check: true } };
+
+  it("resposta livre vai inteira ao motor, sem passar pelo conhecimento que entregaria a resposta", () => {
+    for (const t of ["para a dlq", "acho que se perde", "não sei"]) expect(routeUtterance(t, cctx)).toEqual({ kind: "reply", reply: t });
+  });
+
+  it("pergunta e pulo continuam funcionando durante a checagem", () => {
+    expect(routeUtterance("pode repetir a pergunta?", cctx).kind).not.toBe("reply");
+    expect(routeUtterance("o que é a dlq", cctx).kind).not.toBe("reply");
+    expect(routeUtterance("quero ver a primeira tarefa", cctx).kind).toBe("jump");
+  });
+
+  it("fora de uma checagem, nada muda: a mesma fala vai ao conhecimento", () => {
+    expect(routeUtterance("para a dlq", { ...cctx, waiting: { kind: "reply", replies: checa.suggested_replies ?? [] } }).kind).toBe("knowledge");
+  });
+});

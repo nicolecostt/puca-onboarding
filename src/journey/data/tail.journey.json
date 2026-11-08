@@ -1211,6 +1211,83 @@
           ]
         },
         {
+          "id": "fa-checa",
+          "goal": "Conferir se ficou claro o caminho de erro",
+          "line": "Uma pergunta rápida, só para ver se ficou claro: se o settlement-worker falhar nas três tentativas, para onde vai a venda?",
+          "decision": "wait",
+          "suggested_replies": [
+            "Para a settlement.dlq",
+            "Ela se perde",
+            "Volta para a maquininha"
+          ],
+          "check": {
+            "tema": "falhas",
+            "replies": [
+              "Para a settlement.dlq"
+            ]
+          },
+          "transitions": [
+            {
+              "to": {
+                "step": "fa-certo"
+              },
+              "if": {
+                "checagem": "entendeu"
+              }
+            }
+          ]
+        },
+        {
+          "id": "fa-reforco",
+          "goal": "Mostrar de novo, mais devagar, o caminho até a fila de erro",
+          "line": "Olha o caminho de novo: depois das três tentativas, a venda sai da fila principal e vai para a settlement.dlq. Ela não se perde: fica guardada lá até alguém da Liquidação olhar.",
+          "highlight": "Ela não se perde",
+          "actions": [
+            {
+              "type": "clear_highlight"
+            },
+            {
+              "type": "flow",
+              "path": [
+                "e-topic-settle",
+                "e-settle-dlq"
+              ],
+              "at": "vai para a settlement.dlq"
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "dlq",
+                "e-settle-dlq"
+              ],
+              "tone": "warn",
+              "at": "fica guardada lá"
+            }
+          ],
+          "transitions": [
+            {
+              "to": {
+                "step": "fa-caixa-preta"
+              }
+            }
+          ]
+        },
+        {
+          "id": "fa-certo",
+          "goal": "Confirmar o caminho de erro com o quadro",
+          "line": "Isso. A venda fica guardada na settlement.dlq até alguém da Liquidação olhar: nada se perde.",
+          "actions": [
+            {
+              "type": "highlight",
+              "targets": [
+                "dlq",
+                "e-settle-dlq"
+              ],
+              "tone": "ok"
+            }
+          ]
+        },
+        {
           "id": "fa-caixa-preta",
           "goal": "Admitir o que ainda não está documentado",
           "line": "O settlement-worker ainda é uma caixa preta pra mim: não achei documentação confirmada, então pedi para a Carla Mendes explicar. O cartão mostra o que eu já sei.",
@@ -1367,7 +1444,49 @@
             "on_wrong": "Quase. Repare no que fica entre a venda aprovada e a liquidação. Onde as vendas poderiam estar paradas?",
             "retries": 1,
             "on_reveal": "Sem problema. Eu começaria pela fila transactions.authorized, para ver se as vendas estão acumulando, e pelo settlement-worker, que consome essa fila. Vou deixar os dois destacados."
-          }
+          },
+          "check": {
+            "tema": "pagamentos"
+          },
+          "transitions": [
+            {
+              "to": {
+                "moment": "primeira-tarefa"
+              },
+              "if": {
+                "checagem": "entendeu"
+              }
+            }
+          ]
+        },
+        {
+          "id": "ch-reforco",
+          "goal": "Explicar de novo, mais simples, onde as vendas podem parar",
+          "line": "Pensa assim: a venda aprovada entra na fila transactions.authorized e espera ali até o settlement-worker buscar. Se as vendas param de chegar, ou estão acumulando na fila, ou o worker parou de consumir. Por isso esses dois vêm primeiro.",
+          "highlight": "ou estão acumulando na fila, ou o worker parou de consumir",
+          "actions": [
+            {
+              "type": "clear_highlight"
+            },
+            {
+              "type": "flow",
+              "path": [
+                "e-gw-topic",
+                "e-topic-settle"
+              ],
+              "at": "entra na fila transactions.authorized"
+            },
+            {
+              "type": "highlight",
+              "targets": [
+                "topic",
+                "e-topic-settle",
+                "settlement"
+              ],
+              "tone": "focus",
+              "at": "ou estão acumulando"
+            }
+          ]
         }
       ]
     },

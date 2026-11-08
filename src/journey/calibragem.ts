@@ -4,7 +4,7 @@
 import { normalize } from "./conditions";
 import { DEMO_PROFILES } from "./profile";
 import { callAnswers } from "../data/call-answers";
-import type { Calibragem, Certeza, ItemCalibragem, Nivel, Profile, Tema, Vinculo } from "./types";
+import type { Calibragem, Certeza, ItemCalibragem, Nivel, Profile, ResultadoChecagem, Tema, Vinculo } from "./types";
 
 const STORAGE_KEY = "puca:calibragem";
 
@@ -106,6 +106,21 @@ export function calibragemFromAnswers(perfil: Profile, r: RespostasCalibragem, a
 /** O item de um tema (sempre existe numa calibragem válida). */
 export function itemDoTema(c: Calibragem, tema: Tema): ItemCalibragem | undefined {
   return c.conhecimentos.find((i) => i.tema === tema);
+}
+
+const ORDEM_NIVEL: Record<Nivel, number> = { nao_conhece: 0, ja_ouviu: 1, usa: 2, domina: 3 };
+
+/**
+ * A checagem da sessão atualiza o tema conferido (função pura; quem grava é a tela, com saveCalibragem).
+ * Entendeu: nível pelo menos "usa". Rever: o nível não muda (não é nota), o tema só fica marcado para rever.
+ */
+export function atualizarCalibragem(c: Calibragem, r: ResultadoChecagem, agora = new Date()): Calibragem {
+  const conhecimentos = c.conhecimentos.map((item): ItemCalibragem => {
+    if (item.tema !== r.tema) return item;
+    const nivel = r.entendeu && ORDEM_NIVEL[item.nivel] < ORDEM_NIVEL.usa ? "usa" : item.nivel;
+    return { tema: item.tema, nivel, certeza: "alta", evidencia: r.resposta.trim(), origem: "sessao", checagem: r.entendeu ? "entendeu" : "rever" };
+  });
+  return { ...c, conhecimentos, atualizada_em: agora.toISOString() };
 }
 
 export function saveCalibragem(c: Calibragem): void {

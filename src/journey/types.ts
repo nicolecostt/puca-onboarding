@@ -37,6 +37,23 @@ export interface ItemCalibragem {
   evidencia: string;
   /** call = respondeu na call · vinculo = deduzido de ser novo ou de transição · sessao = atualizado na checagem. */
   origem: "call" | "vinculo" | "sessao";
+  /** Só com origem "sessao": resultado da última checagem do tema. Não é nota. */
+  checagem?: ResultadoDaChecagem;
+}
+
+/** entendeu = a pessoa mostrou que entendeu · rever = vale voltar ao assunto. */
+export type ResultadoDaChecagem = "entendeu" | "rever";
+
+/** O que o motor avisa depois de um passo com `check` (RunnerIO.onCheck). */
+export interface ResultadoChecagem {
+  tema: Tema;
+  /** Id do passo da checagem. */
+  passo: string;
+  entendeu: boolean;
+  /** Quantas vezes a pessoa respondeu (select pode ter mais de uma). */
+  tentativas: number;
+  /** O texto que a pessoa disse ou o id do nó que ela tocou por último. */
+  resposta: string;
 }
 
 /** O que a Puca concluiu na call inicial (CONTEXT.md: calibragem). Contrato em docs/contratos.md. */
@@ -77,6 +94,8 @@ export interface MomentoDaPessoa {
   motivo: string;
   /** Temas da calibragem que o momento cobre (vazio nos momentos sem tema, como a checagem). */
   temas: Tema[];
+  /** A checagem da sessão pediu para rever: o momento volta aos próximos passos mesmo já visto. */
+  rever?: true;
 }
 
 /** A jornada como a pessoa vê: os objetivos dela e cada momento marcado pela calibragem. Contrato em docs/contratos.md. */
@@ -194,7 +213,9 @@ export type Decision = "auto" | "wait" | "select";
 
 export type Condition =
   | { profile: keyof Profile; eq: string }
-  | { reply: string };
+  | { reply: string }
+  /** Só em passo com `check`: o resultado da checagem do passo. */
+  | { checagem: ResultadoDaChecagem };
 
 /** Para outro passo do mesmo momento, ou para o INÍCIO de outro momento (nunca o meio). */
 export type TransitionTarget = { step: string } | { moment: string };
@@ -231,7 +252,16 @@ export interface Step {
   decision?: Decision;
   suggested_replies?: string[];
   expect?: SelectExpect;
+  /** Faz do passo (wait ou select) uma checagem de um tema da calibragem. */
+  check?: StepCheck;
   transitions?: Transition[];
+}
+
+/** Checagem de entendimento (PRODUCT.md §4.2). Num select, valem os expect.nodes; num wait, as `replies`. */
+export interface StepCheck {
+  tema: Tema;
+  /** Num wait: as suggested_replies que mostram que a pessoa entendeu. */
+  replies?: string[];
 }
 
 export interface Moment {
