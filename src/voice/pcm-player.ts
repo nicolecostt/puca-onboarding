@@ -1,5 +1,5 @@
 import type { SpeechPlayer, WordTiming } from "./types";
-import { pcm16ToFloat32 } from "./pcm";
+import { AUDIO_RESUME_TIMEOUT_MS, pcm16ToFloat32, resumeWithin } from "./pcm";
 
 const SAMPLE_RATE = 24000;
 
@@ -44,7 +44,8 @@ export class PcmPlayer implements SpeechPlayer {
 
   async play(audio_url: string, signal?: AbortSignal): Promise<void> {
     const ctx = this.ensure();
-    await ctx.resume();
+    // navegador segurando o áudio: falha esta fala (a legenda segue) em vez de travar a fila
+    if (!(await resumeWithin(ctx, AUDIO_RESUME_TIMEOUT_MS))) throw new Error("áudio bloqueado pelo navegador");
     this.stop();
     const controller = new AbortController();
     this.controller = controller;
