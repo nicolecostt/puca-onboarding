@@ -19,7 +19,6 @@ async function mountSpheres(): Promise<AgentVisual | null> {
   mountPucaDots(qs<HTMLElement>(document, "#puca-orb"));
   const factory = await loadAgentVisual();
   if (!factory) return null;
-  factory(qs<HTMLElement>(document, "#install-sphere")); // a esfera ao lado do passo a passo de instalar
   return factory(qs<HTMLElement>(document, "#puca-sphere"));
 }
 
@@ -176,6 +175,6 @@ mountInstall();
 mountBoard();
 mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
   occluders: "h1, h2, h3, p, dt, dd, .actions, .cmd, .board, .skills, .puca__stage, .orb, .nav, .footer__row > *",
-  round: ".puca__stage, .install__stage, .orb",
+  round: ".puca__stage, .orb",
 });
 void mountSpheres().then(mountSkills);
