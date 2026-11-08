@@ -691,6 +691,7 @@ Decisão: [0008](decisoes/0008-acoes-reais-e-navegador-da-puca.md). Issues: #118
 | `SUPABASE_SERVICE_ROLE_KEY` | servidor (Storage, idempotência dos encaminhamentos) | não |
 | `LIMITE_DIARIO_LLM`, `LIMITE_DIARIO_TTS`, `LIMITE_DIARIO_STT` | servidor | — |
 | `VITE_API_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | app (no build) | sim |
+| `API_TARGET` | só o `npm run dev` no navegador: para onde o Vite repassa `/api` (padrão `http://localhost:8787`; `npm run dev:fly` usa o Fly) | sim |
 
 `FEATHERLESS_API_KEY`, `FEATHERLESS_BASE_URL` e `LLM_MODEL` saem quando o cliente da Anthropic estiver na `main`.
 
