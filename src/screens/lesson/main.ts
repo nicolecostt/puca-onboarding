@@ -14,7 +14,7 @@ import { buildFaqs } from "../../journey/faq";
 import { routeUtterance } from "../../journey/route";
 import { enviarNoSlackReal, lerEmailDoSlack } from "../../journey/slack-real";
 import { browserStore } from "../../journey/storage";
-import { buddyOf, createOutbox, destinoDaDuvida, looksLikeQuestion } from "../../journey/forwarding";
+import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
 import { createPedidos, PEDIDOS_KEY, tarefaDaPessoa, tarefaDoPasso } from "../../journey/primeira-tarefa";
 import { createTrail, sourcesFor } from "../../journey/trail";
 import { createAgentVoice, MIC_AVISO } from "../../voice/agent-voice";
@@ -138,7 +138,6 @@ async function main(): Promise<void> {
   // Encaminhamentos à buddy: a tela do Slack (src/screens/live-session/) envia.
   const outbox = createOutbox(browserStore());
   const buddy = buddyOf(journey);
-  const destino = (pergunta: string) => destinoDaDuvida(pergunta, { buddy, gestor: profile.gestor });
   // Primeira tarefa (§4.4 e §12.1, passo 5): o pedido de aprovação ao gestor; a tela do Slack envia e grava a aprovação.
   const pedidos = createPedidos(browserStore());
   // A tarefa da pessoa (pelo vínculo): responde as dúvidas sobre ela durante a sessão (#79).
@@ -318,13 +317,12 @@ async function main(): Promise<void> {
   }
   const SLACK = { href: screenHref("../live-session/"), target: "puca-slack", label: "Abrir Slack" };
 
-  /** Encaminha a dúvida à buddy, ou ao gestor no caso pessoal (§4.5): guarda para o Slack, marca no rastro e avisa na sessão. */
+  /** Encaminha a dúvida à buddy (§4.5): guarda para o Slack, marca no rastro e avisa na sessão. */
   function forward(entryId: string, f: { question: string; summary: string; reason: string; consulted?: string[] }): void {
     const consulted = [...new Set([...(f.consulted ?? []), ...consultedNow()])];
-    const to = destino(f.question);
-    const created = outbox.add({ ...f, to, pessoa: profile.nome, consulted, moment: currentMoment?.id ?? null });
+    const created = outbox.add({ ...f, to: { name: buddy, role: "buddy" }, pessoa: profile.nome, consulted, moment: currentMoment?.id ?? null });
     trail.update(entryId, { forwarding_id: created.id });
-    showToast(`Encaminhado para ${to.name} no Slack`, SLACK);
+    showToast(`Encaminhado à ${buddy} no Slack`, SLACK);
     // com o e-mail do Slack da Kota, o servidor manda de verdade; senão, o Slack simulado envia (#129)
     void enviarNoSlackReal(created, { outbox, email: lerEmailDoSlack(browserStore()) }).then((link) => {
       if (!link) return;
@@ -515,7 +513,7 @@ async function main(): Promise<void> {
     }
     if (pending?.kind === "reply") return answer(text, "chat");
     // sem servidor e sem fonte confiável: a dúvida fica anotada (§4.5, encaminhamento para uma pessoa)
-    const line = `Não achei isso confirmado na documentação, então não quero chutar. Anotei a sua pergunta para ${destino(text).name} responder.`;
+    const line = "Não achei isso confirmado na documentação, então não quero chutar. Anotei a sua pergunta para a sua buddy responder.";
     trail.update(entry.id, { answer: line });
     // "ok" ou "valeu" não vão para a buddy
     if (looksLikeQuestion(text)) forward(entry.id, { question: text, summary: text, reason: "Estava sem acesso ao agente e não achei isso na sessão." });

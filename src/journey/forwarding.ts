@@ -1,5 +1,5 @@
 // Encaminhamento (PRODUCT.md §4.5 e §12.1, passo 4): quando Puca não tem fonte confiável, a dúvida vai
-// para a buddy (ou, no caso pessoal, para o gestor) com o contexto pronto (o que a pessoa perguntou, o que Puca já consultou e por que não
+// para a buddy com o contexto pronto (o que a pessoa perguntou, o que Puca já consultou e por que não
 // respondeu). A sessão cria; a tela do Slack (screens/live-session) envia. Formato em docs/contratos.md.
 import { pendentes, proximaTentativa } from "./claim-queue";
 import { normalize } from "./conditions";
@@ -13,8 +13,8 @@ export interface Forwarding {
   id: string;
   /** ISO 8601. */
   at: string;
-  /** A buddy é o destino padrão (CONTEXT.md); o caso pessoal vai ao gestor (destinoDaDuvida). */
-  to: { name: string; role: "buddy" | "gestor" };
+  /** A buddy é o destino padrão (CONTEXT.md). */
+  to: { name: string; role: "buddy" };
   pessoa: string;
   /** A fala da pessoa. */
   question: string;
@@ -99,16 +99,6 @@ export function buddyOf(journey: Journey): string {
     .flatMap((b) => b.nodes)
     .find((n) => n.id === "buddy");
   return node?.label.replace(/\n/g, " ") ?? "sua buddy";
-}
-
-// Notion da Kota: bônus é caso individual ("fale com seu gestor ou com People"), e férias e promoção são com o gestor.
-const CASO_PESSOAL = new Set(["bonus", "salario", "salarios", "aumento", "promocao", "contrato", "ferias"]);
-
-/** Para quem a dúvida vai: o caso pessoal, ao gestor da pessoa; o resto, à buddy. */
-export function destinoDaDuvida(pergunta: string, quem: { buddy: string; gestor?: string }): Forwarding["to"] {
-  const pessoal = normalize(pergunta).split(" ").some((w) => CASO_PESSOAL.has(w));
-  const gestor = quem.gestor?.trim();
-  return pessoal && gestor ? { name: gestor, role: "gestor" } : { name: quem.buddy, role: "buddy" };
 }
 
 /** Texto da mensagem que Puca manda para a buddy no Slack. Não supõe o gênero de ninguém. */
