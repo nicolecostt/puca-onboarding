@@ -15,7 +15,8 @@ const supabaseUrl = (process.env.SUPABASE_URL ?? "").replace(/\/+$/, "");
 
 export const env = {
   port: Number(process.env.PORT ?? 8787),
-  model: process.env.LLM_MODEL ?? "Qwen/Qwen3-32B",
+  /** Com ANTHROPIC_API_KEY, o Claude (decisão 0007); LLM_MODEL fica só para a Featherless. */
+  model: process.env.ANTHROPIC_API_KEY ? (process.env.ANTHROPIC_MODEL ?? "claude-haiku-5-5") : (process.env.LLM_MODEL ?? "Qwen/Qwen3-32B"),
   llmTimeoutMs: Number(process.env.LLM_TIMEOUT_MS ?? 8000),
   deepgramKey: process.env.DEEPGRAM_API_KEY ?? "",
   elevenKey: process.env.ELEVENLABS_API_KEY ?? "",
