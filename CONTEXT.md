@@ -6,7 +6,7 @@ enquanto monta um quadro visual que explica sistemas, pessoas e processos. Só g
 ## Pessoas e papéis
 
 **Puca**:
-A agente que conversa com a pessoa e conduz a aula.
+A agente que conversa com a pessoa e conduz a sessão.
 _Avoid_: bot, assistente, tutor
 
 **Orbis**:
@@ -53,9 +53,9 @@ _Avoid_: diagnóstico, avaliação
 A primeira conversa, em que a Puca acolhe a pessoa, faz o onboarding cultural e preenche o perfil.
 _Avoid_: entrevista, kickoff
 
-**Aula**:
-Uma sessão em que a Puca explica um assunto montando o quadro enquanto fala.
-_Avoid_: lição, tutorial
+**Sessão**:
+Uma conversa em que a Puca explica um assunto montando o quadro enquanto fala. Não é educacional: é uma sessão de trabalho com a pessoa.
+_Avoid_: aula, lição, tutorial
 
 **Fala**:
 Um turno da pessoa, por voz ou chat, que a Puca precisa encaminhar.
@@ -76,7 +76,7 @@ _Avoid_: escalonamento, fallback
 ## Jornada
 
 **Jornada**:
-O roteiro de uma aula: momentos, passos e quadros. É o contrato que a Puca segue.
+O roteiro de uma sessão: momentos, passos e quadros. É o contrato que a Puca segue.
 _Avoid_: trilha, fluxo, script
 
 **Momento**:
@@ -105,7 +105,7 @@ Regra que escolhe para onde a jornada vai depois de um passo. (Não confundir co
 ## Quadro
 
 **Quadro**:
-A vista visual que a Puca monta progressivamente durante a aula.
+A vista visual que a Puca monta progressivamente durante a sessão.
 _Avoid_: diagrama, whiteboard
 
 **Nó**:
@@ -154,7 +154,7 @@ _Avoid_: avaliador, juiz
 
 **Integração**:
 O que a empresa compra: uma pessoa entrando num contexto de destino, como novo ou em transição. É a unidade de cobrança. (Não confundir com a conexão com sistemas, como Slack, Jira ou GitHub.)
-_Avoid_: jornada (é o roteiro da aula), licença, assento
+_Avoid_: jornada (é o roteiro da sessão), licença, assento
 
 **Piloto**:
 Primeira contratação paga, curta e com poucas integrações, que termina numa decisão de continuar, ajustar ou encerrar.

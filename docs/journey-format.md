@@ -1,6 +1,6 @@
 # Formato da jornada
 
-A aula no quadro é conduzida por uma **jornada** em JSON (`src/journey/data/*.journey.json`).
+A sessão no quadro é conduzida por uma **jornada** em JSON (`src/journey/data/*.journey.json`).
 O modelo segue a ideia de jornadas usada em agentes de demonstração por voz:
 **momentos** (capítulos) feitos de **passos** (cada fala ou ação do agente). A diferença do Puca é
 uma vista nova, o **quadro**, que o agente monta enquanto explica.
@@ -24,9 +24,9 @@ Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json)
 
 | Campo | Para quê |
 |---|---|
-| `agent.guidelines` | Três instruções sempre ativas: quem o agente é, como fala e quando encaminhar para uma pessoa. Hoje só documentam o tom; viram prompt de sistema quando um LLM conduzir a aula. |
+| `agent.guidelines` | Três instruções sempre ativas: quem o agente é, como fala e quando encaminhar para uma pessoa. Hoje só documentam o tom; viram prompt de sistema quando um LLM conduzir a sessão. |
 | `boards` | Os quadros, declarados uma vez. Todos os nós começam ocultos e aparecem pelas ações dos passos. |
-| `moments` | A aula, na ordem. Sem transição explícita, um momento segue para o próximo. |
+| `moments` | A sessão, na ordem. Sem transição explícita, um momento segue para o próximo. |
 
 ## Quadro
 
@@ -52,7 +52,7 @@ Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json)
 
 | Campo | Para quê |
 |---|---|
-| `id`, `title` | `title` aparece no topo da tela ("Aula · Fluxo de pagamento"). |
+| `id`, `title` | `title` aparece no topo da tela ("Sessão · Fluxo de pagamento"). |
 | `goal` | O que o momento quer alcançar. O agente não fala isso. **Não pode repetir** entre momentos. |
 | `view` | `{ "mode": "logo" }` ou `{ "mode": "board", "board": "<nome>" }`. Um momento **com** `view` recomeça o quadro do zero; **sem** `view`, herda o quadro do momento anterior no estado em que ficou. |
 | `knowledge` | Contexto extra que o agente só usa se perguntarem (ver "Perguntas e pulos"). |
@@ -112,7 +112,7 @@ para o quadro acompanhar a explicação; sem `at`, ela acontece antes da fala. O
 - Sem nenhuma transição válida, o passo segue para o próximo passo e, no fim do momento, para o próximo momento.
 - `{ "step": … }` só aponta para passos do mesmo momento. `{ "moment": … }` sempre entra pelo **primeiro passo** do momento de destino, porque passos se apoiam uns nos outros.
 - `if` é o que o motor local avalia: `{ "reply": "<uma das suggested_replies>" }` ou `{ "profile": "<campo>", "eq": "<valor>" }`.
-- `when` é a mesma condição em linguagem natural. Hoje é documentação; quando um LLM conduzir a aula, é o que ele vai ler.
+- `when` é a mesma condição em linguagem natural. Hoje é documentação; quando um LLM conduzir a sessão, é o que ele vai ler.
 
 ## Perguntas e pulos
 
@@ -122,7 +122,7 @@ Além das respostas sugeridas, a pessoa pode escrever qualquer coisa no chat a q
   **início** do momento pedido. Não é preciso escrever transições para isso; os títulos e objetivos dos momentos são o
   que ela usa para se localizar, por isso precisam ser únicos.
 - **Perguntar algo** ("onde está o cálculo do MDR?"): a Puca responde com o `knowledge` do passo e do momento atuais
-  (ou de outro momento da aula) e continua de onde estava.
+  (ou de outro momento da sessão) e continua de onde estava.
 - **Sem fonte confiável**: ela diz que não achou confirmado e anota a dúvida para a buddy, sem chutar.
 
 Hoje isso é simulado por palavras-chave (`src/journey/intent.ts`). Com um LLM, vale o mesmo contrato: `goal` para se
@@ -132,7 +132,7 @@ localizar, `knowledge` para responder, pulo sempre pelo primeiro passo de um mom
 
 `{ nome, cargo?, time?, gestor?, ferramentas?, aprender?, vinculo: "novo" | "transicao" }`.
 
-A aula escolhe o perfil nesta ordem:
+A sessão escolhe o perfil nesta ordem:
 1. `?perfil=ana` (ou `novo`) e `?perfil=bruno` (ou `transicao`) na URL;
 2. o perfil salvo pela call de entrevista (sessionStorage `puca:profile`);
 3. o perfil de demonstração do Bruno (mudando de time).
