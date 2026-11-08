@@ -37,10 +37,11 @@ const mix = (a: RGB, b: RGB, t: number): RGB => ({
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 export const mountPucaSphere: AgentVisualFactory = (container) => {
-  const BASE = tokenColor("--puca-sphere-dot", { r: 128, g: 124, b: 122 }); // cinza dos pontos de fundo
-  const ACCENT = tokenColor("--puca-sphere-accent", { r: 176, g: 74, b: 48 }); // terracota da faixa
-  const ACCENT_WARM = tokenColor("--puca-sphere-warm", { r: 214, g: 58, b: 44 }); // pensando
-  const CORE = tokenColor("--puca-sphere-core", { r: 30, g: 30, b: 30 }); // miolo escuro da faixa
+  const BASE = tokenColor("--puca-sphere-dot", { r: 201, g: 201, b: 201 }); // cinza dos pontos de fundo
+  const ACCENT = tokenColor("--puca-sphere-accent", { r: 255, g: 95, b: 162 }); // rosa da faixa
+  const ACCENT_WARM = tokenColor("--puca-sphere-warm", { r: 224, g: 52, b: 127 }); // pensando
+  const CORE = tokenColor("--puca-sphere-core", { r: 255, g: 156, b: 198 }); // miolo da faixa
+  const CLICK = tokenColor("--puca-sphere-click", { r: 47, g: 91, b: 255 }); // ondulação do clique
 
   const canvas = document.createElement("canvas");
   canvas.style.cssText = "display:block;width:100%;height:100%";
@@ -237,15 +238,17 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
 
       const core = Math.exp(-(d * d) / (bandW * bandW));
       const halo = Math.exp(-(d * d) / (haloW * haloW));
-      // segunda faixa, mais fraca, só em terracota
+      // segunda faixa, mais fraca, só na cor da faixa
       const d2 = lat[i] - (center - 0.38 + 0.08 * Math.sin(lo * 2 - phase * 1.7));
       const halo2 = Math.exp(-(d2 * d2) / (0.09 * 0.09)) * 0.65;
 
-      const heat = Math.min(1, Math.max(halo, halo2) + touch * 0.5 + ring * 0.6);
-      const dark = Math.min(1, core * 0.95 + touch * 0.35 + ring * 0.5);
+      const heat = Math.min(1, Math.max(halo, halo2) + touch * 0.5);
+      const dark = Math.min(1, core * 0.95 + touch * 0.35);
 
       let c = mix(BASE, accent, heat);
       c = mix(c, CORE, dark);
+      // o clique corre pela esfera em azul
+      c = mix(c, CLICK, Math.min(1, ring * 3));
 
       const size = Math.max(0.45, (0.5 + depth * 0.85) * (1 + heat * 0.6 + dark * 1.3 + touch * 0.8 + ring * 0.6) * (R / 210));
       const alpha = (0.06 + Math.pow(depth, 1.3) * 0.94) * (0.6 + 0.4 * Math.max(heat, dark, 0.3));

@@ -7,6 +7,7 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-hand: "Kalam", "Comic Sans MS", cursive; /* letra do quadro */
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: "Geologica", "Inter", ui-sans-serif, system-ui, sans-serif; /* landing (src/assets/fonts) */
 
   /* ---- Neutros ---- */
   --color-text: #0a0a0a;
@@ -44,11 +45,18 @@
   --color-puca: #d83995; /* cursor da Puca mexendo na tela */
   --color-puca-text: #ffffff;
 
+  /* paleta da landing: preto e branco, com azul e rosa só em detalhes
+     (rosa tem pouco contraste no branco: use em fundo e grifo, não em texto;
+     as duas nunca juntas no mesmo elemento) */
+  --color-blue: #2f5bff;
+  --color-pink: #ff5fa2;
+
   /* esfera da Puca (src/lib/puca-sphere.ts): só #rrggbb, o canvas lê estes valores */
-  --puca-sphere-dot: #807c7a;
-  --puca-sphere-accent: #b04a30;
-  --puca-sphere-warm: #d63a2c;
-  --puca-sphere-core: #1e1e1e;
+  --puca-sphere-dot: #c9c9c9; /* pontos de fundo, cinza claro */
+  --puca-sphere-accent: #ff5fa2; /* faixa rosa (= --color-pink) */
+  --puca-sphere-warm: #e0347f; /* pensando: rosa mais forte */
+  --puca-sphere-core: #ff9cc6; /* miolo da faixa, rosa claro */
+  --puca-sphere-click: #2f5bff; /* ondulação do clique (= --color-blue) */
 
   --color-highlight: rgba(250, 204, 21, 0.35); /* trecho sendo falado / foco no quadro */
 
