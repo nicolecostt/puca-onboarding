@@ -1,6 +1,6 @@
-// Início da plataforma: trilha de progresso, perfil, tarefas (à esquerda) e ferramentas com o estado
-// de cada acesso (à direita). Ao abrir, a Puca confere os acessos: o que falta ela pede ao gestor no Slack
-// (simulado nesta tela) e avisa a pessoa. No canto, "Ligar para a Puca" abre a câmera dela, com voz e chat.
+// Início do Orbis: progresso no topo, perfil, tarefas (à esquerda) e ferramentas com o estado de cada acesso
+// (à direita). Ao abrir, a Puca confere os acessos e avisa o que falta (o pedido ao gestor ainda é simulado, #104).
+// No canto, "Ligar para a Puca" abre a câmera dela, com voz e chat; cada fala passa por journey/route.ts.
 import "../../styles/base.css";
 import "./style.css";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
@@ -10,17 +10,24 @@ import { loadAgentVisual } from "../../lib/agent-visual";
 import { esc, qs } from "../../lib/dom";
 import { mountPucaParticles } from "../../lib/puca-particles";
 import { mountPucaDots } from "../../lib/puca-dots";
-import { activeProfile, company } from "../../data";
+import { company, profiles } from "../../data";
 import { resolveProfile } from "../../journey/profile";
 import { normalize } from "../../journey/conditions";
 import { browserStore } from "../../journey/storage";
-import { createOutbox } from "../../journey/forwarding";
+import { loadJourney } from "../../journey/validate";
+import { routeUtterance, type Route } from "../../journey/route";
+import { buildFaqs } from "../../journey/faq";
+import { createTrail } from "../../journey/trail";
+import { tarefaDaPessoa } from "../../journey/primeira-tarefa";
+import demoJourney from "../../journey/data/tail.journey.json";
 import { createAgentVoice } from "../../voice/agent-voice";
-import { TASKS, TOOLS, TRAIL, type AccessStatus, type TaskState, type Tool } from "./data";
+import { TOOLS, TRAIL, tasksFor, type AccessStatus, type TaskState, type Tool } from "./data";
 
-// ---- Quem é a pessoa: o que a call inicial salvou, completado pelo perfil da demo ----
-const demo = activeProfile();
-const { profile } = resolveProfile(location.search);
+// ---- Quem é a pessoa: o que a call inicial salvou (ou o ?perfil=), completado pelo perfil da demo do mesmo vínculo ----
+const { profile, source } = resolveProfile(location.search);
+const base = profile.vinculo === "transicao" ? profiles.bruno : profiles.ana;
+const nome = source === "entrevista" && profile.nome ? profile.nome : base.name;
+const demo = { ...base, name: nome, initials: nome.split(/\s+/).map((w) => w[0] ?? "").join("").slice(0, 2).toUpperCase() };
 const gestor = profile.gestor || company.people[demo.managerId]?.name || "";
 const buddy = company.people[demo.buddyId]?.name ?? "sua buddy";
 const time = profile.time || demo.toTeam;
@@ -33,7 +40,7 @@ const mark = (state: TaskState | AccessStatus) => {
   return `<span class="mark mark--${kind}" aria-hidden="true">${kind === "done" ? CHECK : ""}</span>`;
 };
 
-// ---- Topo, trilha e perfil ----
+// ---- Topo, progresso e perfil ----
 qs(document, "#me-name").textContent = demo.name;
 qs(document, "#me-initials").textContent = demo.initials;
 qs(document, "#trail-label").textContent = `Processo de ${profile.nome}`;
@@ -52,7 +59,11 @@ const meta: [string, string][] = [
 ];
 qs(document, "#meta").innerHTML = meta.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
 
-// ---- Tarefas ----
+// ---- Tarefas: a primeira tarefa é a do vínculo da pessoa (docs/contratos.md, Primeira tarefa) ----
+const journey = loadJourney(demoJourney);
+const tarefa = tarefaDaPessoa(journey, profile);
+const tarefaNo = Object.values(journey.boards).flatMap((b) => b.nodes).find((n) => n.id === tarefa?.no);
+const TASKS = tasksFor(tarefa, tarefaNo?.sublabel);
 const STATE_LABEL: Record<TaskState, string> = { done: "Concluída", now: "Agora", next: "Depois" };
 qs(document, "#tasks").innerHTML = TASKS.map(
   (t) => `
@@ -61,7 +72,7 @@ qs(document, "#tasks").innerHTML = TASKS.map(
     <div>
       <p class="task__title"><span class="sr-only">${STATE_LABEL[t.state]}: </span>${esc(t.title)}</p>
       <p class="task__detail">${esc(t.detail)}</p>
-      ${t.action ? `<a class="task__action" href="${t.action.href}">${esc(t.action.label)}</a>` : ""}
+      ${t.action ? `<a class="task__action" href="${t.action.href}${esc(location.search)}">${esc(t.action.label)}</a>` : ""}
     </div>
   </li>`,
 ).join("");
@@ -76,7 +87,7 @@ function renderTools(changed?: string): void {
     <li class="tool${t.id === changed ? " is-changed" : ""}">
       <div>
         <p class="tool__name">${esc(t.name)}</p>
-        <p class="tool__use">${esc(t.use)}${t.status === "pending" ? ` · pedido a ${esc(gestor)}` : ""}</p>
+        <p class="tool__use">${esc(t.use)}${t.status === "pending" ? ` · quem libera: ${esc(gestor)}` : ""}</p>
       </div>
       <span class="access access--${t.status}">${mark(t.status)}${ACCESS_LABEL[t.status]}</span>
     </li>`,
@@ -85,15 +96,15 @@ function renderTools(changed?: string): void {
 }
 renderTools();
 
-// A Puca confere os acessos ao abrir: o que falta vira pedido ao gestor no Slack e um aviso aqui.
+// A Puca confere os acessos ao abrir e avisa o que falta. Ela ainda não pede ao gestor de verdade (#104): não diz que pediu.
 let lastNotice = "";
 function checkAccess(): void {
   const missing = tools.filter((t) => t.status === "missing");
   if (!missing.length) return;
   for (const t of missing) t.status = "pending";
   const names = missing.map((t) => t.name).join(" e ");
-  lastNotice = `Você ainda não tinha acesso ao ${names}. Pedi para ${gestor} no Slack e te aviso quando liberar.`;
-  qs(document, "#notice-text").innerHTML = `Você ainda não tinha acesso ao <b>${esc(names)}</b>. Pedi para ${esc(gestor)} no Slack e te aviso quando liberar.`;
+  lastNotice = `Você ainda não tem acesso ao ${names}. Quem libera é ${gestor}; te aviso aqui quando chegar.`;
+  qs(document, "#notice-text").innerHTML = `Você ainda não tem acesso ao <b>${esc(names)}</b>. Quem libera é ${esc(gestor)}; te aviso aqui quando chegar.`;
   qs(document, "#notice").hidden = false;
   renderTools(missing[0].id);
 }
@@ -119,7 +130,9 @@ async function main(): Promise<void> {
   bar.end();
 
   const voice = await createAgentVoice();
-  const outbox = createOutbox(browserStore());
+  // cada fala passa por journey/route.ts e fica no rastro (§12.2), como na sessão
+  const faqs = buildFaqs(journey, profile);
+  const trail = createTrail(browserStore());
   let inCall = false;
   let muted = false;
   let listening = false;
@@ -132,16 +145,19 @@ async function main(): Promise<void> {
     if (inCall) cam.setState("idle");
   }
 
-  async function reply(question: string): Promise<void> {
+  async function reply(question: string, from: "chat" | "voz"): Promise<void> {
     cam.setState("think");
+    const route = routeUtterance(question, { journey, moment: null, step: null, waiting: null, board: null, faqs, tarefa, tarefaApresentada: false });
+    const said = answer(question, route);
+    trail.record({ from, utterance: question, route: route.kind, answer: said, sources: route.kind === "faq" ? [route.faq.label] : [], moment: null, step: null });
     await new Promise((r) => setTimeout(r, 500));
-    await say(answer(question));
+    await say(said);
   }
 
   // fala da pessoa pelo chat
   document.addEventListener("chatpanel:send", (e) => {
     const text = e.detail.text.trim();
-    if (text) void reply(text);
+    if (text) void reply(text, "chat");
   });
 
   document.addEventListener("callbar:start", async () => {
@@ -155,7 +171,7 @@ async function main(): Promise<void> {
       void voice.listen((text) => {
         if (!inCall || muted || !text.trim()) return;
         chat.addMessage({ from: "user", text });
-        void reply(text);
+        void reply(text, "voz");
       }).catch(() => {
         listening = false; // sem microfone (ou sem permissão): a conversa segue pelo chat
       });
@@ -181,41 +197,48 @@ async function main(): Promise<void> {
     if (e.detail.on) voice.stop();
   });
 
-  /** Respostas da Puca no início: só o que esta tela sabe (acessos, tarefas, pessoas).
-   *  Sem fonte confiável, não inventa: encaminha à buddy (PRODUCT.md §4.5). */
-  function answer(question: string): string {
+  /** Resposta da Puca no início, pelo caminho que a rota escolheu. O que é da sessão (FAQ do quadro, conhecimento,
+   *  pulo, primeira tarefa) vem da jornada; o "ask" fica com o que esta tela sabe (acessos, tarefas, pessoas).
+   *  Sem fonte, não inventa e não encaminha daqui: indica a sessão e a buddy. */
+  function answer(question: string, route: Route): string {
+    switch (route.kind) {
+      case "faq":
+        return route.faq.unconfirmed ? `${route.faq.text} Pergunta para ${buddy}, sua buddy, no Slack.` : route.faq.text;
+      case "knowledge":
+        return route.text;
+      case "jump":
+        return `Isso eu te mostro na sua primeira sessão, no momento “${route.moment.title}”. É só clicar em Começar a sessão.`;
+      case "tarefa":
+        return route.resposta.kind === "sem_fonte"
+          ? `A tarefa não diz isso. Pergunta para ${buddy}, sua buddy, no Slack.`
+          : route.resposta.kind === "ainda_nao"
+            ? "Eu te apresento a sua primeira tarefa no fim da primeira sessão."
+            : route.resposta.texto;
+      default:
+        return local(question);
+    }
+  }
+
+  function local(question: string): string {
     const q = normalize(question);
     const tool = tools.find((t) => q.includes(normalize(t.name)) || q.includes(t.id));
     if (tool) {
       if (tool.status === "ok") return `Você já tem acesso ao ${tool.name}. Ele serve para: ${tool.use.toLowerCase()}.`;
-      return `O acesso ao ${tool.name} está aguardando. Pedi para ${gestor} no Slack e te aviso quando liberar.`;
+      return `O acesso ao ${tool.name} ainda não chegou. Quem libera é ${gestor}; te aviso aqui quando chegar.`;
     }
     if (/acess/.test(q)) {
       const waiting = tools.filter((t) => t.status !== "ok").map((t) => t.name);
       return waiting.length
-        ? `Faltam ${waiting.join(" e ")}. Já pedi para ${gestor} no Slack; o resto está liberado.`
+        ? `Faltam ${waiting.join(" e ")}; o resto está liberado. Te aviso aqui quando chegar.`
         : "Você já tem acesso a todas as ferramentas do time.";
-    }
-    if (/tarefa|ticket|firmware/.test(q)) {
-      const first = TASKS.find((t) => t.title.startsWith("Primeira tarefa"));
-      return `${first?.title}. ${first?.detail} Ela fica liberada depois da sua primeira sessão.`;
     }
     if (/sessao|aula|quadro|comecar/.test(q)) {
       return "Sua primeira sessão mostra o caminho de uma transação, o que acontece quando falha e quem cuida de cada parte. É só clicar em Começar a sessão.";
     }
-    if (/buddy|paula/.test(q)) return `Sua buddy é ${buddy}. Ela te acompanha nas primeiras semanas e é para quem eu levo as dúvidas que eu não consigo confirmar.`;
+    if (/buddy|paula/.test(q)) return `Sua buddy é ${buddy}. Ela te acompanha nas primeiras semanas.`;
     if (/gestor|marcos|chefe/.test(q)) return `Seu gestor é ${gestor}, do time ${time}.`;
     if (/^(oi|ola|bom dia|boa tarde|boa noite)\b|obrigad/.test(q)) return "Estou por aqui. Pode perguntar sobre seus acessos, suas tarefas ou o time.";
-    outbox.add({
-      question,
-      summary: question,
-      reason: "No início da plataforma, a Puca não tem fonte confirmada sobre isso.",
-      to: { name: buddy, role: "buddy" },
-      pessoa: profile.nome,
-      consulted: ["Acessos e tarefas do início"],
-      moment: null,
-    });
-    return `Não encontrei uma fonte confirmada sobre isso. Levei sua dúvida para ${buddy}, sua buddy, no Slack, com o contexto.`;
+    return `Isso eu não tenho confirmado aqui no início. Na sua primeira sessão eu vejo com você; se não estiver lá, pergunta para ${buddy}, sua buddy, no Slack.`;
   }
 }
 

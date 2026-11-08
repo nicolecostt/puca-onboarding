@@ -1,7 +1,6 @@
 // Dados sintéticos do início para a demo (mundo fictício da Tail): ferramentas do time, acessos e tarefas.
-// Só esta tela usa. A primeira tarefa vem da jornada (nó "task" do quadro de pagamentos).
-import demo from "../../journey/data/tail.journey.json";
-import type { Journey } from "../../journey/types";
+// Só esta tela usa. A primeira tarefa vem do catálogo da jornada, escolhida pelo vínculo da pessoa (tarefaDaPessoa).
+import type { TarefaDoTime } from "../../journey/primeira-tarefa";
 
 export type AccessStatus = "ok" | "pending" | "missing";
 
@@ -31,25 +30,22 @@ export interface Task {
   action?: { label: string; href: string };
 }
 
-const taskNode = (demo as unknown as Journey).boards.pagamentos.nodes.find((n) => n.id === "task");
+/** Tarefas do início. A primeira tarefa é a do vínculo da pessoa; sem tarefa no catálogo, a linha não aparece. */
+export function tasksFor(tarefa: TarefaDoTime | null, nome: string | undefined): Task[] {
+  return [
+    { title: "Call inicial com a Puca", detail: "A Puca já sabe o que você conhece e o que quer aprender.", state: "done" },
+    {
+      title: "Sua primeira sessão",
+      detail: "O caminho de uma transação, quando falha e quem cuida de cada parte.",
+      state: "now",
+      action: { label: "Começar a sessão", href: "../lesson/" },
+    },
+    ...(tarefa ? [{ title: `Primeira tarefa: ${nome ?? tarefa.titulo}`, detail: tarefa.problema, state: "next" as const }] : []),
+    { title: "Dar oi no #time-terminais", detail: "Se apresentar para o time no canal do Slack.", state: "next" },
+  ];
+}
 
-export const TASKS: Task[] = [
-  { title: "Call inicial com a Puca", detail: "A Puca já sabe o que você conhece e o que quer aprender.", state: "done" },
-  {
-    title: "Sua primeira sessão",
-    detail: "O caminho de uma transação, quando falha e quem cuida de cada parte.",
-    state: "now",
-    action: { label: "Começar a sessão", href: "../lesson/" },
-  },
-  {
-    title: `Primeira tarefa: ${taskNode?.sublabel ?? "validar a versão mínima de firmware"}`,
-    detail: taskNode?.info?.role ?? "Validar a versão mínima de firmware antes de publicar uma configuração.",
-    state: "next",
-  },
-  { title: "Dar oi no #time-terminais", detail: "Se apresentar para o time no canal do Slack.", state: "next" },
-];
-
-/** Etapas da trilha (topo) e onde a pessoa está. */
+/** Etapas do progresso (topo) e onde a pessoa está. */
 export const TRAIL: { label: string; state: TaskState }[] = [
   { label: "Acessos", state: "now" },
   { label: "Sessão", state: "next" },

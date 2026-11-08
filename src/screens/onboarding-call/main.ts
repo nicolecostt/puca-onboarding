@@ -1,5 +1,5 @@
 // Call inicial: a Puca se apresenta, confirma os dados da admissão e levanta o que a pessoa já sabe e
-// o que ela quer (a calibragem), como numa entrevista.
+// o que ela quer (a calibragem), como numa conversa.
 // Por enquanto a conversa é simulada (roteiro abaixo). A pessoa pode responder
 // "por voz" (resposta de exemplo depois de alguns segundos) ou digitando no chat.
 import "../../styles/base.css";
@@ -105,8 +105,8 @@ const FIELDS: Field[] = [
   },
 ];
 
-/** Boas-vindas, aberta no fim da call; de lá a pessoa acessa a plataforma ou refaz a call. */
-const HOME_URL = "../boas-vindas/";
+/** Boas-vindas, aberta no fim da call; de lá a pessoa vai para o início ou refaz a call. */
+const HOME_URL = `../boas-vindas/${location.search}`; // leva o ?perfil= junto
 
 const OUTRO = (a: Answers) =>
   `Perfeito, ${a.nome}. Já tenho o que preciso. Vou montar sua primeira semana com o time ${a.time} e te mostro em seguida.`;
@@ -177,7 +177,7 @@ async function main(): Promise<void> {
     visual = factory(holder);
   }
 
-  // Guarda a resposta sem mostrar na tela: a pessoa vive uma entrevista,
+  // Guarda a resposta sem mostrar na tela: a pessoa vive uma conversa,
   // não vê o que está sendo coletado. Fica em window.onboardingAnswers e no evento.
   window.onboardingAnswers = answers;
   function remember(key: FieldKey, value: string): void {
