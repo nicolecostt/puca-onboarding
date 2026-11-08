@@ -39,8 +39,8 @@ Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json)
 ```
 
 - `x`, `y` são o centro do nó no quadro, que tem **1440 × 844** (o tamanho do Figma).
-- `kind` diz o que o nó é: `frontend`, `service`, `db`, `external`, `queue`, `person`, `team`, `value`, `doc`, `task`. No quadro, `queue` vira pílula azul; o resto, caixa desenhada.
-- Opcionais de desenho: `w` (largura; sem ela, sai do tamanho do rótulo), `look` (`"blackbox"` = caixa preta tracejada, `"dlq"` = fila de erro vermelha), `note` (selo embaixo do nó). O rótulo aceita `\n` para quebrar linha.
+- `kind` diz o que o nó é: `frontend`, `service`, `db`, `external`, `queue`, `person`, `team`, `value`, `doc`, `task`. No quadro, `queue` vira pílula cinza com contorno preto; o resto, caixa desenhada.
+- Opcionais de desenho: `w` (largura; sem ela, sai do tamanho do rótulo), `look` (`"blackbox"` = caixa preta tracejada, `"dlq"` = fila de erro vermelha, tracejada), `note` (selo embaixo do nó). O rótulo aceita `\n` para quebrar linha.
 - `info` alimenta o **cartão do nó** (§4.3): função, time, responsável, fontes e ADR.
 - `owner_confirmed: false` faz o cartão dizer que não há responsável confirmado e indicar a buddy. É a regra de não inventar quem cuida de um sistema.
 - Arestas: `{ "id", "from", "to", "label"? }`. Ids de nós e arestas não podem se repetir no mesmo quadro.
@@ -64,7 +64,7 @@ Jornada de exemplo: [`tail.journey.json`](../src/journey/data/tail.journey.json)
 |---|---|
 | `goal` | O que o passo quer alcançar (não é falado; não pode repetir dentro do momento). |
 | `line` | O que o agente fala. É uma orientação, não um texto decorado: com um LLM, a Puca adapta as palavras à conversa. |
-| `highlight` | Trecho da fala que fica destacado em amarelo na legenda. |
+| `highlight` | Trecho da fala que fica destacado (fundo cinza) na legenda. |
 | `knowledge` | Contexto extra do passo, como o do momento. |
 | `actions` | Ações no quadro: antes da fala, ou no trecho marcado em `at` (tabela abaixo). |
 | `decision` | `auto` (padrão: segue sozinho), `wait` (espera resposta) ou `select` (espera um toque num nó). |
@@ -79,9 +79,9 @@ Um passo `wait` precisa terminar em pergunta ou ter `suggested_replies`, senão 
 | Ação | Efeito |
 |---|---|
 | `{ "type": "reveal", "targets": [ids] }` | Nós aparecem; arestas se desenham. |
-| `{ "type": "highlight", "targets": [ids], "tone": "focus" \| "warn" \| "ok" }` | Destaca e esmaece o resto. |
+| `{ "type": "highlight", "targets": [ids], "tone": "focus" \| "warn" \| "ok" }` | Destaca e esmaece o resto. Sem cor: `ok` = contorno cheio e grosso com um visto; `warn` = contorno duplo cinza. |
 | `{ "type": "clear_highlight" }` | Volta tudo ao normal. |
-| `{ "type": "focus", "target": id \| null }` | Anel amarelo no nó que a Puca está explicando; `null` tira. |
+| `{ "type": "focus", "target": id \| null }` | Anel com a cor da Puca (arco-íris) no nó que ela está explicando; `null` tira. |
 | `{ "type": "flow", "path": [ids de arestas] }` | Um pulso percorre o caminho. |
 | `{ "type": "card", "target": id }` / `{ "type": "close_card" }` | Abre ou fecha o cartão do nó. |
 | `{ "type": "reset" }` | Esconde tudo. |

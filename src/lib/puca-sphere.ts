@@ -1,8 +1,10 @@
 // Visual da Puca: esfera de pontos com uma faixa em onda, sem rosto.
-// Carregado por loadAgentVisual() (agent-visual.ts) em todas as telas. Cores em tokens.css (--puca-sphere-*).
+// Carregado por loadAgentVisual() (agent-visual.ts) em todas as telas. Cor dos pontos de fundo em tokens.css (--puca-sphere-dot).
 //
-// Mouse: a esfera inclina na direção do cursor e os pontos perto dele crescem e escurecem.
+// Mouse: a esfera inclina na direção do cursor e os pontos perto dele crescem e ganham a cor da faixa.
 // Clique: solta uma ondulação que corre pela superfície.
+// Faixa: arco-íris metálico (o tom muda ao longo da faixa e gira com o tempo, com brilho onde a luz bate); o fundo fica claro.
+// O clique também solta uma onda em arco-íris.
 import type { AgentVisual, AgentVisualFactory, AgentVisualState, RGB } from "./agent-visual";
 
 // ---- Ajustes ----
@@ -17,9 +19,9 @@ function tokenColor(name: string, fallback: RGB): RGB {
 
 /** Como cada estado mexe na onda. */
 const MOODS: Record<AgentVisualState, { speed: number; amp: number; width: number; spin: number; pulse: number }> = {
-  idle: { speed: 0.5, amp: 0.3, width: 1, spin: 0.12, pulse: 0 },
-  think: { speed: 1.4, amp: 0.38, width: 0.75, spin: 0.35, pulse: 0 },
-  talk: { speed: 0.9, amp: 0.34, width: 1.15, spin: 0.16, pulse: 1 },
+  idle: { speed: 0.35, amp: 0.3, width: 1, spin: 0.08, pulse: 0 },
+  think: { speed: 1.0, amp: 0.38, width: 0.75, spin: 0.25, pulse: 0 },
+  talk: { speed: 0.63, amp: 0.34, width: 1.15, spin: 0.11, pulse: 1 },
 };
 
 interface Ripple {
@@ -36,11 +38,21 @@ const mix = (a: RGB, b: RGB, t: number): RGB => ({
 });
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
+/** Cor do arco-íris holográfico: tom 0–360, saturação e luz 0–1. */
+function hsl(h: number, s: number, l: number): RGB {
+  const k = (n: number) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => 255 * (l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)));
+  return { r: f(0), g: f(8), b: f(4) };
+}
+
+// arco-íris: quantos graus de tom por volta da esfera e por segundo
+const HUE_SPREAD = 360; // graus de tom ao longo de uma volta da faixa
+const HUE_SPEED = 28; // graus por segundo (pensando gira mais rápido)
+const WHITE: RGB = { r: 255, g: 255, b: 255 }; // brilho metálico
+
 export const mountPucaSphere: AgentVisualFactory = (container) => {
-  const BASE = tokenColor("--puca-sphere-dot", { r: 128, g: 124, b: 122 }); // cinza dos pontos de fundo
-  const ACCENT = tokenColor("--puca-sphere-accent", { r: 176, g: 74, b: 48 }); // terracota da faixa
-  const ACCENT_WARM = tokenColor("--puca-sphere-warm", { r: 214, g: 58, b: 44 }); // pensando
-  const CORE = tokenColor("--puca-sphere-core", { r: 30, g: 30, b: 30 }); // miolo escuro da faixa
+  const BASE = tokenColor("--puca-sphere-dot", { r: 201, g: 201, b: 201 }); // cinza dos pontos de fundo
 
   const canvas = document.createElement("canvas");
   canvas.style.cssText = "display:block;width:100%;height:100%";
@@ -95,6 +107,7 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
   let tiltX = 0; // inclinação atual (segue o mouse com atraso)
   let tiltY = 0;
   let phase = 0;
+  let hue = 0; // tom de partida do arco-íris, gira com o tempo
 
   // mouse em coordenadas -1..1 relativas à esfera; null = fora
   let mouse: { x: number; y: number } | null = null;
@@ -141,10 +154,36 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
     return { x: x1 * cy - z2 * syw, y: y2, z: x1 * syw + z2 * cy };
   }
 
+  // só anima quando aparece na tela e a aba está visível; com movimento reduzido, quase parada e em poucos quadros
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let onScreen = true;
+  let running = false;
+  let lastDraw = 0;
   let last = performance.now() / 1000;
+  const wake = () => {
+    if (running || !onScreen || document.hidden) return;
+    running = true;
+    last = performance.now() / 1000;
+    requestAnimationFrame(frame);
+  };
+  new IntersectionObserver(([e]) => {
+    onScreen = e.isIntersecting;
+    wake();
+  }).observe(container);
+  document.addEventListener("visibilitychange", wake);
+
   function frame(): void {
+    if (!onScreen || document.hidden) {
+      running = false;
+      return;
+    }
     const now = performance.now() / 1000;
-    const dt = Math.min(0.05, now - last);
+    if (reduce && now - lastDraw < 0.25) {
+      requestAnimationFrame(frame);
+      return;
+    }
+    lastDraw = now;
+    const dt = Math.min(0.05, now - last) * (reduce ? 0.15 : 1);
     last = now;
 
     // estado anda devagar até o alvo (troca suave)
@@ -172,7 +211,7 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
     cz = Math.cos(tiltY); szw = Math.sin(tiltY);
 
     // fala: a onda "respira" em pulsos curtos
-    const talk = mood.pulse * (0.5 + 0.5 * Math.sin(now * 9) * Math.sin(now * 3.1));
+    const talk = mood.pulse * (0.5 + 0.5 * Math.sin(now * 6.5) * Math.sin(now * 2.2));
     const amp = mood.amp * (1 + talk * 0.35);
     const bandW = 0.1 * mood.width * (1 + talk * 0.4);
     const haloW = 0.27 * mood.width;
@@ -187,7 +226,8 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
       }
     }
 
-    const accent = mix(ACCENT, ACCENT_WARM, warmMix);
+    hue = (hue + dt * HUE_SPEED * (1 + warmMix * 1.5)) % 360;
+    const sat = 0.75 + warmMix * 0.2;
     const R = Math.min(w, h) * 0.44;
     const cxS = w / 2;
     const cyS = h / 2;
@@ -237,15 +277,22 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
 
       const core = Math.exp(-(d * d) / (bandW * bandW));
       const halo = Math.exp(-(d * d) / (haloW * haloW));
-      // segunda faixa, mais fraca, só em terracota
+      // segunda faixa, mais fraca, só na cor da faixa
       const d2 = lat[i] - (center - 0.38 + 0.08 * Math.sin(lo * 2 - phase * 1.7));
       const halo2 = Math.exp(-(d2 * d2) / (0.09 * 0.09)) * 0.65;
 
-      const heat = Math.min(1, Math.max(halo, halo2) + touch * 0.5 + ring * 0.6);
-      const dark = Math.min(1, core * 0.95 + touch * 0.35 + ring * 0.5);
+      const heat = Math.min(1, Math.max(halo, halo2) + touch * 0.5);
+      const dark = Math.min(1, core * 0.95 + touch * 0.35);
 
-      let c = mix(BASE, accent, heat);
-      c = mix(c, CORE, dark);
+      // tom do ponto: anda com a longitude e com a posição na tela (brilho holográfico)
+      const h = hue + (lo / (Math.PI * 2)) * HUE_SPREAD + (sx[i] - sy[i]) * 140;
+      // metálico: tons médios, e um brilho branco onde a luz (de cima à esquerda) bate
+      let c = mix(BASE, hsl(h, sat, 0.64), heat);
+      c = mix(c, hsl(h + 30, sat, 0.55), dark);
+      const shine = Math.pow(Math.max(0, -sx[i] * 0.45 - sy[i] * 0.55 + z * 0.7), 14);
+      c = mix(c, WHITE, shine * heat * 0.85);
+      // o clique corre pela esfera em arco-íris, com o tom adiantado em relação à faixa
+      c = mix(c, hsl(h + 120 + ring * 90, 0.85, 0.64), Math.min(1, ring * 3));
 
       const size = Math.max(0.45, (0.5 + depth * 0.85) * (1 + heat * 0.6 + dark * 1.3 + touch * 0.8 + ring * 0.6) * (R / 210));
       const alpha = (0.06 + Math.pow(depth, 1.3) * 0.94) * (0.6 + 0.4 * Math.max(heat, dark, 0.3));
@@ -261,7 +308,7 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
     for (let j = ripples.length - 1; j >= 0; j--) if (now - ripples[j].born > 2.4) ripples.splice(j, 1);
     requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+  wake();
 
   const api: AgentVisual = {
     setState(s) {
@@ -271,7 +318,7 @@ export const mountPucaSphere: AgentVisualFactory = (container) => {
       warm = on;
     },
     getColor() {
-      const c = mix(ACCENT, ACCENT_WARM, warmMix);
+      const c = hsl(hue, 0.75, 0.64);
       return { r: Math.round(c.r), g: Math.round(c.g), b: Math.round(c.b) };
     },
   };

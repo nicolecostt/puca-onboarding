@@ -7,7 +7,7 @@ import "./agent-cam.css";
 import { esc, qs } from "../../lib/dom";
 import { makeDraggable } from "../../lib/draggable";
 import { emit } from "../../lib/events";
-import type { AgentVisualFactory, AgentVisualState, RGB } from "../../lib/agent-visual";
+import type { AgentVisualFactory, AgentVisualState } from "../../lib/agent-visual";
 
 export interface AgentCamOptions {
   name?: string;
@@ -27,19 +27,6 @@ export interface AgentCam {
 }
 
 const LABEL: Record<AgentVisualState, string> = { talk: "falando", idle: "", think: "pensando" };
-
-// Sem visual: azul normal, laranja pensando.
-const FALLBACK: Record<AgentVisualState, RGB> = {
-  idle: { r: 63, g: 140, b: 236 },
-  talk: { r: 63, g: 140, b: 236 },
-  think: { r: 241, g: 105, b: 46 },
-};
-
-/** Clareia uma cor misturando com branco (k = 0 nada, 1 = branco). */
-function lighten(c: RGB, k: number): string {
-  const mix = (v: number) => Math.round(v + (255 - v) * k);
-  return `rgb(${mix(c.r)}, ${mix(c.g)}, ${mix(c.b)})`;
-}
 
 export function mountAgentCam(opts: AgentCamOptions = {}): AgentCam {
   const name = opts.name ?? "Puca";
@@ -66,16 +53,6 @@ export function mountAgentCam(opts: AgentCamOptions = {}): AgentCam {
     nameEl.textContent = extra ? `${name} · ${extra}` : name;
     cam.setAttribute("aria-label", `Câmera da ${name}${extra ? `, ${extra}` : ""}`);
   }
-
-  // Borda e bolinha na cor da "emoção" do agente: com visual, a cor dele em tempo real
-  // (azul, e quente quando pensa); forte quando fala/pensa, clarinha quando quieto.
-  (function tint() {
-    const c = visual ? visual.getColor() : FALLBACK[state];
-    const strong = !paused && state !== "idle";
-    cam.style.setProperty("--cam-accent", lighten(c, strong ? 0.6 : 0.8));
-    cam.style.setProperty("--cam-dot", lighten(c, strong ? 0 : 0.45));
-    requestAnimationFrame(tint);
-  })();
 
   // O chat abre colado na câmera, onde quer que ela esteja: acima dela, ou abaixo se não couber.
   // Passa a posição para o CSS do chat por variáveis no body (ver agent-cam.css).

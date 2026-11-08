@@ -1,6 +1,6 @@
 # Instruções para agentes
 
-Front da Lousa + servidor da Puca (agente de onboarding por voz). Vite + TypeScript sem framework; servidor Fastify sem estado em `server/`.
+Front do Orbis + servidor da Puca (agente de onboarding por voz). Vite + TypeScript sem framework; servidor Fastify sem estado em `server/`.
 
 Somos 4 pessoas, cada uma com seu agente, e todo mundo mexe um pouco em tudo. Sessões não compartilham memória:
 o que não estiver no código, numa issue, num PR ou nestes docs, os outros agentes não sabem.

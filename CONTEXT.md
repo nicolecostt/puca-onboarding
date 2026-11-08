@@ -9,9 +9,9 @@ enquanto monta um quadro visual que explica sistemas, pessoas e processos. Só g
 A agente que conversa com a pessoa e conduz a sessão.
 _Avoid_: bot, assistente, tutor
 
-**Lousa**:
+**Orbis**:
 O produto (o app) onde a Puca atua.
-_Avoid_: plataforma
+_Avoid_: plataforma, Lousa, Iris (nomes antigos)
 
 **Pessoa**:
 Quem está sendo integrado, novo na empresa ou mudando de time.
@@ -106,7 +106,7 @@ Regra que escolhe para onde a jornada vai depois de um passo. (Não confundir co
 
 **Quadro**:
 A vista visual que a Puca monta progressivamente durante a sessão.
-_Avoid_: lousa (é o produto), diagrama, whiteboard
+_Avoid_: diagrama, whiteboard
 
 **Nó**:
 Um item do quadro: serviço, fila, pessoa, time, documento, tarefa.
@@ -147,7 +147,7 @@ O que acompanha o kit para o jurado: quem ele é na história, como escolher o p
 _Avoid_: manual, tutorial
 
 **Jurado**:
-Quem avalia a Lousa no hackathon. Vive a pessoa: escolhe o perfil e passa pela jornada.
+Quem avalia o Orbis no hackathon. Vive a pessoa: escolhe o perfil e passa pela jornada.
 _Avoid_: avaliador, juiz
 
 ## Negócio

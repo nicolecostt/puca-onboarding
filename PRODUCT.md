@@ -214,7 +214,7 @@ Além da experiência do funcionário, queremos dar visibilidade às pessoas res
 
 - Percentual de etapas concluídas.
 - Tarefas ou acessos pendentes.
-- Sessões de orientação realizadas.
+- Sessões com a Puca realizadas.
 - Solicitações de suporte ainda abertas.
 - Assuntos que frequentemente geram dúvidas.
 - Tempo até a conclusão de marcos previamente definidos.
@@ -354,7 +354,7 @@ A partir das capturas da página de onboarding da Sana Learn compartilhadas por 
 
 Na referência compartilhada, a Sana descreve seu AI Tutor oferecendo respostas em linguagem natural com citações do conhecimento da empresa. O Puca pretende aprofundar essa experiência, especialmente em **onboarding técnico**, com:
 
-- conversa por voz ou texto conectada a uma **lousa visual interativa**;
+- conversa por voz ou texto conectada a um **quadro visual interativo**;
 - construção progressiva de mapas e explicações sobre arquitetura, fluxos e decisões técnicas;
 - possibilidade de **interromper, explorar uma dúvida e retomar** a explicação;
 - adaptação ao conhecimento identificado na call inicial e nas sessões anteriores;
@@ -393,7 +393,9 @@ Se a Puca só responder dúvidas, ela fica na categoria de chatbot do próprio g
 
 - **Agir num sistema, não só falar.** O encaminhamento do passo 4 precisa acontecer de fato no Slack simulado da tela `live-session`. O guia aceita conexões simuladas *"desde que o agente realmente opere sobre elas na demo"*.
 - **Rastro.** Cada decisão da Puca (o que respondeu, de qual fonte, quando encaminhou e por quê) fica registrada e pode ser auditada depois.
-- **Custo.** Mostrar quanto custa uma sessão em tempo e tokens, comparado com as horas que o buddy gastaria explicando a mesma coisa.
+- **Custo.** Cada sessão registra quanto custou em tempo e tokens, para o time auditar a demo (o JSON baixado do rastro e o log do servidor). Esse número não aparece na tela. A comparação com as horas que o buddy gastaria explicando a mesma coisa, e o valor em dinheiro, ficam para quando tudo estiver pronto (#94).
+
+  > Decisão da Nicole em 2026-11-07.
 
 > **Limites que o desafio impõe:** decisões sobre pessoas ficam com humanos, e a demo usa só dados sintéticos. A calibragem e o andamento descrevem o processo de integração, e não avaliam o desempenho da pessoa (ver o aviso de privacidade em [§5](#5-visibilidade-para-buddy-gestor-e-rh)).
 
@@ -464,7 +466,7 @@ A Puca é vendida para empresas (B2B): **a empresa compra e o RH aprova**. A ent
 | **Gestor e engenharia** | Ajudam a definir tarefas, contexto e qualidade esperada. |
 | **Buddy** | Orienta quando precisa e mostra onde há repetição ou bloqueio. |
 | **TI e segurança** | Participam da conexão com os sistemas da empresa e da avaliação de acessos, quando for o caso. |
-| **Pessoa** | Usa a Lousa para aprender e fazer as primeiras tarefas. |
+| **Pessoa** | Usa o Orbis para aprender e fazer as primeiras tarefas. |
 
 Foco inicial: empresas com times de tecnologia, contratações ou mudanças de time recorrentes e conhecimento espalhado em várias fontes. Não há corte de tamanho definido. Grandes empresas são um bom começo, não um limite.
 
@@ -475,7 +477,7 @@ Os dois vínculos, novo e transição ([§3](#3-cenários-principais-de-uso)), f
 - **Unidade:** a integração, ou seja, uma pessoa entrando num contexto de destino. Novo e transição consomem o **mesmo saldo**, com o mesmo preço, até os dados mostrarem diferença de custo ou de valor.
 - **Piloto pago:** preço e número de integrações menores que no contrato anual. Padrão de partida: **60 dias de uso**, contados depois que fontes e acessos estão disponíveis, em uma equipe. Revisão no meio e revisão comercial no fim.
 - **Contrato anual:** volume de integrações com **quantidade mínima**.
-- **Implantação:** conectar a Lousa às fontes e aos acessos de um cliente. A equipe já está construindo essa parte do produto, mas ainda não há implantação em nenhum cliente. Uma taxa separada só será proposta se o esforço observado justificar.
+- **Implantação:** conectar o Orbis às fontes e aos acessos de um cliente. A equipe já está construindo essa parte do produto, mas ainda não há implantação em nenhum cliente. Uma taxa separada só será proposta se o esforço observado justificar.
 
 O piloto vira contrato anual quando três coisas acontecem juntas:
 

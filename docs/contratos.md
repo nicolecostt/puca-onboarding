@@ -15,9 +15,9 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 | API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask`, `/api/voice/token` | `src/voice/agent-voice.ts`, `screens/lesson` | `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
-| Rastro (decisões da Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo), custo #52, painel #19 (só totais e encaminhamentos, nunca `utterance` nem `answer`: §5) | `__tests__/trail.test.ts` |
+| Rastro (decisões da Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19 (só totais e encaminhamentos, nunca `utterance` nem `answer`: §5) | `__tests__/trail.test.ts` |
 | Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` | `screens/lesson` (cria), `screens/live-session` (envia no Slack), rastro (`forwarding_id`) | `__tests__/forwarding.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
-| Visual da Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `src/lib/puca-sphere.ts` | `tsc` |
+| Visual da Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
 | Opções dos componentes | a função `mount…` de cada `src/components/*/*.ts` | as telas | `tsc` |
 
 Exemplo válido de `TrailEntry` (uma fala da pessoa e o que a Puca fez com ela):
@@ -157,6 +157,35 @@ Exemplo (Bruno, transição; saída de `montarJornadaDaPessoa(journey, DEMO_CALI
   ]
 }
 ```
+
+## Custo da sessão
+
+Tempo e tokens de cada sessão, para o time auditar a demo (#52, PRODUCT.md §12.2). **Nada disso aparece em tela.**
+
+- **`timing` do `/api/ask`** (`AskTiming` em `server/src/agent/ask.ts`), último evento do SSE. Campos novos, aditivos:
+  `tokens_in` e `tokens_out` (tokens de entrada e de saída da chamada ao LLM; `null` quando nada foi consumido: o provedor recusou antes de responder, como sem chave, 401 ou 429) e
+  `tokens_estimated` (`true` quando o provedor não informou e o servidor estimou, à razão de 4 caracteres por token).
+  ```json
+  { "type": "timing", "timing": { "first_speak_ms": 2, "llm_first_token_ms": 3185, "llm_first_sentence_ms": 3333,
+    "total_ms": 3584, "llm_error": null, "tokens_in": 1912, "tokens_out": 38, "tokens_estimated": false } }
+  ```
+- **Log do servidor:** uma linha por `/api/ask`, com `msg: "ask"`, `moment`, `step` e o `timing`, inclusive quando a
+  pessoa interrompe e o navegador não recebe o `timing`. Nunca leva o texto da pessoa.
+- **Rastro** (`src/journey/trail.ts`): a entrada de uma fala que foi ao agente ganha `llm_ms` (o `total_ms` do servidor)
+  e `tokens_in`, `tokens_out` e `tokens_estimated`, copiados do `timing`. Sem esses campos, a pergunta não foi medida no
+  navegador (a pessoa interrompeu); o log do servidor tem o número.
+- **Sessão** (`TrailSession`, chave `puca:sessoes` no `localStorage`): `{ session, started_at, ended_at }`, com o mesmo
+  `session` das entradas. A tela da sessão grava o início quando ela começa e o fim quando a call é encerrada ou a sessão termina;
+  recomeçar a sessão ou retomar a call na mesma página mantém o início e reabre a sessão. "Limpar", na tela de rastro, apaga as falas e as sessões.
+- **JSON baixado** na tela de rastro (`exportJson()`), ⚠️ **quebra só no arquivo baixado**: era a lista de entradas,
+  agora é `{ "sessions": SessionSummary[], "entries": TrailEntry[] }`. O resumo é calculado por `summarizeSessions`;
+  a duração vai do início ao fim da sessão, ou até a última fala se ela não terminou. `llm_calls` conta só as
+  perguntas que chegaram ao servidor, e `llm_calls_unmeasured`, as que chegaram mas cujo `timing` não voltou.
+  ```json
+  { "session": "a91e…", "started_at": "2026-11-07T22:00:00.000Z", "ended_at": "2026-11-07T22:14:30.000Z",
+    "duration_ms": 870000, "utterances": 6, "llm_calls": 2, "llm_calls_unmeasured": 1, "llm_ms": 3561,
+    "tokens_in": 1676, "tokens_out": 18, "tokens_estimated": false }
+  ```
 
 ## Ao mudar um contrato
 

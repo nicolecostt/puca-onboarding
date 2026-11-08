@@ -1,6 +1,6 @@
 # puca-onboarding
 
-Front da **Lousa**, produto de onboarding e transição entre equipes. A agente que conversa com a pessoa é a **Puca**.
+Front do **Orbis**, produto de onboarding e transição entre equipes. A agente que conversa com a pessoa é a **Puca**.
 Visão do produto em [`PRODUCT.md`](PRODUCT.md); glossário em [`CONTEXT.md`](CONTEXT.md).
 
 Vite + TypeScript, sem framework.
@@ -22,11 +22,13 @@ Trabalhando com agentes de programação (Claude Code, Codex…): regras do time
 
 ```
 index.html               lista das telas (página inicial do npm run dev)
+DESIGN.md                sistema visual: preto, branco e a cor da Puca; tipos, componentes e regras
 docs/
   journey-format.md      formato da jornada (momentos, passos, quadro, transições)
 src/
   styles/
     tokens.css           cores, fontes, raios e sombras (tirados do Figma); mude aqui
+  assets/fonts/          Creato Display (títulos da landing), com a licença OFL
     base.css             tokens + reset; importado por toda tela
   data/                  dados de exemplo da demo (depois podem vir de uma API)
     types.ts             formatos: perfil, empresa, jornada, sessão, quadro
@@ -34,6 +36,7 @@ src/
     profiles.ts          os dois perfis: ?perfil=bruno (transição) | ?perfil=ana (recém-contratada)
     lessons/             sessões do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css
+    landing/             apresentação do Orbis e da Puca (só preto, branco e a cor da Puca)
     onboarding-call/     call inicial: o agente entrevista a pessoa e grava a calibragem
     lesson/              sessão no quadro: o quadro se monta junto com a fala
     live-session/        tela de auxílio: barra de call, chat e câmera por cima de uma tela
@@ -101,9 +104,9 @@ document.addEventListener("callbar:pause", (e) => console.log(e.detail.on));
 ## Visual da Puca
 
 A Puca aparece como uma esfera de pontos com uma faixa em onda, sem rosto (`src/lib/puca-sphere.ts`),
-carregada por `loadAgentVisual()` em todas as telas: call inicial, sessão e tela de auxílio. Ela inclina na direção
+carregada por `loadAgentVisual()` em todas as telas: landing, call inicial, sessão e tela de auxílio. Ela inclina na direção
 do mouse, os pontos perto do cursor crescem e um clique solta uma ondulação. Os estados `idle`/`think`/`talk`
-mudam a velocidade e a forma da onda. As cores ficam em `tokens.css` (`--puca-sphere-*`). Se o visual não carregar, fica um círculo neutro.
+mudam a velocidade e a forma da onda. A faixa é um arco-íris metálico gerado no canvas; a cor dos pontos de fundo fica em `tokens.css` (`--puca-sphere-dot`) e o arco-íris usado fora da esfera em `--puca-holo-stops`. A esfera só anima quando está na tela. Se o visual não carregar, fica um círculo neutro.
 
 ## Sessão no quadro
 

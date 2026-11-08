@@ -3,6 +3,6 @@
 <g id="icon/chat">
 <path id="Vector" d="M28 20C28 20.3536 27.8595 20.6928 27.6095 20.9428C27.3594 21.1929 27.0203 21.3333 26.6667 21.3333H18.6667L16 24V13.3333C16 12.9797 16.1405 12.6406 16.3905 12.3905C16.6406 12.1405 16.9797 12 17.3333 12H26.6667C27.0203 12 27.3594 12.1405 27.6095 12.3905C27.8595 12.6406 28 12.9797 28 13.3333V20Z" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" stroke="#0A0A0A"/>
 </g>
-<circle id="unread" cx="31.5" cy="10.5" r="4.5" fill="#D12D26" stroke-width="2" stroke="white"/>
+<circle id="unread" cx="31.5" cy="10.5" r="4.5" fill="#171717" stroke-width="2" stroke="white"/>
 </g>
 </svg>

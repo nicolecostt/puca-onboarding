@@ -47,6 +47,7 @@ Do plano do time. Cada um vale quando o passo correspondente existir.
 - Progresso e memória continuam numa sessão nova.
 - Instalação e uso em outro computador, seguindo só as instruções públicas.
 - Rastro: depois da sessão, abrir `/src/screens/rastro/` (**tela só para a demo**). Cada fala aparece com o caminho, a resposta e a fonte, e "Baixar JSON" gera o arquivo para auditar.
+- Custo da sessão (#52, só para auditar, não aparece na demo): no JSON baixado, `sessions` traz a duração, as falas, as perguntas ao agente e os tokens de cada sessão; no log do servidor (`npm run dev:server`), cada pergunta ao agente vira uma linha `"msg":"ask"` com o `timing`, inclusive as interrompidas.
 
 ## Ordem da apresentação
 
