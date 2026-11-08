@@ -46,6 +46,7 @@ Do plano do time. Cada um vale quando o passo correspondente existir.
 - Perguntas diferentes das preparadas, e perguntas sem resposta na base (tem que cair no passo 8, nunca inventar).
 - Progresso e memória continuam numa sessão nova.
 - Instalação e uso em outro computador, seguindo só as instruções públicas.
+- Rastro: depois da aula, abrir `/src/screens/rastro/` (**tela só para a demo**). Cada fala aparece com o caminho, a resposta e a fonte, e "Baixar JSON" gera o arquivo para auditar.
 
 ## Ordem da apresentação
 
