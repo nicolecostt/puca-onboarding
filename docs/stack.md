@@ -748,7 +748,7 @@ de uso (#119), teste de instalação em outro Mac seguindo só o guia.
 |---|---|
 | Anthropic (Claude) | ok |
 | Supabase | ok |
-| ElevenLabs (plano pago) | ok |
+| ElevenLabs (plano pago) | Starter, 40 mil caracteres por mês, renova dia 7 (#151); a trava `LIMITE_DIARIO_TTS` do `fly.toml` segue essa cota |
 | Deepgram (papel Member) | ok segundo Joaquim; a chave não estava no `server/.env` desta máquina na hora do bench |
 | Slack da Kota (workspace e app) | #118 |
 | Notion da Kota | ok (Kota Workspace) |
