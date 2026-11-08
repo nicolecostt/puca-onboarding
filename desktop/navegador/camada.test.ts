@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CAMADA, escolherAlvo, normalizar } from "./camada";
 
-describe("camada da Puca", () => {
+describe("camada de Puca", () => {
   it("normaliza sem maiúscula, acento nem espaço sobrando", () => {
     expect(normalizar("  Livro-Razão\n ")).toBe("livro-razao");
     expect(normalizar("Meu   texto")).toBe("meu texto");

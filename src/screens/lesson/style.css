@@ -5,12 +5,12 @@ body {
   overflow: hidden;
   background: var(--color-surface);
 }
-/* A página tem três faixas: título no topo, quadro no meio e a fala do Puca embaixo.
+/* A página tem três faixas: título no topo, quadro no meio e a fala de Puca embaixo.
    O pontilhado é da página inteira, então o quadro não tem borda: só fica longe da legenda. */
 .lesson {
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --top: 64px; /* título da sessão */
-  --bottom: 172px; /* fala do Puca e respostas */
+  --bottom: 172px; /* fala de Puca e respostas */
   position: relative;
   height: calc(100vh - 56px);
   background-color: var(--color-surface);
@@ -21,7 +21,7 @@ body {
   position: absolute;
   inset: var(--top) 24px var(--bottom);
 }
-/* com a câmera do Puca no canto, o quadro não passa por baixo dela */
+/* com a câmera de Puca no canto, o quadro não passa por baixo dela */
 body.has-agent-cam:not(.is-call-off) .lesson__board {
   right: 300px;
 }
@@ -30,7 +30,7 @@ body.has-agent-cam:not(.is-call-off) .lesson__board {
   background: none; /* o pontilhado é da página e anda com o quadro (tela infinita, superficie = .lesson) */
 }
 
-/* ---- Navegador do Puca (só no app para Mac) ----
+/* ---- Navegador de Puca (só no app para Mac) ----
    A área tem a mesma posição do quadro; o app põe a página por cima dela, então nada da sessão entra aqui. */
 .lesson__navegador {
   /* começa abaixo do painel "Sua jornada": o navegador fica por cima do HTML e cobriria o painel */
@@ -179,8 +179,8 @@ body.has-agent-cam:not(.is-call-off) .lesson__board {
   border-radius: var(--radius-pill); /* acompanha a curva da pílula */
 }
 
-/* ---- Fala do Puca (embaixo, centro), no modelo da call inicial ----
-   Sem caixa: as bolinhas do Puca em cima, a fala centrada em Creato Display, cada palavra entrando
+/* ---- Fala de Puca (embaixo, centro), no modelo da call inicial ----
+   Sem caixa: as bolinhas de Puca em cima, a fala centrada em Creato Display, cada palavra entrando
    com um leve desfoque. Um véu branco por baixo separa a fala do quadro. */
 .caption {
   position: absolute;
@@ -212,7 +212,7 @@ body.has-agent-cam:not(.is-call-off) .lesson__board {
   height: 38px;
   margin-bottom: 2px;
 }
-/* as bolinhas só aparecem quando o Puca começa a falar */
+/* as bolinhas só aparecem quando Puca começa a falar */
 .caption__orb {
   transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
 }
@@ -361,7 +361,7 @@ body.has-agent-cam:not(.is-call-off) .lesson__board {
 }
 
 /* ---- Telas menores: tira o que é secundário ---- */
-/* com os controles presos na câmera, a câmera já mostra se o Puca fala: as ondas saem */
+/* com os controles presos na câmera, a câmera já mostra se Puca fala: as ondas saem */
 body.has-attached-callbar .voice {
   display: none;
 }

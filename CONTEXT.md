@@ -6,11 +6,11 @@ enquanto monta um quadro visual que explica sistemas, pessoas e processos. Só g
 ## Pessoas e papéis
 
 **Puca**:
-O agente que conversa com a pessoa e conduz a sessão. Sempre no masculino: o Puca, do Puca, ao Puca, ele.
-_Avoid_: bot, assistente, tutor, a Puca
+O agente que conversa com a pessoa e conduz a sessão. Vai sempre sem artigo: "Puca explica", "de Puca", "com Puca".
+_Avoid_: bot, assistente, tutor, "o Puca", "a Puca", "do Puca", "da Puca"
 
 **Orbis**:
-O produto (o app) onde o Puca atua.
+O produto (o app) onde Puca atua.
 _Avoid_: plataforma, Lousa, Iris (nomes antigos)
 
 **Pessoa**:
@@ -18,7 +18,7 @@ Quem está sendo integrado, novo na empresa ou mudando de time.
 _Avoid_: usuário, aluno, colaborador
 
 **Buddy**:
-Colega designado para acompanhar a pessoa; destino padrão quando o Puca não tem fonte confiável.
+Colega designado para acompanhar a pessoa; destino padrão quando Puca não tem fonte confiável.
 _Avoid_: mentor, padrinho
 
 **Gestor**:
@@ -44,25 +44,25 @@ Vínculo de quem já está na empresa e muda de time; pula a parte institucional
 _Avoid_: transferência, mudança
 
 **Calibragem**:
-O que o Puca concluiu sobre o que a pessoa já sabe, com o grau de certeza de cada item.
+O que Puca concluiu sobre o que a pessoa já sabe, com o grau de certeza de cada item.
 _Avoid_: diagnóstico, avaliação
 
 ## Conversa
 
 **Call inicial**:
-A primeira conversa, em que o Puca acolhe a pessoa, faz o onboarding cultural e preenche o perfil.
+A primeira conversa, em que Puca acolhe a pessoa, faz o onboarding cultural e preenche o perfil.
 _Avoid_: entrevista, kickoff
 
 **Sessão**:
-Uma conversa em que o Puca explica um assunto montando o quadro enquanto fala. Não é educacional: é uma sessão de trabalho com a pessoa.
+Uma conversa em que Puca explica um assunto montando o quadro enquanto fala. Não é educacional: é uma sessão de trabalho com a pessoa.
 _Avoid_: aula, lição, tutorial
 
 **Fala**:
-Um turno da pessoa, por voz ou chat, que o Puca precisa encaminhar.
+Um turno da pessoa, por voz ou chat, que Puca precisa encaminhar.
 _Avoid_: mensagem, input
 
 **Ponte**:
-Frase curta que o Puca diz na hora enquanto prepara uma resposta mais longa.
+Frase curta que Puca diz na hora enquanto prepara uma resposta mais longa.
 _Avoid_: filler, enrolação
 
 **Pulo**:
@@ -70,13 +70,13 @@ Pedido da pessoa para mudar de assunto; sempre leva ao início de um momento.
 _Avoid_: atalho, desvio
 
 **Encaminhamento**:
-Quando o Puca admite que não achou fonte confiável e leva a dúvida, com contexto, ao buddy ou responsável.
+Quando Puca admite que não achou fonte confiável e leva a dúvida, com contexto, ao buddy ou responsável.
 _Avoid_: escalonamento, fallback
 
 ## Jornada
 
 **Jornada**:
-O roteiro de uma sessão: momentos, passos e quadros. É o contrato que o Puca segue.
+O roteiro de uma sessão: momentos, passos e quadros. É o contrato que Puca segue.
 _Avoid_: trilha, fluxo, script
 
 **Momento**:
@@ -84,11 +84,11 @@ Um capítulo da jornada, com um objetivo único.
 _Avoid_: etapa, seção, fase
 
 **Passo**:
-Uma fala ou ação do Puca dentro de um momento.
+Uma fala ou ação de Puca dentro de um momento.
 _Avoid_: step, item
 
 **Objetivo**:
-O que um momento ou passo quer alcançar; não é falado, serve para o Puca se localizar.
+O que um momento ou passo quer alcançar; não é falado, serve para Puca se localizar.
 _Avoid_: meta
 
 **Conhecimento**:
@@ -103,13 +103,13 @@ _Avoid_: botão, opção
 Regra que escolhe para onde a jornada vai depois de um passo. (Não confundir com o vínculo de mesmo nome.)
 
 **Primeira tarefa**:
-Atividade real e pequena que o Puca entrega ao fim da sessão, escolhida do catálogo que o time aprovou conforme o perfil da pessoa. O gestor aprova antes de a pessoa começar.
+Atividade real e pequena que Puca entrega ao fim da sessão, escolhida do catálogo que o time aprovou conforme o perfil da pessoa. O gestor aprova antes de a pessoa começar.
 _Avoid_: ticket, task, exercício
 
 ## Quadro
 
 **Quadro**:
-A vista visual que o Puca monta progressivamente durante a sessão.
+A vista visual que Puca monta progressivamente durante a sessão.
 _Avoid_: diagrama, whiteboard
 
 **Nó**:
@@ -143,7 +143,7 @@ O banco digital fictício onde se passam a demo e o teste dos jurados.
 _Avoid_: Tail, empresa de exemplo, empresa mock
 
 **Kit da Kota**:
-Os materiais falsos, mas realistas, da Kota (repositório com código que roda, ADRs, Notion com cultura, pessoas, políticas e responsáveis). É a fonte do Puca e a prova que o jurado confere.
+Os materiais falsos, mas realistas, da Kota (repositório com código que roda, ADRs, Notion com cultura, pessoas, políticas e responsáveis). É a fonte de Puca e a prova que o jurado confere.
 _Avoid_: mock, dados fake, dataset
 
 **Guia de uso**:

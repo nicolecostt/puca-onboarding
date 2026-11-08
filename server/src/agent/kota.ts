@@ -4,7 +4,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 
 const DIR = new URL("../../../kit/kota/notion/paginas/", import.meta.url);
 
-/** As páginas como texto, cada uma com o nome do arquivo (é como o Puca cita a fonte). Vazio sem o kit. */
+/** As páginas como texto, cada uma com o nome do arquivo (é como Puca cita a fonte). Vazio sem o kit. */
 export function notionDaKota(dir: URL = DIR): string {
   if (!existsSync(dir)) return "";
   return readdirSync(dir)

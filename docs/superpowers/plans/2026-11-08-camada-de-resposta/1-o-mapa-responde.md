@@ -4,7 +4,7 @@
 > `superpowers:executing-plans` para executar este plano tarefa a tarefa. Os passos usam caixas (`- [ ]`) para
 > acompanhar o andamento.
 
-**Objetivo:** o Puca responde "quem cuida do X", "como o X se liga" e "mostra o ADR N" pelo mapa da Kota, na hora, sem
+**Objetivo:** Puca responde "quem cuida do X", "como o X se liga" e "mostra o ADR N" pelo mapa da Kota, na hora, sem
 LLM e sem servidor. Ela desenha no quadro os sistemas que ainda não estavam nele e encaminha para a pessoa certa, que o
 mapa escolhe.
 
@@ -25,7 +25,7 @@ fonte" e "O executor").
   **antes** do `knowledge`.
 - Papel de pessoa (tech lead, gestor, buddy, responsável) só sai de `dizer_dono`, com frase escrita pelo código.
 - Quem não usa o quadro ou o navegador continua igual: `npm run dev` sem servidor e sem Electron funciona.
-- O navegador do Puca não existe ainda. `mostrar` vira um cartão com o trecho e o link (sem `window.open`).
+- O navegador de Puca não existe ainda. `mostrar` vira um cartão com o trecho e o link (sem `window.open`).
 - Textos de interface, comentários e docs em português, no vocabulário do `CONTEXT.md`.
 - Commits `tipo(escopo): mensagem`, sem coautoria.
 
@@ -48,7 +48,7 @@ fonte" e "O executor").
 
 **Arquivos:**
 - Modificar: `docs/contratos.md` (linhas da tabela "Encaminhamento", "Rota da fala" e "Rastro", mais uma seção
-  "Plano do Puca" com um exemplo válido)
+  "Plano de Puca" com um exemplo válido)
 
 **Interfaces:**
 - Produz (no doc, implementado nas tarefas seguintes):
@@ -264,7 +264,7 @@ it("mesma entrada, mesma saída", () => expect(acrescentarDoMapa(null, ["contact
   export interface ContextoDeMontagem { mapa: MapaKota; trechos: Map<Handle, Trecho>; quadro: BoardSpec | null;
     revelados: string[]; vinculo: Vinculo; pergunta: string; momentos: string[] }
   export type AcaoNoQuadro = BoardAction | { type: "acrescentar"; nos: BoardNode[]; setas: BoardEdge[] };
-  /** `navegador` fica vazio neste plano; o plano 4 passa a preencher quando há navegador do Puca. */
+  /** `navegador` fica vazio neste plano; o plano 4 passa a preencher quando há navegador de Puca. */
   export interface SegmentoPronto { texto: string; origem: "plano" | "roteiro" | "aviso" | "ponte" | "falha";
     fontes: CitacaoConferida[]; quadro: AcaoNoQuadro[]; navegador: AcaoDaPuca[]; cartoes: CitacaoConferida[] }
   // AcaoDaPuca: a proposta da docs/stack.md §4.3, declarada aqui com `abrir` e `marcar` até o contrato "Computer use" (#123)

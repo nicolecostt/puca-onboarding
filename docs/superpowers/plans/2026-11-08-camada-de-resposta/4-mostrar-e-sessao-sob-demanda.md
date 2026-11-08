@@ -2,11 +2,11 @@
 
 > **Para agentes:** SUB-SKILL OBRIGATÓRIA: use `superpowers:subagent-driven-development` (recomendado) ou
 > `superpowers:executing-plans`. Este plano está no nível de tarefa (arquivos, interfaces, testes). Antes de executar,
-> detalhe os passos de cada tarefa no formato dos planos 1 a 3, com a forma do navegador do Puca que a #123 tiver
+> detalhe os passos de cada tarefa no formato dos planos 1 a 3, com a forma do navegador de Puca que a #123 tiver
 > deixado na `main`.
 
 **Objetivo:**
-- o Puca abre a fonte citada no navegador dele e marca o trecho;
+- Puca abre a fonte citada no navegador dele e marca o trecho;
 - um assunto que a jornada não cobre vira uma sessão gerada na hora, que volta ao passo de antes;
 - os nós da jornada da Kota apontam para trechos do kit.
 
@@ -16,7 +16,7 @@
 - **Sessão sob demanda:** `montarSessaoSobDemanda` é pura e gera uma `Journey` que o mesmo runner roda como desvio.
 
 **Especificação:** [`desenho.md`](desenho.md) (seções "Sessão sob demanda" e "Modo sempre na tela", parte do nível 0 no
-navegador do Puca).
+navegador de Puca).
 
 ## Restrições globais
 
@@ -29,7 +29,7 @@ navegador do Puca).
 
 ## Foco da revisão
 
-1. **Página que não carrega ou trecho não achado na página aberta:** a ação falha sem quebrar a fila, e o Puca diz
+1. **Página que não carrega ou trecho não achado na página aberta:** a ação falha sem quebrar a fila, e Puca diz
    onde fica o trecho (stack §4.3).
 2. **Desvio dentro do desvio:** pedir outra sessão sob demanda no meio de uma substitui a atual. Não empilha mais de um
    nível.
@@ -38,7 +38,7 @@ navegador do Puca).
 
 ---
 
-### Tarefa 1: `mostrar` no navegador do Puca
+### Tarefa 1: `mostrar` no navegador de Puca
 
 - **Arquivos:**
   - `src/puca/executor.ts`: o palco ganha `navegador: { executar(a: AcaoDaPuca[]): Promise<ResultadoDaFila>; cancelar(): void } | null`;

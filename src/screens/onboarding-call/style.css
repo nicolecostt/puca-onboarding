@@ -1,5 +1,5 @@
 /* Call inicial no visual da landing (DESIGN.md): papel branco, tinta preta, fios de 1px,
-   títulos em Creato Display. A única cor é a do Puca: a esfera e as partículas do fundo.
+   títulos em Creato Display. A única cor é a de Puca: a esfera e as partículas do fundo.
    Barra de call (embaixo) e chat (à direita) são componentes. */
 :root {
   --ink: var(--color-text);
@@ -23,7 +23,7 @@ body {
   color: var(--paper);
 }
 
-/* ---- Partículas do Puca no fundo ---- */
+/* ---- Partículas de Puca no fundo ---- */
 .particles {
   position: fixed;
   inset: 0;
@@ -69,7 +69,7 @@ body {
 }
 
 .brand__mark {
-  /* logo: as bolinhas do Puca (src/assets/orbis-logo.png) */
+  /* logo: as bolinhas de Puca (src/assets/orbis-logo.png) */
   display: block;
   flex: none;
   width: 26px;
@@ -106,7 +106,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* ---- Palco: o Puca no centro, a conversa embaixo dele ---- */
+/* ---- Palco: Puca no centro, a conversa embaixo dele ---- */
 .stage {
   display: flex;
   flex-direction: column;
@@ -134,7 +134,7 @@ body {
   aspect-ratio: 1;
 }
 
-/* sem o visual do Puca: um círculo neutro */
+/* sem o visual de Puca: um círculo neutro */
 .agent__core {
   position: relative;
   z-index: 1;
@@ -194,7 +194,7 @@ body {
   }
 }
 
-/* com a esfera do Puca */
+/* com a esfera de Puca */
 .agent__orb.has-visual > .agent__core,
 .agent__orb.has-visual > .agent__ring {
   display: none;
@@ -242,7 +242,7 @@ body {
   text-align: center;
 }
 
-/* fio curto separando o Puca da conversa */
+/* fio curto separando Puca da conversa */
 .caption::before {
   content: "";
   width: 48px;

@@ -62,7 +62,7 @@ body {
 }
 
 .brand__mark {
-  /* logo: as bolinhas do Puca (src/assets/orbis-logo.png) */
+  /* logo: as bolinhas de Puca (src/assets/orbis-logo.png) */
   display: block;
   flex: none;
   width: 26px;

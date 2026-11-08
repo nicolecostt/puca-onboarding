@@ -1,4 +1,4 @@
-// Camada do Puca injetada nas páginas do navegador dele (docs/stack.md §4.4): cursor, círculo à mão e marca-texto,
+// Camada de Puca injetada nas páginas do navegador dele (docs/stack.md §4.4): cursor, círculo à mão e marca-texto,
 // em coordenadas do documento (rolam junto), sem pegar clique. O script é montado das funções abaixo, então o que roda
 // na página é o que os testes cobrem.
 
