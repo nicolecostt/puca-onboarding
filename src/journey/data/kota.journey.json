@@ -922,7 +922,7 @@
         {
           "id": "st-gestor",
           "goal": "Apresentar a gestão",
-          "line": "{gestor} lidera o time. É com ela que você combina objetivos, acessos e a sua primeira tarefa.",
+          "line": "{gestor} lidera o time. É com essa pessoa que você combina objetivos, acessos e a sua primeira tarefa.",
           "actions": [
             {
               "type": "reveal",
@@ -1476,7 +1476,7 @@
         {
           "id": "qc-livro-razao",
           "goal": "Mostrar os responsáveis do time",
-          "line": "O ledgerwriter, os dois leitores e o ledger-db são do Livro-razão. O CODEOWNERS liga essas pastas ao Thiago Nakamura e à {gestor}.",
+          "line": "O ledgerwriter, os dois leitores e o ledger-db são do Livro-razão. O CODEOWNERS liga essas pastas ao tech lead, o Thiago Nakamura, e à gestão do time, {gestor}.",
           "actions": [
             {
               "type": "clear_highlight"
