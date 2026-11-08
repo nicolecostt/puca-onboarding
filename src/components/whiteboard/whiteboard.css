@@ -9,6 +9,15 @@
   background-image: radial-gradient(var(--color-board-dot) 1px, transparent 1.2px);
   background-size: 22px 22px;
 }
+/* A tela infinita corta o desenho na área do quadro; o cartão e o zoom ficam fora do corte. clip, e não hidden: com
+   hidden o navegador ainda rola a área sozinho (foco num nó, arraste selecionando texto) e o desenho sai de onde a
+   câmera o põe. */
+.wb__vista {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  overflow: clip;
+}
 .wb__stage {
   position: absolute;
   left: 50%;
@@ -508,4 +517,62 @@
 }
 .wb-label--mono {
   color: var(--color-muted);
+}
+
+/* ---- Tela infinita: zoom e movimento (como no Excalidraw) ---- */
+.wb-zoom {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-sans);
+}
+.wb-zoom__btn {
+  all: unset;
+  box-sizing: border-box;
+  min-width: 30px;
+  height: 28px;
+  padding: 0 8px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.wb-zoom__pct {
+  min-width: 52px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+.wb-zoom__ajustar {
+  font-size: 12px;
+}
+.wb-zoom__btn:hover {
+  background: var(--color-surface-muted);
+}
+.wb-zoom__btn:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 1px;
+}
+.wb-espaco,
+.wb-espaco .wb-node {
+  cursor: grab;
+}
+.wb-movendo,
+.wb-movendo * {
+  cursor: grabbing !important;
+}
+.wb-sem-selecao,
+.wb-sem-selecao * {
+  -webkit-user-select: none;
+  user-select: none;
 }
