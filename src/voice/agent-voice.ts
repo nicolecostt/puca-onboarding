@@ -26,6 +26,8 @@ export interface AskHandlers {
   /** O agente não achou fonte confiável: a tela encaminha a dúvida à buddy (resumo do agente). */
   /** Sem fonte confiável; destino = quem recebe (sem destino, a buddy). */
   onEscalate?(summary: string, destino?: DestinoDoEncaminhamento): void;
+  /** Trechos do kit da Kota que a resposta citou (título e URL pública; URL vazia quando a página não tem). */
+  onFontes?(fontes: { titulo: string; url: string }[]): void;
   /** Tempo e tokens do pedido (último evento; não chega se a pessoa interrompeu). Custo da sessão, #52. */
   onTiming?(timing: AskTimingSummary): void;
 }
@@ -288,6 +290,7 @@ export async function createAgentVoice(): Promise<AgentVoice> {
             } else if (ev.type === "action") actions.push(ev.action);
             else if (ev.type === "go_to") h.onGoTo(ev.target);
             else if (ev.type === "escalate") h.onEscalate?.(ev.summary, ev.destino);
+            else if (ev.type === "fontes") h.onFontes?.(ev.fontes);
             else if (ev.type === "timing") h.onTiming?.(ev.timing);
           }
         }

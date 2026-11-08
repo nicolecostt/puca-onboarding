@@ -30,6 +30,8 @@ import { mountAgentCam } from "../../components/agent-cam/agent-cam";
 import { mountJourneyPanel } from "../../components/journey-panel/journey-panel";
 import { loadAgentVisual, type AgentVisualState } from "../../lib/agent-visual";
 import { mountPucaDots } from "../../lib/puca-dots";
+import { screenHref } from "../../lib/navigation";
+import { completeSession, sessionCompleted } from "../../journey/session-progress";
 import { emit } from "../../lib/events";
 import { esc, qs } from "../../lib/dom";
 import { profiles, type Profile as DemoProfile } from "../../data";
@@ -88,7 +90,13 @@ async function main(): Promise<void> {
   const profile = resolved.profile;
 
   // ---- Montagem da tela ----
-  mountAppHeader({ current: "lesson", profile: headerPerson(profile, resolved.source === "entrevista") });
+  const header = mountAppHeader({ current: "lesson", profile: headerPerson(profile, resolved.source === "entrevista") });
+  const brand = qs<HTMLAnchorElement>(header, ".app-header__brand");
+  const homeHref = brand.href;
+  if (!sessionCompleted(profile)) {
+    brand.removeAttribute("href");
+    brand.setAttribute("aria-label", "Orbis");
+  }
   const el = {
     boardHost: qs(document, "#board-host"),
     logoView: qs(document, "#logo-view"),
@@ -143,6 +151,12 @@ async function main(): Promise<void> {
     if (history.length > 6) history.shift();
   };
 
+  const homeLink = Object.assign(document.createElement("a"), {
+    className: "orbis-link",
+    href: screenHref("../inicio/"),
+    textContent: "Ir para o Início",
+  });
+
   let paused = false;
   let ended = false;
   let micOk = false; // o microfone está ouvindo (sem ele, a conversa segue pelo chat)
@@ -184,6 +198,7 @@ async function main(): Promise<void> {
           : agentState === "choosing"
             ? "Toque num item do quadro (ou escreva o nome no chat)."
             : "";
+    if (!off && agentState === "done" && sessionCompleted(profile)) el.hint.append(homeLink);
   }
 
   setInterval(() => {
@@ -301,7 +316,7 @@ async function main(): Promise<void> {
     clearTimeout(toastTimer);
     toastTimer = window.setTimeout(() => (el.forwardToast.hidden = true), 8000);
   }
-  const SLACK = { href: "../live-session/", target: "puca-slack", label: "Abrir Slack" };
+  const SLACK = { href: screenHref("../live-session/"), target: "puca-slack", label: "Abrir Slack" };
 
   /** Encaminha a dúvida à buddy (§4.5): guarda para o Slack, marca no rastro e avisa na sessão. */
   function forward(entryId: string, f: { question: string; summary: string; reason: string; consulted?: string[]; destino?: DestinoDoEncaminhamento }): void {
@@ -342,7 +357,7 @@ async function main(): Promise<void> {
     if (p?.status !== "aprovada") return;
     aprovacaoAvisada.add(p.id);
     showToast(`${p.aprovada_por ?? p.gestor} aprovou a sua primeira tarefa`, {
-      href: `../primeira-tarefa/?id=${encodeURIComponent(p.id)}`,
+      href: screenHref(`../primeira-tarefa/?id=${encodeURIComponent(p.id)}`),
       target: "puca-tarefa",
       label: "Ver tarefa",
     });
@@ -366,7 +381,12 @@ async function main(): Promise<void> {
       puloPendente = m;
       return line;
     }
-    if (!running || !runner.jumpTo(m.id)) return null;
+    if (!running) {
+      puloPendente = m;
+      void start();
+      return line;
+    }
+    if (!runner.jumpTo(m.id)) return null;
     voice.stop();
     interrupt();
     void speakAside(line);
@@ -460,6 +480,8 @@ async function main(): Promise<void> {
     // ask: o agente responde; a ponte sai na hora e o LLM vem atrás.
     remember("user", text);
     const said: string[] = [];
+    // títulos das fontes que a resposta citou: vão junto no encaminhamento (o evento fontes chega antes do escalate)
+    let fontesCitadas: string[] = [];
     const t0 = performance.now();
     const asked =
       !!currentMoment &&
@@ -478,8 +500,14 @@ async function main(): Promise<void> {
               question: text,
               summary,
               destino,
+              consulted: fontesCitadas,
               reason: destino && destino !== "buddy" ? "É um caso pessoal: a regra geral está nas políticas da empresa, mas a resposta para você é de quem decide." : "Não encontrei fonte confiável para responder.",
             }),
+          // fontes do kit que a resposta citou: ficam no rastro para conferir
+          onFontes: (fontes) => {
+            fontesCitadas = fontes.map((f) => f.titulo);
+            trail.update(entry.id, { sources: fontes.map((f) => (f.url ? `${f.titulo} · ${f.url}` : f.titulo)) });
+          },
           // custo da sessão (#52): só no rastro, para auditar; nada em tela
           onTiming: (t) =>
             trail.update(entry.id, { llm_ms: t.total_ms, llm_error: t.llm_error ?? undefined, tokens_in: t.tokens_in ?? undefined, tokens_out: t.tokens_out ?? undefined, tokens_estimated: t.tokens_estimated }),
@@ -506,7 +534,7 @@ async function main(): Promise<void> {
   // Sessão sob demanda: clicar num momento do painel leva ao início dele.
   document.addEventListener("journeypanel:pick", (e) => {
     const m = journey.moments.find((x) => x.id === e.detail.id);
-    if (m && m.id !== currentMoment?.id && !paused && !ended) pularPara(m);
+    if (m && (!running || m.id !== currentMoment?.id) && !paused && !ended) pularPara(m);
   });
   document.addEventListener("callbar:mute", (e) => voice.setMuted(!!e.detail.on));
 
@@ -689,7 +717,9 @@ async function main(): Promise<void> {
       return new Promise<string>((resolve, reject) => {
         pending = { kind: "reply", resolve, reject, replies };
         showReplies(replies);
-        if (auto && replies.length) void clock.wait(2200).then(() => answer(replies[0], "auto"), () => {});
+        // Na demo automática, encerra em vez de voltar ao quadro pelo primeiro botão.
+        const autoReply = replies.find((reply) => reply === "Terminar por hoje") ?? replies[0];
+        if (auto && autoReply) void clock.wait(2200).then(() => answer(autoReply, "auto"), () => {});
       }).then(async (text) => {
         setAgent("thinking");
         await clock.wait(700);
@@ -763,7 +793,12 @@ async function main(): Promise<void> {
       const pulo = puloPendente;
       puloPendente = null;
       if (pulo) pularPara(pulo);
-      await run;
+      const result = await run;
+      if (result.ended === "done") {
+        completeSession(profile);
+        brand.href = homeHref;
+        brand.setAttribute("aria-label", "Orbis, início");
+      }
       running = false;
       trail.endSession();
       journeyPanel.setProgress(visitados, null);
@@ -771,7 +806,6 @@ async function main(): Promise<void> {
       el.moment.textContent = "sessão completa";
       showReplies(["Recomeçar a sessão"]);
       pending = { kind: "reply", resolve: () => void start(), reject: () => {} };
-      el.hint.textContent = "Fim da sessão.";
     } catch (err) {
       if (err instanceof Cancelled) return; // a sessão recomeçou
       throw err;

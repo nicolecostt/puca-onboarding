@@ -1,5 +1,6 @@
-// Perfil da pessoa: vem da call de entrevista (sessionStorage), da URL (?perfil=)
+// Perfil da pessoa: vem da call de entrevista, da URL (?perfil=)
 // ou de um dos dois perfis da demo (src/data/profiles.ts).
+import { onboardingStore } from "./storage";
 import { normalize } from "./conditions";
 import { company } from "../data/company";
 import { profiles } from "../data/profiles";
@@ -49,7 +50,7 @@ export function profileFromAnswers(answers: Partial<Record<string, string>>): Pr
 
 export function saveProfile(p: Profile): void {
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(p));
+    onboardingStore().setItem(STORAGE_KEY, JSON.stringify(p));
   } catch {
     // sem storage (aba privada, preview): a sessão cai no perfil de demo
   }
@@ -57,7 +58,7 @@ export function saveProfile(p: Profile): void {
 
 export function loadSavedProfile(): Profile | null {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = onboardingStore().getItem(STORAGE_KEY);
     if (!raw) return null;
     const p = JSON.parse(raw) as Partial<Profile>;
     if (typeof p.nome !== "string" || (p.vinculo !== "novo" && p.vinculo !== "transicao")) return null;

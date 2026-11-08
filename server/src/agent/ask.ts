@@ -6,6 +6,7 @@ import { randomUUID } from "node:crypto";
 import { detectIntent } from "../../../src/journey/conditions";
 import { looksLikeQuestion } from "../../../src/journey/forwarding";
 import type { BoardAction, Journey, Profile } from "../../../src/journey/types";
+import type { Brain } from "../brain/brain";
 import type { TtsService } from "../voice/tts/service";
 import { streamChat, type ChatMessage } from "../llm";
 import { FAILURE_LINE, pickBridge } from "./bridges";
@@ -32,6 +33,8 @@ export type AskEvent =
   | { type: "go_to"; target: string }
   /** Sem fonte confiável: a tela encaminha a dúvida (no máximo um por pedido, antes do timing). Sem destino, à buddy. */
   | { type: "escalate"; summary: string; destino?: DestinoDoEncaminhamento }
+  /** Trechos do kit citados na resposta ([fN]), sem repetir; antes do timing. */
+  | { type: "fontes"; fontes: { titulo: string; url: string }[] }
   | { type: "timing"; timing: AskTiming };
 
 export interface AskTiming {
@@ -65,11 +68,29 @@ export interface AskInput {
   timeoutMs: number;
   /** Abortado quando a pessoa interrompe (o cliente fecha a conexão). */
   signal?: AbortSignal;
+  /** Company brain: trechos do kit da Kota para a fala (server/src/brain). */
+  brain?: Brain;
 }
+
+// Marca de citação do LLM ("... pelo CI [f1]."): sai do texto falado, com o espaço antes.
+// Aceita [f1], [F1], [f1, f2], [f1][f2] (cada colchete é uma marca), e também [1], (f2), [fonte 3] e (fonte 3);
+// o número é o do trecho (f1 = 1). Guarda todos os ids citados. Número solto só vale entre colchetes: "(3)" fica.
+const REF = "(?:f(?:onte)?\\s*)?\\d+";
+const CITACAO = new RegExp(
+  `\\s*(?:\\[\\s*${REF}(?:\\s*,\\s*${REF})*\\s*\\]|\\(\\s*(?:f(?:onte)?\\s*)\\d+(?:\\s*,\\s*(?:f(?:onte)?\\s*)?\\d+)*\\s*\\))`,
+  "gi",
+);
 
 // O LLM às vezes admite que não confirmou sem chamar escalate_to_buddy: vale como encaminhamento.
 // ... ou diz que encaminha ("Escalo para People", "Vou te encaminhar"): a Puca não pode prometer e não encaminhar.
 const NO_SOURCE = /não (consegui|consigo) confirmar|não (achei|tenho) (isso )?confirmad|\b(vou (te |lhe )?(encaminhar|escalar)|encaminho|escalo)\b/i;
+
+// Caso pessoal da pessoa ("qual vai ser o meu bônus?"): a regra geral vem do kit, mas o caso dela vai para a buddy.
+// Se o LLM não encaminhou, o código encaminha (nunca em falha técnica).
+const CASO_PESSOAL = /\b(meu|minha|meus|minhas)\s+(?:\S+\s+)?(bonus|salario|ferias|promocao|avaliacao|desempenho|aumento|plr)\b/;
+export function isCasoPessoal(text: string): boolean {
+  return CASO_PESSOAL.test(text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase());
+}
 
 export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promise<AskTiming> {
   const t0 = performance.now();
@@ -84,7 +105,9 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
 
   say(pickBridge(detectIntent(input.text)), "bridge");
 
-  const ctx = { journey: input.journey, profile: input.profile, momentId: input.momentId, stepId: input.stepId, history: input.history };
+  const trechos = input.brain?.buscar(input.text, 5) ?? [];
+  const ctx = { journey: input.journey, profile: input.profile, momentId: input.momentId, stepId: input.stepId, history: input.history, trechos };
+  const citados = new Set<number>();
   const ids = new Set(visibleNodes(ctx).map((n) => n.id));
   const ac = new AbortController();
   const timer = setTimeout(() => ac.abort(), input.timeoutMs);
@@ -102,7 +125,10 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
     escalationDestino = destino;
   };
   let falado = "";
-  const sentence = (s: string) => {
+  const sentence = (raw: string) => {
+    const s = raw.replace(CITACAO, (m) => { for (const n of m.match(/\d+/g) ?? []) citados.add(Number(n)); return ""; }).trim();
+    // frase vazia, ou que sobrou só com pontuação ("CI. [f1]." deixa "."), não é falada
+    if (!/[\p{L}\p{N}]/u.test(s)) return;
     timing.llm_first_sentence_ms ??= ms();
     spoke = true;
     say(s, "llm");
@@ -167,14 +193,20 @@ export async function ask(input: AskInput, emit: (ev: AskEvent) => void): Promis
   if (input.signal?.aborted && !timing.llm_error) timing.llm_error = "interrupted";
   const empty = !spoke && !wentTo && !escalationSummary && !input.signal?.aborted && !timing.llm_error;
   if (empty) timing.llm_error = "empty_response";
+  // as fontes saem antes do encaminhamento: a tela leva o que foi consultado junto com a dúvida
+  const fontes = [...citados].sort((a, b) => a - b).map((n) => trechos[n - 1]).filter(Boolean)
+    .map((t) => ({ titulo: t.titulo, url: t.url }))
+    .filter((f, i, all) => all.findIndex((g) => g.titulo === f.titulo && g.url === f.url) === i);
+  if (fontes.length) emit({ type: "fontes", fontes });
   if (timing.llm_error && timing.llm_error !== "interrupted") {
     say(FAILURE_LINE, "fallback");
   } else if (!input.signal?.aborted && looksLikeQuestion(input.text)) {
-    // sem destino na tool, vale o que a Puca acabou de dizer ("fale com People", "com sua gestora"): fala e mensagem batem
-    const destino = escalationDestino ?? destinoPelaFala(falado);
+    // sem destino na tool, vale o que a Puca acabou de dizer ("fale com People", "com sua gestora"): fala e mensagem
+    // batem; caso pessoal sem destino nenhum vai a People (PRODUCT.md §13.2)
+    const destino = escalationDestino ?? destinoPelaFala(falado) ?? (isCasoPessoal(input.text) ? "rh" : undefined);
     const comDestino = destino ? { destino } : {};
     if (escalationSummary) emit({ type: "escalate", summary: escalationSummary, ...comDestino });
-    else if (saidNoSource) emit({ type: "escalate", summary: input.text, ...comDestino });
+    else if (saidNoSource || isCasoPessoal(input.text)) emit({ type: "escalate", summary: input.text, ...comDestino });
   }
   timing.total_ms = ms();
   emit({ type: "timing", timing });

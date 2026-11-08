@@ -8,6 +8,8 @@ RUN npm ci --omit=dev && npm install -g tsx@4.23.15 && npm cache clean --force
 
 COPY tsconfig.json ./
 COPY src ./src
+# src/data importa o mapa da Kota (kit/kota/mapa.ts)
+COPY kit ./kit
 COPY server ./server
 
 EXPOSE 8787

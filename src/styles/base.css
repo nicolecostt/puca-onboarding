@@ -29,3 +29,11 @@ button {
   outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }
+
+.orbis-link:not([hidden]) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-text);
+  text-underline-offset: 3px;
+}

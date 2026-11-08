@@ -7,16 +7,17 @@ que a integração quebra. Mudou algum deles? Siga a skill `contrato` (ou os pas
 |---|---|---|---|
 | Jornada da sessão (JSON) | `src/journey/types.ts` + [`journey-format.md`](journey-format.md) | `runner.ts`, `whiteboard/from-journey.ts`, `screens/lesson`, quem escreve jornadas | `validate.ts` + `__tests__/validate.test.ts` |
 | Eventos entre componentes | `src/lib/events.ts` (`DocumentEventMap`) | telas e componentes que escutam `callbar:*`, `chatpanel:*`, `onboarding:*`, `journey:*`, `journeypanel:*`, `agentcam:*` | `tsc` |
-| Perfil da pessoa | `src/journey/profile.ts` e `src/data/types.ts` | call inicial (grava `sessionStorage` `puca:profile`) → sessão → `POST /api/ask` | `__tests__/validate.test.ts` |
-| Calibragem | `src/journey/types.ts` (`Calibragem`) + `src/journey/calibragem.ts` (temas, regras, `sessionStorage` `puca:calibragem`) — [seção abaixo](#calibragem) | call inicial escreve (#16) e a checagem da sessão atualiza (#24) → jornada (#17) e adaptação das explicações (#23) leem | `__tests__/calibragem.test.ts` |
+| Perfil da pessoa | `src/journey/profile.ts` e `src/data/types.ts` | call inicial (grava `puca:profile`) → sessão → `POST /api/ask` | `__tests__/validate.test.ts` |
+| Calibragem | `src/journey/types.ts` (`Calibragem`) + `src/journey/calibragem.ts` (temas, regras, `puca:calibragem`) — [seção abaixo](#calibragem) | call inicial escreve (#16) e a checagem da sessão atualiza (#24) → jornada (#17) e adaptação das explicações (#23) leem | `__tests__/calibragem.test.ts` |
 | Voz ↔ quadro | `BoardAction.at` em `src/journey/types.ts` + `RunnerIO.say(text, cues)` + `GET /api/tts/:id/words` — [seção abaixo](#voz--quadro) | `runner.ts`, `screens/lesson` (`io.say`), `src/voice/agent-voice.ts`, quem escreve jornadas | `validate.test.ts`, `runner.test.ts`, `server/src/voice/tts/service.test.ts` |
 | Jornada da pessoa | `src/journey/types.ts` (`JornadaDaPessoa`) + `src/journey/jornada-da-pessoa.ts` (`montarJornadaDaPessoa`, `proximosPassos`) — [seção abaixo](#jornada-da-pessoa) | sessão, painel "Sua jornada" (#17) → progresso (#18), painel do buddy (#19), checagem (#24) | `__tests__/jornada-da-pessoa.test.ts` |
 | Rota da fala | `src/journey/route.ts` (`Route`: jump → reply → tarefa → select → knowledge → faq → ask; numa checagem, `waiting.check`: o que não é pergunta nem pulo é `reply`; `tarefa`: pergunta que cita a primeira tarefa, respondida pelos campos dela em `src/journey/duvidas-da-tarefa.ts`, com `RouteContext.tarefa`/`tarefaApresentada` opcionais) | `screens/lesson`, voz e chat | `__tests__/route.test.ts` |
-| API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask`, `/api/voice/token`, `/api/encaminhamentos`; token do Supabase, limites e CORS — [seção abaixo](#api-do-servidor) | `src/voice/agent-voice.ts`, `src/voice/pcm-player.ts`, `screens/lesson`, `server/bench/turn-latency.ts` | `server/src/app.test.ts`, `server/src/**/*.test.ts` |
+| API do servidor | `server/src/app.ts`: `/api/health`, `/api/speak`, `/api/tts/:id`, `/api/tts/:id/words`, `/api/ask` (eventos SSE `speak`, `action`, `go_to`, `escalate`, `fontes` e `timing`), `/api/voice/token`, `/api/encaminhamentos`; token do Supabase, limites e CORS — [seção abaixo](#api-do-servidor) | `src/voice/agent-voice.ts`, `src/voice/pcm-player.ts`, `screens/lesson`, `server/bench/turn-latency.ts` | `server/src/app.test.ts`, `server/src/**/*.test.ts` |
 | Tipos de voz | `src/voice/types.ts` (compartilhados browser ↔ servidor) | `src/voice/*`, `server/src/voice/*` | `tsc` |
 | Dados da demo e quadro | `src/data/types.ts` (pessoas, empresa, etapas, `WhiteboardSpec`) | `src/data/*.ts`, `app-header`, `whiteboard`, telas | `tsc` |
 | Rastro (decisões de Puca) | `src/journey/trail.ts` (`TrailEntry`, chave `puca:rastro` no `localStorage`) | `screens/lesson` (grava), `screens/rastro` (tela de demo e JSON baixado), custo #52 (ver "Custo da sessão"), painel #19: `screens/rh` lê `puca:sessoes` e, do rastro, só `moment` e `route` para contar dúvidas por momento, nunca `utterance` nem `answer` (§5) | `__tests__/trail.test.ts` |
-| Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` (`{ summary, destino? }`: sem destino, a buddy; no caso pessoal o agente escolhe `"gestor"` ou `"rh"` na tool `escalate_to_buddy`, e `Forwarding.to.role` segue o destino, #125) | `screens/lesson` (cria e pede o envio no Slack da Kota pelo servidor, `src/journey/slack-real.ts`), `screens/live-session` (envia no Slack simulado o que ficou pendente), rastro (`forwarding_id`, `forwarding_link`), `screens/rh` (conta os abertos pelo `status`); envio real: [seção abaixo](#encaminhamento-no-slack-da-kota) | `__tests__/forwarding.test.ts`, `__tests__/slack-real.test.ts`, `server/src/slack/encaminhar.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
+| Company brain | `server/src/brain/brain.ts` (`Trecho`, `Brain`). O brain mínimo lê as páginas do Notion e o mapa do kit da Kota, busca em memória, e a resposta do `/api/ask` cita `[fN]`, que vira o evento `fontes` (título e URL) | `server/src/agent/ask.ts`, rastro (`sources` da entrada `ask`, em `screens/lesson`) | `server/src/brain/brain.test.ts`, `server/src/agent/ask.fontes.test.ts` |
+| Encaminhamento | `src/journey/forwarding.ts` (`Forwarding`, chave `puca:encaminhamentos` no `localStorage`) e `AskEvent` `escalate` em `server/src/agent/ask.ts` (`{ summary, destino? }`: sem destino, a buddy; no caso pessoal o agente escolhe `"gestor"` ou `"rh"` na tool `escalate_to_buddy`, ou vale a fala dele, e `Forwarding.to.role` segue o destino, #125) | `screens/lesson` (cria e pede o envio no Slack da Kota pelo servidor, `src/journey/slack-real.ts`), `screens/live-session` (envia no Slack simulado o que ficou pendente), rastro (`forwarding_id`, `forwarding_link`), `screens/rh` (conta os abertos pelo `status`); envio real: [seção abaixo](#encaminhamento-no-slack-da-kota) | `__tests__/forwarding.test.ts`, `__tests__/slack-real.test.ts`, `server/src/slack/encaminhar.test.ts`, `__tests__/review-fixes.test.ts`, `server/src/agent/ask.test.ts`, `server/src/agent/ask.escalate.test.ts` |
 | Primeira tarefa | `src/journey/primeira-tarefa.ts` (`TarefaDoTime`, `PedidoDeAprovacao`, chave `puca:primeiras-tarefas` no `localStorage`) e os nós `kind: "task"` da jornada — [seção abaixo](#primeira-tarefa) | `screens/lesson` (cria o pedido quando o cartão da tarefa abre), `screens/live-session` (pede a aprovação ao gestor no Slack e grava a aprovação), `screens/primeira-tarefa` (página da tarefa), `screens/rh` (conta pessoas com pedido não aprovado, por `status` e `pessoa`) | `__tests__/primeira-tarefa.test.ts`, `screens/primeira-tarefa/pagina.test.ts` |
 | App para Mac (`window.orbis`) | `desktop/preload.ts` + `src/orbis.d.ts` — [seção abaixo](#app-para-mac) | telas que testam `if (window.orbis)`; a #123 acrescenta `navegador` | `tsc` |
 | Visual de Puca | `src/lib/agent-visual.ts` (`AgentVisual`) | `agent-cam`, `onboarding-call`, `landing`, `src/lib/puca-sphere.ts` | `tsc` |
@@ -60,7 +61,7 @@ escreve o formato aqui (tipo + um exemplo válido) **antes** de implementar; o o
 | Contrato | Liga | Ponto de partida hoje |
 |---|---|---|
 | Company brain | pergunta → trechos com **fonte** (ADR, código, doc cultural) | `knowledge` dos passos e `info.docs`/`info.adr` dos nós |
-| Progresso e memória | o que a pessoa estudou, dúvidas e onde parou, entre sessões | perfil em `sessionStorage` (`puca:profile`) |
+| Progresso e memória | o que a pessoa estudou, dúvidas e onde parou, entre sessões | perfil, calibragem e conclusão da sessão no dispositivo no app para Mac |
 | Painel buddy/gestor/RH | marcos, pendências e pedidos de suporte | etapas da jornada em `src/data/company.ts` |
 | Computer use | o agente mexendo nas ferramentas | cursor em `components/agent-cursor`; primeiro uso real: o envio do encaminhamento no Slack (`screens/live-session/slack-dm.ts`) |
 
@@ -104,6 +105,24 @@ Content-Type: application/json
 
 {"text":"Quem cuida do balancereader?","moment_id":"pagamentos","step_id":"pg-pergunta","perfil":"novo"}
 ```
+
+## Company brain
+
+O brain mínimo (`server/src/brain/brain.ts`) sobe com o servidor: lê as páginas do Notion e o mapa do kit da Kota,
+parte em trechos (`Trecho` = `{ id, titulo, url, texto }`) e busca em memória. A fala que cai no `/api/ask` ganha os
+melhores trechos no prompt como `[f1]`, `[f2]`…; o modelo cita `[fN]` na resposta, o servidor tira a marca da fala e
+manda o evento SSE `fontes` no fim do turno, depois dos `speak` e antes do `escalate` e do `timing` (o encaminhamento leva as fontes consultadas). A marca também pode vir como `[1]`, `(f2)` ou `[fonte 3]`: sai da fala do mesmo jeito. Trecho abaixo do corte de relevância não entra no prompt; sem trecho
+relevante, a Puca diz que não confirmou e encaminha. Aditivo: cliente antigo ignora o evento.
+
+```
+data: {"type":"fontes","fontes":[{"titulo":"Deploy · Do merge à produção","url":"https://…notion.site/deploy"}]}
+```
+
+O app guarda cada fonte no rastro como `"<título> · <url>"` (`sources` da entrada `ask`). Sem `fontes`, `sources` fica
+como estava.
+
+Caso pessoal da pessoa ("qual vai ser o meu bônus?", férias, salário, avaliação, promoção): a Puca explica a regra
+geral com a fonte e o servidor emite `escalate` (resumo = a fala) se o modelo não chamou `escalate_to_buddy`.
 
 ## Encaminhamento no Slack da Kota
 
@@ -170,6 +189,8 @@ Exemplo de uso numa tela:
 ```ts
 if (window.orbis) console.log(`Orbis ${window.orbis.versao}`); // no app
 ```
+
+No app para Mac, perfil, calibragem e conclusão da sessão usam `localStorage` do Orbis. O navegador usa `sessionStorage`. Perfil e calibragem mantêm as mesmas chaves e formatos.
 
 ## Calibragem
 
