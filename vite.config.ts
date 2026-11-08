@@ -18,6 +18,8 @@ export default defineConfig({
         rastro: page("./src/screens/rastro/index.html"),
         primeiraTarefa: page("./src/screens/primeira-tarefa/index.html"),
         landing: page("./src/screens/landing/index.html"),
+        boasVindas: page("./src/screens/boas-vindas/index.html"),
+        inicio: page("./src/screens/inicio/index.html"),
       },
     },
   },

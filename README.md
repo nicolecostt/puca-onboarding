@@ -37,7 +37,9 @@ src/
     lessons/             sessões do quadro (nós, setas, falas por trecho, perguntas)
   screens/               uma pasta por tela: index.html + main.ts + style.css
     landing/             apresentação do Orbis e da Puca (só preto, branco e a cor da Puca)
-    onboarding-call/     call inicial: o agente entrevista a pessoa e grava a calibragem
+    onboarding-call/     call inicial: o agente entrevista a pessoa e grava a calibragem; no fim, abre as boas-vindas
+    boas-vindas/         "Oi, {nome}": acessar a plataforma ou refazer a call inicial
+    inicio/              início da plataforma (em construção)
     lesson/              sessão no quadro: o quadro se monta junto com a fala
     live-session/        tela de auxílio: barra de call, chat e câmera por cima de uma tela
     primeira-tarefa/     página da primeira tarefa (estilo Notion): o que é, quem ajuda e a aprovação do gestor
