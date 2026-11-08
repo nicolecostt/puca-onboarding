@@ -31,22 +31,34 @@ const pct = (n: number) => `${Math.round(n * 100)}%`;
 const VINCULO: Record<Vinculo, string> = { novo: "Novo", transicao: "Transição" };
 
 // ---- O que este navegador já registrou (só contagens) ----
+/** Lista guardada no navegador, só com os itens que são objetos (um `null` ou um número na lista é ignorado). */
 function readList(key: string): Record<string, unknown>[] {
   try {
     const v: unknown = JSON.parse(localStorage.getItem(key) ?? "[]");
-    return Array.isArray(v) ? (v as Record<string, unknown>[]) : [];
+    if (!Array.isArray(v)) return [];
+    return v.filter((x): x is Record<string, unknown> => !!x && typeof x === "object" && !Array.isArray(x));
   } catch {
     return [];
   }
 }
+/** Falas que são dúvidas (não respostas de checagem, pulos nem toques no quadro). */
+const ROTAS_DE_DUVIDA = new Set(["faq", "knowledge", "ask", "tarefa"]);
+const ENCAMINHAMENTO_ABERTO = new Set(["pendente", "enviando", "enviado"]);
 const live = {
-  sessoes: readList(SESSIONS_KEY).length,
+  sessoes: readList(SESSIONS_KEY).filter((x) => typeof x.session === "string").length,
   duvidasPorMomento: readList(TRAIL_KEY).reduce<Record<string, number>>((acc, e) => {
-    if (typeof e.moment === "string") acc[e.moment] = (acc[e.moment] ?? 0) + 1;
+    if (typeof e.moment === "string" && typeof e.route === "string" && ROTAS_DE_DUVIDA.has(e.route)) {
+      acc[e.moment] = (acc[e.moment] ?? 0) + 1;
+    }
     return acc;
   }, {}),
-  encaminhamentosAbertos: readList(FORWARDING_KEY).filter((f) => f.status !== "confirmado").length,
-  pedidosAguardando: readList(PEDIDOS_KEY).filter((p) => p.status !== "aprovada").length,
+  encaminhamentosAbertos: readList(FORWARDING_KEY).filter((f) => typeof f.status === "string" && ENCAMINHAMENTO_ABERTO.has(f.status)).length,
+  // cada sessão nova pede de novo: conta pessoas com pedido aguardando, não pedidos (o nome só serve para contar)
+  pedidosAguardando: new Set(
+    readList(PEDIDOS_KEY)
+      .filter((p) => typeof p.status === "string" && p.status !== "aprovada" && typeof p.pessoa === "string")
+      .map((p) => p.pessoa),
+  ).size,
 };
 const temLive = live.sessoes + live.encaminhamentosAbertos + live.pedidosAguardando + Object.keys(live.duvidasPorMomento).length > 0;
 
@@ -62,6 +74,8 @@ mountPucaDots(qs(document, "#privacy-orb"));
 
 // ---- Indicadores ----
 type Filtro = Vinculo | "todos";
+/** Menor grupo para mostrar uma média: abaixo disso, ela identifica a pessoa. */
+const MIN_GRUPO = 3;
 
 function obrigatoriasDe(p: Integracao) {
   return OBRIGATORIAS.filter((o) => o.so === null || o.so === p.vinculo);
@@ -75,8 +89,9 @@ function render(filtro: Filtro): void {
   const devidas = lista.reduce((n, p) => n + obrigatoriasDe(p).length, 0);
   const feitas = lista.reduce((n, p) => n + obrigatoriasDe(p).filter((o) => p.feitas.includes(o.id)).length, 0);
   // tempo até a primeira tarefa (só de quem já chegou lá)
+  // com menos de MIN_GRUPO pessoas, a "média" seria o número de alguém da tabela: não mostra (§5, só agregado)
   const chegaram = lista.filter((p) => p.diasAtePrimeiraTarefa !== undefined);
-  const media = chegaram.length ? chegaram.reduce((n, p) => n + (p.diasAtePrimeiraTarefa ?? 0), 0) / chegaram.length : null;
+  const media = chegaram.length >= MIN_GRUPO ? chegaram.reduce((n, p) => n + (p.diasAtePrimeiraTarefa ?? 0), 0) / chegaram.length : null;
   const novos = lista.filter((p) => p.vinculo === "novo").length;
 
   const kpis: { label: string; value: string; unit?: string; note: string }[] = [
@@ -86,7 +101,9 @@ function render(filtro: Filtro): void {
       label: "Até a primeira tarefa",
       value: media === null ? "—" : media.toFixed(0),
       unit: media === null ? undefined : "dias",
-      note: chegaram.length ? `média de ${chegaram.length} ${chegaram.length === 1 ? "pessoa que já chegou" : "pessoas que já chegaram"} lá` : "ninguém chegou lá ainda",
+      note: media !== null
+        ? `média de ${chegaram.length} pessoas que já chegaram lá`
+        : `aparece com ${MIN_GRUPO} pessoas ou mais (${chegaram.length} até agora)`,
     },
     {
       label: "Turnover de 90 dias",
@@ -190,13 +207,12 @@ function render(filtro: Filtro): void {
   // ---- Dúvidas por momento ----
   const titulo = new Map(journey.moments.map((m) => [m.id, m.title]));
   const contagem = new Map<string, number>();
-  for (const [id, n] of Object.entries(DUVIDAS_POR_MOMENTO)) contagem.set(id, n);
+  const vinculos: Vinculo[] = filtro === "todos" ? ["novo", "transicao"] : [filtro];
+  for (const g of vinculos) for (const [id, n] of Object.entries(DUVIDAS_POR_MOMENTO[g])) contagem.set(id, (contagem.get(id) ?? 0) + n);
   if (comLive) for (const [id, n] of Object.entries(live.duvidasPorMomento)) contagem.set(id, (contagem.get(id) ?? 0) + n);
-  // no filtro, a contagem é proporcional ao grupo (os dados de exemplo não guardam o vínculo de cada dúvida)
-  const fator = comLive ? 1 : lista.length / INTEGRACOES.length;
   const topicos = [...contagem.entries()]
     .filter(([id]) => titulo.has(id))
-    .map(([id, n]) => ({ label: titulo.get(id) ?? id, n: Math.round(n * fator) }))
+    .map(([id, n]) => ({ label: titulo.get(id) ?? id, n }))
     .sort((a, b) => b.n - a.n)
     .slice(0, 5);
   const max = Math.max(1, ...topicos.map((t) => t.n));

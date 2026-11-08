@@ -341,7 +341,7 @@ h2 {
   height: 30px;
   font-size: 11px;
   /* cor da pessoa no espectro da Puca (--hue vem do main.ts), com as iniciais em tinta */
-  background: hsl(var(--hue, 0) 80% 72%);
+  background: hsl(var(--hue, 0) var(--person-saturation) var(--person-lightness));
   color: var(--ink);
 }
 .who__text {

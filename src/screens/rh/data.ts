@@ -2,6 +2,7 @@
 // Só esta tela usa. Tudo aqui descreve o PROCESSO de integração (etapas, pendências, tempo até os marcos),
 // nunca o desempenho da pessoa: não há nota, avaliação nem produtividade (§5, privacidade e confiança).
 import type { Vinculo } from "../../journey/types";
+import { profiles } from "../../data";
 
 /** Etapas da integração, na ordem (as mesmas do progresso no início). */
 export const ETAPAS = ["Acessos", "Sessão", "Primeira tarefa", "Pronto para contribuir"] as const;
@@ -45,12 +46,12 @@ export const RH_PESSOA = { nome: "Renata Alves", papel: "Pessoas e cultura" };
 
 export const INTEGRACOES: Integracao[] = [
   {
-    nome: "Ana Ribeiro", cargo: "Engenheira de software", time: "Terminais", vinculo: "novo", dia: 3, etapa: 1,
+    nome: profiles.ana.name, cargo: profiles.ana.role, time: "Terminais", vinculo: "novo", dia: 3, etapa: 1,
     feitas: ["contrato", "cultura", "acessos"], pendencias: [{ label: "Acesso ao Kafka UI", quem: "Gestor" }],
     sessoes: 1, encaminhamentosAbertos: 1, buddy: "Paula Nunes",
   },
   {
-    nome: "Bruno Tavares", cargo: "Engenheiro de software", time: "Terminais", vinculo: "transicao", dia: 2, etapa: 1,
+    nome: profiles.bruno.name, cargo: profiles.bruno.role, time: "Terminais", vinculo: "transicao", dia: 2, etapa: 1,
     feitas: ["contrato", "acessos"], pendencias: [{ label: "Acesso ao Grafana", quem: "TI" }],
     sessoes: 1, encaminhamentosAbertos: 0, buddy: "Paula Nunes",
   },
@@ -90,14 +91,11 @@ export const INTEGRACOES: Integracao[] = [
   },
 ];
 
-/** Dúvidas por momento da sessão nos últimos 90 dias (só a contagem; o texto das perguntas não vem para o RH). */
-export const DUVIDAS_POR_MOMENTO: Record<string, number> = {
-  "pagamentos": 34,
-  "falha": 27,
-  "quem-cuida": 19,
-  "seu-time": 12,
-  "primeira-tarefa": 9,
-  "empresa-e-cultura": 6,
+/** Dúvidas por momento da sessão nos últimos 90 dias, por vínculo (só a contagem; o texto das perguntas não vem para o RH).
+ *  Quem está em transição já conhece a empresa e pula a parte institucional. */
+export const DUVIDAS_POR_MOMENTO: Record<Vinculo, Record<string, number>> = {
+  novo: { "pagamentos": 22, "falha": 15, "quem-cuida": 12, "seu-time": 9, "primeira-tarefa": 6, "empresa-e-cultura": 6 },
+  transicao: { "pagamentos": 12, "falha": 12, "quem-cuida": 7, "seu-time": 3, "primeira-tarefa": 3 },
 };
 
 /** Integrações que começaram nos últimos 90 dias e quantas terminaram com a saída da pessoa (turnover de 90 dias). */
