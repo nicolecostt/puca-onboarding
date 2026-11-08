@@ -68,7 +68,6 @@ export function tasksFor(
       title: "Dar oi no #livro-razao",
       detail: "Se apresentar para o time no canal do Slack.",
       state: pedido ? "next" : "now",
-      action: { label: "Abrir Slack da Kota", href: "../live-session/" },
     },
   ];
 }
