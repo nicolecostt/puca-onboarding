@@ -14,11 +14,14 @@ import { buildFaqs } from "../../journey/faq";
 import { routeUtterance } from "../../journey/route";
 import { createAgentVoice } from "../../voice/agent-voice";
 import { interpolateDeep, resolveProfile } from "../../journey/profile";
+import { resolveCalibragem } from "../../journey/calibragem";
+import { montarJornadaDaPessoa } from "../../journey/jornada-da-pessoa";
 import type { Moment, Profile, Step, Vinculo } from "../../journey/types";
 import { mountAppHeader } from "../../components/app-header/app-header";
 import { mountChatPanel } from "../../components/chat-panel/chat-panel";
 import { mountCallBar } from "../../components/call-bar/call-bar";
 import { mountAgentCam } from "../../components/agent-cam/agent-cam";
+import { mountJourneyPanel } from "../../components/journey-panel/journey-panel";
 import { loadAgentVisual, type AgentVisualState } from "../../lib/agent-visual";
 import { emit } from "../../lib/events";
 import { esc, qs } from "../../lib/dom";
@@ -84,6 +87,11 @@ async function main(): Promise<void> {
   mountCallBar({ chat, draggable: false }); // fixa; sem status: a legenda já mostra o que está acontecendo
   // a Puca aparece na "câmera" do canto, como numa videochamada
   const cam = mountAgentCam({ name: journey.agent.name, visual: await loadAgentVisual() });
+  // Jornada da pessoa: a calibragem da call inicial marca cada momento (aprender, revisar, fora) e o painel mostra.
+  const jornadaDaPessoa = montarJornadaDaPessoa(journey, resolveCalibragem(location.search).calibragem);
+  const journeyPanel = mountJourneyPanel({ jornada: jornadaDaPessoa, final: "primeira-tarefa" });
+  let visitados: string[] = [];
+  let painelRecolhido = false; // recolhe sozinho uma vez, quando o quadro aparece; depois, só a pessoa abre e fecha
   // Voz de verdade (servidor em server/): sem ele, a aula segue só com legenda e chat.
   const voice = await createAgentVoice();
   const faqs = buildFaqs(journey, profile);
@@ -205,6 +213,15 @@ async function main(): Promise<void> {
     if (id && runner?.jumpTo(id)) interrupt();
   }
 
+  /** Pulo pedido pela pessoa (chat, voz ou clique no painel "Sua jornada"): vai ao início do momento. */
+  function pularPara(m: Moment): void {
+    if (running && runner?.jumpTo(m.id)) {
+      voice.stop();
+      interrupt();
+      void speakAside(`Claro, vamos para ${m.title.toLowerCase()}.`);
+    }
+  }
+
   // Fala da pessoa (chat ou voz). A ordem está em journey/route.ts: pulo → resposta sugerida → nome de
   // um item do quadro → conhecimento da aula → FAQ do nó → agente (ponte na hora + LLM no servidor).
   async function handleUtterance(text: string, from: "chat" | "voz"): Promise<void> {
@@ -218,12 +235,7 @@ async function main(): Promise<void> {
     const route = routeUtterance(text, { journey, moment: currentMoment, step: currentStep, waiting, board: currentBoard, faqs });
     switch (route.kind) {
       case "jump":
-        if (running && runner?.jumpTo(route.moment.id)) {
-          voice.stop();
-          interrupt();
-          void speakAside(`Claro, vamos para ${route.moment.title.toLowerCase()}.`);
-        }
-        return;
+        return pularPara(route.moment);
       case "reply":
         return answer(route.reply, "chat");
       case "select":
@@ -252,6 +264,11 @@ async function main(): Promise<void> {
   }
 
   document.addEventListener("chatpanel:send", (e) => void handleUtterance(e.detail.text, "chat"));
+  // Aula sob demanda: clicar num momento do painel leva ao início dele.
+  document.addEventListener("journeypanel:pick", (e) => {
+    const m = journey.moments.find((x) => x.id === e.detail.id);
+    if (m && m.id !== currentMoment?.id && !paused && !ended) pularPara(m);
+  });
   document.addEventListener("callbar:mute", (e) => voice.setMuted(!!e.detail.on));
 
   // ---- Barra de call ----
@@ -298,6 +315,10 @@ async function main(): Promise<void> {
     enterView(view, fresh) {
       if (view.mode === "logo") showLogo();
       else showBoard(view.board, fresh);
+      if (view.mode === "board" && !painelRecolhido) {
+        painelRecolhido = true;
+        journeyPanel.toggle(false); // aberto, o painel tampa a esquerda do quadro
+      }
     },
     apply(a) {
       if (!board) return;
@@ -349,6 +370,8 @@ async function main(): Promise<void> {
     },
     onMoment(m) {
       currentMoment = m;
+      if (!visitados.includes(m.id)) visitados.push(m.id);
+      journeyPanel.setProgress(visitados, m.id);
       el.moment.textContent = m.title;
       emit("journey:moment", { id: m.id, title: m.title });
     },
@@ -368,6 +391,8 @@ async function main(): Promise<void> {
     el.captionAgent.textContent = "";
     el.captionUser.textContent = "";
     currentBoard = null;
+    visitados = [];
+    journeyPanel.setProgress(visitados, null);
     try {
       setAgent("thinking");
       await clock.wait(600);
@@ -375,6 +400,7 @@ async function main(): Promise<void> {
       running = true;
       await runner.run();
       running = false;
+      journeyPanel.setProgress(visitados, null);
       setAgent("done");
       el.moment.textContent = "aula completa";
       showReplies(["Recomeçar a aula"]);
