@@ -21,6 +21,8 @@ export interface Clock {
   interrupt(): void;
   /** Segundos de call ativa desde o início. */
   readonly seconds: number;
+  /** Muda a cada interrupção ou cancelamento: quem guardou o valor sabe na hora se foi interrompido. */
+  readonly generation: number;
 }
 
 const TICK = 50;
@@ -67,6 +69,9 @@ export function createClock(): Clock {
     },
     get seconds() {
       return elapsed;
+    },
+    get generation() {
+      return generation;
     },
     setPaused(on) {
       paused = on;

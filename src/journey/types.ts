@@ -165,7 +165,7 @@ export interface BoardSpec {
 
 export type HighlightTone = "focus" | "warn" | "ok";
 
-export type BoardAction =
+export type BoardAction = (
   | { type: "reveal"; targets: string[] }
   | { type: "highlight"; targets: string[]; tone?: HighlightTone }
   | { type: "clear_highlight" }
@@ -173,7 +173,17 @@ export type BoardAction =
   | { type: "flow"; path: string[] }
   | { type: "card"; target: string }
   | { type: "close_card" }
-  | { type: "reset" };
+  | { type: "reset" }
+) & {
+  /** Trecho da fala do passo: a ação acontece quando a Puca chega nele. Sem `at`, acontece antes da fala. */
+  at?: string;
+};
+
+/** Ação marcada para um ponto da fala: `at` é a posição (em caracteres) no texto já com o perfil preenchido. */
+export interface SpeechCue {
+  at: number;
+  action: BoardAction;
+}
 
 // ---------- Jornada ----------
 

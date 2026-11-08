@@ -83,6 +83,14 @@ export function buildApp(opts: { journey?: Journey; tts?: TtsService | null } = 
     }
   });
 
+  /** Tempo de cada palavra de um áudio do /api/speak (contrato Voz ↔ quadro em docs/contratos.md). */
+  app.get<{ Params: { id: string } }>("/api/tts/:id/words", async (req, reply) => {
+    if (!tts) return reply.status(503).send({ error: "tts_unavailable" });
+    const words = tts.words(req.params.id);
+    if (!words) return reply.status(404).send({ error: "audio_not_found" });
+    return { words: await words };
+  });
+
   app.get<{ Params: { id: string } }>("/api/tts/:id", async (req, reply) => {
     if (!tts) return reply.status(503).send({ error: "tts_unavailable" });
     if (!tts.has(req.params.id)) return reply.status(404).send({ error: "audio_not_found" });

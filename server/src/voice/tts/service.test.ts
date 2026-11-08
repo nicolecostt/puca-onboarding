@@ -102,4 +102,16 @@ describe("TtsService", () => {
     expect((await reading).length).toBe(0);
     svc.cancelAll();
   });
+
+  it("words() gives the word timings once synthesis ends, [] on error and null for an unknown id", async () => {
+    const svc = service(new FakeProvider([chunk([1, 2], "Oi "), chunk([3, 4], "tu", 30)], 5));
+    void svc.start({ action_id: "w", text: "Oi tu" });
+    const words = await svc.words("w");
+    expect(words?.map((w) => [w.word, w.start_ms])).toEqual([["Oi", 0], ["tu", 30]]);
+    expect(svc.words("nao-existe")).toBeNull();
+
+    const failing = service(new FakeProvider([chunk([1], "x")], 0, new Error("boom")));
+    failing.start({ action_id: "f", text: "x" }).catch(() => undefined);
+    expect(await failing.words("f")).toEqual([]);
+  });
 });

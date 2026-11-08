@@ -120,6 +120,9 @@ export function validateJourney(input: unknown): ValidationResult {
           errors.push(`${where(s)}: ação "${a.type}" num momento sem quadro`);
           continue;
         }
+        if (a.at !== undefined && (!isStr(a.at) || !s.line.includes(a.at))) {
+          errors.push(`${where(s)}: ação "${a.type}" tem at "${String(a.at)}", que não é trecho da fala do passo`);
+        }
         const refs: string[] =
           a.type === "reveal" || a.type === "highlight" ? a.targets
           : a.type === "focus" ? (a.target ? [a.target] : [])
