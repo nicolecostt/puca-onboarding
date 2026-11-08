@@ -12,5 +12,12 @@ COPY src ./src
 COPY kit ./kit
 COPY server ./server
 
+# Company brain com os ADRs e o código do kota-bank (#228): o repo é público, entra num commit fixo
+ARG KOTA_BANK_COMMIT=5f38c79eeba30d9b7dfe2f58bb272d9040ea928e
+RUN mkdir -p /app/kota-bank \
+  && node -e "fetch('https://codeload.github.com/JucaGF/kota-bank/tar.gz/${KOTA_BANK_COMMIT}').then(r=>{if(!r.ok)throw new Error('kota-bank '+r.status);return r.arrayBuffer()}).then(b=>require('fs').writeFileSync('/tmp/kb.tgz',Buffer.from(b)))" \
+  && tar xzf /tmp/kb.tgz -C /app/kota-bank --strip-components=1 && rm /tmp/kb.tgz
+ENV KOTA_BANK_DIR=/app/kota-bank
+
 EXPOSE 8787
 CMD ["tsx", "server/src/server.ts"]
