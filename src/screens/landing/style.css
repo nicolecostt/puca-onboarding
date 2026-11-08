@@ -175,7 +175,7 @@ main,
 
 .btn:hover {
   transform: translateY(-2px);
-  background: #000;
+  background: var(--color-text);
 }
 
 .btn:active {
