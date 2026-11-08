@@ -5,11 +5,11 @@ import { createEncaminhador, mensagemDoEncaminhamento, type SlackDm } from "./en
 const pedido = (extra: Partial<PedidoDeEncaminhamento> = {}): PedidoDeEncaminhamento => ({
   id: "f1",
   destino: "buddy",
-  para: "Paula Nunes",
-  pergunta: "Quem cuida do tail-common?",
-  resumo: "Quem cuida do tail-common?",
-  fontes_consultadas: ["ADR-012", "README do pos-gateway"],
-  motivo: "Não há responsável confirmado para o tail-common nas fontes.",
+  para: "Beatriz Cavalcanti",
+  pergunta: "Quem cuida do ledgermonolith?",
+  resumo: "Quem cuida do ledgermonolith?",
+  fontes_consultadas: ["ADR 6", "README do ledgerwriter"],
+  motivo: "Não há responsável confirmado para o ledgermonolith nas fontes.",
   email: "jurado@exemplo.com",
   ...extra,
 });
@@ -107,10 +107,10 @@ describe("mensagemDoEncaminhamento", () => {
 
   it("diz a quem iria na Kota e leva a pergunta, as fontes e o motivo", () => {
     const msg = mensagemDoEncaminhamento(pedido());
-    expect(msg).toContain("Paula Nunes");
-    expect(msg).toContain("Quem cuida do tail-common?");
-    expect(msg).toContain("ADR-012; README do pos-gateway");
-    expect(msg).toContain("Não há responsável confirmado para o tail-common nas fontes.");
+    expect(msg).toContain("Beatriz Cavalcanti");
+    expect(msg).toContain("Quem cuida do ledgermonolith?");
+    expect(msg).toContain("ADR 6; README do ledgerwriter");
+    expect(msg).toContain("Não há responsável confirmado para o ledgermonolith nas fontes.");
   });
 
   it("não supõe o gênero de quem recebe (#86)", () => {
@@ -153,8 +153,8 @@ describe("lerPedidoDeEncaminhamento", () => {
   });
 
   it("e-mail vazio vira sem e-mail, e fonte que não é texto é descartada", () => {
-    const p = lerPedidoDeEncaminhamento({ ...pedido(), email: "  ", fontes_consultadas: ["ADR-012", 3, null] });
+    const p = lerPedidoDeEncaminhamento({ ...pedido(), email: "  ", fontes_consultadas: ["ADR 6", 3, null] });
     expect(p?.email).toBeUndefined();
-    expect(p?.fontes_consultadas).toEqual(["ADR-012"]);
+    expect(p?.fontes_consultadas).toEqual(["ADR 6"]);
   });
 });

@@ -178,10 +178,10 @@ describe("POST /api/encaminhamentos (#129)", () => {
   const corpo = {
     id: "f1",
     destino: "buddy",
-    para: "Paula Nunes",
-    pergunta: "Quem cuida do tail-common?",
-    resumo: "Quem cuida do tail-common?",
-    fontes_consultadas: ["ADR-012"],
+    para: "Beatriz Cavalcanti",
+    pergunta: "Quem cuida do ledgermonolith?",
+    resumo: "Quem cuida do ledgermonolith?",
+    fontes_consultadas: ["ADR 6"],
     motivo: "Não há responsável confirmado.",
     email: "jurado@exemplo.com",
   };

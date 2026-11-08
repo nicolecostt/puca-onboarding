@@ -141,7 +141,7 @@ Slack que ele informa, opcional, no início do Orbis (`localStorage` `puca:slack
 interface PedidoDeEncaminhamento {
   id: string;                       // o id do Forwarding: o mesmo id duas vezes não posta duas vezes
   destino: "buddy" | "gestor" | "rh"; // hoje a sessão só manda "buddy"; gestor e rh são da #104 e da #125
-  para: string;                     // quem receberia na Kota (ex.: "Paula Nunes")
+  para: string;                     // quem receberia na Kota (ex.: "Beatriz Cavalcanti")
   pergunta: string;
   resumo: string;
   fontes_consultadas: string[];     // títulos, como em Forwarding.consulted
@@ -164,7 +164,7 @@ Exemplo válido:
 POST /api/encaminhamentos HTTP/1.1
 Content-Type: application/json
 
-{"id":"544ac694-d4d5-49f0-9cd9-866dbcc7a018","destino":"buddy","para":"Paula Nunes","pergunta":"Quem cuida do tail-common?","resumo":"Quem cuida do tail-common?","fontes_consultadas":["ADR-012","README do pos-gateway"],"motivo":"Não há responsável confirmado para o tail-common nas fontes.","email":"jurado@exemplo.com"}
+{"id":"544ac694-d4d5-49f0-9cd9-866dbcc7a018","destino":"buddy","para":"Beatriz Cavalcanti","pergunta":"Quem troca de plantão comigo se eu precisar faltar?","resumo":"A pessoa quer saber como trocar um turno do plantão do Livro-razão.","fontes_consultadas":["Rituais (Notion da Kota)","README do ledgerwriter"],"motivo":"As fontes dizem como é o rodízio do plantão, mas não como trocar um turno.","email":"jurado@exemplo.com"}
 ```
 
 ```json
