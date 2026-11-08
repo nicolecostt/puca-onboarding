@@ -779,10 +779,9 @@ body {
   z-index: 991;
   margin: 0;
   height: 30px;
-  padding: 0 14px 0 10px;
+  padding: 0 14px;
   display: flex;
   align-items: center;
-  gap: 8px;
   transform: translateX(-50%);
   border-radius: var(--radius-pill);
   background: var(--color-text);
@@ -791,13 +790,6 @@ body {
   white-space: nowrap;
   pointer-events: none;
   transition: opacity 0.4s ease, transform 0.4s ease;
-}
-.cu-pill__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: conic-gradient(from var(--holo-turn), var(--puca-holo-stops));
-  animation: holo-spin 4s linear infinite;
 }
 body:not(.has-agent-cam) .cu-frame,
 body:not(.has-agent-cam) .cu-pill {
@@ -821,7 +813,4 @@ body:not(.has-agent-cam) .cu-pill {
 }
 @media (prefers-reduced-motion: reduce) {
   .cu-frame,
-  .cu-pill__dot {
-    animation: none;
   }
-}
