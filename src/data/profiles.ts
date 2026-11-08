@@ -51,9 +51,10 @@ export const profiles: Record<string, Profile> = {
   },
 };
 
-export function activeProfile(): Profile {
-  const id = new URLSearchParams(location.search).get("perfil") ?? transicao.id;
-  return profiles[id] ?? profiles[transicao.id];
+export function activeProfile(fallback = transicao.id): Profile {
+  const id = new URLSearchParams(location.search).get("perfil") ?? fallback;
+  if (id === "novo") return profiles.ana;
+  return Object.hasOwn(profiles, id) ? profiles[id] : profiles[transicao.id];
 }
 
 /** "Contas → Livro-razão" na transição; só o time novo para quem acabou de chegar. */
