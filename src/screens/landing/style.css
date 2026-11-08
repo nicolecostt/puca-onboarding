@@ -1,26 +1,5 @@
 /* Landing do Orbis: cartaz suíço. Grade de 12 colunas, preto no branco, fios de 1px.
    A única cor é a da Puca (--puca-holo-stops e a esfera), em poucos pontos. */
-@font-face {
-  font-family: "Creato Display";
-  src: url("../../assets/fonts/CreatoDisplay-Regular.otf") format("opentype");
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Creato Display";
-  src: url("../../assets/fonts/CreatoDisplay-Medium.otf") format("opentype");
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Creato Display";
-  src: url("../../assets/fonts/CreatoDisplay-Bold.otf") format("opentype");
-  font-weight: 700;
-  font-display: swap;
-}
-
 :root {
   --ink: var(--color-text);
   --paper: var(--color-surface);
@@ -130,6 +109,9 @@ main,
   align-items: center;
   gap: 32px;
   height: 64px;
+  /* o topo abre mais que o conteúdo: marca e ações perto dos cantos, como no app */
+  max-width: 1680px;
+  padding-inline: min(32px, var(--side));
 }
 
 .brand {
@@ -144,15 +126,11 @@ main,
 }
 
 .brand__mark {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  background: var(--ink);
-  color: var(--paper);
-  font-size: 14px;
-  font-weight: 700;
+  /* logo: as bolinhas da Puca (src/assets/orbis-logo.png) */
+  display: block;
+  flex: none;
+  width: 26px;
+  height: 26px;
 }
 
 .nav__links {
@@ -365,8 +343,7 @@ main,
 }
 
 /* foco da Puca: o único anel colorido */
-.node.is-focus::after,
-.orb::after {
+.node.is-focus::after {
   content: "";
   position: absolute;
   inset: -7px;
@@ -442,12 +419,6 @@ main,
   width: 52px;
   height: 52px;
   border-radius: 50%;
-}
-
-.orb::after {
-  inset: -4px;
-  border-radius: 50%;
-  padding: 1.5px;
 }
 
 /* ---- A Puca ---- */
@@ -677,8 +648,7 @@ main,
     scroll-behavior: auto;
   }
   [data-enter],
-  .node.is-focus::after,
-  .orb::after {
+  .node.is-focus::after {
     animation: none;
   }
   .skill,
