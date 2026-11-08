@@ -221,8 +221,8 @@ não serve para um servidor.
 
 ## 9. Fora deste trabalho
 
-- Trocar a Tail pela Kota no código do Orbis (`src/data/`, jornada de demo, `docs/demo.md`, `docs/contratos.md`,
-  `docs/journey-format.md`, README): nova jornada, outra issue.
+- Trocar a Tail pela Kota no código do Orbis (`src/data/`, jornada de demo, landing, `server/src/app.ts`, `docs/demo.md`,
+  `docs/contratos.md`, `docs/journey-format.md`, README e as skills em `.claude/skills/`): nova jornada, outra issue.
 - Stack do app e acesso ao Notion em tempo de demo: #13 e #26.
 - Os dois perfis no app: #30. Landing: #48. Ambiente de demonstração: #49.
 
