@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Iris — onboarding com a Puca</title>
+<meta name="description" content="A Puca conversa com quem chega no time e monta, enquanto fala, um quadro com os sistemas, as pessoas e as decisões que importam.">
+<script>
+  // Aberto direto como arquivo? Sem o Vite o TypeScript não roda: mostra o caminho certo.
+  if (location.protocol === "file:") {
+    addEventListener("DOMContentLoaded", function () {
+      document.body.innerHTML =
+        '<div style="max-width:440px;margin:15vh auto;padding:24px;font:15px/1.6 system-ui,sans-serif;color:#171717;background:#fff;border:1px solid #e5e5e5;border-radius:12px">' +
+        "<strong>Esta página precisa do servidor do projeto.</strong><br>" +
+        "No terminal, na pasta do projeto, rode <code>npm run dev</code> e abra " +
+        '<a href="http://localhost:5173/">http://localhost:5173</a>.</div>';
+    });
+  }
+</script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="#topo" aria-label="Iris, início">
+      <span class="brand-mark" aria-hidden="true">i</span>Iris
+    </a>
+    <nav class="nav-links" aria-label="Seções">
+      <a href="#problema">Problema</a>
+      <a href="#solucao">Solução</a>
+      <a href="#como-funciona">Como funciona</a>
+    </nav>
+    <a class="btn btn-dark btn-sm" href="../onboarding-call/">Ver a demo</a>
+  </header>
+
+  <main id="topo">
+    <!-- Hero -->
+    <section class="hero">
+      <h1>A primeira semana,<br>explicada no <span class="mark">quadro</span>.</h1>
+      <p class="lead">
+        A Puca conversa por voz com quem chega no time e, enquanto fala, monta um quadro com os sistemas,
+        as pessoas e as decisões que importam. Sem fonte confiável, ela não inventa: leva a dúvida ao buddy.
+      </p>
+      <div class="actions">
+        <a class="btn btn-dark" href="../onboarding-call/">Começar a call inicial</a>
+        <a class="btn btn-ghost" href="../lesson/">Ver uma aula <span aria-hidden="true">→</span></a>
+      </div>
+
+      <figure class="board" aria-label="Exemplo de quadro: o caminho de uma venda na Tail">
+        <div class="board-bar">
+          <span class="board-title">Aula · O caminho de uma venda</span>
+          <span class="board-hint">Clique num nó</span>
+          <span class="live"><span class="dot dot-pink"></span>Puca falando</span>
+        </div>
+        <div class="board-canvas">
+          <svg class="edges" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M12 30 L49.5 30" class="edge proven" />
+            <path d="M49.5 30 L84 30" class="edge proven" />
+            <path d="M12 30 L12 76 L41.5 76" class="edge proven" />
+          </svg>
+          <button type="button" class="node" data-node="gateway" style="left:4%;top:20%"><small>serviço</small>pos-gateway</button>
+          <button type="button" class="node node-focus" data-node="topic" style="left:39.5%;top:20%;width:20%"><small>fila</small>transactions.authorized</button>
+          <button type="button" class="node node-box" data-node="settlement" style="left:75%;top:20%;width:18%"><small>caixa preta</small>settlement-worker</button>
+          <button type="button" class="node" data-node="authorizer" style="left:41.5%;top:66%"><small>serviço</small>authorizer</button>
+
+          <div class="card" aria-live="polite">
+            <strong data-card="title"></strong>
+            <span data-card="role"></span>
+            <span data-card="owner"></span>
+            <span class="tag tag-sky" data-card="tag"></span>
+          </div>
+
+          <div class="cursor" aria-hidden="true">
+            <svg viewBox="0 0 16 16" width="16" height="16"><path d="M1 1l5 14 2-6 6-2z" /></svg>
+            <span>Puca</span>
+          </div>
+        </div>
+        <figcaption class="caption">
+          <div class="orb" id="puca-orb" aria-hidden="true"></div>
+          <p>“Quando o pos-gateway aprova uma venda, ele publica na fila <b>transactions.authorized</b>. O settlement-worker lê dali. Quer ver o que acontece se falhar?”</p>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- Problema -->
+    <section class="section" id="problema">
+      <h2>Todo começo depende de alguém ter tempo para explicar.</h2>
+      <ol class="problems">
+        <li>
+          <span class="num">01</span>
+          <h3>Conhecimento espalhado</h3>
+          <p>Notion, repositórios, ADRs, mensagens e conversas de corredor. Ninguém sabe por onde começar.</p>
+        </li>
+        <li>
+          <span class="num">02</span>
+          <h3>Buddy sobrecarregado</h3>
+          <p>As mesmas explicações introdutórias, repetidas a cada pessoa que entra.</p>
+        </li>
+        <li>
+          <span class="num">03</span>
+          <h3>Quem cuida do quê?</h3>
+          <p>Descobrir o responsável por um sistema vira investigação.</p>
+        </li>
+        <li>
+          <span class="num">04</span>
+          <h3>Mudar de time é recomeçar</h3>
+          <p>Quem já conhece a empresa passa por tudo de novo, sem pular o que já sabe.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Solução -->
+    <section class="section" id="solucao">
+      <div class="split">
+        <div>
+          <h2>Uma aula, não um chatbot.</h2>
+          <p class="lead">
+            A Puca transforma o conhecimento do time numa aula guiada: explica, desenha, pergunta se ficou claro e
+            adapta o ritmo a quem está aprendendo.
+          </p>
+        </div>
+        <ul class="pillars">
+          <li><b>Conversa.</b> Por voz ou texto. A pessoa interrompe, pergunta e muda de assunto quando quiser.</li>
+          <li><b>Quadro.</b> Serviços, filas, times e pessoas aparecem enquanto a Puca explica.</li>
+          <li><b>Fontes.</b> ADRs, código e docs, com a evidência de cada ligação: <span class="u-sky">provado</span> ou inferido.</li>
+          <li><b>Encaminhamento.</b> Sem fonte confiável, a dúvida vai ao buddy com contexto, nunca um palpite.</li>
+        </ul>
+      </div>
+
+      <div class="profiles">
+        <article>
+          <span class="tag">Novo</span>
+          <h3>Quem acabou de entrar</h3>
+          <p>Começa pela cultura e pela parte institucional, depois chega ao time.</p>
+        </article>
+        <article>
+          <span class="tag">Transição</span>
+          <h3>Quem muda de time</h3>
+          <p>Pula o institucional e vai direto aos sistemas e às pessoas do time novo.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Como funciona -->
+    <section class="section" id="como-funciona">
+      <h2>Da primeira conversa à primeira tarefa.</h2>
+      <ol class="steps">
+        <li>
+          <span class="num">1</span>
+          <h3>Call inicial</h3>
+          <p>A Puca acolhe a pessoa, apresenta a cultura e entende o que ela já sabe.</p>
+        </li>
+        <li>
+          <span class="num">2</span>
+          <h3>Jornada</h3>
+          <p>Com o perfil, monta o roteiro: o que explicar, em que ordem e o que pular.</p>
+        </li>
+        <li>
+          <span class="num">3</span>
+          <h3>Aula no quadro</h3>
+          <p>Explica falando e desenhando. Uma pergunta no meio muda o rumo da aula.</p>
+        </li>
+        <li>
+          <span class="num">4</span>
+          <h3>Verificação</h3>
+          <p>Uma pergunta leve confirma se ficou claro antes de seguir.</p>
+        </li>
+        <li>
+          <span class="num">5</span>
+          <h3>Primeira tarefa</h3>
+          <p>O aprendizado vira prática, e buddy e gestor acompanham o progresso.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+      <h2>Deixe a Puca receber a <span class="mark">próxima pessoa</span> do time.</h2>
+      <p>Experimente a call inicial com a Tail, a empresa da demo.</p>
+      <div class="actions">
+        <a class="btn btn-dark" href="../onboarding-call/">Começar a call inicial</a>
+        <a class="btn btn-ghost" href="../lesson/">Ver uma aula <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span class="brand"><span class="brand-mark" aria-hidden="true">i</span>Iris</span>
+    <span>Onboarding com a Puca · Converge Challenge</span>
+  </footer>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>
