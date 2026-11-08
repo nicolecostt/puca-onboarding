@@ -29,6 +29,7 @@ Opções: $ARGUMENTS
 9. **PR.** Escreva a descrição seguindo `.github/pull_request_template.md`, com `Closes #<n>` da issue (o número
    costuma estar no nome da branch). Com `--abrir` ou um pedido de subir/abrir PR, faça
    `git push -u origin HEAD` e `gh pr create --base main --title "…" --body-file <arquivo>`. Sem `--abrir`, só mostre o texto.
+10. **Acompanhe.** Com o PR aberto, chame a skill `acompanhar-pr`: o PR fica com você até estar pronto para integrar.
 
 ## Saída
 
