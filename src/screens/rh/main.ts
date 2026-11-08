@@ -131,7 +131,7 @@ function render(filtro: Filtro): void {
   const total = FEEDBACK.promotores + FEEDBACK.neutros + FEEDBACK.detratores;
   const enps = Math.round(((FEEDBACK.promotores - FEEDBACK.detratores) / total) * 100);
   const stats: [string, string][] = [
-    ["Sessões com o Puca", String(sessoes)],
+    ["Sessões com Puca", String(sessoes)],
     ["Encaminhamentos abertos", String(abertos)],
     ["Acessos pendentes", String(acessos)],
     ["Feedback da integração", `${enps > 0 ? "+" : ""}${enps}`],
@@ -144,7 +144,7 @@ function render(filtro: Filtro): void {
   qs(document, "#people-count").textContent = `${lista.length} ${lista.length === 1 ? "pessoa" : "pessoas"}`;
   qs(document, "#people").innerHTML = lista
     .map((p) => {
-      // cada pessoa numa cor do espectro do Puca (a mesma de sempre, pela posição na lista completa)
+      // cada pessoa numa cor do espectro de Puca (a mesma de sempre, pela posição na lista completa)
       const hue = Math.round((INTEGRACOES.indexOf(p) / INTEGRACOES.length) * 360 + 200) % 360;
       const segs = ETAPAS.map((_, i) => `<i class="seg ${i < p.etapa ? "is-done" : i === p.etapa ? "is-now" : ""}"></i>`).join("");
       const pend = p.pendencias.length

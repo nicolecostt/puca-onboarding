@@ -1,4 +1,4 @@
-// Call inicial: o Puca acolhe, faz o onboarding cultural e conhece a pessoa (a calibragem), numa conversa de voz.
+// Call inicial: Puca acolhe, faz o onboarding cultural e conhece a pessoa (a calibragem), numa conversa de voz.
 // O LLM conduz pelo /api/call (#57, decisão 0012): perguntas norteadoras, follow-ups dele e a cultura vinda do
 // Notion da Kota. O que a pessoa conta chega como anotações, que viram o perfil e a calibragem da sessão.
 import "../../styles/base.css";
@@ -22,11 +22,11 @@ if (!savedProfile) qs<HTMLAnchorElement>(document, ".brand").href = "../boas-vin
 preserveProfileLinks();
 
 // Com quem a pessoa entra: a escolha nas boas-vindas (?perfil= na URL) ou o perfil já salvo. Com ela, a call usa a
-// admissão dessa pessoa e o vínculo já vai anotado, então o Puca não pergunta de novo se é a primeira vez na empresa
+// admissão dessa pessoa e o vínculo já vai anotado, então Puca não pergunta de novo se é a primeira vez na empresa
 // ou uma troca de time (server/src/agent/call.ts: "Não pergunte o que já está anotado").
 const escolha = resolveProfile(location.search);
 const vinculoEscolhido = escolha.source === "demo" ? null : escolha.profile.vinculo;
-// Dados da admissão: a empresa já sabe, o Puca só confirma (sem escolha, a Ana).
+// Dados da admissão: a empresa já sabe, Puca só confirma (sem escolha, a Ana).
 const profile = activeProfile(vinculoEscolhido ? ID_DO_VINCULO[vinculoEscolhido] : "ana");
 const admissao = {
   cargo: profile.role,
@@ -36,7 +36,7 @@ const admissao = {
 
 
 
-const SEM_PUCA = "O Puca está fora do ar agora. Recarregue a página em alguns minutos para fazer a call.";
+const SEM_PUCA = "Puca está fora do ar agora. Recarregue a página em alguns minutos para fazer a call.";
 const FALHOU = "Perdi a conexão para pensar agora. Pode repetir?";
 
 // ---- Estados ----
@@ -92,7 +92,7 @@ async function main(): Promise<void> {
   let cortada = "";
   let seguir: HTMLButtonElement | null = null;
 
-  // partículas do Puca no fundo, atrás do texto, da esfera, do chat e da barra de call
+  // partículas de Puca no fundo, atrás do texto, da esfera, do chat e da barra de call
   mountPucaParticles(qs<HTMLCanvasElement>(document, "#particles"), {
     occluders: ".topbar__row > *, .agent__orb, .agent__meta, .caption > *, .chat-panel, .call-dock, .call-gate",
     round: ".agent__orb",
@@ -125,7 +125,7 @@ async function main(): Promise<void> {
     });
   }
 
-  // Visual do Puca (teste local). Sem ele, fica o círculo neutro.
+  // Visual de Puca (teste local). Sem ele, fica o círculo neutro.
   let visual: AgentVisual | null = null;
   const factory = await loadAgentVisual();
   if (factory) {
@@ -161,7 +161,7 @@ async function main(): Promise<void> {
       shown === "listening" && state.muted
         ? "Seu microfone está mudo. Responda pelo chat."
         : shown === "ended"
-          ? "Use “Ligar para o Puca” para continuar de onde parou."
+          ? "Use “Ligar para Puca” para continuar de onde parou."
           : "";
     // o aviso aparece embaixo da conversa: se a fala era longa, rola até ele em vez de deixá-lo atrás da barra de call
     if (el.captionHint.textContent) requestAnimationFrame(() => el.captionHint.scrollIntoView({ block: "nearest", behavior: "smooth" }));
@@ -175,7 +175,7 @@ async function main(): Promise<void> {
     el.timer.textContent = `${m}:${s}`;
   }, 1000);
 
-  /** Uma frase do Puca: a legenda entra quando o áudio começa e segue as palavras dele; chat e voz. */
+  /** Uma frase de Puca: a legenda entra quando o áudio começa e segue as palavras dele; chat e voz. */
   async function falar(text: string, play: (o?: SpeakOptions) => Promise<void> = (o) => voice.speak(text, o)): Promise<void> {
     let words: Element[] = [];
     const show = () => {
@@ -200,7 +200,7 @@ async function main(): Promise<void> {
     words.forEach((w) => w.classList.add("is-in"));
   }
 
-  /** Um turno da call. O Puca fala; se a call acabou, grava o perfil e segue para as boas-vindas. */
+  /** Um turno da call. Puca fala; se a call acabou, grava o perfil e segue para as boas-vindas. */
   async function turno(kind: CallRequest["kind"], text?: string, interrupted?: string): Promise<void> {
     const meu = ++turnoAtual;
     clearTimeout(silencio);
@@ -244,11 +244,11 @@ async function main(): Promise<void> {
     seguir = null;
     if (acabou) return encerrar();
     setAgent("listening");
-    // ninguém respondeu: o Puca pergunta de novo, de outro jeito (uma vez por espera)
+    // ninguém respondeu: Puca pergunta de novo, de outro jeito (uma vez por espera)
     if (kind !== "silencio") silencio = window.setTimeout(() => meu === turnoAtual && !state.paused && !state.ended && void turno("silencio"), 15000);
   }
 
-  /** Fala da pessoa (voz ou chat): corta o Puca e vira um turno, levando a frase que ela cortou. */
+  /** Fala da pessoa (voz ou chat): corta Puca e vira um turno, levando a frase que ela cortou. */
   function fala(text: string, from: "voz" | "chat"): void {
     text = text.trim();
     if (!text || !state.started || state.paused || state.ended || state.done) return;
@@ -314,7 +314,7 @@ async function main(): Promise<void> {
     render();
     if (!state.started || state.done) return;
     ouvir();
-    void turno("silencio"); // o Puca retoma de onde parou
+    void turno("silencio"); // Puca retoma de onde parou
   });
 
   render();
@@ -322,7 +322,7 @@ async function main(): Promise<void> {
     chat.addMessage({ from: "agent", text: SEM_PUCA });
     // sem a call, a pessoa não fica presa aqui: segue para a sessão com o perfil de exemplo de quem ela escolheu.
     // A legenda fica com a primeira frase (o aviso inteiro está no chat), para o botão caber acima da barra da call.
-    el.captionAgent.textContent = "O Puca está fora do ar agora.";
+    el.captionAgent.textContent = "Puca está fora do ar agora.";
     setAgent("offline");
     oferecerSessao();
     return;

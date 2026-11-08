@@ -1,5 +1,5 @@
 // Quadro da sessão (Figma: "03 · Aula no quadro"). Desenha nós, setas e selos e vai revelando aos poucos,
-// acompanhando a fala do Puca. Os dados vêm da jornada (ver from-journey.ts).
+// acompanhando a fala de Puca. Os dados vêm da jornada (ver from-journey.ts).
 //   const board = mountWhiteboard(el, spec);
 //   board.reveal(["gateway", "e-pos-gw"]); board.setFocus("gateway"); board.highlight(["dlq"], "warn");
 //   board.openCard("gateway"); board.flow(["e-pos-gw", "e-gw-topic"]); board.setSelectable(true);
@@ -161,7 +161,7 @@ export function mountWhiteboard(parent: HTMLElement, lesson: WhiteboardSpec, opt
     const pad = 32;
     return { x: x0 - pad, y: y0 - pad, w: x1 - x0 + pad * 2, h: y1 - y0 + pad * 2 };
   }
-  // ---- câmera (tela infinita): a pessoa move e dá zoom; o Puca centra o que está explicando ----
+  // ---- câmera (tela infinita): a pessoa move e dá zoom; Puca centra o que está explicando ----
   let cam: Camera = { x: 0, y: 0, escala: 1 };
   // a pessoa mexeu na câmera: o quadro para de se reajustar sozinho até ela pedir "Ajustar" (ou o quadro trocar)
   let mexeu = false;
@@ -228,7 +228,7 @@ export function mountWhiteboard(parent: HTMLElement, lesson: WhiteboardSpec, opt
     }
     return Number.isFinite(x0) ? { x: x0, y: y0, w: x1 - x0, h: y1 - y0 } : null;
   }
-  /** O que o Puca está explicando ficou fora da tela (a pessoa moveu o quadro): centra nele. */
+  /** O que Puca está explicando ficou fora da tela (a pessoa moveu o quadro): centra nele. */
   function seguir(ids: string[]): void {
     const c = temArea() ? caixaDe(ids) : null;
     if (!c || visivel(cam, c, viewport())) return;

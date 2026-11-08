@@ -70,8 +70,8 @@ Tomadas aqui para destravar as raias. Cada uma pode ser revista sem refazer o re
    de uma pessoa real no GitHub.
 5. **Avatares do Slack** pelo DiceBear (iniciais, `https://api.dicebear.com/9.x/initials/png?seed=<nome>`): sintético, sem rosto.
 6. **Textos do Notion nascem em Markdown** em `kit/kota/notion/paginas/` e sobem pelo MCP. A mesma pasta é a cópia que a
-   o Puca lê (#26, `docs/stack.md` §9). A C3 confere que o Notion publicado ainda bate com ela. As URLs são as públicas
-   (`*.notion.site`), as mesmas que a lista de endereços permitidos do navegador do Puca aceita (`docs/stack.md` §4.7).
+   Puca lê (#26, `docs/stack.md` §9). A C3 confere que o Notion publicado ainda bate com ela. As URLs são as públicas
+   (`*.notion.site`), as mesmas que a lista de endereços permitidos do navegador de Puca aceita (`docs/stack.md` §4.7).
 7. **`check:kota` fora do `npm run check`**, porque o CI do Orbis não tem o checkout do Kota. Roda à mão com `--repo`.
 8. **Testes do Kota rodam dentro do Docker** (`scripts/testar.sh`), para o jurado só precisar do Docker, inclusive nas
    branches de primeira tarefa.

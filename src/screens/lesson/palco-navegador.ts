@@ -1,4 +1,4 @@
-// Palco do navegador do Puca na sessão: a área onde o app para Mac põe o navegador dele, no lugar do quadro.
+// Palco do navegador de Puca na sessão: a área onde o app para Mac põe o navegador dele, no lugar do quadro.
 // Só existe com window.orbis.navegador (contrato "Computer use", src/lib/orbis.ts); sem o app, a sessão segue igual.
 import type { AcaoDaPuca, OrbisNavegador } from "../../lib/orbis";
 
@@ -80,9 +80,9 @@ export function montarPalcoNavegador(
       void nav
         .executar([a])
         .then((r) => {
-          if (r.falhas.length) console.warn("navegador do Puca: ações que não deram certo", r.falhas);
+          if (r.falhas.length) console.warn("navegador de Puca: ações que não deram certo", r.falhas);
         })
-        .catch((e) => console.warn("navegador do Puca: a fila falhou", e));
+        .catch((e) => console.warn("navegador de Puca: a fila falhou", e));
     },
     mostrarNavegador,
     mostrarQuadro,
