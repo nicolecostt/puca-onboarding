@@ -65,6 +65,17 @@ export function createOutbox(store: KeyValueStore, opts: { now?: () => Date } = 
           (tab !== undefined && f.status === "enviando" && f.claimed_by !== tab && t - Date.parse(f.claimed_at ?? f.at) > STALE_CLAIM_MS),
       );
     },
+    /**
+     * Quanto falta (ms) para um envio preso em "enviando" por outra aba poder ser pego por esta; null se não há.
+     * A tela agenda uma nova tentativa com isso: sem timer, o envio só voltaria com outro evento (#84).
+     */
+    nextRetryIn(tab: string): number | null {
+      const t = now().getTime();
+      const waits = read()
+        .filter((f) => f.status === "enviando" && f.claimed_by !== tab)
+        .map((f) => Math.max(0, STALE_CLAIM_MS - (t - Date.parse(f.claimed_at ?? f.at))));
+      return waits.length ? Math.min(...waits) : null;
+    },
     setStatus(id: string, status: ForwardingStatus): void {
       write(read().map((f) => (f.id === id ? { ...f, status } : f)));
     },
@@ -88,16 +99,19 @@ export function buddyOf(journey: Journey): string {
   return node?.label.replace(/\n/g, " ") ?? "sua buddy";
 }
 
-/** Texto da mensagem que a Puca manda para a buddy no Slack. */
+/** Texto da mensagem que a Puca manda para a buddy no Slack. Não supõe o gênero de ninguém. */
 export function forwardingMessage(f: Forwarding): string {
+  // sem nome, profile.nome vira "você" (journey/profile.ts)
+  const nome = f.pessoa.trim();
+  const asked = nome && nome.toLowerCase() !== "você" ? `Pergunta de ${nome} na aula` : "A pessoa que estou acompanhando perguntou na aula";
   const consulted = f.consulted.length ? f.consulted.join("; ") : "Não achei nenhuma fonte sobre isso.";
   const summary = f.summary.trim() && normalize(f.summary) !== normalize(f.question) ? [`Resumo: ${f.summary.trim()}`] : [];
   return [
-    `Oi, ${f.to.name}! A ${f.pessoa} perguntou na aula: "${f.question}"`,
+    `Oi, ${f.to.name}! ${asked}: "${f.question}"`,
     ...summary,
     `O que eu já consultei: ${consulted}`,
     `Por que não respondi: ${f.reason}`,
-    "Pode ajudar? Respondo para ela assim que você me disser.",
+    "Pode ajudar? Volto para a pessoa assim que você me disser.",
   ].join("\n");
 }
 

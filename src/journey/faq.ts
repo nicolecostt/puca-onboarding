@@ -18,7 +18,7 @@ export interface Faq {
 // ponytail: frases por template a partir de node.info. Para soar mais natural, reescrever offline com LLM e revisar.
 export function buildFaqs(journey: Journey, profile: Profile): Faq[] {
   const buddy = Object.values(journey.boards).flatMap((b) => b.nodes).find((n) => n.id === "buddy")?.label;
-  const askBuddy = buddy ? `A ${buddy.split(" ")[0]}, sua buddy, pode te indicar.` : "Sua buddy pode te indicar.";
+  const askBuddy = buddy ? `${buddy.split(" ")[0]}, sua buddy, pode te indicar.` : "Sua buddy pode te indicar.";
   const out: Faq[] = [];
   for (const [board, spec] of Object.entries(journey.boards)) {
     for (const n of spec.nodes) {

@@ -88,7 +88,15 @@ async function main(): Promise<void> {
       }
     } finally {
       sending = false;
+      scheduleRetry();
     }
+  }
+  // Envio preso por outra aba (fechou ou recarregou no meio): tenta de novo quando ele passar a contar como preso.
+  let retry: ReturnType<typeof setTimeout> | undefined;
+  function scheduleRetry(): void {
+    clearTimeout(retry);
+    const wait = outbox.nextRetryIn(tab);
+    if (wait !== null) retry = setTimeout(() => void sendPending(), wait + 1000);
   }
   addEventListener("storage", (e) => {
     if (e.key === FORWARDING_KEY) void sendPending();

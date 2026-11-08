@@ -72,14 +72,28 @@ describe("forwardingMessage", () => {
   it("leva a pessoa, a dúvida, o que foi consultado e o motivo", () => {
     const msg = forwardingMessage(f);
     expect(msg).toContain("Oi, Paula Nunes!");
-    expect(msg).toContain("A Ana perguntou na aula");
-    expect(msg).toContain('"Quem cuida do tail-common?"');
+    expect(msg).toContain('Pergunta de Ana na aula: "Quem cuida do tail-common?"');
     expect(msg).toContain("ADR-012; README do pos-gateway");
     expect(msg).toContain("Não há responsável confirmado para o tail-common nas fontes da Tail.");
   });
 
   it("sem nada consultado, diz que não achou fonte", () => {
     expect(forwardingMessage({ ...f, consulted: [] })).toContain("Não achei nenhuma fonte sobre isso.");
+  });
+
+  it("não supõe o gênero da pessoa nem da buddy (#86)", () => {
+    const msg = forwardingMessage({ ...f, pessoa: "Bruno", to: { name: "Lucas Prado", role: "buddy" } });
+    expect(msg).toContain('Pergunta de Bruno na aula: "Quem cuida do tail-common?"');
+    expect(msg).not.toMatch(/\b(A|O) Bruno\b/);
+    expect(msg).not.toMatch(/\b(ela|ele)\b/);
+  });
+
+  it("sem nome da pessoa, não sai 'A você perguntou' (#66)", () => {
+    for (const pessoa of ["você", "", "  "]) {
+      const msg = forwardingMessage({ ...f, pessoa });
+      expect(msg).toContain('A pessoa que estou acompanhando perguntou na aula: "Quem cuida do tail-common?"');
+      expect(msg).not.toMatch(/você perguntou|de você/i);
+    }
   });
 });
 

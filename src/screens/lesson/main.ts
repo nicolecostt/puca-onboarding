@@ -290,7 +290,7 @@ async function main(): Promise<void> {
       case "faq": {
         remember("user", text);
         // dono sem fonte confiável: a dúvida vai para a buddy, com contexto
-        const said = route.faq.unconfirmed ? `${route.faq.text} Já encaminhei a sua pergunta para ela no Slack.` : route.faq.text;
+        const said = route.faq.unconfirmed ? `${route.faq.text} Já encaminhei a sua pergunta no Slack.` : route.faq.text;
         trail.update(entry.id, { answer: said });
         for (const a of route.faq.actions) io.apply(a);
         if (route.faq.unconfirmed) {

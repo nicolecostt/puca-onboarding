@@ -20,6 +20,21 @@ describe("I3: envio preso em 'enviando' volta a ser pegável", () => {
     expect(out.pending("aba-nova").map((p) => p.id)).toEqual([f.id]);
     expect(out.pending("aba-que-fechou")).toEqual([]); // a própria dona não repega o que está enviando
   });
+
+  it("#84: a aba sabe quanto esperar para tentar de novo, sem depender de outro evento", () => {
+    let t = Date.parse("2026-11-07T22:00:00Z");
+    const out = createOutbox(memoryStore(), { now: () => new Date(t) });
+    expect(out.nextRetryIn("aba-nova")).toBeNull(); // nada preso: não agenda
+    const f = out.add(draft("Quem cuida do tail-common?"));
+    out.claim(f.id, "aba-que-fechou");
+    t += 10_000;
+    expect(out.nextRetryIn("aba-nova")).toBe(20_000);
+    expect(out.nextRetryIn("aba-que-fechou")).toBeNull(); // a dona não espera por ela mesma
+    t += 25_000;
+    expect(out.nextRetryIn("aba-nova")).toBe(0); // já pode pegar
+    out.setStatus(f.id, "enviado");
+    expect(out.nextRetryIn("aba-nova")).toBeNull();
+  });
 });
 
 describe("I4: id sem contexto seguro (http://<ip-da-rede>)", () => {
