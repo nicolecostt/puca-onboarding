@@ -7,6 +7,7 @@ const AVATAR = "https://api.dicebear.com/9.x/initials/png?seed=";
 export function validarMapa(m: MapaKota, nomesProibidos: string[] = []): string[] {
   return [
     ...repetidos(m.pessoas),
+    ...slackComArroba(m.pessoas),
     ...avatares(m.pessoas),
     ...emailsForaDaKota(m),
     ...contagem(m.pessoas),
@@ -20,7 +21,7 @@ export function validarMapa(m: MapaKota, nomesProibidos: string[] = []): string[
   ];
 }
 
-const chave = (s: string) => s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim();
+const chave = (s: string) => s.normalize("NFKD").replace(/[\p{M}\p{Cf}]/gu, "").replace(/\s+/g, " ").trim().toLowerCase();
 const primeiroNome = (nome: string) => nome.trim().split(/\s+/)[0];
 
 function repetidos(pessoas: PessoaKota[]): string[] {
@@ -34,6 +35,12 @@ function repetidos(pessoas: PessoaKota[]): string[] {
     }
   }
   return erros;
+}
+
+function slackComArroba(pessoas: PessoaKota[]): string[] {
+  return pessoas
+    .filter((p) => chave(p.slack).startsWith("@"))
+    .map((p) => `pessoa ${p.id}: slack "${p.slack}" com @; o nome do Slack vai sem @`);
 }
 
 function avatares(pessoas: PessoaKota[]): string[] {

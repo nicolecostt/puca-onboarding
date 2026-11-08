@@ -118,6 +118,16 @@ describe("validarMapa", () => {
     expect(erros(com((m) => { m.pessoas[1].nome = "ANA SÓUZA"; }))).toMatch(/pessoa bruno-teles: nome "ANA SÓUZA" repetido/);
   });
 
+  it("acusa nome ou Slack repetido com espaço sobrando ou caractere invisível", () => {
+    for (const nome of ["Ana  Souza", "Ana\tSouza", "Ana Souza", "Ana Sou​za", " Ana Souza​"]) {
+      expect(erros(com((m) => { m.pessoas[1].nome = nome; }))).toMatch(/pessoa bruno-teles: nome .* repetido/);
+      expect(erros(com((m) => { m.pessoas[1].slack = nome; }))).toMatch(/pessoa bruno-teles: slack .* repetido/);
+    }
+  });
+
+  it("acusa nome do Slack com @", () =>
+    expect(erros(com((m) => { m.pessoas[1].slack = "@Bruno Teles"; }))).toMatch(/pessoa bruno-teles: slack "@Bruno Teles" com @/));
+
   it("acusa e-mail ou nome do Slack repetido", () => {
     expect(erros(com((m) => { m.pessoas[1].email = "ana-souza@kota.example"; }))).toMatch(/pessoa bruno-teles: e-mail "ana-souza@kota.example" repetido/);
     expect(erros(com((m) => { m.pessoas[1].slack = "Ana Souza"; }))).toMatch(/pessoa bruno-teles: slack "Ana Souza" repetido/);
