@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Chame automaticamente quando a pessoa der a tarefa por terminada ou quiser entregar — ex.: "terminei", "pronto", "pode subir", "sobe isso", "abre o PR", "manda pra revisão". Sincroniza, roda o check, registra decisões e monta o PR. Commit e push só com o ok da pessoa.
+description: Chame automaticamente quando a pessoa der a tarefa por terminada ou quiser entregar — ex.: "terminei", "pronto", "pode subir", "sobe isso", "abre o PR", "manda pra revisão". Sincroniza, roda o check, registra decisões e monta o PR. Commit e push só com o ok da pessoa; depois do PR aberto, as correções da revisão seguem a skill acompanhar-pr.
 argument-hint: "[--abrir para já abrir o PR]"
 ---
 
@@ -30,6 +30,8 @@ Opções: $ARGUMENTS
    costuma estar no nome da branch). Com `--abrir` ou um pedido de subir/abrir PR, faça
    `git push -u origin HEAD` e `gh pr create --base main --title "…" --body-file <arquivo>`. Sem `--abrir`, só mostre o texto.
 10. **Acompanhe.** Com o PR aberto, chame a skill `acompanhar-pr`: o PR fica com você até estar pronto para integrar.
+    Abrir o PR com o ok da pessoa já vale como ok para os commits e pushes na mesma branch que respondem à revisão ou
+    ao CI ([decisão 0009](../../../docs/decisoes/0009-pr-acompanhado-ate-pronto.md)).
 
 ## Saída
 

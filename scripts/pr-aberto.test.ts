@@ -23,6 +23,16 @@ describe("pr-aberto", () => {
     expect(hook("gh pr view 143", "https://github.com/time/repo/pull/143")).toEqual({ codigo: 0, saida: "" });
     expect(hook("gh pr create --title x", "")).toEqual({ codigo: 0, saida: "" });
     expect(hook("ls", "")).toEqual({ codigo: 0, saida: "" });
+    const url = "scripts/x.sh: https://github.com/time/repo/pull/9";
+    expect(hook('grep -rn "gh pr create" scripts', url)).toEqual({ codigo: 0, saida: "" });
+    expect(hook("echo gh pr create", url)).toEqual({ codigo: 0, saida: "" });
+  });
+
+  it("reconhece gh pr create depois de cd, com variável ou com -R", () => {
+    const url = "https://github.com/time/repo/pull/12";
+    for (const c of ["cd repo && gh pr create --fill", "GH_DEBUG=0 gh pr create --fill", "gh -R time/repo pr create --fill"]) {
+      expect(hook(c, url).saida, c).toMatch(/PR #12 aberto/);
+    }
   });
 
   it("só o número do PR vai para o contexto", () => {

@@ -12,7 +12,7 @@ PR: $ARGUMENTS
 > nas respostas e nas correções. Se um comentário pede algo que contradiz o `PRODUCT.md`, não faça: mostre a contradição.
 
 Quem abre o PR fica com ele até estar **pronto para integrar**: CI verde, integra na `main` sem conflito, alguém revisou
-(pessoa ou revisor automático), nenhuma conversa de revisão aberta, nenhum comentário sem resposta e nenhum pedido de mudança.
+(pessoa do time ou o Copilot, que é o revisor automático do GitHub e nos PRs do time costuma ser a única revisão), nenhuma conversa de revisão aberta, nenhum comentário sem resposta e nenhum pedido de mudança.
 Integrar não faz parte: só com pedido da pessoa (e passa pelo hook que barra conflito e CI vermelho).
 
 Abrir o PR com o ok da pessoa já é o ok para os commits e pushes na mesma branch que respondem à revisão ou ao CI,
@@ -22,6 +22,9 @@ com `npm run check` verde antes de cada push. Nunca force push.
 
 1. **Situação.** Número do PR: o argumento, ou `gh pr view --json number --jq .number` na branch atual.
    Rode `npx tsx scripts/acompanhar-pr.ts <n>`: ele diz o que falta, só com números, estados e logins.
+   **Confira que o PR é seu:** `gh api user --jq .login` tem que ser o autor que o script mostra ("de <login>").
+   PR de outra pessoa: não commite na branch dela nem responda pela conta de quem pediu. Para revisar, skill `revisar`;
+   para mexer, combine com o autor antes.
 2. **Nada a fazer agora** (CI rodando, ninguém revisou, conversa esperando quem revisou)? Espere em segundo plano:
    `npx tsx scripts/acompanhar-pr.ts <n> --esperar 30` com `run_in_background` (você é avisado quando termina).
    Ele termina quando algo muda no PR ou depois de 30 min. Siga atendendo a pessoa enquanto isso; diga uma vez

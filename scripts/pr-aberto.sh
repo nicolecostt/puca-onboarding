@@ -8,7 +8,10 @@ n=$(node -e '
   let d = {};
   try { d = JSON.parse(process.argv[1]); } catch { process.exit(0); }
   const cmd = d.tool_input?.command || "";
-  if (!/\bgh\b[^\n;&|]*\bpr\s+create\b/.test(cmd)) process.exit(0);
+  // só quando o comando de um trecho é o próprio gh pr create (não grep/echo com o texto dentro)
+  const semVars = (t) => t.trim().replace(/^([A-Z_][A-Z0-9_]*=\S*\s+)*/, "");
+  const criaPr = cmd.split(/&&|\|\||[;|\n]/).some((t) => /^(\S*\/)?gh\s+(\S+\s+)*?pr\s+create(\s|$)/.test(semVars(t)));
+  if (!criaPr) process.exit(0);
   const r = d.tool_response;
   const saida = typeof r === "string" ? r : [r?.stdout, r?.stderr].filter(Boolean).join("\n");
   const ns = [...String(saida).matchAll(/github\.com\/[\w.-]+\/[\w.-]+\/pull\/(\d+)/g)].map((m) => m[1]);

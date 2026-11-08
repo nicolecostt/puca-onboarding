@@ -4,7 +4,7 @@
 //   npx tsx scripts/acompanhar-pr.ts <n> --conversas       comentários sem resposta e conversas de revisão abertas, com o texto
 // Só lê (gh api graphql). A situação traz só números, estados e logins. Texto escrito por terceiros só aparece com
 // --conversas, que o agente pede de propósito para resolver cada item, e só de quem é do time (OWNER, MEMBER,
-// COLLABORATOR) ou de robô instalado no repositório (revisor automático); de quem é de fora, o texto não aparece.
+// COLLABORATOR) ou do Copilot (revisor automático do GitHub); de quem é de fora, o texto não aparece.
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
@@ -65,12 +65,15 @@ export interface Situacao {
 
 const LOGIN = /^[A-Za-z0-9-]{1,39}(\[bot\])?$/;
 const TIME = new Set(["OWNER", "MEMBER", "COLLABORATOR"]);
+/** Robôs cujo texto vale como revisão. Outros (Actions, apps) podem repassar texto de terceiros: ficam de fora. */
+const ROBOS_CONFIAVEIS = new Set(["copilot-pull-request-reviewer"]);
 /** Login filtrado: a saída vai para o contexto do agente, então nada fora do formato de login. */
 const login = (a: Autor): string => (a?.login && LOGIN.test(a.login) ? a.login : "?");
 const robo = (a: Autor): boolean => a?.__typename === "Bot" || /\[bot\]$/.test(a?.login ?? "");
 const doTime = (x: { authorAssociation?: string }): boolean => TIME.has(x.authorAssociation ?? "");
-/** Texto que pode ir para o agente: do time ou de robô instalado no repositório. */
-const confiavel = (x: { author: Autor; authorAssociation?: string }): boolean => doTime(x) || robo(x.author);
+/** Texto que pode ir para o agente: do time ou do Copilot (revisor automático do GitHub). */
+const confiavel = (x: { author: Autor; authorAssociation?: string }): boolean =>
+  doTime(x) || (robo(x.author) && ROBOS_CONFIAVEIS.has(login(x.author)));
 const ultimoDa = (c: Conversa): Comentario | undefined => c.comments.nodes[c.comments.nodes.length - 1];
 
 /** Comentários e revisões com texto, de pessoas do time, depois da última fala do autor do PR: esperam resposta. */
@@ -179,7 +182,8 @@ const FECHA = "⟫";
 /** Texto de terceiro entre marcas, sem caracteres de controle e sem as marcas dentro. */
 function citado(t: string): string {
   const limpo = t.replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "").replaceAll(ABRE, "‹").replaceAll(FECHA, "›");
-  const curto = limpo.length > 2000 ? `${limpo.slice(0, 2000)}…` : limpo;
+  // revisão do time costuma ser longa e as notas ficam no fim: corta só o que for muito grande
+  const curto = limpo.length > 12000 ? `${limpo.slice(0, 12000)}… (cortado em 12000 caracteres)` : limpo;
   return `    ${ABRE}\n${curto.replace(/^/gm, "    ")}\n    ${FECHA}`;
 }
 const caminho = (p?: string) => (p ?? "").replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 200);
