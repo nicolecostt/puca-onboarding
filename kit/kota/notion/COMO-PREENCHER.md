@@ -61,7 +61,7 @@ Percorra a `ARVORE` na ordem do array (o pai sempre vem antes dos filhos). Para 
 
 | Tipo | Ferramenta | Parâmetros |
 |---|---|---|
-| raiz `kota` | `notion-create-pages` | `parent: {"teamspace_id": "<id>"}`, com o id do teamspace `Joaquim’s Space HQ` dado por `notion-get-teams`; `pages: [{"properties": {"title": "Kota"}, "content": ""}]` |
+| raiz `kota` | `notion-create-pages` | `parent: {"teamspace_id": "<id>"}`, com o id do teamspace do Kota Workspace dado por `notion-get-teams` (hoje o único, `Joaquim’s Space HQ`; com outra conta no MCP, use o teamspace em que a raiz já está); `pages: [{"properties": {"title": "Kota"}, "content": ""}]` |
 | `pagina` | `notion-create-pages` | `parent: {"type": "page_id", "page_id": "<id do pai>"}`; `pages: [{"properties": {"title": "<título>"}, "content": ""}]` |
 | `database` | `notion-create-database` | `parent: {"type": "page_id", "page_id": "<id do pai>"}`, `title: "<título>"`, `schema` da tabela abaixo |
 | `linha` | `notion-create-pages` | `parent: {"type": "data_source_id", "data_source_id": "<collection da database>"}`; `pages` com as propriedades da linha (seção 2) |
@@ -89,7 +89,7 @@ listando **todas** as opções: a que ficar de fora some da coluna.
 Logo depois de achar ou criar o nó, grave a URL pública dele no `urls.json`, na ordem da `ARVORE`:
 
 ```bash
-npx tsx -e 'import { readFileSync, writeFileSync, existsSync } from "node:fs"; import { ARVORE } from "./kit/kota/notion/arvore"; const [dominio, chave, id] = process.argv.slice(1); if (!ARVORE.some((n) => n.chave === chave)) throw new Error(`chave fora da ARVORE: ${chave}`); const f = "kit/kota/notion/urls.json"; const urls = existsSync(f) ? JSON.parse(readFileSync(f, "utf8")) : {}; urls[chave] = `https://${dominio}.notion.site/${id.replaceAll("-", "")}`; writeFileSync(f, JSON.stringify(Object.fromEntries(ARVORE.filter((n) => n.chave in urls).map((n) => [n.chave, urls[n.chave]])), null, 2) + "\n");' dominio-pendente <chave> <id>
+npx tsx -e 'import { readFileSync, writeFileSync, existsSync } from "node:fs"; import { ARVORE } from "./kit/kota/notion/arvore"; const [dominio, chave, id] = process.argv.slice(1); if (!ARVORE.some((n) => n.chave === chave)) throw new Error(`chave fora da ARVORE: ${chave}`); const f = "kit/kota/notion/urls.json"; const urls = existsSync(f) ? JSON.parse(readFileSync(f, "utf8")) : {}; urls[chave] = `https://${dominio}.notion.site/${id.replaceAll("-", "")}`; writeFileSync(f, JSON.stringify(Object.fromEntries(ARVORE.filter((n) => n.chave in urls).map((n) => [n.chave, urls[n.chave]])), null, 2) + "\n");' lean-ptarmigan-dd2 <chave> <id>
 ```
 
 O id é o que o Notion devolveu (com ou sem hífens). Para uma database, é o id da database (`<database url>`), não o da
