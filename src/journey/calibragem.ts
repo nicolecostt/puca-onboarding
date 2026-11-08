@@ -8,7 +8,7 @@ import type { Calibragem, Certeza, ItemCalibragem, Nivel, Profile, ResultadoChec
 
 const STORAGE_KEY = "puca:calibragem";
 
-/** Os temas e os momentos da jornada que cada um controla (ids de tail.journey.json). */
+/** Os temas e os momentos da jornada que cada um controla (ids de kota.journey.json). */
 export const CALIBRAGEM_TEMAS: Record<Tema, { nome: string; momentos: string[] }> = {
   empresa: { nome: "A empresa e a cultura", momentos: ["empresa-e-cultura"] },
   rituais: { nome: "Rituais e pessoas do time", momentos: ["seu-time"] },
@@ -37,7 +37,7 @@ const USA = ["sim", "uso", "usei", "usava", "trabalho", "trabalhei", "trabalhava
 
 /** Palavras que mostram o tema na experiência que a pessoa contou (usadas quando a resposta direta não diz o nível). */
 const TEMA_PALAVRAS: Partial<Record<Tema, string[]>> = {
-  pagamentos: ["pagamento", "pagamentos", "cartao", "adquirencia", "maquininha", "fintech", "banco", "transacao", "transacoes"],
+  pagamentos: ["pagamento", "pagamentos", "transferencia", "transferencias", "saldo", "extrato", "fintech", "banco", "transacao", "transacoes"],
   mensageria: ["kafka", "fila", "filas", "mensageria", "rabbitmq", "sqs", "topico", "eventos"],
   falhas: ["retry", "dlq", "fila de erro", "incidente", "incidentes", "plantao"],
 };

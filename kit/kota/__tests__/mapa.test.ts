@@ -1,10 +1,11 @@
 import { expect, it } from "vitest";
-import { company } from "../../../src/data/company"; // a Tail, enquanto existir
 import { mapa } from "../mapa";
 import { validarMapa } from "../validar";
 
-it("o mapa da Kota é válido e não reaproveita nomes da Tail", () =>
-  expect(validarMapa(mapa, Object.values(company.people).map((p) => p.name))).toEqual([]));
+// As pessoas da empresa de teste que veio antes da Kota (decisão 0005). Fixas aqui: o src/data/company.ts agora é a Kota.
+const NOMES_ANTIGOS = ["Diego Ramos", "Júlia Paiva", "Rafael Lins", "Carla Mendes", "Lucas Melo", "Marcos Vidal", "Paula Nunes"];
+
+it("o mapa da Kota é válido e não reaproveita nomes antigos", () => expect(validarMapa(mapa, NOMES_ANTIGOS)).toEqual([]));
 
 it("os sistemas cobrem os 10 serviços do §2", () =>
   expect(mapa.sistemas.map((s) => s.id).sort()).toEqual(["accounts-db", "balancereader", "contacts", "frontend", "ledger-db",

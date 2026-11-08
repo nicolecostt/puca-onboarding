@@ -4,7 +4,7 @@
 // força um perfil da demo; ?auto=1 responde sozinho, para apresentar sem mexer no mouse.
 import "../../styles/base.css";
 import "./style.css";
-import demo from "../../journey/data/tail.journey.json";
+import demo from "../../journey/data/kota.journey.json";
 import { loadJourney } from "../../journey/validate";
 import { createRunner, type Runner, type RunnerIO } from "../../journey/runner";
 import { createClock, Cancelled } from "../../journey/clock";
@@ -12,6 +12,7 @@ import { mountWhiteboard, type Whiteboard } from "../../components/whiteboard/wh
 import { whiteboardFromJourney } from "../../components/whiteboard/from-journey";
 import { buildFaqs } from "../../journey/faq";
 import { routeUtterance } from "../../journey/route";
+import { enviarNoSlackReal, lerEmailDoSlack } from "../../journey/slack-real";
 import { browserStore } from "../../journey/storage";
 import { buddyOf, createOutbox, looksLikeQuestion } from "../../journey/forwarding";
 import { createPedidos, PEDIDOS_KEY, tarefaDaPessoa, tarefaDoPasso } from "../../journey/primeira-tarefa";
@@ -307,6 +308,12 @@ async function main(): Promise<void> {
     const created = outbox.add({ ...f, to: { name: buddy, role: "buddy" }, pessoa: profile.nome, consulted, moment: currentMoment?.id ?? null });
     trail.update(entryId, { forwarding_id: created.id });
     showToast(`Encaminhado à ${buddy} no Slack`, SLACK);
+    // com o e-mail do Slack da Kota, o servidor manda de verdade; senão, o Slack simulado envia (#129)
+    void enviarNoSlackReal(created, { outbox, email: lerEmailDoSlack(browserStore()) }).then((link) => {
+      if (!link) return;
+      trail.update(entryId, { forwarding_link: link });
+      showToast("Mandei a dúvida no seu Slack da Kota", { href: link, target: "_blank", label: "Abrir no Slack" });
+    });
   }
 
   /** O passo abriu o cartão de uma tarefa do catálogo: pede a aprovação do gestor (o Slack envia). */

@@ -13,13 +13,14 @@ import { mountPucaDots } from "../../lib/puca-dots";
 import { company, profiles } from "../../data";
 import { resolveProfile } from "../../journey/profile";
 import { normalize } from "../../journey/conditions";
+import { lerEmailDoSlack, salvarEmailDoSlack } from "../../journey/slack-real";
 import { browserStore } from "../../journey/storage";
 import { loadJourney } from "../../journey/validate";
 import { routeUtterance, type Route } from "../../journey/route";
 import { buildFaqs } from "../../journey/faq";
 import { createTrail } from "../../journey/trail";
 import { tarefaDaPessoa } from "../../journey/primeira-tarefa";
-import demoJourney from "../../journey/data/tail.journey.json";
+import demoJourney from "../../journey/data/kota.journey.json";
 import { createAgentVoice, MIC_AVISO } from "../../voice/agent-voice";
 import { TOOLS, TRAIL, tasksFor, type AccessStatus, type TaskState, type Tool } from "./data";
 
@@ -95,6 +96,22 @@ function renderTools(changed?: string): void {
     .join("");
 }
 renderTools();
+
+// E-mail do jurado no Slack da Kota: o encaminhamento sai por mensagem direta a ele (#129, src/journey/slack-real.ts)
+const slackForm = qs<HTMLFormElement>(document, "#slack-email");
+const slackInput = qs<HTMLInputElement>(document, "#slack-email-input");
+const slackStatus = qs(document, "#slack-email-status");
+slackInput.value = lerEmailDoSlack(browserStore()) ?? "";
+slackForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  salvarEmailDoSlack(browserStore(), slackInput.value);
+  const salvo = lerEmailDoSlack(browserStore());
+  slackStatus.textContent = salvo
+    ? "Pronto: as dúvidas que eu não souber vão por mensagem direta no Slack da Kota."
+    : slackInput.value.trim()
+      ? "Esse e-mail não parece válido. Sem ele, as dúvidas ficam só aqui no Orbis."
+      : "Sem e-mail: as dúvidas que eu não souber ficam só aqui no Orbis.";
+});
 
 // A Puca confere os acessos ao abrir e avisa o que falta. Ela ainda não pede ao gestor de verdade (#104): não diz que pediu.
 let lastNotice = "";
@@ -244,8 +261,8 @@ async function main(): Promise<void> {
     if (/sessao|aula|quadro|comecar/.test(q)) {
       return "Sua primeira sessão mostra o caminho de uma transação, o que acontece quando falha e quem cuida de cada parte. É só clicar em Começar a sessão.";
     }
-    if (/buddy|paula/.test(q)) return `Sua buddy é ${buddy}. Ela te acompanha nas primeiras semanas.`;
-    if (/gestor|marcos|chefe/.test(q)) return `Seu gestor é ${gestor}, do time ${time}.`;
+    if (/buddy|beatriz/.test(q)) return `Sua buddy é ${buddy}. Ela te acompanha nas primeiras semanas.`;
+    if (/gestor|natalia|natália|chefe/.test(q)) return `Seu gestor é ${gestor}, do time ${time}.`;
     if (/^(oi|ola|bom dia|boa tarde|boa noite)\b|obrigad/.test(q)) return "Estou por aqui. Pode perguntar sobre seus acessos, suas tarefas ou o time.";
     return `Isso eu não tenho confirmado aqui no início. Na sua primeira sessão eu vejo com você; se não estiver lá, pergunta para ${buddy}, sua buddy, no Slack.`;
   }

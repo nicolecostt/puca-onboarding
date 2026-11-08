@@ -19,7 +19,7 @@ Pedido: $ARGUMENTS
 2. Registre a entrada em `vite.config.ts` (`rollupOptions.input`). **Sem isso, a tela funciona no `dev` e some no build.**
 3. Adicione o link na lista do `index.html` da raiz, com título e uma linha de descrição.
 4. Reaproveite componentes (`mountChatPanel`, `mountCallBar`, `mountAppHeader`…) em vez de copiar HTML.
-5. Atualize a árvore de `src/screens/` no `README.md`.
+5. Atualize a árvore de `src/screens/` em `docs/desenvolvimento.md`.
 
 ## Componente novo
 
@@ -27,7 +27,7 @@ Pedido: $ARGUMENTS
 2. Exporte uma função `mount<Nome>(opções)` que recebe o que precisa e devolve o controle (métodos) para a tela.
 3. Para avisar a tela de algo, dispare um evento tipado: declare em `src/lib/events.ts` e use `emit(...)`.
    Isso é contrato: veja a skill `contrato`.
-4. Atualize a árvore de `src/components/` no `README.md`.
+4. Atualize a árvore de `src/components/` em `docs/desenvolvimento.md`.
 
 ## No app para Mac
 

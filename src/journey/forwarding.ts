@@ -30,6 +30,8 @@ export interface Forwarding {
   claimed_by?: string;
   /** Quando a aba pegou o envio (ISO). Passados 30 s sem enviar, outra aba pode pegar. */
   claimed_at?: string;
+  /** Link da mensagem no Slack da Kota, quando o servidor enviou de verdade (#129). */
+  slack_link?: string;
 }
 
 export const FORWARDING_KEY = "puca:encaminhamentos";
@@ -78,6 +80,10 @@ export function createOutbox(store: KeyValueStore, opts: { now?: () => Date } = 
     /** A aba pega o envio: tira dos pendentes e marca a dona. Vale a última que escreveu. */
     claim(id: string, tab: string): void {
       write(read().map((f) => (f.id === id ? { ...f, status: "enviando" as const, claimed_by: tab, claimed_at: now().toISOString() } : f)));
+    },
+    /** O servidor enviou no Slack da Kota (#129): fica "enviado", com o link, e o Slack simulado não envia de novo. */
+    marcarNoSlack(id: string, link: string): void {
+      write(read().map((f) => (f.id === id ? { ...f, status: "enviado" as const, slack_link: link } : f)));
     },
     ownerOf(id: string): string | undefined {
       return read().find((f) => f.id === id)?.claimed_by;

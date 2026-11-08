@@ -1,19 +1,25 @@
-// Empresa fictícia da demo (a mesma das telas do Figma).
+// A empresa da demo é a Kota, lida do mapa do kit (kit/kota/mapa.ts): o mesmo de onde saem o CODEOWNERS e o Notion.
+import { mapa } from "../../kit/kota/mapa";
+import type { AreaId, MapaKota, TimeId } from "../../kit/kota/tipos";
 import type { Company, JourneyStep } from "./types";
 
-export const company: Company = {
-  name: "Tail",
-  teams: ["Antifraude", "Terminais", "Autorização", "Liquidação", "Plataforma"],
-  people: {
-    diego: { id: "diego", name: "Diego Ramos", handle: "diegoramos", role: "Tech lead", team: "Autorização" },
-    julia: { id: "julia", name: "Júlia Paiva", handle: "juliapaiva", role: "Engenheira sênior", team: "Autorização" },
-    rafa: { id: "rafa", name: "Rafael Lins", handle: "rafalins", role: "Engenheiro", team: "Liquidação" },
-    carla: { id: "carla", name: "Carla Mendes", handle: "carlamendes", role: "Tech lead", team: "Liquidação" },
-    lucas: { id: "lucas", name: "Lucas Melo", handle: "lucasmelo", role: "Tech lead", team: "Terminais" },
-    marcos: { id: "marcos", name: "Marcos Vidal", handle: "marcosvidal", role: "Gestor de engenharia", team: "Terminais" },
-    paula: { id: "paula", name: "Paula Nunes", handle: "paulanunes", role: "Engenheira", team: "Terminais" },
-  },
+const AREAS_FORA_DOS_TIMES: Record<Exclude<AreaId, TimeId>, string> = {
+  people: "People",
+  seguranca: "Segurança da informação",
 };
+
+export function empresaDoMapa(m: MapaKota): Company {
+  const nomeDaArea = (a: AreaId) => m.times.find((t) => t.id === a)?.nome ?? AREAS_FORA_DOS_TIMES[a as Exclude<AreaId, TimeId>];
+  return {
+    name: "Kota",
+    teams: m.times.map((t) => t.nome),
+    people: Object.fromEntries(
+      m.pessoas.map((p) => [p.id, { id: p.id, name: p.nome, handle: p.slack, role: p.cargo, team: nomeDaArea(p.area) }]),
+    ),
+  };
+}
+
+export const company = empresaDoMapa(mapa);
 
 /** Etapas da jornada (topo das telas). */
 export const journey: JourneyStep[] = [

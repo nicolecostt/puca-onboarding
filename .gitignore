@@ -21,3 +21,7 @@ dist/
 
 # servidor: cache de áudio gerado
 server/cache/
+
+# app para Mac: compilado do desktop/ e pacotes gerados
+dist-desktop/
+release/

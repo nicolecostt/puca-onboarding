@@ -515,3 +515,68 @@ h2 {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* ---- E-mail do Slack da Kota (encaminhamento real, #129) ---- */
+.slack-email {
+  margin-top: 18px;
+}
+
+.slack-email__label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.slack-email__label span {
+  font-weight: 400;
+  color: var(--grey);
+}
+
+.slack-email__hint {
+  margin: 2px 0 10px;
+  font-size: 13px;
+  color: var(--grey);
+}
+
+.slack-email__row {
+  display: flex;
+  gap: 8px;
+}
+
+.slack-email__input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.slack-email__input:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.slack-email__save {
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--paper);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.slack-email__status {
+  min-height: 18px;
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--grey);
+}
