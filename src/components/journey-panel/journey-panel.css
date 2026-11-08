@@ -125,7 +125,7 @@
 .jp-moments::before {
   content: "";
   position: absolute;
-  left: 8.5px; /* centro da marca */
+  left: 14.5px; /* centro da marca: 8px de padding + 7px */
   top: 14px;
   bottom: 14px;
   width: 1px;
