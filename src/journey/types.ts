@@ -57,6 +57,37 @@ export interface Calibragem {
   atualizada_em: string;
 }
 
+// ---------- Jornada da pessoa (calibragem → jornada marcada) ----------
+
+/**
+ * Como a jornada trata cada momento para esta pessoa. Nenhum momento sai da jornada: o estado só marca.
+ * aprender = assunto novo · revisar = já usa, passa mais rápido · ja_conhece = domina (certeza alta) ·
+ * fora = a jornada desvia dele (parte institucional para quem está em transição).
+ */
+export type EstadoMomento = "aprender" | "revisar" | "ja_conhece" | "fora";
+
+export interface MomentoDaPessoa {
+  /** Id do momento na jornada. */
+  id: string;
+  titulo: string;
+  /** O goal do momento: serve para a Puca e para o painel do buddy, não é mostrado à pessoa. */
+  objetivo: string;
+  estado: EstadoMomento;
+  /** Por que esse estado, em uma frase curta para a pessoa (vazio quando não há o que dizer). */
+  motivo: string;
+  /** Temas da calibragem que o momento cobre (vazio nos momentos sem tema, como a checagem). */
+  temas: Tema[];
+}
+
+/** A jornada como a pessoa vê: os objetivos dela e cada momento marcado pela calibragem. Contrato em docs/contratos.md. */
+export interface JornadaDaPessoa {
+  versao: 1;
+  /** Os objetivos que a pessoa contou na call inicial. */
+  objetivos: string[];
+  /** Todos os momentos da jornada, na ordem. */
+  momentos: MomentoDaPessoa[];
+}
+
 // ---------- Quadro ----------
 
 export type NodeKind = "frontend" | "service" | "db" | "external" | "queue" | "person" | "team" | "value" | "doc" | "task";
