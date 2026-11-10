@@ -64,12 +64,12 @@ describe("turn", () => {
     expect(fontes).toEqual(expect.arrayContaining(["Repositório kota-bank", "ADR 1 · Quebrar o monolito do livro-razão em três serviços", "Notion · Quem somos"]));
   });
 
-  it("leva o Notion na parte fixa e a interrupção e a fala da pessoa na última mensagem", async () => {
+  it("leva o Notion na parte fixa e a interrupção e a fala da pessoa no contexto, depois da conversa", async () => {
     script = [{ type: "text", text: "Das dez às quatro. Posso voltar?" }];
     await run({ kind: "fala", text: "e o home office?", interrupted: "O gateway recebe a venda." });
     expect(sent.filter((m) => m.role === "system").some((m) => m.content.includes("home-office"))).toBe(true);
     const last = sent.at(-1)!;
-    expect(last.role).toBe("user");
+    expect(last.role).toBe("system");
     expect(last.content).toContain('interrompido enquanto dizia: "O gateway recebe a venda."');
     expect(last.content).toContain('A pessoa disse: "e o home office?"');
   });

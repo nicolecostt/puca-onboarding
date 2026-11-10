@@ -33,7 +33,9 @@ describe("callTurn", () => {
     const brain = { buscar: () => [{ id: "adr:0004#decisao", titulo: "ADR · 4. Saldo com cache · Decisão", url: "u", texto: "O balancereader guarda o saldo em cache." }] };
     script = [{ type: "text", text: "Pela ADR 4, o saldo fica em cache." }];
     await run({ brain, text: "por que o saldo tem cache?" });
-    expect(sent.some((m) => m.role === "system" && m.content.includes("ADR · 4. Saldo com cache · Decisão: O balancereader guarda"))).toBe(true);
+    expect(sent.at(-1)?.role === "system" && sent.at(-2)?.content === "por que o saldo tem cache?" && sent.at(-1)?.content.includes("ADR · 4. Saldo com cache · Decisão: O balancereader guarda")).toBe(true);
+    // fora da parte fixa, para não quebrar o cache de prompt a cada fala
+    expect(sent.slice(0, sent.findIndex((m) => m.role !== "system")).some((m) => m.content.includes("Trechos do company brain"))).toBe(false);
     await run({ text: "por que o saldo tem cache?" });
     expect(sent.some((m) => m.content.includes("Trechos do company brain"))).toBe(false);
     await run({ brain, kind: "inicio", text: undefined });

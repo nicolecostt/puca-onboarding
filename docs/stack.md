@@ -493,15 +493,19 @@ Tail, prompt escrito para o Qwen.
   com OpenAI), emitindo os mesmos `LlmEvent` de hoje (`text`, `tool_call`, `usage`, `done`). O resto do servidor não
   muda. O cliente da Featherless sai depois que o novo estiver na `main`.
 - **Chamada:** `client.messages.stream({ model: "claude-haiku-5-5", thinking: { type: "disabled" },
-  output_config: { effort: "medium" }, max_tokens: 1024, system, messages, tools })`. No Haiku 5.5, desligar o
-  raciocínio só é aceito com esforço `high` ou abaixo.
+  output_config: { effort: "low" }, max_tokens: 1024, system, messages, tools })`. No Haiku 5.5, desligar o
+  raciocínio só é aceito com esforço `high` ou abaixo. O esforço sai de `ANTHROPIC_EFFORT` (padrão `low`). Sonnet 5.5
+  recebe `between_tools` e Opus 5.5 fica sem o campo, porque `disabled` dá 400 neles.
 - **Ferramentas:** as de `buildTools` viram `{ name, description, input_schema, eager_input_streaming: true }`. Com
   `eager_input_streaming`, o servidor não valida a entrada: validar cada ferramenta contra o esquema antes de usar
   (como `validTool` já faz no bench) e descartar a inválida.
-- **System e mensagens:** as mensagens `system` de `buildMessages` vão para o campo `system`; o resto, para
-  `messages`. A conversa começa sempre com `user`.
+- **System e mensagens:** as mensagens `system` do começo vão para o campo `system`; o resto, para `messages`. A
+  conversa começa sempre com `user`. Num turno de fala, a fala entra como mensagem `user` e o contexto do turno
+  (passo, perfil, trechos do brain) vem depois dela como mensagem `system` no meio da conversa, separado das palavras
+  da pessoa.
 - **Cache de prompt:** a parte fixa primeiro (instruções de Puca, ferramentas, a jornada da sessão), a parte que muda
-  depois (momento, passo, histórico, fala). `cache_control: { type: "ephemeral" }` no fim da parte fixa. Conferir
+  depois (momento, passo, trechos do brain, fala). Duas marcas: `cache_control: { type: "ephemeral", ttl: "1h" }` no
+  fim da parte fixa e uma de 5 min na penúltima mensagem, que cobre a conversa. Conferir
   `usage.cache_read_input_tokens` > 0 a partir da segunda fala.
 - **Aquecimento:** ao começar a sessão, uma chamada com `max_tokens: 0` e a parte fixa, para a primeira pergunta já
   achar o cache.

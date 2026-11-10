@@ -51,7 +51,8 @@ async function* streamFeatherless(req: ChatRequest, apiKey = process.env.FEATHER
   if (!apiKey) throw new LlmError("FEATHERLESS_API_KEY is not set", "config");
   const body: Record<string, unknown> = {
     model: req.model,
-    messages: req.messages,
+    // system no meio da conversa é do Claude; aqui o contexto do turno segue como mensagem da pessoa
+    messages: req.messages.map((m, i) => (m.role === "system" && req.messages.slice(0, i).some((x) => x.role !== "system") ? { ...m, role: "user" } : m)),
     stream: true,
     // o provedor manda os tokens num chunk final, sem choices
     stream_options: { include_usage: true },
