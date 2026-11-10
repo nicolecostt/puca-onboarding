@@ -11,13 +11,22 @@ export interface AnthropicLike {
 let shared: Anthropic | null = null;
 
 export async function* streamAnthropic(req: ChatRequest, client: AnthropicLike = (shared ??= new Anthropic())): AsyncGenerator<LlmEvent> {
-  const system: Anthropic.TextBlockParam[] = req.messages.filter((m) => m.role === "system" && m.content).map((m) => ({ type: "text", text: m.content }));
-  // tools e system vêm antes das mensagens no cache: a marca no fim do system cobre os dois
-  if (system.length) system[system.length - 1].cache_control = { type: "ephemeral" };
+  // só as mensagens system do começo vão para o campo system; uma system depois da conversa (o contexto do turno)
+  // fica onde está, como instrução no meio da conversa, separada das palavras da pessoa
+  const inicio = req.messages.findIndex((m) => m.role !== "system");
+  const fixas = inicio < 0 ? req.messages : req.messages.slice(0, inicio);
+  const system: Anthropic.TextBlockParam[] = fixas.filter((m) => m.content).map((m) => ({ type: "text", text: m.content }));
+  // tools e system vêm antes das mensagens no cache: a marca no fim do system cobre os dois.
+  // 1 h: a parte fixa é a mesma para todo mundo, então uma sessão mantém o cache quente para a seguinte.
+  if (system.length) system[system.length - 1].cache_control = { type: "ephemeral", ttl: "1h" };
   const messages: Anthropic.MessageParam[] = req.messages
-    .filter((m) => m.role !== "system" && m.content)
-    .map((m) => ({ role: m.role === "assistant" ? "assistant" : "user", content: m.content }));
+    .slice(fixas.length)
+    .filter((m) => m.content)
+    .map((m) => ({ role: m.role === "assistant" || m.role === "system" ? m.role : "user", content: m.content }));
   while (messages[0]?.role === "assistant") messages.shift();
+  // a última mensagem muda a cada turno (é o contexto do passo); a conversa até a penúltima é só acréscimo e entra no cache
+  const penultima = messages.at(-2);
+  if (penultima) penultima.content = [{ type: "text", text: penultima.content as string, cache_control: { type: "ephemeral" } }];
 
   const schemas = new Map((req.tools ?? []).map((t) => [t.function.name, t.function.parameters]));
   const tools: Anthropic.Tool[] = (req.tools ?? []).map((t) => ({
@@ -31,11 +40,15 @@ export async function* streamAnthropic(req: ChatRequest, client: AnthropicLike =
     model: req.model,
     // 250 (o que o ask pede ao Qwen) pode cortar o JSON de uma ferramenta no meio
     max_tokens: 1024,
-    output_config: { effort: "medium" },
+    // resposta falada e curta: esforço baixo responde mais rápido. ANTHROPIC_EFFORT sobe se as ferramentas falharem.
+    output_config: { effort: (process.env.ANTHROPIC_EFFORT as Anthropic.OutputConfig["effort"]) || "low" },
     system,
     messages,
   };
-  if (req.thinking === false) body.thinking = { type: "disabled" };
+  if (req.thinking === false) {
+    const off = semRaciocinio(req.model);
+    if (off) body.thinking = off;
+  }
   if (tools.length) body.tools = tools;
 
   const blocks = new Map<number, { name: string; json: string }>();
@@ -82,6 +95,14 @@ export async function* streamAnthropic(req: ChatRequest, client: AnthropicLike =
   }
   if (usage) yield { type: "usage", ...usage };
   yield { type: "done", finishReason };
+}
+
+/** Como cada modelo aceita ficar sem raciocínio: "disabled" dá 400 no Sonnet 5.5, no Opus 5.5 e nos Fable/Mythos. */
+function semRaciocinio(model: string): Anthropic.ThinkingConfigParam | null {
+  if (model.startsWith("claude-sonnet-5-5")) return { type: "between_tools" };
+  // nesses o raciocínio não desliga: fica só o esforço baixo
+  if (/^claude-(opus-5-5|fable|mythos)/.test(model)) return null;
+  return { type: "disabled" };
 }
 
 function toLlmError(e: unknown): unknown {

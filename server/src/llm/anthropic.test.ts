@@ -75,10 +75,38 @@ describe("streamAnthropic", () => {
     const { body } = await run([start(), end("end_turn", 1)], {
       messages: [{ role: "system", content: "regras" }, { role: "assistant", content: "olá" }, { role: "user", content: "oi" }],
     });
-    expect(body.system).toEqual([{ type: "text", text: "regras", cache_control: { type: "ephemeral" } }]);
+    expect(body.system).toEqual([{ type: "text", text: "regras", cache_control: { type: "ephemeral", ttl: "1h" } }]);
     expect(body.messages).toEqual([{ role: "user", content: "oi" }]);
     expect(body.thinking).toEqual({ type: "disabled" });
-    expect(body.output_config).toEqual({ effort: "medium" });
+    expect(body.output_config).toEqual({ effort: "low" });
     expect(body.tools?.[0]).toMatchObject({ name: "go_to", input_schema: goTo.function.parameters });
+  });
+
+  it("a conversa até a penúltima mensagem entra no cache; a última, que muda a cada turno, não", async () => {
+    const { body } = await run([start(), end("end_turn", 1)], {
+      messages: [{ role: "system", content: "regras" }, { role: "user", content: "oi" }, { role: "assistant", content: "olá" }, { role: "user", content: "e agora?" }],
+    });
+    expect(body.messages).toEqual([
+      { role: "user", content: "oi" },
+      { role: "assistant", content: [{ type: "text", text: "olá", cache_control: { type: "ephemeral" } }] },
+      { role: "user", content: "e agora?" },
+    ]);
+  });
+
+  it("system depois de uma fala fica na conversa, e a fala inteira entra no cache", async () => {
+    const { body } = await run([start(), end("end_turn", 1)], {
+      messages: [{ role: "system", content: "regras" }, { role: "user", content: "e o home office?" }, { role: "system", content: "Turno: fala." }],
+    });
+    expect(body.system).toHaveLength(1);
+    expect(body.messages).toEqual([
+      { role: "user", content: [{ type: "text", text: "e o home office?", cache_control: { type: "ephemeral" } }] },
+      { role: "system", content: "Turno: fala." },
+    ]);
+  });
+
+  it("modelo que não aceita desligar o raciocínio não recebe disabled", async () => {
+    const msg = [start(), end("end_turn", 1)];
+    expect((await run(msg, { model: "claude-sonnet-5-5" })).body.thinking).toEqual({ type: "between_tools" });
+    expect((await run(msg, { model: "claude-opus-5-5" })).body.thinking).toBeUndefined();
   });
 });
