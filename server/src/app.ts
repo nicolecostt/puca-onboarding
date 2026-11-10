@@ -14,6 +14,7 @@ import { createEncaminhador, slackDmDeVerdade } from "./slack/encaminhar";
 import Fastify, { type FastifyReply } from "fastify";
 import { DEMO_PROFILES } from "../../src/journey/profile";
 import type { Journey, Profile } from "../../src/journey/types";
+import { TURNOS_NO_HISTORICO } from "../../src/voice/historico";
 import { loadJourney } from "../../src/journey/validate";
 import { ask, type AskEvent } from "./agent/ask";
 import { carregarBrain, type Brain } from "./brain/brain";
@@ -60,6 +61,8 @@ function sse(reply: FastifyReply): (ev: AskEvent | TurnEvent | CallEvent) => voi
 }
 
 const MAX_TEXT = 500;
+/** Uma entrada do histórico é um turno inteiro (várias frases de Puca); cortada, fica o fim, que é o mais recente. */
+const MAX_TURNO = 1500;
 const MAX_CAMPO_PERFIL = 120;
 
 /** Perfil que veio do app: só os campos conhecidos, texto curto e vínculo válido (o servidor é público). */
@@ -223,8 +226,8 @@ export function buildApp(opts: BuildAppOptions = {}) {
       if (!trava.llm.usa()) return reply.status(503).send({ error: "limite_diario" });
       const history = (b.history ?? [])
         .filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
-        .slice(-12)
-        .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_TEXT) }));
+        .slice(-TURNOS_NO_HISTORICO)
+        .map((m) => ({ role: m.role, content: m.content.slice(-MAX_TURNO) }));
       const said = typeof b.interrupted?.said === "string" ? b.interrupted.said.slice(0, MAX_TEXT) : undefined;
       const ac = new AbortController();
       reply.raw.on("close", () => { if (!reply.raw.writableFinished) ac.abort(); });
@@ -255,8 +258,8 @@ export function buildApp(opts: BuildAppOptions = {}) {
       }
       const history = (b.history ?? [])
         .filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
-        .slice(-16)
-        .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_TEXT) }));
+        .slice(-TURNOS_NO_HISTORICO)
+        .map((m) => ({ role: m.role, content: m.content.slice(-MAX_TURNO) }));
       const ac = new AbortController();
       reply.raw.on("close", () => { if (!reply.raw.writableFinished) ac.abort(); });
       const emit = sse(reply);

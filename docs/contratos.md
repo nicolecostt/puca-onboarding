@@ -317,7 +317,9 @@ segue a jornada como roteiro, pela `route.ts`.
     escreveu; vem com `text`) ou `silencio` (Puca perguntou e ninguém respondeu).
   - `moment_id`, `step_id`: onde a sessão está. `perfil`: o vínculo; `profile` (opcional): o perfil que a call
     inicial gravou, para Puca chamar a pessoa pelo nome (sem ele, vale o perfil de demo do vínculo).
-  - `history`: até 12 falas já ditas (`user`/`assistant`), da mais antiga à mais nova, sem a deste turno.
+  - `history`: até 24 turnos já ditos (`user`/`assistant`), do mais antigo ao mais novo, sem a fala deste turno. Uma
+    entrada por turno: frases seguidas de Puca vão juntas (`lembrar` em `src/voice/historico.ts`). O servidor guarda
+    os últimos 1.500 caracteres de cada entrada.
   - `interrupted` (opcional): a pessoa cortou Puca; `said` é a frase que estava tocando.
 - **Saída** (`TurnEvent` em `server/src/agent/turn.ts`): `speak`, `action` (qualquer ação do quadro, com ids que
   existem na jornada), `escalate` e `timing`, como no `/api/ask`, e:
@@ -357,7 +359,7 @@ são perguntas norteadoras (em `server/src/agent/call.ts`), e o LLM faz os follo
 (empresa para quem é novo, time para quem está mudando de time).
 
 - **Entrada** (`CallRequest` em `src/voice/agent-voice.ts`): `kind` (`inicio`, `fala` com `text`, `silencio`),
-  `history` (até 16 falas), `interrupted` opcional (como no turno), `admissao` (`cargo`, `time`, `gestor`: Puca
+  `history` (até 24 turnos, como no turno), `interrupted` opcional (como no turno), `admissao` (`cargo`, `time`, `gestor`: Puca
   confirma, não pergunta), `anotado` (o que já foi anotado, chave → texto) e `cultura` (assuntos culturais já contados).
 - **Saída** (`CallEvent` em `server/src/agent/call.ts`): `speak` e `timing` como no turno, e:
   - `answer` com `key` (as chaves de `profileFromAnswers` e `calibragemFromAnswers`: `nome`, `vinculo`, `cargo`,

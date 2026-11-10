@@ -23,6 +23,7 @@ import { createPedidos, PEDIDOS_KEY, tarefaDaPessoa, tarefaDoPasso } from "../..
 import { createTrail, sourcesFor } from "../../journey/trail";
 import { createTarefas, type TarefaDoAgente } from "../../journey/tarefas";
 import { createAgentVoice, MIC_AVISO, type SpeakOptions, type TurnRequest } from "../../voice/agent-voice";
+import { lembrar, type Historico } from "../../voice/historico";
 import { interpolate, interpolateDeep, resolveProfile } from "../../journey/profile";
 import { atualizarCalibragem, resolveCalibragem, saveCalibragem } from "../../journey/calibragem";
 import { montarJornadaDaPessoa } from "../../journey/jornada-da-pessoa";
@@ -164,11 +165,8 @@ async function main(): Promise<void> {
     if (!registro.salvar(profile)) avisarFalhaAoSalvarConversa();
   }
 
-  const history: { role: "user" | "assistant"; content: string }[] = [];
-  const remember = (role: "user" | "assistant", content: string) => {
-    history.push({ role, content });
-    if (history.length > 12) history.shift();
-  };
+  const history: Historico = [];
+  const remember = (role: "user" | "assistant", content: string) => lembrar(history, role, content);
   // O LLM conduz a sessão (decisão 0012); sem LLM no servidor, com ?auto=1 ou ?modo=roteiro, a jornada vira roteiro.
   const roteiro = auto || new URLSearchParams(location.search).get("modo") === "roteiro";
   let conversa = voice.llm && !roteiro;
