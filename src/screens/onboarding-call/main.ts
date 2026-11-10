@@ -15,6 +15,7 @@ import { loadSavedProfile, profileFromAnswers, resolveProfile, saveProfile, vinc
 import { admissaoDaCall } from "./admissao";
 import { calibragemFromAnswers, saveCalibragem } from "../../journey/calibragem";
 import { createAgentVoice, MIC_AVISO, type CallRequest, type SpeakOptions } from "../../voice/agent-voice";
+import { lembrar, type Historico } from "../../voice/historico";
 import { dadosParaSessao } from "./recuperacao";
 import { browserStore } from "../../journey/storage";
 import { createTarefas } from "../../journey/tarefas";
@@ -77,7 +78,7 @@ async function main(): Promise<void> {
   const answers: Record<string, string> = vinculoConhecido ? { vinculo: vinculoConhecido } : {};
   const cultura: string[] = [];
   const registro = criarRegistro("call-inicial");
-  const history: { role: "user" | "assistant"; content: string }[] = [];
+  const history: Historico = [];
   const state = { paused: false, ended: false, muted: false, seconds: 0, done: false, started: false };
   let agentState: AgentState = "idle";
   let turnoAtual = 0;
@@ -135,8 +136,7 @@ async function main(): Promise<void> {
   window.onboardingAnswers = answers;
   const remember = (role: "user" | "assistant", content: string) => {
     registro.anotar(role, content);
-    history.push({ role, content });
-    if (history.length > 16) history.shift();
+    lembrar(history, role, content);
   };
 
   function setAgent(s: AgentState): void {
